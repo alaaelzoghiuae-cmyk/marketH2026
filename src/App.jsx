@@ -10,6 +10,95 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
+// Image compression: يصغّر أي صورة قبل تحويلها Base64 عشان حجم الداتا ميكبرش
+// (كانت الصور بتتخزن كاملة وبتضخّم صف المزامنة لعشرات الميجا)
+// ============================================================================
+const compressImageFile = (file, maxDim = 900, quality = 0.72) =>
+  new Promise((resolve, reject) => {
+    const fallback = () => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    };
+    try {
+      if (!file.type || !file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
+        return fallback();
+      }
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        try {
+          let { width, height } = img;
+          const scale = Math.min(1, maxDim / Math.max(width, height));
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+          URL.revokeObjectURL(url);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        } catch (e) {
+          URL.revokeObjectURL(url);
+          fallback();
+        }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); fallback(); };
+      img.src = url;
+    } catch (e) {
+      fallback();
+    }
+  });
+
+// رفع الصورة لـ Supabase Storage وإرجاع رابطها العام. لو فشل لأي سبب بيرجع null
+// والكود بيكمل بالصورة Base64 المضغوطة (يعني مفيش حاجة بتتكسر).
+const uploadImageToSupabaseStorage = async (dataUrl) => {
+  const cfg = typeof window !== 'undefined' ? window.__HMARKET_SB_RUNTIME__ : null;
+  if (!cfg || !cfg.sbUrl || !cfg.sbKey) return null;
+  try {
+    const blob = await (await fetch(dataUrl)).blob();
+    const name = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+    const res = await fetch(`${cfg.sbUrl}/storage/v1/object/product-images/${name}`, {
+      method: 'POST',
+      headers: {
+        apikey: cfg.sbKey,
+        Authorization: `Bearer ${cfg.sbKey}`,
+        'Content-Type': blob.type || 'image/jpeg'
+      },
+      body: blob
+    });
+    if (!res.ok) {
+      console.warn('[H-market] Storage upload failed', res.status, await res.text().catch(() => ''));
+      return null;
+    }
+    return `${cfg.sbUrl}/storage/v1/object/public/product-images/${name}`;
+  } catch (e) {
+    console.warn('[H-market] Storage upload error', e);
+    return null;
+  }
+};
+
+// بديل متوافق مع واجهة FileReader (onload / result / readAsDataURL): بيضغط الصورة ثم يرفعها للـ Storage
+class CompressedImageReader {
+  constructor() { this.result = null; this.onload = null; }
+  readAsDataURL(file) {
+    compressImageFile(file).then(async dataUrl => {
+      let finalValue = dataUrl;
+      if (typeof dataUrl === 'string' && dataUrl.startsWith('data:image/jpeg')) {
+        const publicUrl = await uploadImageToSupabaseStorage(dataUrl);
+        if (publicUrl) finalValue = publicUrl;
+      }
+      this.result = finalValue;
+      if (typeof this.onload === 'function') this.onload();
+    });
+  }
+}
+
+// ============================================================================
 // INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS)
 // ============================================================================
 
@@ -1087,22 +1176,29 @@ export default function App() {
   const hasCloudInitialPullCompletedRef = React.useRef(false);
   const isCustomerMutatingCloudRef = React.useRef(false);
   const lastCloudUpdatedAtRef = React.useRef(0);
+  // --- Sync safety refs (يمنعوا الـ polling من الكتابة فوق تعديلاتك قبل ما تتحفظ) ---
+  const pushInFlightRef = React.useRef(false);   // فيه طلب حفظ شغال دلوقتي
+  const pushQueuedBundleRef = React.useRef(null); // آخر نسخة مستنية تتحفظ بعد الطلب الحالي
+  const pushTimerRef = React.useRef(null);        // debounce للحفظ
+  const dirtyRef = React.useRef(false);           // فيه تعديلات محلية لسه ما اتحفظتش
+  const retryCountRef = React.useRef(0);
+  const lastSeenRowTsRef = React.useRef('');      // آخر updated_at شفناه في السيرفر
 
   // Helper to resolve Supabase URL and Key from Env OR SiteSettings
   const getSupabaseConfig = () => {
     const sbUrl = (window.__HMARKET_SUPABASE_URL__ || siteSettings?.supabaseUrl || '').trim().replace(/\/$/, '');
     const sbKey = (window.__HMARKET_SUPABASE_KEY__ || siteSettings?.supabaseAnonKey || '').trim();
     const isValid = Boolean(sbUrl && sbKey && sbUrl.startsWith('http'));
+    if (typeof window !== 'undefined') window.__HMARKET_SB_RUNTIME__ = isValid ? { sbUrl, sbKey } : null;
     return { sbUrl, sbKey, isValid };
   };
 
-  // Explicit helper to push state to Supabase Cloud (Called by Admin actions or customer order/registration)
+  // Explicit helper to push state to Supabase Cloud
+  // - مسلسل (Serialized): طلب واحد في نفس الوقت، وآخر نسخة بس هي اللي بتتبعت
+  // - بيظهر خطأ حقيقي لو الحفظ فشل (قبل كده كان الفشل صامت!)
   const pushToSupabaseCloud = (customBundle = null, showSuccessToast = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return;
-
-    const nowTs = Date.now();
-    lastCloudUpdatedAtRef.current = nowTs;
 
     const bundleToSave = customBundle || {
       siteSettings,
@@ -1120,34 +1216,101 @@ export default function App() {
       complaints,
       promoCodes,
       storeAds,
-      showcaseBars,
-      updatedAt: nowTs
+      showcaseBars
     };
 
-    setCloudSyncStatus('syncing');
-    fetch(`${sbUrl}/rest/v1/app_state_sync`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: sbKey,
-        Authorization: `Bearer ${sbKey}`,
-        Prefer: 'resolution=merge-duplicates,return=minimal'
-      },
-      body: JSON.stringify({
-        id: 'main_store',
-        payload: { ...bundleToSave, updatedAt: nowTs },
-        updated_at: new Date().toISOString()
-      })
-    })
-      .then(res => {
-        if (res.ok) {
-          setCloudSyncStatus('cloud_synced');
-          if (showSuccessToast) {
-            showToast('تم حفظ ومزامنة كافة البيانات في قاعدة البيانات السحابية بنجاح!', 'success');
-          }
+    dirtyRef.current = true;
+
+    // لو فيه طلب شغال، خزّن أحدث نسخة وهتتبعت أول ما يخلص
+    if (pushInFlightRef.current) {
+      pushQueuedBundleRef.current = { bundle: bundleToSave, toast: showSuccessToast };
+      return;
+    }
+
+    const runPush = (bundle, toastFlag) => {
+      pushInFlightRef.current = true;
+      const nowTs = Date.now();
+      const rowIso = new Date(nowTs).toISOString();
+      lastCloudUpdatedAtRef.current = nowTs;
+      setCloudSyncStatus('syncing');
+
+      const finish = () => {
+        pushInFlightRef.current = false;
+        const queued = pushQueuedBundleRef.current;
+        if (queued) {
+          pushQueuedBundleRef.current = null;
+          runPush(queued.bundle, queued.toast);
         }
+      };
+
+      fetch(`${sbUrl}/rest/v1/app_state_sync?on_conflict=id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          Prefer: 'resolution=merge-duplicates,return=minimal'
+        },
+        body: JSON.stringify({
+          id: 'main_store',
+          payload: { ...bundle, updatedAt: nowTs },
+          updated_at: rowIso
+        })
       })
-      .catch(() => {});
+        .then(async res => {
+          if (res.ok) {
+            retryCountRef.current = 0;
+            lastSeenRowTsRef.current = rowIso;
+            if (!pushQueuedBundleRef.current) dirtyRef.current = false;
+            setCloudSyncStatus('cloud_synced');
+            if (toastFlag) {
+              showToast('تم حفظ ومزامنة كافة البيانات في قاعدة البيانات السحابية بنجاح!', 'success');
+            }
+            finish();
+          } else {
+            const txt = await res.text().catch(() => '');
+            console.error('[H-market] Cloud save failed', res.status, txt);
+            setCloudSyncStatus('error');
+            const hint =
+              res.status === 413 ? 'حجم البيانات كبير جداً (الصور)' :
+              res.status === 401 || res.status === 403 ? 'مشكلة صلاحيات في Supabase' :
+              res.status === 429 ? 'طلبات كتير، استنى لحظات' :
+              res.status >= 500 ? 'مشكلة مؤقتة في السيرفر' : 'خطأ غير معروف';
+            showToast(`فشل الحفظ على السيرفر (${res.status}) — ${hint}. هنحاول تاني تلقائياً.`, 'error');
+            scheduleRetry(bundle);
+            pushInFlightRef.current = false;
+          }
+        })
+        .catch(err => {
+          console.error('[H-market] Cloud save network error', err);
+          setCloudSyncStatus('error');
+          showToast('فشل الاتصال بالسيرفر أثناء الحفظ — هنحاول تاني تلقائياً.', 'error');
+          scheduleRetry(bundle);
+          pushInFlightRef.current = false;
+        });
+    };
+
+    const scheduleRetry = (bundle) => {
+      // dirty تفضل true فالـ polling مش هيمسح التعديل. 3 محاولات بتأخير متزايد.
+      if (retryCountRef.current >= 3) return;
+      retryCountRef.current += 1;
+      const delay = 2500 * retryCountRef.current;
+      setTimeout(() => {
+        if (!pushInFlightRef.current) runPush(pushQueuedBundleRef.current?.bundle || bundle, false);
+      }, delay);
+    };
+
+    runPush(bundleToSave, showSuccessToast);
+  };
+
+  // Debounced push (للتعديلات التلقائية اللي بتحصل مع كل تغيير في الـ state)
+  const schedulePushToSupabaseCloud = (bundle) => {
+    dirtyRef.current = true; // علّم فوراً إن فيه تعديل مستني، عشان الـ polling يستنى
+    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
+    pushTimerRef.current = setTimeout(() => {
+      pushTimerRef.current = null;
+      pushToSupabaseCloud(bundle, false);
+    }, 700);
   };
 
   useEffect(() => {
@@ -1210,7 +1373,7 @@ export default function App() {
         if (isCustomerMutatingCloudRef.current) {
           isCustomerMutatingCloudRef.current = false;
         }
-        pushToSupabaseCloud(bundle, false);
+        schedulePushToSupabaseCloud(bundle);
       }
     } catch (err) {
       // ignore storage quota errors
@@ -1281,27 +1444,49 @@ export default function App() {
   }, [myTabId, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
 
   // Load & Poll state from Supabase Cloud across all devices & browsers
+  // - الـ polling دلوقتي بيسأل الأول عن updated_at بس (خفيف جداً) ومبيحمّلش الـ payload كله غير لو اتغير
+  // - مبيكتبش فوق تعديلاتك لو فيه حفظ شغال أو تعديل لسه ما اتحفظش
   const pullFromSupabaseCloud = (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) {
       hasCloudInitialPullCompletedRef.current = true;
       return;
     }
+    if (pushInFlightRef.current || dirtyRef.current || pushTimerRef.current) return;
 
-    fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, {
-      headers: {
-        apikey: sbKey,
-        Authorization: `Bearer ${sbKey}`,
-        'Cache-Control': 'no-cache'
-      }
-    })
+    const authHeaders = {
+      apikey: sbKey,
+      Authorization: `Bearer ${sbKey}`,
+      'Cache-Control': 'no-cache'
+    };
+
+    fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=updated_at`, { headers: authHeaders })
       .then(r => r.json())
-      .then(rows => {
+      .then(meta => {
+        const rowTs = Array.isArray(meta) && meta[0] ? String(meta[0].updated_at || '') : '';
+        if (hasCloudInitialPullCompletedRef.current && rowTs && rowTs === lastSeenRowTsRef.current) {
+          return null; // مفيش تغيير على السيرفر
+        }
+        return fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, { headers: authHeaders })
+          .then(r => r.json())
+          .then(rows => ({ rows, rowTs }));
+      })
+      .then(result => {
+        if (!result) return;
+        // تأكد إن مفيش حفظ بدأ أثناء ما كنا بنحمّل
+        if (pushInFlightRef.current || dirtyRef.current || pushTimerRef.current) return;
+
+        const { rows, rowTs } = result;
         const cloudData = Array.isArray(rows) ? rows?.[0]?.payload : null;
         const hasValidCloudContent =
           cloudData &&
           typeof cloudData === 'object' &&
           (Array.isArray(cloudData.parts) || Array.isArray(cloudData.storeAds) || cloudData.updatedAt);
+
+        // نسخة أقدم من آخر حفظ عملناه؟ يبقى قراءة متأخرة (stale) — تجاهلها
+        if (hasValidCloudContent && cloudData.updatedAt && cloudData.updatedAt < lastCloudUpdatedAtRef.current) {
+          return;
+        }
 
         if (hasValidCloudContent) {
           // Only apply if cloudData is newer or different from current
@@ -1370,6 +1555,7 @@ export default function App() {
           setCloudSyncStatus('cloud_synced');
           if (!silent) showToast('تمت مزامنة البيانات مع قاعدة البيانات السحابية بنجاح!', 'success');
           hasCloudInitialPullCompletedRef.current = true;
+          lastSeenRowTsRef.current = rowTs;
         } else {
           // Cloud table row is empty `{}`!
           // Mark initial pull completed, and if this is Admin, immediately push current admin state to initialize the cloud!
@@ -3646,7 +3832,7 @@ export default function App() {
   const handleClientAvatarFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
+    const reader = new CompressedImageReader();
     reader.onload = () => {
       const dataUrl = reader.result;
       setProfileForm(prev => ({ ...prev, avatarImage: dataUrl }));
@@ -5799,7 +5985,7 @@ export default function App() {
   const handleNewModelImageFileUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
+    const reader = new CompressedImageReader();
     reader.onload = () => setNewModelImage(reader.result);
     reader.readAsDataURL(file);
   };
@@ -7220,7 +7406,7 @@ export default function App() {
   const handleNewAdImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
+    const reader = new CompressedImageReader();
     reader.onload = () => setNewAdForm(prev => ({ ...prev, image: reader.result }));
     reader.readAsDataURL(file);
   };
@@ -7515,7 +7701,7 @@ export default function App() {
   const handleAdminUploadClientAvatar = (e) => {
     const file = e.target.files?.[0];
     if (!file || !adminEditClientForm) return;
-    const reader = new FileReader();
+    const reader = new CompressedImageReader();
     reader.onload = () => {
       const dataUrl = reader.result;
       setAdminEditClientForm(prev => ({ ...prev, avatarImage: dataUrl }));
@@ -9287,7 +9473,7 @@ model OrderInvoice {
   const handleDirectClientAvatarUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
+    const reader = new CompressedImageReader();
     reader.onload = () => {
       setDirectClientForm(prev => ({ ...prev, avatarImage: reader.result }));
     };
@@ -10886,7 +11072,7 @@ model OrderInvoice {
       const files = Array.from(e.target.files || []);
       if (files.length === 0) return;
       files.forEach(file => {
-        const reader = new FileReader();
+        const reader = new CompressedImageReader();
         reader.onload = () => {
           setAddingPartToModel(prev => {
             const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : [];
@@ -11183,7 +11369,7 @@ model OrderInvoice {
       const files = Array.from(e.target.files || []);
       if (files.length === 0) return;
       files.forEach(file => {
-        const reader = new FileReader();
+        const reader = new CompressedImageReader();
         reader.onload = () => {
           setEditingPartObj(prev => {
             const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : (prev.image ? [prev.image] : []);
@@ -11427,7 +11613,7 @@ model OrderInvoice {
     const handleEditModelImageUpload = (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new FileReader();
+      const reader = new CompressedImageReader();
       reader.onload = () => {
         setEditingModelObj(prev => ({ ...prev, image: reader.result }));
       };
