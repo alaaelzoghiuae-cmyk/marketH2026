@@ -1,10 +1,11 @@
 -- ============================================================================
--- PartsPro ERP & B2B/B2C Storefront — Complete Supabase PostgreSQL Schema
+-- H-market ERP & B2B/B2C Storefront — Complete Supabase PostgreSQL + Storage Schema (v6.0)
 -- ============================================================================
 -- طريقة الاستخدام:
 -- 1. افتح مشروعك في Supabase (https://supabase.com)
 -- 2. ادخل على قسم (SQL Editor) من القائمة الجانبية واضغط (New Query)
 -- 3. انسخ هذا الكود بالكامل والصقه هناك ثم اضغط (Run)
+-- ملاحظة: هذا السكريبت آمن للتشغيل عدة مرات (Idempotent) بدون أي أخطاء!
 -- ============================================================================
 
 -- 1. جدول العملات وأسعار الصرف
@@ -20,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.pricing_groups (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   currency TEXT NOT NULL REFERENCES public.currencies(code) ON UPDATE CASCADE,
-  modifier_type TEXT NOT NULL DEFAULT 'none', -- 'none' | 'percentage' | 'flat'
+  modifier_type TEXT NOT NULL DEFAULT 'none',
   modifier_value NUMERIC(12, 2) NOT NULL DEFAULT 0,
   delivery_fee_base NUMERIC(12, 2) NOT NULL DEFAULT 50,
   is_default BOOLEAN NOT NULL DEFAULT false,
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS public.spare_parts (
   description TEXT,
   warranty_text TEXT,
   image TEXT,
+  images JSONB NOT NULL DEFAULT '[]'::jsonb,
   stock INTEGER NOT NULL DEFAULT 0,
   low_stock_threshold INTEGER NOT NULL DEFAULT 5,
   max_order_qty INTEGER NOT NULL DEFAULT 10,
@@ -61,7 +63,7 @@ CREATE TABLE IF NOT EXISTS public.spare_parts (
   created_at TEXT
 );
 
--- 5. جدول حسابات التجار والمحلات وكشوف الحساب (Ledger)
+-- 5. جدول حسابات التجار والعملاء وكشوف الحساب (تم تصحيح ON DELETE SET NULL)
 CREATE TABLE IF NOT EXISTS public.clients (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
@@ -97,7 +99,7 @@ CREATE TABLE IF NOT EXISTS public.account_requests (
   created_at TEXT
 );
 
--- 7. جدول الطلبات والفواتير اللحظية
+-- 7. جدول الطلبات والفواتير اللحظية (تم تصحيح ON DELETE SET NULL)
 CREATE TABLE IF NOT EXISTS public.orders (
   id TEXT PRIMARY KEY,
   client_id TEXT REFERENCES public.clients(id) ON DELETE SET NULL,
@@ -168,14 +170,16 @@ CREATE TABLE IF NOT EXISTS public.promo_codes (
 );
 
 -- 11. جدول مخزن الحالة المتزامنة اللحظية (Realtime App State Store)
--- هذا الجدول يتيح حفظ ومزامنة كامل بيانات المتجر والأدمن لحظياً بدون تعقيد!
 CREATE TABLE IF NOT EXISTS public.app_state_sync (
   id TEXT PRIMARY KEY DEFAULT 'main_store',
   payload JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- تفعيل القراءة والكتابة والتحديث اللحظي (Realtime)
+-- فهرس لتسريع استعلام الـ Polling الخفيف على updated_at
+CREATE INDEX IF NOT EXISTS idx_app_state_sync_updated_at ON public.app_state_sync (id, updated_at);
+
+-- تفعيل القراءة والكتابة لجدول المزامنة
 ALTER TABLE public.app_state_sync ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow public read/write for app_state_sync" ON public.app_state_sync;
@@ -190,31 +194,57 @@ INSERT INTO public.app_state_sync (id, payload)
 VALUES ('main_store', '{}'::jsonb)
 ON CONFLICT (id) DO NOTHING;
 
--- تفعيل خاصية التحديث اللحظي (Supabase Realtime)
+-- 12. تفعيل خاصية التحديث اللحظي (Supabase Realtime) بشكل آمن لا يفشل عند التكرار
 DO $$
 BEGIN
   IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'app_state_sync'
+    SELECT 1
+    FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime'
+      AND schemaname = 'public'
+      AND tablename = 'app_state_sync'
   ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.app_state_sync;
   END IF;
 END $$;
 
 -- ============================================================================
--- 12. تخزين الصور (Supabase Storage) — بدل تخزين الصور Base64 داخل صف المزامنة
+-- 13. إعداد Supabase Storage Bucket (product-images) لرفع الصور خارج قاعدة البيانات
 -- ============================================================================
--- الصور بتترفع للـ bucket ده ويتخزن في الداتا رابطها فقط (أسطر قليلة بدل ميجات)
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('product-images', 'product-images', true)
-ON CONFLICT (id) DO UPDATE SET public = true;
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'product-images',
+  'product-images',
+  true,
+  5242880, -- 5MB limit per compressed image
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+)
+ON CONFLICT (id) DO UPDATE
+SET public = true,
+    file_size_limit = 5242880;
 
-DROP POLICY IF EXISTS "product-images public read" ON storage.objects;
-CREATE POLICY "product-images public read"
+-- سياسات الأمان لـ Storage Bucket (قراءة عامة + رفع وتحديث وحذف)
+DROP POLICY IF EXISTS "Public Read Access for product-images" ON storage.objects;
+CREATE POLICY "Public Read Access for product-images"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'product-images');
 
-DROP POLICY IF EXISTS "product-images anon upload" ON storage.objects;
-CREATE POLICY "product-images anon upload"
+DROP POLICY IF EXISTS "Public Insert Access for product-images" ON storage.objects;
+CREATE POLICY "Public Insert Access for product-images"
   ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Public Update Access for product-images" ON storage.objects;
+CREATE POLICY "Public Update Access for product-images"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Public Delete Access for product-images" ON storage.objects;
+CREATE POLICY "Public Delete Access for product-images"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'product-images');
+
+-- ============================================================================
+-- استعلام فحص حجم صف البيانات الحالي (للتأكد من خفة الصف بعد نقل الصور):
+-- SELECT id, pg_size_pretty(pg_column_size(payload)) AS payload_size, updated_at FROM public.app_state_sync;
+-- ============================================================================
