@@ -402,7 +402,7 @@ const normalizeDigits = (str) =>
     .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 
 const INITIAL_SITE_SETTINGS = {
-  storeName: 'H-market',
+  storeName: 'ELZOGHBI-MARKET',
   storeSubtitle: 'MOBILE ACCESSORIES & SPARE PARTS SHOP',
   storeTagline: 'كل اللي محتاجه لموبايلك في مكان واحد: إكسسوارات أصلية، شواحن، سماعات، وقطع غيار جملة وقطاعي',
   whatsappUrl: 'https://wa.me/201012345678',
@@ -412,7 +412,7 @@ const INITIAL_SITE_SETTINGS = {
   hotline: '19950',
   workingHours: 'كل يوم من 10 الصبح لحد 11 بالليل',
   termsTitle: 'قواعد الشغل والشروط العامة',
-  termsText: 'كل المنتجات في H-market متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
+  termsText: 'كل المنتجات في ELZOGHBI-MARKET متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
   returnPolicyTitle: 'سياسة الاسترجاع والضمان (القطع والإكسسوارات)',
   returnPolicyText: 'الضمان ساري من 7 لـ 14 يوم من يوم الاستلام. في قطع الغيار لازم الختم المائي والاستيكر الأصلي يفضلوا زي ما جم من المصنع من غير لزق أو لحام، وفي الإكسسوارات لازم العلبة الأصلية والسيريال يتحافظ عليهم.',
   deliveryPolicyTitle: 'سياسة الشحن والتوصيل السريع',
@@ -2099,7 +2099,7 @@ export default function App() {
     const targetClient = clients.find(c => c.id === normalizedRole);
     showToast(
       targetClient
-        ? `أهلاً بيك "${targetClient.name}" في ${siteSettings.storeName || 'H-market'} — الأسعار والسلة اتحدّثت على حسابك.`
+        ? `أهلاً بيك "${targetClient.name}" في ${siteSettings.storeName || 'ELZOGHBI-MARKET'} — الأسعار والسلة اتحدّثت على حسابك.`
         : 'إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).',
       'info'
     );
@@ -3229,20 +3229,20 @@ export default function App() {
     return (
       <header className="bg-[#0d151c] text-white border-b border-cyan-500/20 sticky top-0 z-40 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
-          {/* H-market Official Brand Logo */}
+          {/* ELZOGHBI-MARKET Official Brand Logo */}
           <div
             onClick={() => setClientTab('home')}
             className="flex items-center gap-3.5 cursor-pointer group"
           >
             <img
               src={HMARKET_LOGO}
-              alt="H-market Logo"
+              alt="ELZOGHBI-MARKET Logo"
               className="w-12 h-12 rounded-2xl object-cover border-2 border-cyan-400/40 shadow-lg group-hover:scale-105 group-hover:border-cyan-400 transition duration-300"
             />
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-black tracking-wide bg-gradient-to-l from-cyan-300 via-teal-200 to-blue-400 bg-clip-text text-transparent">
-                  {siteSettings.storeName || 'H-market'}
+                  {siteSettings.storeName || 'ELZOGHBI-MARKET'}
                 </h1>
                 <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 font-bold border border-cyan-400/30">
                   {siteSettings.storeSubtitle || 'MOBILE & ACCESSORIES'}
@@ -5492,7 +5492,7 @@ export default function App() {
     const pendingReqCount = accountRequests.filter(r => r.status === 'pending').length;
     const pendingRetCount = returnsList.filter(r => r.status === 'قيد المراجعة').length;
 
-    // Admin Login Gate (Standalone H-market ERP Login Screen)
+    // Admin Login Gate (Standalone ELZOGHBI-MARKET ERP Login Screen)
     if (!adminAuthenticated) {
       return (
         <div className="min-h-screen bg-[#0d151c] flex items-center justify-center p-4">
@@ -5500,11 +5500,11 @@ export default function App() {
             <div className="text-center space-y-2">
               <img
                 src={HMARKET_LOGO}
-                alt="H-market Logo"
+                alt="ELZOGHBI-MARKET Logo"
                 className="w-20 h-20 rounded-2xl object-cover mx-auto border-2 border-cyan-400/50 shadow-xl"
               />
               <h1 className="text-xl font-black tracking-tight bg-gradient-to-l from-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                بوابة الإدارة المركزية — H-market ERP
+                بوابة الإدارة المركزية — ELZOGHBI-MARKET ERP
               </h1>
               <p className="text-xs text-slate-400">
                 يرجى إدخال اسم المستخدم وكلمة المرور الخاصة بمدير النظام للدخول
@@ -5555,7 +5555,7 @@ export default function App() {
                 onClick={() => switchPortal('storefront')}
                 className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition"
               >
-                العودة إلى متجر العملاء (H-market Store)
+                العودة إلى متجر العملاء (ELZOGHBI-MARKET Store)
               </button>
             </form>
           </div>
@@ -5579,7 +5579,7 @@ export default function App() {
 
     return (
       <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
-        {/* Professional Right Sidebar for H-market Admin ERP */}
+        {/* Professional Right Sidebar for ELZOGHBI-MARKET Admin ERP */}
         <aside className="w-full lg:w-72 bg-[#0d151c] text-white shrink-0 border-l border-slate-800 flex flex-col justify-between">
           <div>
             {/* Brand Header */}
@@ -5587,11 +5587,11 @@ export default function App() {
               <div className="flex items-center gap-3">
                 <img
                   src={HMARKET_LOGO}
-                  alt="H-market"
+                  alt="ELZOGHBI-MARKET"
                   className="w-11 h-11 rounded-xl object-cover border border-cyan-400/40 shadow"
                 />
                 <div>
-                  <h1 className="text-sm font-black tracking-wide text-cyan-300">H-market ERP</h1>
+                  <h1 className="text-sm font-black tracking-wide text-cyan-300">ELZOGHBI-MARKET ERP</h1>
                   <p className="text-[11px] text-slate-400">لوحة الإدارة والمخازن المركزية</p>
                 </div>
               </div>
@@ -5922,7 +5922,7 @@ export default function App() {
         <div className="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-extrabold text-slate-900">
-              إعدادات هوية H-market، روابط السوشيال ميديا، والشروط والأحكام
+              إعدادات هوية ELZOGHBI-MARKET، روابط السوشيال ميديا، والشروط والأحكام
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               عدّل روابط واتساب وفيسبوك وإنستجرام وشروط العمل وسياسة الاسترجاع والدليفري التي تظهر في أسفل الموقع
@@ -11059,7 +11059,7 @@ model OrderInvoice {
         <html lang="ar" dir="rtl">
           <head>
             <meta charset="UTF-8" />
-            <title>فاتورة ${siteSettings.storeName || 'H-market'} - ${order.id}</title>
+            <title>فاتورة ${siteSettings.storeName || 'ELZOGHBI-MARKET'} - ${order.id}</title>
             <script src="https://cdn.tailwindcss.com"></script>
             <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
             <style>
@@ -11101,7 +11101,7 @@ model OrderInvoice {
             .html2pdf()
             .set({
               margin: 8,
-              filename: `${siteSettings.storeName || 'H-market'}-${effectiveMode}-${order.id}.pdf`,
+              filename: `${siteSettings.storeName || 'ELZOGHBI-MARKET'}-${effectiveMode}-${order.id}.pdf`,
               image: { type: 'jpeg', quality: 0.95 },
               html2canvas: {
                 scale: window.innerWidth < 768 ? 1.5 : 2,
@@ -11203,17 +11203,17 @@ model OrderInvoice {
             id="hmarket-printable-invoice-area"
             className="border-2 border-slate-900 rounded-2xl p-6 space-y-5 text-xs bg-white text-slate-900 shadow-inner"
           >
-            {/* Invoice Top Letterhead with H-market Official Logo */}
+            {/* Invoice Top Letterhead with ELZOGHBI-MARKET Official Logo */}
             <div className="flex flex-wrap justify-between items-start gap-4 border-b-2 border-slate-900 pb-4">
               <div className="flex items-center gap-3.5">
                 <img
                   src={HMARKET_LOGO}
-                  alt="H-market Logo"
+                  alt="ELZOGHBI-MARKET Logo"
                   className="w-14 h-14 rounded-2xl object-cover border border-slate-300 shadow-xs"
                 />
                 <div>
                   <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                    {siteSettings.storeName || 'H-market'} — {siteSettings.storeSubtitle || 'للهواتف والإكسسوارات وقطع الغيار'}
+                    {siteSettings.storeName || 'ELZOGHBI-MARKET'} — {siteSettings.storeSubtitle || 'للهواتف والإكسسوارات وقطع الغيار'}
                   </h2>
                   <p className="text-[11px] text-slate-600">
                     {effectiveMode === 'picking'
@@ -12887,7 +12887,7 @@ model OrderInvoice {
     );
   };
 
-  // --- H-market Comprehensive Footer (Business Rules, Terms, Return Policy, Delivery Policy & Social Icons) ---
+  // --- ELZOGHBI-MARKET Comprehensive Footer (Business Rules, Terms, Return Policy, Delivery Policy & Social Icons) ---
   const renderClientFooter = () => (
     <footer className="bg-[#0d151c] text-slate-300 border-t border-cyan-500/20 mt-16 pt-12 pb-24">
       <div className="max-w-7xl mx-auto px-4 space-y-10">
@@ -12896,7 +12896,7 @@ model OrderInvoice {
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-cyan-400" />
             <h3 className="text-base font-extrabold text-white">
-              شروطنا وسياسات الضمان والشحن عند {siteSettings.storeName || 'H-market'}
+              شروطنا وسياسات الضمان والشحن عند {siteSettings.storeName || 'ELZOGHBI-MARKET'}
             </h3>
           </div>
 
@@ -12932,12 +12932,12 @@ model OrderInvoice {
           <div className="flex items-center gap-4">
             <img
               src={HMARKET_LOGO}
-              alt="H-market"
+              alt="ELZOGHBI-MARKET"
               className="w-14 h-14 rounded-2xl object-cover border border-cyan-400/40 shadow-lg"
             />
             <div className="space-y-1">
               <div className="text-lg font-black text-white tracking-wide">
-                {siteSettings.storeName || 'H-market'}{' '}
+                {siteSettings.storeName || 'ELZOGHBI-MARKET'}{' '}
                 <span className="text-xs font-bold text-cyan-400">
                   {siteSettings.storeSubtitle}
                 </span>
@@ -12959,9 +12959,9 @@ model OrderInvoice {
               <span
                 onDoubleClick={() => switchPortal('admin')}
                 className="select-none cursor-default"
-                title="H-market"
+                title="ELZOGHBI-MARKET"
               >
-                © {new Date().getFullYear()} {siteSettings.storeName || 'H-market'}. جميع الحقوق محفوظة.
+                © {new Date().getFullYear()} {siteSettings.storeName || 'ELZOGHBI-MARKET'}. جميع الحقوق محفوظة.
               </span>
               <span>•</span>
 
