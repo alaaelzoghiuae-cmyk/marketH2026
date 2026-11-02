@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.clients (
   password TEXT NOT NULL,
   address TEXT,
   secondary_address TEXT,
-  group_id TEXT REFERENCES public.pricing_groups(id) ON SET NULL,
+  group_id TEXT REFERENCES public.pricing_groups(id) ON DELETE SET NULL,
   wallet_balance NUMERIC(12, 2) NOT NULL DEFAULT 0,
   credit_limit NUMERIC(12, 2) NOT NULL DEFAULT 0,
   avatar TEXT,
@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS public.account_requests (
 -- 7. جدول الطلبات والفواتير اللحظية
 CREATE TABLE IF NOT EXISTS public.orders (
   id TEXT PRIMARY KEY,
-  client_id TEXT REFERENCES public.clients(id) ON SET NULL,
+  client_id TEXT REFERENCES public.clients(id) ON DELETE SET NULL,
   client_name TEXT NOT NULL,
   group_id TEXT,
   currency TEXT NOT NULL DEFAULT 'EGP',
@@ -191,4 +191,30 @@ VALUES ('main_store', '{}'::jsonb)
 ON CONFLICT (id) DO NOTHING;
 
 -- تفعيل خاصية التحديث اللحظي (Supabase Realtime)
-ALTER PUBLICATION supabase_realtime ADD TABLE public.app_state_sync;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'app_state_sync'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.app_state_sync;
+  END IF;
+END $$;
+
+-- ============================================================================
+-- 12. تخزين الصور (Supabase Storage) — بدل تخزين الصور Base64 داخل صف المزامنة
+-- ============================================================================
+-- الصور بتترفع للـ bucket ده ويتخزن في الداتا رابطها فقط (أسطر قليلة بدل ميجات)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "product-images public read" ON storage.objects;
+CREATE POLICY "product-images public read"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "product-images anon upload" ON storage.objects;
+CREATE POLICY "product-images anon upload"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'product-images');
