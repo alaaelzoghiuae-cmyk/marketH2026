@@ -312,6 +312,76 @@ const PART_IMAGES = {
   logo: HMARKET_LOGO
 };
 
+const DEFAULT_REGISTRATION_TERMS = `1) قبول الشروط
+بمجرد ما تعمل حساب أو تطلب من الموقع، فإنت موافق على الشروط دي كلها. لو مش موافق على أي بند، ماتكمّلش التسجيل.
+
+2) بيانات الحساب
+- لازم بياناتك (الاسم، الموبايل، العنوان) تكون صحيحة ومحدّثة، وإنت المسؤول عن صحتها.
+- كلمة المرور سر، وإنت المسؤول عن أي عملية بتتم من حسابك. لو شكّيت إن حد دخل على حسابك بلّغنا فوراً.
+- من حقنا نوقف أو نلغي أي حساب بيانات غلط أو بيتستخدم استخدام مخالف أو بقصد الإضرار.
+
+3) الأسعار والعروض
+- الأسعار بالعملة الظاهرة على حسابك، وممكن تتغيّر في أي وقت من غير إشعار، والسعر المعتمد هو سعر وقت تأكيد الطلب.
+- في حالة الخطأ الواضح في السعر أو الكمية، من حقنا نلغي الطلب أو نعدّله بعد التواصل معاك.
+- أسعار الجملة والخصومات مخصوصة لحسابات التجار المعتمدة بس.
+
+4) الطلب والتأكيد
+- تسجيل الطلب مش معناه قبوله النهائي، والطلب بيتأكد بعد توفّر الكمية ومراجعته من فريقنا.
+- الكميات المتاحة هي اللي ظاهرة في المخزن، ومن حقنا نوفّر جزء من الطلب لو الباقي مش متاح.
+
+5) الدفع
+- بنقبل طرق الدفع المعروضة في صفحة إتمام الطلب بس، وممكن نضيف أو نوقف أي طريقة في أي وقت.
+- الدفع الآجل متاح للحسابات اللي اتحدد لها سقف ائتماني فقط، وإنت ملتزم بالسداد في الميعاد المتفق عليه.
+
+6) الشحن والتوصيل
+- التوصيل لكل المحافظات في المدة المعلنة بالتقريب، ومواعيدها تقديرية وممكن تتأخر بسبب ظروف خارجة عن إرادتنا.
+- من حقك تعاين الطلب وقت الاستلام قبل الدفع، وأي ملاحظة لازم تتبلّغ للمندوب في نفس لحظة الاستلام.
+- مسؤولية صحة العنوان ورقم التليفون عليك، وتكلفة إعادة التوصيل بسبب بيانات غلط عليك.
+
+7) الاستبدال والاسترجاع والضمان
+- ده كله بما لا يخل بحقوقك في قانون حماية المستهلك رقم 181 لسنة 2018.
+- من حقك تبلّغنا بأي عيب صناعة في خلال مدة الضمان المعلنة على كل منتج، ونستبدل القطعة أو نرجّع قيمتها حسب الحالة.
+- لازم القطعة ترجع بحالتها الأصلية وبالعلبة والختم المائي والاستيكر والسيريال، وبدون أي لحام أو لزق أو تركيب نهائي أو كسر أو سوائل.
+- الضمان مايشملش: سوء الاستخدام، الكسر، المياه والرطوبة، التركيب الغلط، أو فتح القطعة أو تعديلها بعد الاستلام.
+- القطع الإلكترونية اللي اتركّبت أو اتشغّلت نهائياً ماتتردّش إلا لو ثبت إن فيها عيب صناعة بفحص فني.
+- قطع الغيار اللي اتصنّفت "خلع أصلي" ضمانها تجربة قصيرة قبل التركيب حسب المدة المكتوبة في المنتج.
+
+8) مواصفات المنتجات والتوافق
+- درجة الجودة (أصلي توكيل، أوليد، إن سيل...) مكتوبة في بيانات كل قطعة، وإنت المسؤول إنك تتأكد من توافق القطعة مع موديل جهازك قبل الطلب.
+- الصور للتوضيح وممكن يكون في اختلاف بسيط في اللون أو شكل العلبة.
+
+9) الخصوصية وبياناتك
+- بنستخدم بياناتك لتنفيذ الطلبات والتوصيل والتواصل معاك وتحسين الخدمة بس.
+- مش بنبيع بياناتك لأي طرف، وبنشاركها بس مع جهات التوصيل والدفع اللازمة لإتمام طلبك.
+- ممكن نتواصل معاك بخصوص طلباتك وعروضنا، وتقدر توقف رسايل العروض في أي وقت.
+
+10) المسؤولية
+- مش مسؤولين عن أي خسائر غير مباشرة أو عن أي استخدام غلط للمنتجات بعد الاستلام، وبحد أقصى قيمة الطلب محل النزاع.
+- الموقع ممكن يتوقف مؤقتاً للصيانة أو لأسباب فنية.
+
+11) الملكية الفكرية
+الصور والشعارات والنصوص ملك المتجر أو أصحابها، وماينفعش نسخها أو استخدامها تجارياً من غير إذن كتابي.
+
+12) تعديل الشروط
+من حقنا نعدّل الشروط دي في أي وقت، والتعديل بيسري من وقت نشره على الموقع، واستمرارك في الاستخدام معناه موافقتك عليه.
+
+13) القانون المطبّق وحل النزاعات
+الشروط دي بتخضع للقانون المصري. نحاول نحل أي خلاف ودياً الأول، ولو ماتحلّش يتحال للجهة المختصة (ومنها جهاز حماية المستهلك) أو المحاكم المصرية المختصة.`;
+
+const EMPTY_REG_FORM = {
+  accountCategory: 'individual',
+  shopName: '',
+  ownerName: '',
+  phone: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  address: '',
+  shopType: 'عميل فردي (استخدام شخصي)',
+  notes: '',
+  acceptTerms: false
+};
+
 const CREDIT_PAYMENT_ID = 'آجل / على الحساب';
 
 const INITIAL_PAYMENT_METHODS = [
@@ -348,6 +418,8 @@ const INITIAL_SITE_SETTINGS = {
   deliveryPolicyTitle: 'سياسة الشحن والتوصيل السريع',
   deliveryPolicyText: 'بنوصّل لكل المحافظات والمحلات ومراكز الصيانة في خلال 24 لـ 48 ساعة، وتقدر تعاين وتفحص القطع وقت الاستلام.',
   paymentMethods: INITIAL_PAYMENT_METHODS,
+  registrationTermsTitle: 'الشروط والأحكام',
+  registrationTermsText: DEFAULT_REGISTRATION_TERMS,
   supabaseUrl: '',
   supabaseAnonKey: ''
 };
@@ -1898,6 +1970,8 @@ export default function App() {
   const [useWalletBalance, setUseWalletBalance] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('كاش عند الاستلام');
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentBoxOpen, setPaymentBoxOpen] = useState(false);
+  const [termsBoxOpen, setTermsBoxOpen] = useState(false);
 
   // لو طريقة الدفع المختارة اتقفلت من الأدمن، اختار أول طريقة مفتوحة تلقائي
   useEffect(() => {
@@ -5828,11 +5902,25 @@ export default function App() {
 
         {/* Payment Methods Control */}
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-xs">
-          <div className="flex items-center justify-between gap-2 flex-wrap">
-            <h4 className="font-extrabold text-slate-900 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPaymentBoxOpen(o => !o)}
+            className="w-full flex items-center justify-between gap-2 font-extrabold text-slate-900"
+          >
+            <span className="flex items-center gap-2">
               <CreditCard className="w-4 h-4 text-indigo-600" />
               طرق الدفع اللي بتظهر للعميل
-            </h4>
+              <span className="text-[11px] font-bold text-emerald-700">
+                ({getPaymentMethods(siteSettings).filter(m => m.enabled).length} شغّالة)
+              </span>
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+              {paymentBoxOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            </span>
+          </button>
+          {paymentBoxOpen && (
+            <div className="space-y-3">
+              <div className="flex justify-end">
             <button
               type="button"
               onClick={() =>
@@ -5851,7 +5939,7 @@ export default function App() {
             >
               + ضيف طريقة دفع
             </button>
-          </div>
+              </div>
           <p className="text-slate-500">
             شغّل أو اقفل أي طريقة، وعدّل اسمها ووصفها. الطرق المقفولة مش هتظهر للعميل في صفحة الدفع. بعد التعديل دوس على زرار "حفظ" عشان يتسجّل.
           </p>
@@ -5918,6 +6006,58 @@ export default function App() {
               </div>
             ))}
           </div>
+            </div>
+          )}
+        </div>
+
+        {/* Registration Terms Control */}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-xs">
+          <button
+            type="button"
+            onClick={() => setTermsBoxOpen(o => !o)}
+            className="w-full flex items-center justify-between gap-2 font-extrabold text-slate-900"
+          >
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-indigo-600" />
+              الشروط والأحكام اللي العميل لازم يوافق عليها وقت التسجيل
+            </span>
+            <span className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+              {termsBoxOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            </span>
+          </button>
+          {termsBoxOpen && (
+            <div className="space-y-2.5">
+              <p className="text-slate-500">
+                عدّل النص زي ما تحب. العميل مش هيعرف يعمل حساب غير لما يعلّم على "موافق". النص ده صيغة عامة ومش بديل لمراجعة محامي.
+              </p>
+              <input
+                type="text"
+                value={siteSettings.registrationTermsTitle || ''}
+                onChange={e => setSiteSettings(prev => ({ ...prev, registrationTermsTitle: e.target.value }))}
+                placeholder="عنوان الشروط"
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-extrabold"
+              />
+              <textarea
+                rows={16}
+                value={siteSettings.registrationTermsText || ''}
+                onChange={e => setSiteSettings(prev => ({ ...prev, registrationTermsText: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 leading-relaxed"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setSiteSettings(prev => ({
+                    ...prev,
+                    registrationTermsTitle: 'الشروط والأحكام',
+                    registrationTermsText: DEFAULT_REGISTRATION_TERMS
+                  }))
+                }
+                className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 font-bold text-slate-800"
+              >
+                رجّع النص الأصلي
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Store Name & Social Media Links */}
@@ -9564,18 +9704,7 @@ model OrderInvoice {
   const [clientLoginIdentifier, setClientLoginIdentifier] = useState('');
   const [clientLoginPassword, setClientLoginPassword] = useState('');
 
-  const [regForm, setRegForm] = useState({
-    accountCategory: 'individual', // 'individual' (شخص عادي) | 'shop' (صاحب محل أو مركز صيانة)
-    shopName: '',
-    ownerName: '',
-    phone: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    address: '',
-    shopType: 'عميل فردي (استخدام شخصي)',
-    notes: ''
-  });
+  const [regForm, setRegForm] = useState({ ...EMPTY_REG_FORM });
   const [regErrors, setRegErrors] = useState({});
 
   const handleClientLoginSubmit = (e) => {
@@ -9645,6 +9774,10 @@ model OrderInvoice {
       errs.confirmPassword = 'كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط';
     }
 
+    if (!regForm.acceptTerms) {
+      errs.terms = 'لازم توافق على الشروط والأحكام عشان تكمّل';
+    }
+
     setRegErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -9688,8 +9821,74 @@ model OrderInvoice {
       shopType: isIndiv ? 'عميل فردي (شخص عادي)' : regForm.shopType,
       notes: regForm.notes.trim(),
       createdAt: nowFormatted,
+      acceptedTermsAt: nowFormatted,
       status: 'pending'
     };
+
+    // الحساب الشخصي بيتفتح تلقائي من غير موافقة الأدمن
+    if (isIndiv) {
+      const defaultGroup = groups.find(g => g.isDefault) || groups[0];
+      const newClientId = `cli_${Date.now()}`;
+      const newClientObj = {
+        id: newClientId,
+        name: clientName,
+        owner: ownerName,
+        phone: cleanPhone,
+        email: regForm.email.trim(),
+        password: regForm.password,
+        address: regForm.address.trim(),
+        secondaryAddress: '',
+        groupId: defaultGroup.id,
+        walletBalance: 0,
+        creditLimit: 0,
+        avatar: clientName.slice(0, 2),
+        avatarBg: 'from-emerald-600 to-teal-700',
+        avatarImage: '',
+        status: 'active',
+        accountType: 'individual',
+        createdAt: nowFormatted.slice(0, 10),
+        acceptedTermsAt: nowFormatted,
+        ledger: [
+          {
+            id: `ldg_${Date.now()}`,
+            date: nowFormatted,
+            type: 'opening',
+            ref: 'OPEN-ACC',
+            desc: 'فتح حساب شخصي تلقائي من الموقع',
+            amount: 0,
+            balanceAfter: 0
+          }
+        ]
+      };
+      const approvedReq = { ...newReq, status: 'approved', autoApproved: true };
+      const autoNotif = {
+        id: `ntf_${Date.now()}_newcli`,
+        target: 'admin',
+        type: 'new_client',
+        title: `عميل جديد سجّل بنفسه: ${clientName}`,
+        msg: `"${clientName}" (حساب شخصي) برقم ${cleanPhone} فتح حسابه تلقائي ووافق على الشروط والأحكام.`,
+        time: 'الآن',
+        read: false
+      };
+
+      isCustomerMutatingCloudRef.current = true;
+      setClients(prev => [newClientObj, ...prev]);
+      setAccountRequests(prev => [approvedReq, ...prev]);
+      setNotifications(prev => [autoNotif, ...prev]);
+      commitCustomerCloudTransaction(cloud => ({
+        ...cloud,
+        clients: [newClientObj, ...(Array.isArray(cloud.clients) ? cloud.clients : clients)],
+        accountRequests: [approvedReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
+        notifications: [autoNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+      }));
+
+      setActiveRole(newClientId);
+      setLoginModalOpen(false);
+      setRegErrors({});
+      setRegForm({ ...EMPTY_REG_FORM });
+      showToast(`أهلاً بيك يا ${clientName}! حسابك اتفتح وإنت دخلت عليه.`, 'success');
+      return;
+    }
 
     const newAdminNotif = {
       id: `ntf_${Date.now()}_req`,
@@ -9715,18 +9914,7 @@ model OrderInvoice {
 
     setLoginModalOpen(false);
     setRegErrors({});
-    setRegForm({
-      accountCategory: 'individual',
-      shopName: '',
-      ownerName: '',
-      phone: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      address: '',
-      shopType: 'عميل فردي (استخدام شخصي)',
-      notes: ''
-    });
+    setRegForm({ ...EMPTY_REG_FORM });
     showToast(
       `طلب فتح حسابك (${clientName}) اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.`,
       'success'
@@ -9869,7 +10057,7 @@ model OrderInvoice {
                     <div>
                       <div className="font-black text-slate-900 text-xs">شخص عادي (استخدام شخصي)</div>
                       <div className="text-[10px] text-slate-500 leading-relaxed mt-0.5">
-                        اشتري قطع غيار وإكسسوارات لموبايلك بأسعار القطاعي
+                        اشتري قطع غيار وإكسسوارات لموبايلك بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة
                       </div>
                     </div>
                   </div>
@@ -10060,6 +10248,33 @@ model OrderInvoice {
                 </div>
               </div>
 
+              {/* Terms & Conditions (mandatory) */}
+              <div className={`rounded-2xl border p-3 space-y-2 ${regErrors.terms ? 'border-rose-500 bg-rose-50/40' : 'border-slate-200 bg-slate-50'}`}>
+                <div className="font-extrabold text-slate-900">
+                  {siteSettings.registrationTermsTitle || 'الشروط والأحكام'}
+                </div>
+                <div className="max-h-40 overflow-y-auto p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] leading-relaxed text-slate-600 whitespace-pre-line">
+                  {siteSettings.registrationTermsText || DEFAULT_REGISTRATION_TERMS}
+                </div>
+                <label className="flex items-start gap-2 cursor-pointer font-bold text-slate-800">
+                  <input
+                    type="checkbox"
+                    checked={!!regForm.acceptTerms}
+                    onChange={e => {
+                      setRegForm(p => ({ ...p, acceptTerms: e.target.checked }));
+                      if (regErrors.terms) setRegErrors(p => ({ ...p, terms: null }));
+                    }}
+                    className="w-4 h-4 mt-0.5 accent-emerald-600"
+                  />
+                  <span>قرأت الشروط والأحكام وموافق عليها *</span>
+                </label>
+                {regErrors.terms && (
+                  <p className="text-[11px] text-rose-600 font-bold flex items-center gap-1">
+                    <AlertTriangle className="w-3 h-3 shrink-0" /> {regErrors.terms}
+                  </p>
+                )}
+              </div>
+
               <button
                 type="submit"
                 className={`w-full py-3.5 rounded-2xl text-white font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 ${
@@ -10069,7 +10284,7 @@ model OrderInvoice {
                 }`}
               >
                 <Check className="w-4 h-4 stroke-[3]" />
-                {regForm.accountCategory === 'individual' ? 'ابعت بياناتي واعمل الحساب' : 'ابعت طلب فتح حساب المحل للإدارة'}
+                {regForm.accountCategory === 'individual' ? 'اعمل الحساب وادخل على طول' : 'ابعت طلب فتح حساب المحل للإدارة'}
               </button>
             </form>
           )}
