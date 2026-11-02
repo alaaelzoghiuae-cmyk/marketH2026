@@ -10,95 +10,6 @@ import {
 } from 'lucide-react';
 
 // ============================================================================
-// Image compression: يصغّر أي صورة قبل تحويلها Base64 عشان حجم الداتا ميكبرش
-// (كانت الصور بتتخزن كاملة وبتضخّم صف المزامنة لعشرات الميجا)
-// ============================================================================
-const compressImageFile = (file, maxDim = 900, quality = 0.72) =>
-  new Promise((resolve, reject) => {
-    const fallback = () => {
-      const r = new FileReader();
-      r.onload = () => resolve(r.result);
-      r.onerror = reject;
-      r.readAsDataURL(file);
-    };
-    try {
-      if (!file.type || !file.type.startsWith('image/') || file.type === 'image/gif' || file.type === 'image/svg+xml') {
-        return fallback();
-      }
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        try {
-          let { width, height } = img;
-          const scale = Math.min(1, maxDim / Math.max(width, height));
-          width = Math.round(width * scale);
-          height = Math.round(height * scale);
-          const canvas = document.createElement('canvas');
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(0, 0, width, height);
-          ctx.drawImage(img, 0, 0, width, height);
-          URL.revokeObjectURL(url);
-          resolve(canvas.toDataURL('image/jpeg', quality));
-        } catch (e) {
-          URL.revokeObjectURL(url);
-          fallback();
-        }
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); fallback(); };
-      img.src = url;
-    } catch (e) {
-      fallback();
-    }
-  });
-
-// رفع الصورة لـ Supabase Storage وإرجاع رابطها العام. لو فشل لأي سبب بيرجع null
-// والكود بيكمل بالصورة Base64 المضغوطة (يعني مفيش حاجة بتتكسر).
-const uploadImageToSupabaseStorage = async (dataUrl) => {
-  const cfg = typeof window !== 'undefined' ? window.__HMARKET_SB_RUNTIME__ : null;
-  if (!cfg || !cfg.sbUrl || !cfg.sbKey) return null;
-  try {
-    const blob = await (await fetch(dataUrl)).blob();
-    const name = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-    const res = await fetch(`${cfg.sbUrl}/storage/v1/object/product-images/${name}`, {
-      method: 'POST',
-      headers: {
-        apikey: cfg.sbKey,
-        Authorization: `Bearer ${cfg.sbKey}`,
-        'Content-Type': blob.type || 'image/jpeg'
-      },
-      body: blob
-    });
-    if (!res.ok) {
-      console.warn('[H-market] Storage upload failed', res.status, await res.text().catch(() => ''));
-      return null;
-    }
-    return `${cfg.sbUrl}/storage/v1/object/public/product-images/${name}`;
-  } catch (e) {
-    console.warn('[H-market] Storage upload error', e);
-    return null;
-  }
-};
-
-// بديل متوافق مع واجهة FileReader (onload / result / readAsDataURL): بيضغط الصورة ثم يرفعها للـ Storage
-class CompressedImageReader {
-  constructor() { this.result = null; this.onload = null; }
-  readAsDataURL(file) {
-    compressImageFile(file).then(async dataUrl => {
-      let finalValue = dataUrl;
-      if (typeof dataUrl === 'string' && dataUrl.startsWith('data:image/jpeg')) {
-        const publicUrl = await uploadImageToSupabaseStorage(dataUrl);
-        if (publicUrl) finalValue = publicUrl;
-      }
-      this.result = finalValue;
-      if (typeof this.onload === 'function') this.onload();
-    });
-  }
-}
-
-// ============================================================================
 // INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS)
 // ============================================================================
 
@@ -1037,8 +948,8 @@ export default function App() {
   const [showcaseBars, setShowcaseBars] = useState(() => loadPersisted('showcaseBars', INITIAL_SHOWCASE_BARS));
   const [cloudSyncStatus, setCloudSyncStatus] = useState('local_ready'); // 'local_ready' | 'cloud_synced' | 'syncing'
 
-  // --- Live Order Notifications State ---
-  const [notifications, setNotifications] = useState([
+  // --- Live Order & Account Request Notifications State (Persisted & Cloud Synced) ---
+  const [notifications, setNotifications] = useState(() => loadPersisted('notifications', [
     {
       id: 'ntf_1',
       target: 'admin',
@@ -1057,8 +968,10 @@ export default function App() {
       read: false,
       orderId: 'INV-1048'
     }
-  ]);
+  ]));
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [heroAdIndex, setHeroAdIndex] = useState(0);
+  const [adminNotifPanelOpen, setAdminNotifPanelOpen] = useState(false);
 
   // --- Product / Ad Detail Modal & Collapsible States ---
   const [selectedDetailItem, setSelectedDetailItem] = useState(null); // { type: 'part' | 'ad', part, ad }
@@ -1131,12 +1044,7 @@ export default function App() {
 
   // --- Persistent Shopping Cart State (keyed by partId) ---
   // { [partId]: { qty: number, color: string } }
-  const [cart, setCart] = useState(() =>
-    loadPersisted('cart', {
-      prt_11: { qty: 1, color: 'شفاف بحلقة ماج سيف' },
-      prt_12: { qty: 1, color: 'أسود' }
-    })
-  );
+  const [cart, setCart] = useState(() => loadPersisted('cart_v4', {}));
 
   // Listen to URL hash changes (#/admin vs #/) so separate tabs/urls work seamlessly
   useEffect(() => {
@@ -1172,35 +1080,388 @@ export default function App() {
   const isIncomingSyncRef = React.useRef(false);
   const lastSavedPayloadRef = React.useRef('');
 
-  // Save state slices to localStorage and broadcast safely without feedback loops
+  // ============================================================================
+  // V6 SERIALIZED CLOUD SYNC, LIGHTWEIGHT POLLING, IMAGE COMPRESSION & STORAGE
+  // ============================================================================
   const hasCloudInitialPullCompletedRef = React.useRef(false);
-  const isCustomerMutatingCloudRef = React.useRef(false);
-  const lastCloudUpdatedAtRef = React.useRef(0);
-  // --- Sync safety refs (يمنعوا الـ polling من الكتابة فوق تعديلاتك قبل ما تتحفظ) ---
-  const pushInFlightRef = React.useRef(false);   // فيه طلب حفظ شغال دلوقتي
-  const pushQueuedBundleRef = React.useRef(null); // آخر نسخة مستنية تتحفظ بعد الطلب الحالي
-  const pushTimerRef = React.useRef(null);        // debounce للحفظ
-  const dirtyRef = React.useRef(false);           // فيه تعديلات محلية لسه ما اتحفظتش
-  const retryCountRef = React.useRef(0);
-  const lastSeenRowTsRef = React.useRef('');      // آخر updated_at شفناه في السيرفر
+  const isSavingRef = React.useRef(false);
+  const pendingSaveBundleRef = React.useRef(null);
+  const saveDebounceTimerRef = React.useRef(null);
+  const lastLocalMutationAtRef = React.useRef(0);
+  const lastKnownRemoteUpdatedAtRef = React.useRef('');
+  const lastKnownRemoteTimestampMsRef = React.useRef(0);
+  const lastSeenOrderCountRef = React.useRef(orders.length);
+  const lastSeenReqCountRef = React.useRef(accountRequests.length);
+  const [migratingImages, setMigratingImages] = useState(false);
+  const [migrationProgress, setMigrationProgress] = useState('');
 
-  // Helper to resolve Supabase URL and Key from Env OR SiteSettings
+  // Web Audio Chime for New Admin Notifications
+  const playNotificationSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+      osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch (e) {}
+  };
+
+  // Resolve Supabase URL and Key from Env OR SiteSettings OR LocalStorage Backup
   const getSupabaseConfig = () => {
-    const sbUrl = (window.__HMARKET_SUPABASE_URL__ || siteSettings?.supabaseUrl || '').trim().replace(/\/$/, '');
-    const sbKey = (window.__HMARKET_SUPABASE_KEY__ || siteSettings?.supabaseAnonKey || '').trim();
+    let savedUrl = '';
+    let savedKey = '';
+    try {
+      savedUrl = window.localStorage.getItem('hmarket_sb_url') || '';
+      savedKey = window.localStorage.getItem('hmarket_sb_key') || '';
+    } catch (e) {}
+    const sbUrl = (window.__HMARKET_SUPABASE_URL__ || siteSettings?.supabaseUrl || savedUrl || '').trim().replace(/\/$/, '');
+    const sbKey = (window.__HMARKET_SUPABASE_KEY__ || siteSettings?.supabaseAnonKey || savedKey || '').trim();
     const isValid = Boolean(sbUrl && sbKey && sbUrl.startsWith('http'));
-    if (typeof window !== 'undefined') window.__HMARKET_SB_RUNTIME__ = isValid ? { sbUrl, sbKey } : null;
+    if (isValid) {
+      try {
+        window.localStorage.setItem('hmarket_sb_url', sbUrl);
+        window.localStorage.setItem('hmarket_sb_key', sbKey);
+      } catch (e) {}
+    }
     return { sbUrl, sbKey, isValid };
   };
 
-  // Explicit helper to push state to Supabase Cloud
-  // - مسلسل (Serialized): طلب واحد في نفس الوقت، وآخر نسخة بس هي اللي بتتبعت
-  // - بيظهر خطأ حقيقي لو الحفظ فشل (قبل كده كان الفشل صامت!)
-  const pushToSupabaseCloud = (customBundle = null, showSuccessToast = false) => {
-    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) return;
+  // --- Automatic Image Compression (Max 900px, JPEG 72% quality -> ~100-200KB) ---
+  const compressImageDataUrl = (fileOrDataUrl, maxDim = 900, quality = 0.72) => {
+    return new Promise((resolve) => {
+      const processImg = (srcUrl) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            let w = img.width || 800;
+            let h = img.height || 800;
+            if (w > maxDim || h > maxDim) {
+              if (w >= h) {
+                h = Math.round((h * maxDim) / w);
+                w = maxDim;
+              } else {
+                w = Math.round((w * maxDim) / h);
+                h = maxDim;
+              }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            // Fill white background for transparent PNGs converted to JPEG
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, w, h);
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(compressedDataUrl);
+          } catch (err) {
+            resolve(srcUrl);
+          }
+        };
+        img.onerror = () => resolve(srcUrl);
+        img.src = srcUrl;
+      };
 
-    const bundleToSave = customBundle || {
+      if (typeof fileOrDataUrl === 'string') {
+        processImg(fileOrDataUrl);
+      } else if (fileOrDataUrl instanceof Blob) {
+        const reader = new FileReader();
+        reader.onload = () => processImg(reader.result);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(fileOrDataUrl);
+      } else {
+        resolve('');
+      }
+    });
+  };
+
+  // Convert DataURL to Blob for Supabase Storage upload
+  const dataUrlToBlob = (dataUrl) => {
+    const arr = dataUrl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+  };
+
+  // --- Upload Image to Supabase Storage Bucket (`product-images`) with Automatic Compressed Fallback ---
+  const processAndUploadImage = async (fileOrDataUrl, folder = 'parts') => {
+    const compressedDataUrl = await compressImageDataUrl(fileOrDataUrl, 900, 0.72);
+    if (!compressedDataUrl || !compressedDataUrl.startsWith('data:image/')) {
+      return compressedDataUrl;
+    }
+
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) {
+      return compressedDataUrl;
+    }
+
+    try {
+      const blob = dataUrlToBlob(compressedDataUrl);
+      const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const uploadRes = await fetch(`${sbUrl}/storage/v1/object/product-images/${fileName}`, {
+        method: 'POST',
+        headers: {
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          'Content-Type': 'image/jpeg',
+          'x-upsert': 'true'
+        },
+        body: blob
+      });
+
+      if (uploadRes.ok) {
+        return `${sbUrl}/storage/v1/object/public/product-images/${fileName}`;
+      }
+    } catch (err) {
+      // Fall back to compressedDataUrl (100-180KB) if bucket not created yet
+    }
+    return compressedDataUrl;
+  };
+
+  // --- One-Click Batch Migration of Existing Base64 Images Inside Row to Supabase Storage ---
+  const handleMigrateAllBase64ImagesToStorage = async () => {
+    const { isValid } = getSupabaseConfig();
+    if (!isValid) {
+      showToast('يرجى إدخال رابط ومفتاح Supabase في إعدادات الموقع أولاً.', 'warning');
+      return;
+    }
+    if (migratingImages) return;
+
+    setMigratingImages(true);
+    setMigrationProgress('جاري فحص الصور داخل الصف...');
+    let migratedCount = 0;
+
+    try {
+      const isBase64 = (str) => typeof str === 'string' && str.startsWith('data:image/') && str.length > 500;
+
+      // 1. Migrate Parts Images
+      const nextParts = [...parts];
+      for (let i = 0; i < nextParts.length; i++) {
+        const p = { ...nextParts[i] };
+        let changed = false;
+        if (isBase64(p.image)) {
+          setMigrationProgress(`جاري ضغط ونقل صورة المنتج (${i + 1}/${nextParts.length})...`);
+          const url = await processAndUploadImage(p.image, 'parts');
+          if (url && url !== p.image) {
+            p.image = url;
+            changed = true;
+            migratedCount++;
+          }
+        }
+        if (Array.isArray(p.images) && p.images.length > 0) {
+          const newGallery = [];
+          for (let j = 0; j < p.images.length; j++) {
+            const imgItem = p.images[j];
+            if (isBase64(imgItem)) {
+              const url = await processAndUploadImage(imgItem, 'parts');
+              newGallery.push(url || imgItem);
+              if (url && url !== imgItem) migratedCount++;
+              changed = true;
+            } else {
+              newGallery.push(imgItem);
+            }
+          }
+          p.images = newGallery;
+          if (newGallery[0]) p.image = newGallery[0];
+        }
+        if (changed) nextParts[i] = p;
+      }
+
+      // 2. Migrate Models Images
+      const nextModels = [...models];
+      for (let i = 0; i < nextModels.length; i++) {
+        const m = { ...nextModels[i] };
+        if (isBase64(m.image)) {
+          setMigrationProgress(`جاري نقل صورة الموديل (${i + 1}/${nextModels.length})...`);
+          const url = await processAndUploadImage(m.image, 'models');
+          if (url && url !== m.image) {
+            m.image = url;
+            nextModels[i] = m;
+            migratedCount++;
+          }
+        }
+      }
+
+      // 3. Migrate Store Ads Images
+      const nextAds = [...storeAds];
+      for (let i = 0; i < nextAds.length; i++) {
+        const a = { ...nextAds[i] };
+        if (isBase64(a.image)) {
+          setMigrationProgress(`جاري نقل صورة الإعلان (${i + 1}/${nextAds.length})...`);
+          const url = await processAndUploadImage(a.image, 'ads');
+          if (url && url !== a.image) {
+            a.image = url;
+            nextAds[i] = a;
+            migratedCount++;
+          }
+        }
+      }
+
+      // 4. Migrate Client Avatars
+      const nextClients = [...clients];
+      for (let i = 0; i < nextClients.length; i++) {
+        const c = { ...nextClients[i] };
+        if (isBase64(c.avatarImage)) {
+          const url = await processAndUploadImage(c.avatarImage, 'avatars');
+          if (url && url !== c.avatarImage) {
+            c.avatarImage = url;
+            nextClients[i] = c;
+            migratedCount++;
+          }
+        }
+      }
+
+      setParts(nextParts);
+      setModels(nextModels);
+      setStoreAds(nextAds);
+      setClients(nextClients);
+
+      const cleanBundle = {
+        siteSettings,
+        adminCredentials,
+        currencies,
+        groups,
+        brands,
+        autoTemplates,
+        models: nextModels,
+        parts: nextParts,
+        clients: nextClients,
+        accountRequests,
+        orders,
+        returnsList,
+        complaints,
+        promoCodes,
+        storeAds: nextAds,
+        showcaseBars,
+        notifications
+      };
+
+      setMigrationProgress('جاري حفظ الصف الخفيف في السيرفر...');
+      await pushToSupabaseCloud(cleanBundle, true);
+      showToast(
+        migratedCount > 0
+          ? `تم ضغط ونقل (${migratedCount}) صورة إلى Supabase Storage وتصغير حجم الصف بنجاح!`
+          : 'جميع الصور مضغوطة ومنقولة بالفعل! الصف في حالة ممتازة.',
+        'success'
+      );
+    } catch (err) {
+      showToast('حدث خطأ أثناء نقل الصور: ' + String(err.message || err), 'error');
+    } finally {
+      setMigratingImages(false);
+      setMigrationProgress('');
+    }
+  };
+
+  // --- Human-Readable HTTP Error Formatter ---
+  const formatSyncHttpError = (status) => {
+    if (status === 413) return 'حجم البيانات كبير جداً (كود 413 Payload Too Large) — اضغط زر "ضغط ونقل الصور لـ Storage" لتصغير حجم الصف فوراً.';
+    if (status === 401 || status === 403) return `خطأ في صلاحيات مفتاح Supabase (كود ${status} Unauthorized) — تأكد من صحة Anon Key وتشغيل ملف SQL.`;
+    if (status === 429) return 'ضغط طلبات متتالية على السيرفر (كود 429 Rate Limit) — جاري إعادة المحاولة تلقائياً...';
+    if (status >= 500) return `خطأ مؤقت في سيرفر قاعدة البيانات (كود ${status} Server Error) — جاري إعادة المحاولة...`;
+    return `فشل حفظ البيانات في السيرفر (كود الخطأ: ${status})`;
+  };
+
+  // --- Serialized Save Queue with 3 Automatic Retries & Real Error Reporting ---
+  const executeSingleCloudSaveWithRetry = async (bundleToSave, showSuccessToast = false) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) {
+      if (showSuccessToast) {
+        showToast('تم حفظ جميع التعديلات محلياً في المتصفح بنجاح!', 'success');
+      }
+      return false;
+    }
+
+    const nowTs = Date.now();
+    const nowIso = new Date(nowTs).toISOString();
+    lastLocalMutationAtRef.current = nowTs;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        setCloudSyncStatus('syncing');
+        const res = await fetch(`${sbUrl}/rest/v1/app_state_sync`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            Prefer: 'resolution=merge-duplicates,return=minimal'
+          },
+          body: JSON.stringify({
+            id: 'main_store',
+            payload: { ...bundleToSave, updatedAt: nowTs },
+            updated_at: nowIso
+          })
+        });
+
+        if (res.ok) {
+          lastKnownRemoteUpdatedAtRef.current = nowIso;
+          lastKnownRemoteTimestampMsRef.current = nowTs;
+          setCloudSyncStatus('cloud_synced');
+          if (showSuccessToast) {
+            showToast('تم تأكيد وحفظ كافة التعديلات والمدخلات في السيرفر السحابي بنجاح ✓', 'success');
+          }
+          return true;
+        } else {
+          const errMsg = formatSyncHttpError(res.status);
+          if (attempt < 3) {
+            await new Promise(r => setTimeout(r, attempt * 1000));
+          } else {
+            setCloudSyncStatus('local_ready');
+            showToast(`⚠️ ${errMsg} (فشلت 3 محاولات)`, 'error');
+            return false;
+          }
+        }
+      } catch (networkErr) {
+        if (attempt < 3) {
+          await new Promise(r => setTimeout(r, attempt * 1000));
+        } else {
+          setCloudSyncStatus('local_ready');
+          showToast('⚠️ تعذر الاتصال بالسيرفر لحفظ التعديلات (Timeout / Network Error) بعد 3 محاولات.', 'error');
+          return false;
+        }
+      }
+    }
+    return false;
+  };
+
+  // --- Serialized Queue Processor (One Request at a Time, Only Latest Snapshot Sent) ---
+  const processSaveQueue = async (showSuccessToast = false) => {
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
+
+    try {
+      while (pendingSaveBundleRef.current !== null) {
+        const latestBundle = pendingSaveBundleRef.current;
+        pendingSaveBundleRef.current = null;
+        await executeSingleCloudSaveWithRetry(latestBundle, showSuccessToast && pendingSaveBundleRef.current === null);
+      }
+    } finally {
+      isSavingRef.current = false;
+    }
+  };
+
+  // Public helper to enqueue or immediately flush a Cloud Save
+  const pushToSupabaseCloud = async (customBundle = null, showSuccessToast = false) => {
+    const nowTs = Date.now();
+    lastLocalMutationAtRef.current = nowTs;
+
+    const bundle = customBundle || {
       siteSettings,
       adminCredentials,
       currencies,
@@ -1216,111 +1477,75 @@ export default function App() {
       complaints,
       promoCodes,
       storeAds,
-      showcaseBars
+      showcaseBars,
+      notifications,
+      updatedAt: nowTs
     };
 
-    dirtyRef.current = true;
-
-    // لو فيه طلب شغال، خزّن أحدث نسخة وهتتبعت أول ما يخلص
-    if (pushInFlightRef.current) {
-      pushQueuedBundleRef.current = { bundle: bundleToSave, toast: showSuccessToast };
-      return;
+    pendingSaveBundleRef.current = bundle;
+    if (saveDebounceTimerRef.current) {
+      clearTimeout(saveDebounceTimerRef.current);
+      saveDebounceTimerRef.current = null;
     }
+    await processSaveQueue(showSuccessToast);
+  };
 
-    const runPush = (bundle, toastFlag) => {
-      pushInFlightRef.current = true;
-      const nowTs = Date.now();
-      const rowIso = new Date(nowTs).toISOString();
-      lastCloudUpdatedAtRef.current = nowTs;
+  // Safe Merge Transaction for Customer Actions (Registration, Orders, Returns, Complaints)
+  const commitCustomerCloudTransaction = async (mutatorFn) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) return;
+
+    const nowTs = Date.now();
+    lastLocalMutationAtRef.current = nowTs;
+
+    try {
       setCloudSyncStatus('syncing');
-
-      const finish = () => {
-        pushInFlightRef.current = false;
-        const queued = pushQueuedBundleRef.current;
-        if (queued) {
-          pushQueuedBundleRef.current = null;
-          runPush(queued.bundle, queued.toast);
-        }
-      };
-
-      fetch(`${sbUrl}/rest/v1/app_state_sync?on_conflict=id`, {
-        method: 'POST',
+      const r = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, {
         headers: {
-          'Content-Type': 'application/json',
           apikey: sbKey,
           Authorization: `Bearer ${sbKey}`,
-          Prefer: 'resolution=merge-duplicates,return=minimal'
-        },
-        body: JSON.stringify({
-          id: 'main_store',
-          payload: { ...bundle, updatedAt: nowTs },
-          updated_at: rowIso
-        })
-      })
-        .then(async res => {
-          if (res.ok) {
-            retryCountRef.current = 0;
-            lastSeenRowTsRef.current = rowIso;
-            if (!pushQueuedBundleRef.current) dirtyRef.current = false;
-            setCloudSyncStatus('cloud_synced');
-            if (toastFlag) {
-              showToast('تم حفظ ومزامنة كافة البيانات في قاعدة البيانات السحابية بنجاح!', 'success');
-            }
-            finish();
-          } else {
-            const txt = await res.text().catch(() => '');
-            console.error('[H-market] Cloud save failed', res.status, txt);
-            setCloudSyncStatus('error');
-            const hint =
-              res.status === 413 ? 'حجم البيانات كبير جداً (الصور)' :
-              res.status === 401 || res.status === 403 ? 'مشكلة صلاحيات في Supabase' :
-              res.status === 429 ? 'طلبات كتير، استنى لحظات' :
-              res.status >= 500 ? 'مشكلة مؤقتة في السيرفر' : 'خطأ غير معروف';
-            showToast(`فشل الحفظ على السيرفر (${res.status}) — ${hint}. هنحاول تاني تلقائياً.`, 'error');
-            scheduleRetry(bundle);
-            pushInFlightRef.current = false;
-          }
-        })
-        .catch(err => {
-          console.error('[H-market] Cloud save network error', err);
-          setCloudSyncStatus('error');
-          showToast('فشل الاتصال بالسيرفر أثناء الحفظ — هنحاول تاني تلقائياً.', 'error');
-          scheduleRetry(bundle);
-          pushInFlightRef.current = false;
-        });
-    };
+          'Cache-Control': 'no-cache'
+        }
+      });
+      const rows = await r.json();
+      const existingCloud = (Array.isArray(rows) && rows?.[0]?.payload && typeof rows[0].payload === 'object')
+        ? rows[0].payload
+        : {
+            siteSettings,
+            adminCredentials,
+            currencies,
+            groups,
+            brands,
+            autoTemplates,
+            models,
+            parts,
+            clients,
+            accountRequests,
+            orders,
+            returnsList,
+            complaints,
+            promoCodes,
+            storeAds,
+            showcaseBars,
+            notifications
+          };
 
-    const scheduleRetry = (bundle) => {
-      // dirty تفضل true فالـ polling مش هيمسح التعديل. 3 محاولات بتأخير متزايد.
-      if (retryCountRef.current >= 3) return;
-      retryCountRef.current += 1;
-      const delay = 2500 * retryCountRef.current;
-      setTimeout(() => {
-        if (!pushInFlightRef.current) runPush(pushQueuedBundleRef.current?.bundle || bundle, false);
-      }, delay);
-    };
-
-    runPush(bundleToSave, showSuccessToast);
+      const mergedPayload = mutatorFn(existingCloud);
+      mergedPayload.updatedAt = Date.now();
+      pendingSaveBundleRef.current = mergedPayload;
+      await processSaveQueue(false);
+    } catch (e) {}
   };
 
-  // Debounced push (للتعديلات التلقائية اللي بتحصل مع كل تغيير في الـ state)
-  const schedulePushToSupabaseCloud = (bundle) => {
-    dirtyRef.current = true; // علّم فوراً إن فيه تعديل مستني، عشان الـ polling يستنى
-    if (pushTimerRef.current) clearTimeout(pushTimerRef.current);
-    pushTimerRef.current = setTimeout(() => {
-      pushTimerRef.current = null;
-      pushToSupabaseCloud(bundle, false);
-    }, 700);
-  };
-
+  // --- Debounced (0.7s) & Serialized Auto-Save on State Changes ---
   useEffect(() => {
-    // If this state update was received from another tab or cloud, DO NOT broadcast or push it back!
     if (isIncomingSyncRef.current) {
       isIncomingSyncRef.current = false;
       return;
     }
 
     try {
+      const nowTs = Date.now();
       const bundle = {
         siteSettings,
         adminCredentials,
@@ -1337,7 +1562,8 @@ export default function App() {
         complaints,
         promoCodes,
         storeAds,
-        showcaseBars
+        showcaseBars,
+        notifications
       };
 
       const payloadStr = JSON.stringify(bundle);
@@ -1345,39 +1571,38 @@ export default function App() {
         return;
       }
       lastSavedPayloadRef.current = payloadStr;
+      lastLocalMutationAtRef.current = nowTs;
 
-      // Save individual slices to localStorage
+      // 1. Save individual slices to localStorage immediately
       Object.entries(bundle).forEach(([k, v]) => {
         window.localStorage.setItem('hmarket_v2_' + k, JSON.stringify(v));
       });
 
       const { isValid } = getSupabaseConfig();
 
-      // Only use localStorage master_bundle broadcast if Supabase is NOT configured.
-      // When Supabase IS configured, Supabase is the SINGLE source of truth so stale tabs never overwrite active tabs!
-      if (!isValid) {
-        window.localStorage.setItem(
-          'hmarket_v2_master_bundle',
-          JSON.stringify({ ...bundle, senderTabId: myTabId, updatedAt: Date.now() })
-        );
-      }
+      // 2. Broadcast to same-browser tabs
+      window.localStorage.setItem(
+        'hmarket_v2_master_bundle',
+        JSON.stringify({
+          ...bundle,
+          senderTabId: myTabId,
+          senderRole: adminAuthenticated ? 'admin' : 'client',
+          updatedAt: nowTs
+        })
+      );
 
-      // Push to Supabase Cloud ONLY if:
-      // 1. Initial pull from cloud has finished (so a newly opened tab/browser never overwrites cloud with defaults!)
-      // 2. AND this session is an authenticated Admin (or a customer actively submitting an order/account request)
-      const isAuthorizedToPush =
-        hasCloudInitialPullCompletedRef.current &&
-        (adminAuthenticated || isCustomerMutatingCloudRef.current);
-
-      if (isValid && isAuthorizedToPush) {
-        if (isCustomerMutatingCloudRef.current) {
-          isCustomerMutatingCloudRef.current = false;
+      // 3. Enqueue Debounced (700ms) & Serialized Save to Supabase if Admin
+      if (isValid && hasCloudInitialPullCompletedRef.current && adminAuthenticated) {
+        pendingSaveBundleRef.current = { ...bundle, updatedAt: nowTs };
+        if (saveDebounceTimerRef.current) {
+          clearTimeout(saveDebounceTimerRef.current);
         }
-        schedulePushToSupabaseCloud(bundle);
+        saveDebounceTimerRef.current = setTimeout(() => {
+          saveDebounceTimerRef.current = null;
+          processSaveQueue(false);
+        }, 700);
       }
-    } catch (err) {
-      // ignore storage quota errors
-    }
+    } catch (err) {}
   }, [
     siteSettings,
     adminCredentials,
@@ -1395,6 +1620,7 @@ export default function App() {
     promoCodes,
     storeAds,
     showcaseBars,
+    notifications,
     adminAuthenticated
   ]);
 
@@ -1404,15 +1630,13 @@ export default function App() {
       window.localStorage.setItem('hmarket_v2_activeClientRole', JSON.stringify(activeRole));
       window.localStorage.setItem('hmarket_v2_adminAuth', JSON.stringify(adminAuthenticated));
       window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(adminCredentials));
-      window.localStorage.setItem('hmarket_v2_cart', JSON.stringify(cart));
+      window.localStorage.setItem('hmarket_v2_cart_v4', JSON.stringify(cart));
     } catch (e) {}
   }, [activeRole, adminAuthenticated, adminCredentials, cart]);
 
-  // Real-time Cross-Tab Synchronization (Only used as fallback when Supabase Cloud is not connected)
+  // Real-time Cross-Tab Synchronization
   useEffect(() => {
     const handleStorageEvent = (e) => {
-      const { isValid } = getSupabaseConfig();
-      if (isValid) return; // Ignore localStorage cross-tab bounce when Cloud Sync is active!
       if (!e.key || !e.newValue) return;
       try {
         if (e.key === 'hmarket_v2_master_bundle') {
@@ -1420,161 +1644,211 @@ export default function App() {
           if (data.senderTabId === myTabId) return;
 
           isIncomingSyncRef.current = true;
-          if (data.siteSettings) setSiteSettings(data.siteSettings);
-          if (data.adminCredentials) setAdminCredentials(data.adminCredentials);
-          if (data.currencies) setCurrencies(data.currencies);
-          if (data.groups) setGroups(data.groups);
-          if (data.brands) setBrands(data.brands);
-          if (data.autoTemplates) setAutoTemplates(data.autoTemplates);
-          if (data.models) setModels(data.models);
-          if (data.parts) setParts(data.parts);
-          if (data.clients) setClients(data.clients);
-          if (data.accountRequests) setAccountRequests(data.accountRequests);
-          if (data.orders) setOrders(data.orders);
-          if (data.returnsList) setReturnsList(data.returnsList);
-          if (data.complaints) setComplaints(data.complaints);
-          if (data.promoCodes) setPromoCodes(data.promoCodes);
-          if (data.storeAds) setStoreAds(data.storeAds);
-          if (data.showcaseBars) setShowcaseBars(data.showcaseBars);
+
+          if (Array.isArray(data.clients)) setClients(data.clients);
+          if (Array.isArray(data.accountRequests)) setAccountRequests(data.accountRequests);
+          if (Array.isArray(data.orders)) setOrders(data.orders);
+          if (Array.isArray(data.returnsList)) setReturnsList(data.returnsList);
+          if (Array.isArray(data.complaints)) setComplaints(data.complaints);
+          if (Array.isArray(data.notifications)) setNotifications(data.notifications);
+          if (Array.isArray(data.parts)) setParts(data.parts);
+
+          if (data.senderRole === 'admin') {
+            if (data.siteSettings) setSiteSettings(data.siteSettings);
+            if (data.adminCredentials) setAdminCredentials(data.adminCredentials);
+            if (data.currencies) setCurrencies(data.currencies);
+            if (Array.isArray(data.groups)) setGroups(data.groups);
+            if (Array.isArray(data.brands)) setBrands(data.brands);
+            if (Array.isArray(data.autoTemplates)) setAutoTemplates(data.autoTemplates);
+            if (Array.isArray(data.models)) setModels(data.models);
+            if (Array.isArray(data.promoCodes)) setPromoCodes(data.promoCodes);
+            if (Array.isArray(data.storeAds)) setStoreAds(data.storeAds);
+            if (Array.isArray(data.showcaseBars)) setShowcaseBars(data.showcaseBars);
+          }
         }
       } catch (err) {}
     };
     window.addEventListener('storage', handleStorageEvent);
     return () => window.removeEventListener('storage', handleStorageEvent);
-  }, [myTabId, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
+  }, [myTabId]);
 
-  // Load & Poll state from Supabase Cloud across all devices & browsers
-  // - الـ polling دلوقتي بيسأل الأول عن updated_at بس (خفيف جداً) ومبيحمّلش الـ payload كله غير لو اتغير
-  // - مبيكتبش فوق تعديلاتك لو فيه حفظ شغال أو تعديل لسه ما اتحفظش
-  const pullFromSupabaseCloud = (silent = false) => {
+  // --- Lightweight Two-Step Polling (`select=updated_at` first, never overwrites in-flight or newer local saves!) ---
+  const pullFromSupabaseCloud = async (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) {
       hasCloudInitialPullCompletedRef.current = true;
       return;
     }
-    if (pushInFlightRef.current || dirtyRef.current || pushTimerRef.current) return;
 
-    const authHeaders = {
-      apikey: sbKey,
-      Authorization: `Bearer ${sbKey}`,
-      'Cache-Control': 'no-cache'
-    };
+    // NEVER poll or overwrite while a save is currently in-flight or queued in the 0.7s debounce window!
+    if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
+      return;
+    }
 
-    fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=updated_at`, { headers: authHeaders })
-      .then(r => r.json())
-      .then(meta => {
-        const rowTs = Array.isArray(meta) && meta[0] ? String(meta[0].updated_at || '') : '';
-        if (hasCloudInitialPullCompletedRef.current && rowTs && rowTs === lastSeenRowTsRef.current) {
-          return null; // مفيش تغيير على السيرفر
-        }
-        return fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, { headers: authHeaders })
-          .then(r => r.json())
-          .then(rows => ({ rows, rowTs }));
-      })
-      .then(result => {
-        if (!result) return;
-        // تأكد إن مفيش حفظ بدأ أثناء ما كنا بنحمّل
-        if (pushInFlightRef.current || dirtyRef.current || pushTimerRef.current) return;
-
-        const { rows, rowTs } = result;
-        const cloudData = Array.isArray(rows) ? rows?.[0]?.payload : null;
-        const hasValidCloudContent =
-          cloudData &&
-          typeof cloudData === 'object' &&
-          (Array.isArray(cloudData.parts) || Array.isArray(cloudData.storeAds) || cloudData.updatedAt);
-
-        // نسخة أقدم من آخر حفظ عملناه؟ يبقى قراءة متأخرة (stale) — تجاهلها
-        if (hasValidCloudContent && cloudData.updatedAt && cloudData.updatedAt < lastCloudUpdatedAtRef.current) {
+    try {
+      // STEP 1: Lightweight Metadata Check (~100 bytes) — Query ONLY `updated_at`
+      if (silent && hasCloudInitialPullCompletedRef.current && lastKnownRemoteUpdatedAtRef.current) {
+        const metaRes = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=updated_at`, {
+          headers: {
+            apikey: sbKey,
+            Authorization: `Bearer ${sbKey}`,
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (!metaRes.ok) return;
+        const metaRows = await metaRes.json();
+        const remoteUpdatedAt = Array.isArray(metaRows) ? metaRows?.[0]?.updated_at : null;
+        if (!remoteUpdatedAt || remoteUpdatedAt === lastKnownRemoteUpdatedAtRef.current) {
+          // Nothing changed on server! Skip downloading payload!
           return;
         }
-
-        if (hasValidCloudContent) {
-          // Only apply if cloudData is newer or different from current
-          const incomingCompareObj = {
-            siteSettings: cloudData.siteSettings,
-            adminCredentials: cloudData.adminCredentials,
-            currencies: cloudData.currencies,
-            groups: cloudData.groups,
-            brands: cloudData.brands,
-            autoTemplates: cloudData.autoTemplates,
-            models: cloudData.models,
-            parts: cloudData.parts,
-            clients: cloudData.clients,
-            accountRequests: cloudData.accountRequests,
-            orders: cloudData.orders,
-            returnsList: cloudData.returnsList,
-            complaints: cloudData.complaints,
-            promoCodes: cloudData.promoCodes,
-            storeAds: cloudData.storeAds,
-            showcaseBars: cloudData.showcaseBars
-          };
-          const incomingStr = JSON.stringify(incomingCompareObj);
-
-          if (incomingStr !== lastSavedPayloadRef.current) {
-            isIncomingSyncRef.current = true;
-            lastSavedPayloadRef.current = incomingStr;
-
-            // Update both React state AND localStorage immediately so next refresh is 100% up-to-date
-            if (cloudData.siteSettings && typeof cloudData.siteSettings === 'object') {
-              const mergedSettings = {
-                ...cloudData.siteSettings,
-                supabaseUrl: cloudData.siteSettings.supabaseUrl || sbUrl,
-                supabaseAnonKey: cloudData.siteSettings.supabaseAnonKey || sbKey
-              };
-              setSiteSettings(mergedSettings);
-              window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings));
-            }
-            if (cloudData.adminCredentials && typeof cloudData.adminCredentials === 'object') {
-              setAdminCredentials(cloudData.adminCredentials);
-              window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(cloudData.adminCredentials));
-            }
-            if (cloudData.currencies && typeof cloudData.currencies === 'object') {
-              setCurrencies(cloudData.currencies);
-              window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(cloudData.currencies));
-            }
-            const syncSlice = (key, setter) => {
-              if (Array.isArray(cloudData[key])) {
-                setter(cloudData[key]);
-                window.localStorage.setItem('hmarket_v2_' + key, JSON.stringify(cloudData[key]));
-              }
-            };
-            syncSlice('groups', setGroups);
-            syncSlice('brands', setBrands);
-            syncSlice('autoTemplates', setAutoTemplates);
-            syncSlice('models', setModels);
-            syncSlice('parts', setParts);
-            syncSlice('clients', setClients);
-            syncSlice('accountRequests', setAccountRequests);
-            syncSlice('orders', setOrders);
-            syncSlice('returnsList', setReturnsList);
-            syncSlice('complaints', setComplaints);
-            syncSlice('promoCodes', setPromoCodes);
-            syncSlice('storeAds', setStoreAds);
-            syncSlice('showcaseBars', setShowcaseBars);
-          }
-          setCloudSyncStatus('cloud_synced');
-          if (!silent) showToast('تمت مزامنة البيانات مع قاعدة البيانات السحابية بنجاح!', 'success');
-          hasCloudInitialPullCompletedRef.current = true;
-          lastSeenRowTsRef.current = rowTs;
-        } else {
-          // Cloud table row is empty `{}`!
-          // Mark initial pull completed, and if this is Admin, immediately push current admin state to initialize the cloud!
-          hasCloudInitialPullCompletedRef.current = true;
-          if (adminAuthenticated) {
-            pushToSupabaseCloud(null, false);
-          }
+        const remoteMs = new Date(remoteUpdatedAt).getTime();
+        if (remoteMs && remoteMs < lastLocalMutationAtRef.current) {
+          // Server version is older than our latest local edit — ignore it!
+          return;
         }
-      })
-      .catch(() => {
-        hasCloudInitialPullCompletedRef.current = true;
+      }
+
+      // Guard again in case user started saving while metadata check was running
+      if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
+        return;
+      }
+
+      // STEP 2: Fetch Full Payload ONLY because `updated_at` actually changed (or initial load)
+      const fullRes = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload,updated_at`, {
+        headers: {
+          apikey: sbKey,
+          Authorization: `Bearer ${sbKey}`,
+          'Cache-Control': 'no-cache'
+        }
       });
+      if (!fullRes.ok) {
+        if (!silent) showToast(formatSyncHttpError(fullRes.status), 'error');
+        hasCloudInitialPullCompletedRef.current = true;
+        return;
+      }
+
+      const rows = await fullRes.json();
+      const rowObj = Array.isArray(rows) ? rows?.[0] : null;
+      const cloudData = rowObj?.payload;
+      const remoteUpdatedAt = rowObj?.updated_at || '';
+
+      // Final Race-Condition Guard before applying state:
+      // If a save started while downloading payload, or if payload timestamp is older than our last local mutation, abort!
+      if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
+        return;
+      }
+      const payloadTs = Number(cloudData?.updatedAt || (remoteUpdatedAt ? new Date(remoteUpdatedAt).getTime() : 0));
+      if (silent && hasCloudInitialPullCompletedRef.current && payloadTs > 0 && payloadTs < lastLocalMutationAtRef.current) {
+        return;
+      }
+
+      const hasValidCloudContent =
+        cloudData &&
+        typeof cloudData === 'object' &&
+        (Array.isArray(cloudData.parts) || Array.isArray(cloudData.storeAds) || cloudData.updatedAt);
+
+      if (hasValidCloudContent) {
+        lastKnownRemoteUpdatedAtRef.current = remoteUpdatedAt;
+        if (payloadTs) lastKnownRemoteTimestampMsRef.current = payloadTs;
+
+        const incomingCompareObj = {
+          siteSettings: cloudData.siteSettings,
+          adminCredentials: cloudData.adminCredentials,
+          currencies: cloudData.currencies,
+          groups: cloudData.groups,
+          brands: cloudData.brands,
+          autoTemplates: cloudData.autoTemplates,
+          models: cloudData.models,
+          parts: cloudData.parts,
+          clients: cloudData.clients,
+          accountRequests: cloudData.accountRequests,
+          orders: cloudData.orders,
+          returnsList: cloudData.returnsList,
+          complaints: cloudData.complaints,
+          promoCodes: cloudData.promoCodes,
+          storeAds: cloudData.storeAds,
+          showcaseBars: cloudData.showcaseBars,
+          notifications: cloudData.notifications
+        };
+        const incomingStr = JSON.stringify(incomingCompareObj);
+
+        if (incomingStr !== lastSavedPayloadRef.current) {
+          isIncomingSyncRef.current = true;
+          lastSavedPayloadRef.current = incomingStr;
+
+          if (Array.isArray(cloudData.orders) && cloudData.orders.length > lastSeenOrderCountRef.current) {
+            lastSeenOrderCountRef.current = cloudData.orders.length;
+            if (appPortal === 'admin') {
+              playNotificationSound();
+              showToast('🔔 وصلت طلبية جديدة الآن من أحد العملاء! تفقد قسم الطلبات.', 'success');
+            }
+          }
+          if (Array.isArray(cloudData.accountRequests) && cloudData.accountRequests.length > lastSeenReqCountRef.current) {
+            lastSeenReqCountRef.current = cloudData.accountRequests.length;
+            if (appPortal === 'admin') {
+              playNotificationSound();
+              showToast('🔔 وصل طلب تسجيل حساب عميل جديد بانتظار موافقتك!', 'success');
+            }
+          }
+
+          if (cloudData.siteSettings && typeof cloudData.siteSettings === 'object') {
+            const mergedSettings = {
+              ...cloudData.siteSettings,
+              supabaseUrl: cloudData.siteSettings.supabaseUrl || sbUrl,
+              supabaseAnonKey: cloudData.siteSettings.supabaseAnonKey || sbKey
+            };
+            setSiteSettings(mergedSettings);
+            window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings));
+          }
+          if (cloudData.adminCredentials && typeof cloudData.adminCredentials === 'object') {
+            setAdminCredentials(cloudData.adminCredentials);
+            window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(cloudData.adminCredentials));
+          }
+          if (cloudData.currencies && typeof cloudData.currencies === 'object') {
+            setCurrencies(cloudData.currencies);
+            window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(cloudData.currencies));
+          }
+          const syncSlice = (key, setter) => {
+            if (Array.isArray(cloudData[key])) {
+              setter(cloudData[key]);
+              window.localStorage.setItem('hmarket_v2_' + key, JSON.stringify(cloudData[key]));
+            }
+          };
+          syncSlice('groups', setGroups);
+          syncSlice('brands', setBrands);
+          syncSlice('autoTemplates', setAutoTemplates);
+          syncSlice('models', setModels);
+          syncSlice('parts', setParts);
+          syncSlice('clients', setClients);
+          syncSlice('accountRequests', setAccountRequests);
+          syncSlice('orders', setOrders);
+          syncSlice('returnsList', setReturnsList);
+          syncSlice('complaints', setComplaints);
+          syncSlice('promoCodes', setPromoCodes);
+          syncSlice('storeAds', setStoreAds);
+          syncSlice('showcaseBars', setShowcaseBars);
+          syncSlice('notifications', setNotifications);
+        }
+        setCloudSyncStatus('cloud_synced');
+        if (!silent) showToast('تمت مزامنة وتحديث كافة البيانات من السيرفر بنجاح ✓', 'success');
+        hasCloudInitialPullCompletedRef.current = true;
+      } else {
+        hasCloudInitialPullCompletedRef.current = true;
+        if (adminAuthenticated) {
+          pushToSupabaseCloud(null, false);
+        }
+      }
+    } catch (err) {
+      hasCloudInitialPullCompletedRef.current = true;
+    }
   };
 
   useEffect(() => {
     pullFromSupabaseCloud(true);
     const interval = setInterval(() => pullFromSupabaseCloud(true), 3500);
     return () => clearInterval(interval);
-  }, [siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey, adminAuthenticated]);
+  }, [siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey, adminAuthenticated, appPortal]);
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
@@ -1971,30 +2245,45 @@ export default function App() {
         prev.map(pc => (pc.id === appliedPromo.id ? { ...pc, usedCount: pc.usedCount + 1 } : pc))
       );
     }
+    const adminOrderNotif = {
+      id: `ntf_${Date.now()}_adm`,
+      target: 'admin',
+      type: 'new_order',
+      title: `طلبية جديدة #${newOrderId} (${currentClient.name})`,
+      msg: `أرسل "${currentClient.name}" (${currentClient.phone}) طلبية جديدة (${cartSummary.totalQty} قطع) بقيمة ${formatMoney(cartSummary.finalPayableBase)}`,
+      time: 'الآن',
+      read: false,
+      orderId: newOrderId
+    };
+    const clientOrderNotif = {
+      id: `ntf_${Date.now()}_cli`,
+      target: currentClient.id,
+      title: `تم استلام طلبك #${newOrderId}`,
+      msg: `تم تسجيل فاتورتك بنجاح وجاري تحضير القطع في المخزن (${cartSummary.totalQty} قطع).`,
+      time: 'الآن',
+      read: false,
+      orderId: newOrderId
+    };
+
     isCustomerMutatingCloudRef.current = true;
     setOrders(prev => [newOrder, ...prev]);
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
-    setNotifications(prev => [
-      {
-        id: `ntf_${Date.now()}_adm`,
-        target: 'admin',
-        title: `طلبية جديدة #${newOrderId}`,
-        msg: `أرسل "${currentClient.name}" طلبية جديدة (${cartSummary.totalQty} قطع) بقيمة ${formatMoney(cartSummary.finalPayableBase)}`,
-        time: 'الآن',
-        read: false,
-        orderId: newOrderId
-      },
-      {
-        id: `ntf_${Date.now()}_cli`,
-        target: currentClient.id,
-        title: `تم استلام طلبك #${newOrderId}`,
-        msg: `تم تسجيل فاتورتك بنجاح وجاري تحضير القطع في المخزن (${cartSummary.totalQty} قطع).`,
-        time: 'الآن',
-        read: false,
-        orderId: newOrderId
-      },
-      ...prev
-    ]);
+    setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
+
+    // Immediately merge into Supabase Cloud so Admin Dashboard receives the order & notification right away!
+    commitCustomerCloudTransaction(cloud => {
+      const updatedCloudParts = (Array.isArray(cloud.parts) ? cloud.parts : parts).map(p => {
+        const cartItem = cartSummary.items.find(i => i.part.id === p.id);
+        if (!cartItem) return p;
+        return { ...p, stock: Math.max(0, p.stock - cartItem.qty) };
+      });
+      return {
+        ...cloud,
+        parts: updatedCloudParts,
+        orders: [newOrder, ...(Array.isArray(cloud.orders) ? cloud.orders : orders)],
+        notifications: [adminOrderNotif, clientOrderNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+      };
+    });
     setCart({});
     setAppliedPromo(null);
     setPromoCodeInput('');
@@ -3047,85 +3336,150 @@ export default function App() {
           </div>
         )}
 
-        {/* Interactive Promotional Hero Banners Grid (Admin-Controlled Ads) */}
-        {activeAds.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* Main Featured Ad Banner (Takes 2 Columns on Desktop) */}
-            {activeAds[0] && (
-              <div
-                onClick={() => {
-                  const linkedPart = parts.find(p => p.id === activeAds[0].linkedPartId);
-                  setSelectedDetailItem({ type: 'ad', ad: activeAds[0], part: linkedPart });
-                }}
-                className={`lg:col-span-2 relative rounded-3xl overflow-hidden bg-gradient-to-r ${
-                  activeAds[0].gradient || 'from-slate-900 via-indigo-950 to-blue-900'
-                } text-white p-6 sm:p-8 flex flex-col justify-between min-h-[290px] cursor-pointer group shadow-xl border border-white/10`}
-              >
-                <img
-                  src={activeAds[0].image}
-                  alt={activeAds[0].title}
-                  className="absolute left-0 top-0 w-1/2 h-full object-cover opacity-30 group-hover:scale-105 group-hover:opacity-40 transition duration-500"
-                />
-                <div className="relative z-10 max-w-xl space-y-3">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-extrabold shadow">
-                    {activeAds[0].badge}
-                  </span>
-                  <h2 className="text-xl sm:text-3xl font-extrabold leading-tight">
-                    {activeAds[0].title}
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                    {activeAds[0].subtitle}
-                  </p>
-                </div>
+        {/* Interactive Promotional Hero Banners Carousel with Left/Right Navigation Buttons */}
+        {activeAds.length > 0 && (() => {
+          const currentAdIdx = heroAdIndex % activeAds.length;
+          const mainAd = activeAds[currentAdIdx] || activeAds[0];
+          const sideAds = activeAds.filter((_, idx) => idx !== currentAdIdx).slice(0, 2);
 
-                <div className="relative z-10 pt-5 flex flex-wrap items-center gap-3">
-                  <span className="px-5 py-2.5 rounded-xl bg-white text-slate-950 font-extrabold text-xs shadow-md group-hover:bg-amber-400 transition flex items-center gap-2">
-                    <span>{activeAds[0].buttonText || 'عرض تفاصيل العرض والطلب'}</span>
-                    <ChevronLeft className="w-4 h-4" />
-                  </span>
-                  <span className="text-[11px] text-slate-300 font-semibold">
-                    اضغط على الإعلان لفتح التفاصيل والطلب المباشر
-                  </span>
-                </div>
-              </div>
-            )}
+          return (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+              {/* Main Featured Ad Banner with Next/Prev Carousel Buttons */}
+              {mainAd && (
+                <div
+                  onClick={() => {
+                    const linkedPart = parts.find(p => p.id === mainAd.linkedPartId);
+                    setSelectedDetailItem({ type: 'ad', ad: mainAd, part: linkedPart });
+                  }}
+                  className={`${sideAds.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'} relative rounded-3xl overflow-hidden bg-gradient-to-r ${
+                    mainAd.gradient || 'from-slate-900 via-indigo-950 to-blue-900'
+                  } text-white p-6 sm:p-8 flex flex-col justify-between min-h-[295px] cursor-pointer group shadow-xl border border-white/10 select-none`}
+                >
+                  <img
+                    src={mainAd.image}
+                    alt={mainAd.title}
+                    className="absolute left-0 top-0 w-1/2 h-full object-cover opacity-30 group-hover:scale-105 group-hover:opacity-40 transition duration-500"
+                  />
 
-            {/* Side Stacked Promotional Banners */}
-            <div className="space-y-5 flex flex-col justify-between">
-              {activeAds.slice(1, 3).map(ad => {
-                const linkedPart = parts.find(p => p.id === ad.linkedPartId);
-                return (
-                  <div
-                    key={ad.id}
-                    onClick={() => setSelectedDetailItem({ type: 'ad', ad, part: linkedPart })}
-                    className={`relative flex-1 rounded-3xl overflow-hidden bg-gradient-to-l ${
-                      ad.gradient || 'from-slate-900 to-slate-800'
-                    } text-white p-5 flex flex-col justify-between cursor-pointer group shadow-md border border-white/10 min-h-[135px]`}
-                  >
-                    <img
-                      src={ad.image}
-                      alt={ad.title}
-                      className="absolute left-0 top-0 w-2/5 h-full object-cover opacity-25 group-hover:scale-110 transition duration-500"
-                    />
-                    <div className="relative z-10 space-y-1.5 max-w-[75%]">
-                      <span className="inline-block px-2.5 py-0.5 rounded-md bg-white/15 text-amber-300 text-[10px] font-extrabold">
-                        {ad.badge}
+                  {/* Left & Right Navigation Buttons for Ads */}
+                  {activeAds.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHeroAdIndex(prev => (prev - 1 + activeAds.length) % activeAds.length);
+                        }}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-cyan-500 text-white hover:text-slate-950 flex items-center justify-center text-xl font-black shadow-xl z-20 transition border border-white/25"
+                        title="الإعلان السابق"
+                      >
+                        ‹
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHeroAdIndex(prev => (prev + 1) % activeAds.length);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-cyan-500 text-white hover:text-slate-950 flex items-center justify-center text-xl font-black shadow-xl z-20 transition border border-white/25"
+                        title="الإعلان التالي"
+                      >
+                        ›
+                      </button>
+                    </>
+                  )}
+
+                  <div className="relative z-10 max-w-xl space-y-3 px-4">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-extrabold shadow">
+                        {mainAd.badge}
                       </span>
-                      <h3 className="text-sm font-extrabold leading-snug">{ad.title}</h3>
-                      <p className="text-[11px] text-slate-300 line-clamp-1">{ad.subtitle}</p>
+                      {activeAds.length > 1 && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-slate-950/70 text-cyan-300 text-[11px] font-mono font-bold border border-white/15">
+                          إعلان {currentAdIdx + 1} من {activeAds.length}
+                        </span>
+                      )}
                     </div>
-                    <div className="relative z-10 pt-2">
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-400 group-hover:translate-x-[-4px] transition">
-                        <span>{ad.buttonText}</span>
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </span>
-                    </div>
+                    <h2 className="text-xl sm:text-3xl font-extrabold leading-tight">
+                      {mainAd.title}
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                      {mainAd.subtitle}
+                    </p>
                   </div>
-                );
-              })}
+
+                  <div className="relative z-10 pt-5 px-4 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="px-5 py-2.5 rounded-xl bg-white text-slate-950 font-extrabold text-xs shadow-md group-hover:bg-amber-400 transition flex items-center gap-2">
+                        <span>{mainAd.buttonText || 'عرض تفاصيل العرض والطلب'}</span>
+                        <ChevronLeft className="w-4 h-4" />
+                      </span>
+                      <span className="text-[11px] text-slate-300 font-semibold">
+                        اضغط على الإعلان لفتح التفاصيل والطلب المباشر
+                      </span>
+                    </div>
+
+                    {/* Carousel Indicators */}
+                    {activeAds.length > 1 && (
+                      <div className="flex items-center gap-1.5 bg-slate-950/60 px-3 py-1.5 rounded-full border border-white/10">
+                        {activeAds.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setHeroAdIndex(idx);
+                            }}
+                            className={`h-2 rounded-full transition-all ${
+                              idx === currentAdIdx ? 'w-6 bg-amber-400' : 'w-2 bg-white/40 hover:bg-white/80'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Side Stacked Promotional Banners */}
+              {sideAds.length > 0 && (
+                <div className="space-y-5 flex flex-col justify-between">
+                  {sideAds.map(ad => {
+                    const linkedPart = parts.find(p => p.id === ad.linkedPartId);
+                    return (
+                      <div
+                        key={ad.id}
+                        onClick={() => setSelectedDetailItem({ type: 'ad', ad, part: linkedPart })}
+                        className={`relative flex-1 rounded-3xl overflow-hidden bg-gradient-to-l ${
+                          ad.gradient || 'from-slate-900 to-slate-800'
+                        } text-white p-5 flex flex-col justify-between cursor-pointer group shadow-md border border-white/10 min-h-[135px]`}
+                      >
+                        <img
+                          src={ad.image}
+                          alt={ad.title}
+                          className="absolute left-0 top-0 w-2/5 h-full object-cover opacity-25 group-hover:scale-110 transition duration-500"
+                        />
+                        <div className="relative z-10 space-y-1.5 max-w-[75%]">
+                          <span className="inline-block px-2.5 py-0.5 rounded-md bg-white/15 text-amber-300 text-[10px] font-extrabold">
+                            {ad.badge}
+                          </span>
+                          <h3 className="text-sm font-extrabold leading-snug">{ad.title}</h3>
+                          <p className="text-[11px] text-slate-300 line-clamp-1">{ad.subtitle}</p>
+                        </div>
+                        <div className="relative z-10 pt-2">
+                          <span className="inline-flex items-center gap-1 text-xs font-extrabold text-amber-400 group-hover:translate-x-[-4px] transition">
+                            <span>{ad.buttonText}</span>
+                            <ChevronLeft className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Visual Mobile Models Showcase Strip (With Model Images!) */}
         <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs space-y-4">
@@ -3229,44 +3583,25 @@ export default function App() {
   };
 
   const renderStickyCartBar = () => (
-    <div className="fixed bottom-4 left-4 right-4 max-w-5xl mx-auto bg-slate-900/95 backdrop-blur-md text-white rounded-2xl p-4 shadow-2xl border border-slate-700 flex flex-wrap items-center justify-between gap-4 z-30">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-extrabold">
+    <button
+      type="button"
+      onClick={() => setCartDrawerOpen(true)}
+      className="fixed bottom-6 left-6 z-40 group flex items-center gap-3 bg-gradient-to-l from-slate-900 via-indigo-950 to-slate-900 hover:from-emerald-600 hover:to-teal-600 text-white p-3.5 rounded-full shadow-2xl border-2 border-emerald-400/70 hover:scale-105 transition-all duration-300"
+      title="اضغط لفتح سلة المشتريات ومراجعة الأصناف"
+    >
+      <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500 text-slate-950 shadow-md">
+        <ShoppingCart className="w-5 h-5 stroke-[2.5]" />
+        <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1 rounded-full bg-rose-600 text-white text-[11px] font-black flex items-center justify-center border-2 border-slate-900 shadow">
           {cartSummary.totalQty}
-        </div>
-        <div>
-          <div className="text-xs text-slate-300">
-            سلة المشتريات نشطة ومحفوظة ({cartSummary.items.length} أصناف)
-          </div>
-          <div className="text-base font-extrabold text-emerald-400">
-            إجمالي السلة: {formatMoney(cartSummary.subtotalBase)}
-          </div>
+        </span>
+      </div>
+      <div className="text-right pr-1 pl-2 hidden sm:block">
+        <div className="text-[10px] text-emerald-300 font-bold leading-none mb-1">سلة المشتريات</div>
+        <div className="text-xs font-black text-white font-mono leading-none">
+          {formatMoney(cartSummary.subtotalBase)}
         </div>
       </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => setCartDrawerOpen(true)}
-          className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition"
-        >
-          مراجعة السلة
-        </button>
-        <button
-          onClick={() => {
-            if (!currentClient) {
-              setAuthModalTab('login');
-              setLoginModalOpen(true);
-            } else {
-              setClientTab('checkout');
-            }
-          }}
-          className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition flex items-center gap-1.5 shadow-md"
-        >
-          <span>إتمام الطلب الآن</span>
-          <ChevronLeft className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
+    </button>
   );
 
   // --- 2. DEDICATED INSTANT SEARCH & FULL CATALOG PAGE ---
@@ -3829,19 +4164,16 @@ export default function App() {
     }
   }, [currentClient?.id]);
 
-  const handleClientAvatarFileUpload = (e) => {
+  const handleClientAvatarFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new CompressedImageReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      setProfileForm(prev => ({ ...prev, avatarImage: dataUrl }));
-      setClients(prev =>
-        prev.map(c => (c.id === currentClient.id ? { ...c, avatarImage: dataUrl } : c))
-      );
-      showToast('تم رفع وتحديث الصورة الشخصية للحساب بنجاح!', 'success');
-    };
-    reader.readAsDataURL(file);
+    const uploadedUrl = await processAndUploadImage(file, 'avatars');
+    if (!uploadedUrl) return;
+    setProfileForm(prev => ({ ...prev, avatarImage: uploadedUrl }));
+    setClients(prev =>
+      prev.map(c => (c.id === currentClient.id ? { ...c, avatarImage: uploadedUrl } : c))
+    );
+    showToast('تم ضغط ورفع الصورة الشخصية للحساب بنجاح!', 'success');
   };
 
   const handleSaveClientProfile = (e) => {
@@ -5158,51 +5490,183 @@ export default function App() {
 
         {/* Main Workspace Area */}
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden space-y-6">
-          {/* Top Executive Status Bar */}
-          <div className="bg-white rounded-2xl px-5 py-3.5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-400" />
-              <span className="text-xs font-extrabold text-slate-800">
-                جميع التعديلات والطلبات محفوظة تلقائياً وتعمل بدون فقدان عند عمل Refresh ({cloudSyncStatus === 'cloud_synced' ? 'متصل بقاعدة بيانات Supabase السحابية ✓' : 'حفظ فوري ومزامنة لحظية نشطة ✓'})
-              </span>
+          {/* Top Executive Status Bar + Notification Center + Server Save Confirmation */}
+          <div className="bg-white rounded-2xl px-5 py-3.5 border border-slate-200 shadow-xs space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className={`w-3 h-3 rounded-full ${cloudSyncStatus === 'syncing' ? 'bg-amber-400 animate-ping' : 'bg-emerald-500 shadow-sm shadow-emerald-400'}`} />
+                <span className="text-xs font-extrabold text-slate-800">
+                  {cloudSyncStatus === 'cloud_synced'
+                    ? 'متصل بالسيرفر السحابي (Supabase) — كافة المدخلات والطلبات محفوظة ✓'
+                    : cloudSyncStatus === 'syncing'
+                    ? 'جاري حفظ ومزامنة المدخلات مع السيرفر...'
+                    : 'حفظ فوري ومزامنة لحظية نشطة ✓'}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs relative">
+                {/* Explicit Server Save Button */}
+                <button
+                  type="button"
+                  onClick={() => pushToSupabaseCloud(null, true)}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-l from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>حفظ وتأكيد كافة التعديلات في السيرفر ✓</span>
+                </button>
+
+                {/* One-Click Migrate Base64 Images to Storage */}
+                <button
+                  type="button"
+                  disabled={migratingImages}
+                  onClick={handleMigrateAllBase64ImagesToStorage}
+                  className="px-3 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-900 font-extrabold flex items-center gap-1.5 border border-indigo-200 transition"
+                  title="ضغط الصور القديمة ونقلها إلى Supabase Storage لتصغير حجم الصف وتسريع الحفظ"
+                >
+                  <Upload className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{migratingImages ? 'جاري النقل...' : 'نقل الصور لـ Storage'}</span>
+                </button>
+
+                {/* Pull Latest Orders/Accounts from Server */}
+                <button
+                  type="button"
+                  onClick={() => pullFromSupabaseCloud(false)}
+                  className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold flex items-center gap-1.5 border border-slate-300 transition"
+                  title="جلب أحدث طلبات العملاء والحسابات المسجلة من السيرفر الآن"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-blue-600" />
+                  <span>تحديث من السيرفر</span>
+                </button>
+
+                {/* Admin Notification Bell Dropdown */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setAdminNotifPanelOpen(prev => !prev)}
+                    className={`px-3.5 py-2 rounded-xl font-extrabold flex items-center gap-1.5 border transition ${
+                      notifications.filter(n => n.target === 'admin' && !n.read).length > 0 || pendingReqCount > 0
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-md animate-pulse'
+                        : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 border-amber-500/30'
+                    }`}
+                  >
+                    <Bell className="w-4 h-4" />
+                    <span>
+                      الإشعارات ({notifications.filter(n => n.target === 'admin' && !n.read).length + pendingReqCount} جديد)
+                    </span>
+                  </button>
+
+                  {adminNotifPanelOpen && (
+                    <div className="absolute left-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden">
+                      <div className="p-3 bg-slate-900 text-white flex items-center justify-between">
+                        <span className="font-extrabold text-xs">مركز إشعارات الإدارة (الطلبات والحسابات)</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNotifications(prev => prev.map(n => (n.target === 'admin' ? { ...n, read: true } : n)));
+                          }}
+                          className="text-[11px] text-cyan-300 hover:underline font-bold"
+                        >
+                          تحديد الكل كمقروء
+                        </button>
+                      </div>
+                      <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                        {pendingReqCount > 0 && (
+                          <div
+                            onClick={() => {
+                              setAdminTab('clients');
+                              setAdminNotifPanelOpen(false);
+                            }}
+                            className="p-3 bg-rose-50 hover:bg-rose-100/80 cursor-pointer transition flex items-start gap-2.5"
+                          >
+                            <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 mt-0.5">
+                              <Users className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="font-black text-rose-950 text-xs">
+                                يوجد ({pendingReqCount}) عميل جديد بانتظار تأكيد إضافته!
+                              </div>
+                              <div className="text-[11px] text-rose-800 mt-0.5">
+                                اضغط هنا لفتح قسم الحسابات والموافقة على إضافتهم فوراً.
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {notifications
+                          .filter(n => n.target === 'admin')
+                          .slice(0, 15)
+                          .map(n => (
+                            <div
+                              key={n.id}
+                              onClick={() => {
+                                setNotifications(prev => prev.map(x => (x.id === n.id ? { ...x, read: true } : x)));
+                                if (n.type === 'account_request' || n.reqId) {
+                                  setAdminTab('clients');
+                                } else {
+                                  setAdminTab('orders');
+                                }
+                                setAdminNotifPanelOpen(false);
+                              }}
+                              className={`p-3 cursor-pointer hover:bg-slate-50 transition ${!n.read ? 'bg-amber-50/70' : 'bg-white'}`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="font-extrabold text-slate-900 text-xs">{n.title}</span>
+                                <span className="text-[10px] text-slate-400">{n.time}</span>
+                              </div>
+                              <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{n.msg}</p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => switchPortal('storefront')}
+                  className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold"
+                >
+                  عرض المتجر
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => pushToSupabaseCloud(null, true)}
-                className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold flex items-center gap-1.5 shadow-xs transition"
-                title="رفع وتثبيت جميع التعديلات والبيانات الحالية في السحابة لتظهر في كل الموبايلات والمتصفحات فوراً"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                <span>تثبيت التعديلات في السحابة الآن</span>
-              </button>
-              <button
-                onClick={() => {
-                  setAdminTab('orders');
-                  setNotifications(prev => prev.map(n => (n.target === 'admin' ? { ...n, read: true } : n)));
-                }}
-                className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 border border-amber-500/30 font-extrabold flex items-center gap-1.5"
-              >
-                <Bell className="w-3.5 h-3.5 text-amber-600" />
-                <span>إشعارات الأوردرات ({notifications.filter(n => n.target === 'admin' && !n.read).length} جديد)</span>
-              </button>
-              {pendingReqCount > 0 && (
-                <button
-                  onClick={() => setAdminTab('clients')}
-                  className="px-3 py-1.5 rounded-xl bg-rose-600 text-white font-extrabold flex items-center gap-1.5 shadow-xs"
-                >
-                  <Bell className="w-3.5 h-3.5" />
-                  يوجد {pendingReqCount} طلبات فتح حساب جديدة
-                </button>
-              )}
-              <button
-                onClick={() => switchPortal('storefront')}
-                className="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold"
-              >
-                عرض المتجر
-              </button>
-            </div>
+            {/* Live Alert Banner whenever there are Pending Account Confirmations or Unread New Orders */}
+            {(pendingReqCount > 0 || notifications.filter(n => n.target === 'admin' && !n.read && n.orderId).length > 0) && (
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                {pendingReqCount > 0 && (
+                  <div
+                    onClick={() => setAdminTab('clients')}
+                    className="flex-1 min-w-[260px] p-2.5 rounded-xl bg-rose-600 text-white font-extrabold text-xs flex items-center justify-between cursor-pointer hover:bg-rose-700 transition shadow-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Bell className="w-4 h-4 animate-bounce" />
+                      <span>تنبيه: يوجد ({pendingReqCount}) طلب إضافة حساب عميل جديد بانتظار تأكيدك!</span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg bg-white text-rose-700 text-[11px] font-black">
+                      مراجعة وتأكيد الآن ←
+                    </span>
+                  </div>
+                )}
+                {notifications.filter(n => n.target === 'admin' && !n.read && n.orderId).length > 0 && (
+                  <div
+                    onClick={() => {
+                      setAdminTab('orders');
+                      setNotifications(prev => prev.map(n => (n.target === 'admin' && n.orderId ? { ...n, read: true } : n)));
+                    }}
+                    className="flex-1 min-w-[260px] p-2.5 rounded-xl bg-amber-500 text-slate-950 font-extrabold text-xs flex items-center justify-between cursor-pointer hover:bg-amber-400 transition shadow-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4" />
+                      <span>
+                        تنبيه: وصلت ({notifications.filter(n => n.target === 'admin' && !n.read && n.orderId).length}) طلبية شراء جديدة من العملاء!
+                      </span>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-lg bg-slate-950 text-amber-300 text-[11px] font-black">
+                      فتح الطلبات الجديدة ←
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {adminTab === 'overview' && renderAdminOverview()}
@@ -5216,6 +5680,40 @@ export default function App() {
           {adminTab === 'clients' && renderAdminClients()}
           {adminTab === 'returns' && renderAdminReturnsAndComplaints()}
           {adminTab === 'schema' && renderAdminDatabaseSchema()}
+
+          {/* Persistent Bottom Save & Server Sync Confirmation Bar inside Admin Dashboard */}
+          <div className="sticky bottom-4 z-40 bg-slate-900/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-cyan-500/40 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 text-xs">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="font-extrabold text-white">تأكيد حفظ العمليات والمدخلات في السيرفر</div>
+                <div className="text-[11px] text-slate-300">
+                  اضغط على زر الحفظ لتثبيت كافة التعديلات والمنتجات والإعلانات والحسابات في السيرفر فوراً
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => pullFromSupabaseCloud(false)}
+                className="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1.5 border border-slate-700 transition"
+              >
+                <RefreshCw className="w-3.5 h-3.5 text-cyan-400" />
+                <span>جلب أحدث الطلبات</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => pushToSupabaseCloud(null, true)}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-l from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/25 flex items-center gap-2 transition"
+              >
+                <Save className="w-4 h-4 stroke-[2.5]" />
+                <span>تأكيد وحفظ كل العمليات في السيرفر الآن ✓</span>
+              </button>
+            </div>
+          </div>
         </main>
       </div>
     );
@@ -5234,9 +5732,14 @@ export default function App() {
               عدّل روابط واتساب وفيسبوك وإنستجرام وشروط العمل وسياسة الاسترجاع والدليفري التي تظهر في أسفل الموقع
             </p>
           </div>
-          <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold">
-            يتم حفظ جميع التعديلات تلقائياً ✓
-          </span>
+          <button
+            type="button"
+            onClick={() => pushToSupabaseCloud(null, true)}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+          >
+            <Save className="w-4 h-4" />
+            <span>حفظ وتأكيد الإعدادات في السيرفر ✓</span>
+          </button>
         </div>
 
         {/* Store Name & Social Media Links */}
@@ -5399,6 +5902,28 @@ export default function App() {
                 className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
               />
             </div>
+          </div>
+
+          {/* One-Click Batch Migration of Old Base64 Images to Supabase Storage */}
+          <div className="p-4 rounded-2xl bg-indigo-50/80 border border-indigo-200 flex flex-wrap items-center justify-between gap-3 mt-3">
+            <div className="space-y-1 max-w-xl">
+              <div className="font-extrabold text-indigo-950 text-xs flex items-center gap-1.5">
+                <Database className="w-4 h-4 text-indigo-600" />
+                <span>أداة تنظيف وتصغير حجم الصف ونقل الصور القديمة إلى Supabase Storage</span>
+              </div>
+              <p className="text-[11px] text-indigo-800 leading-relaxed">
+                إذا كان لديك صور منتجات أو إعلانات قديمة مخزنة بصيغة Base64 كبيرة داخل الصف، اضغط هذا الزر ليقوم النظام بضغطها (900px وجودة 72%) ورفعها إلى Bucket <span className="font-mono font-bold">product-images</span> واستبدالها بروابط خفيفة وحفظ الصف فوراً.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={migratingImages}
+              onClick={handleMigrateAllBase64ImagesToStorage}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition shrink-0"
+            >
+              <Upload className="w-4 h-4" />
+              <span>{migratingImages ? migrationProgress || 'جاري نقل الصور...' : 'ضغط ونقل الصور القديمة لـ Storage الآن'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -5982,12 +6507,14 @@ export default function App() {
   const [partGroupPricesModalPart, setPartGroupPricesModalPart] = useState(null);
   const [groupModalSearchQuery, setGroupModalSearchQuery] = useState('');
 
-  const handleNewModelImageFileUpload = (e) => {
+  const handleNewModelImageFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new CompressedImageReader();
-    reader.onload = () => setNewModelImage(reader.result);
-    reader.readAsDataURL(file);
+    const uploadedUrl = await processAndUploadImage(file, 'models');
+    if (uploadedUrl) {
+      setNewModelImage(uploadedUrl);
+      showToast('تم ضغط وتجهيز صورة الموديل بنجاح!', 'info');
+    }
   };
 
   const generateTemplatePartsForModel = (modelObj) => {
@@ -6158,6 +6685,15 @@ export default function App() {
                 className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold"
               >
                 + فتح كل الموديلات
+              </button>
+
+              <button
+                type="button"
+                onClick={() => pushToSupabaseCloud(null, true)}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+              >
+                <Save className="w-4 h-4" />
+                <span>حفظ وتأكيد الكتالوج في السيرفر ✓</span>
               </button>
 
               <button
@@ -7212,10 +7748,20 @@ export default function App() {
         className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4"
       >
         <div>
-          <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-            <Percent className="w-5 h-5 text-rose-600" />
-            إنشاء وإدارة أكواد الخصم والكوبونات الذكية
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+              <Percent className="w-5 h-5 text-rose-600" />
+              إنشاء وإدارة أكواد الخصم والكوبونات الذكية
+            </h2>
+            <button
+              type="button"
+              onClick={() => pushToSupabaseCloud(null, true)}
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+            >
+              <Save className="w-4 h-4" />
+              <span>حفظ وتأكيد الكوبونات في السيرفر ✓</span>
+            </button>
+          </div>
           <p className="text-xs text-slate-500 mt-0.5">
             أنشئ أكواد خصم بنسبة مئوية (%)، أو مبلغ نقدي ثابت، أو توصيل مجاني/مخفض، مع تحديد الحد الأقصى لمبلغ الخصم والحد الأدنى للطلب وعدد مرات الاستخدام
           </p>
@@ -7403,12 +7949,14 @@ export default function App() {
     selectedPartIds: ['prt_1', 'prt_2', 'prt_3']
   });
 
-  const handleNewAdImageUpload = (e) => {
+  const handleNewAdImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new CompressedImageReader();
-    reader.onload = () => setNewAdForm(prev => ({ ...prev, image: reader.result }));
-    reader.readAsDataURL(file);
+    const uploadedUrl = await processAndUploadImage(file, 'ads');
+    if (uploadedUrl) {
+      setNewAdForm(prev => ({ ...prev, image: uploadedUrl }));
+      showToast('تم ضغط ورفع صورة الإعلان بنجاح!', 'info');
+    }
   };
 
   const renderAdminStorefrontCms = () => (
@@ -7698,19 +8246,16 @@ export default function App() {
     }
   }, [selectedAdminClient?.id]);
 
-  const handleAdminUploadClientAvatar = (e) => {
+  const handleAdminUploadClientAvatar = async (e) => {
     const file = e.target.files?.[0];
     if (!file || !adminEditClientForm) return;
-    const reader = new CompressedImageReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      setAdminEditClientForm(prev => ({ ...prev, avatarImage: dataUrl }));
-      setClients(prev =>
-        prev.map(c => (c.id === adminEditClientForm.id ? { ...c, avatarImage: dataUrl } : c))
-      );
-      showToast('تم رفع وتحديث صورة حساب العميل بنجاح!', 'success');
-    };
-    reader.readAsDataURL(file);
+    const uploadedUrl = await processAndUploadImage(file, 'avatars');
+    if (!uploadedUrl) return;
+    setAdminEditClientForm(prev => ({ ...prev, avatarImage: uploadedUrl }));
+    setClients(prev =>
+      prev.map(c => (c.id === adminEditClientForm.id ? { ...c, avatarImage: uploadedUrl } : c))
+    );
+    showToast('تم ضغط ورفع صورة حساب العميل بنجاح!', 'success');
   };
 
   const handleAdminSaveClientFullEdits = (e) => {
@@ -7848,8 +8393,14 @@ export default function App() {
                         onClick={() =>
                           setApprovingRequestObj({
                             req,
-                            groupId: groups[1]?.id || groups[0].id,
-                            creditLimit: 15000,
+                            groupId:
+                              req.accountCategory === 'individual' || (req.shopType || '').includes('فردي')
+                                ? groups.find(g => g.isDefault)?.id || groups[0].id
+                                : groups[1]?.id || groups[0].id,
+                            creditLimit:
+                              req.accountCategory === 'individual' || (req.shopType || '').includes('فردي')
+                                ? 0
+                                : 15000,
                             password: req.requestedPassword || '123',
                             avatar: req.shopName.slice(0, 2),
                             avatarBg: 'from-emerald-600 to-teal-700'
@@ -7922,6 +8473,27 @@ export default function App() {
                           {c.owner} • <span className="font-mono">{c.phone}</span>
                         </div>
                       </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          askConfirmDelete(
+                            'حذف الحساب بشكل نهائي',
+                            `هل أنت متأكد من حذف حساب "${c.name}" (${c.phone}) نهائياً؟`,
+                            () => {
+                              const remaining = clients.filter(x => x.id !== c.id);
+                              setClients(remaining);
+                              if (activeRole === c.id) setActiveRole('guest');
+                              if (selectedClient?.id === c.id) setSelectedAdminClientId(remaining[0]?.id || '');
+                              showToast(`تم حذف الحساب "${c.name}" بشكل نهائي.`, 'info');
+                            }
+                          );
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition shrink-0"
+                        title="حذف الحساب نهائياً"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                     <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-[11px]">
                       <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
@@ -7965,7 +8537,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => handleSwitchRole(selectedClient.id)}
@@ -7980,7 +8552,28 @@ export default function App() {
                       className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
                     >
                       <Save className="w-3.5 h-3.5" />
-                      حفظ تعديلات الحساب
+                      حفظ وتأكيد تعديلات الحساب
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        askConfirmDelete(
+                          'حذف حساب العميل بشكل نهائي',
+                          `هل أنت متأكد من حذف حساب "${selectedClient.name}" (${selectedClient.phone}) نهائياً من النظام؟ لن يتمكن من تسجيل الدخول مرة أخرى.`,
+                          () => {
+                            const remaining = clients.filter(c => c.id !== selectedClient.id);
+                            setClients(remaining);
+                            if (activeRole === selectedClient.id) setActiveRole('guest');
+                            setSelectedAdminClientId(remaining[0]?.id || '');
+                            showToast(`تم حذف الحساب "${selectedClient.name}" بشكل نهائي.`, 'info');
+                          }
+                        )
+                      }
+                      className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 text-xs font-extrabold flex items-center gap-1.5 transition"
+                      title="حذف الحساب نهائياً"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      حذف الحساب نهائياً
                     </button>
                   </div>
                 </div>
@@ -8881,88 +9474,63 @@ model OrderInvoice {
     const isIndiv = regForm.accountCategory === 'individual';
     const clientName = isIndiv ? regForm.ownerName.trim() : regForm.shopName.trim();
     const ownerName = regForm.ownerName.trim() || clientName;
+    const nowFormatted = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+    const newReq = {
+      id: `req_${Date.now()}`,
+      accountCategory: isIndiv ? 'individual' : 'shop',
+      shopName: clientName,
+      ownerName: ownerName,
+      phone: cleanPhone,
+      email: regForm.email.trim(),
+      requestedPassword: regForm.password,
+      address: regForm.address.trim(),
+      shopType: isIndiv ? 'عميل فردي (شخص عادي)' : regForm.shopType,
+      notes: regForm.notes.trim(),
+      createdAt: nowFormatted,
+      status: 'pending'
+    };
+
+    const newAdminNotif = {
+      id: `ntf_${Date.now()}_req`,
+      target: 'admin',
+      type: 'account_request',
+      title: isIndiv ? `طلب حساب شخصي جديد: ${clientName}` : `طلب حساب محل/تاجر جديد: ${clientName}`,
+      msg: `قدم "${clientName}" (${isIndiv ? 'شخص عادي' : regForm.shopType}) برقم هاتف (${cleanPhone}) طلباً لإنشاء حساب وبانتظار تأكيدك وإضافته.`,
+      time: 'الآن',
+      read: false,
+      reqId: newReq.id
+    };
 
     isCustomerMutatingCloudRef.current = true;
+    setAccountRequests(prev => [newReq, ...prev]);
+    setNotifications(prev => [newAdminNotif, ...prev]);
 
-    if (isIndiv) {
-      // Individual Customer: Instant account creation with default retail pricing
-      const newClientId = `cli_${Date.now()}`;
-      const newClientObj = {
-        id: newClientId,
-        name: clientName,
-        owner: ownerName,
-        phone: cleanPhone,
-        email: regForm.email.trim(),
-        password: regForm.password,
-        address: regForm.address.trim(),
-        secondaryAddress: '',
-        groupId: 'grp_default', // Default retail group
-        walletBalance: 0,
-        creditLimit: 0,
-        avatar: clientName.slice(0, 2),
-        avatarBg: 'from-emerald-600 to-teal-700',
-        avatarImage: '',
-        status: 'active',
-        createdAt: new Date().toISOString().slice(0, 10),
-        ledger: []
-      };
+    // Immediately merge into Supabase Cloud so Admin Dashboard receives it right away!
+    commitCustomerCloudTransaction(cloud => ({
+      ...cloud,
+      accountRequests: [newReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
+      notifications: [newAdminNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+    }));
 
-      setClients(prev => [newClientObj, ...prev]);
-      setActiveRole(newClientId);
-      setLoginModalOpen(false);
-      setRegErrors({});
-      setRegForm({
-        accountCategory: 'individual',
-        shopName: '',
-        ownerName: '',
-        phone: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        address: '',
-        shopType: 'عميل فردي (استخدام شخصي)',
-        notes: ''
-      });
-      showToast(
-        `أهلاً بك "${clientName}"! تم إنشاء حسابك الشخصي بنجاح وتسجيل الدخول فوراً. يمكنك الآن التسوق وتأكيد طلباتك!`,
-        'success'
-      );
-    } else {
-      // Merchant / Shop: Submit to Admin Account Requests for wholesale tier review
-      const newReq = {
-        id: `req_${Date.now()}`,
-        shopName: clientName,
-        ownerName: ownerName,
-        phone: cleanPhone,
-        email: regForm.email.trim(),
-        requestedPassword: regForm.password,
-        address: regForm.address.trim(),
-        shopType: regForm.shopType,
-        notes: regForm.notes.trim(),
-        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        status: 'pending'
-      };
-
-      setAccountRequests(prev => [newReq, ...prev]);
-      setLoginModalOpen(false);
-      setRegErrors({});
-      setRegForm({
-        accountCategory: 'shop',
-        shopName: '',
-        ownerName: '',
-        phone: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        address: '',
-        shopType: 'مركز صيانة ومبيعات قطع غيار',
-        notes: ''
-      });
-      showToast(
-        'تم إرسال طلب فتح حساب التاجر للإدارة بنجاح! سيتم مراجعته وتفعيل شريحة أسعار الجملة المخصصة لكم.',
-        'success'
-      );
-    }
+    setLoginModalOpen(false);
+    setRegErrors({});
+    setRegForm({
+      accountCategory: 'individual',
+      shopName: '',
+      ownerName: '',
+      phone: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      address: '',
+      shopType: 'عميل فردي (استخدام شخصي)',
+      notes: ''
+    });
+    showToast(
+      `تم إرسال طلب إنشاء حسابك (${clientName}) إلى الإدارة بنجاح! سيتم تأكيد وتفعيل حسابكم فوراً.`,
+      'success'
+    );
   };
 
   const renderLoginModal = () => {
@@ -9292,7 +9860,7 @@ model OrderInvoice {
                 }`}
               >
                 <Check className="w-4 h-4 stroke-[3]" />
-                {regForm.accountCategory === 'individual' ? 'إنشاء الحساب وبدء التسوق فوراً' : 'إرسال طلب فتح حساب التاجر للمراجعة'}
+                {regForm.accountCategory === 'individual' ? 'إرسال بياناتي وتأكيد إنشاء الحساب الشخصي' : 'إرسال طلب فتح حساب المحل / التاجر للإدارة'}
               </button>
             </form>
           )}
@@ -9470,14 +10038,13 @@ model OrderInvoice {
     avatarImage: ''
   });
 
-  const handleDirectClientAvatarUpload = (e) => {
+  const handleDirectClientAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new CompressedImageReader();
-    reader.onload = () => {
-      setDirectClientForm(prev => ({ ...prev, avatarImage: reader.result }));
-    };
-    reader.readAsDataURL(file);
+    const uploadedUrl = await processAndUploadImage(file, 'avatars');
+    if (uploadedUrl) {
+      setDirectClientForm(prev => ({ ...prev, avatarImage: uploadedUrl }));
+    }
   };
 
   const renderAdminCreateClientModal = () => {
@@ -11068,24 +11635,26 @@ model OrderInvoice {
   const renderAddPartToModelModal = () => {
     if (!addingPartToModel) return null;
 
-    const handleUploadNewPartCustomImage = (e) => {
-      const files = Array.from(e.target.files || []);
+    const handleUploadNewPartCustomImage = async (e) => {
+      const files = Array.from(e.target.files || []).slice(0, 5);
       if (files.length === 0) return;
-      files.forEach(file => {
-        const reader = new CompressedImageReader();
-        reader.onload = () => {
+      showToast('جاري ضغط ورفع صور المنتج تلقائياً (أقصى 900px وجودة 72%)...', 'info');
+      for (const file of files) {
+        const uploadedUrl = await processAndUploadImage(file, 'parts');
+        if (uploadedUrl) {
           setAddingPartToModel(prev => {
+            if (!prev) return prev;
             const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : [];
-            const nextList = [...currentList, reader.result].slice(0, 5);
+            const nextList = [...currentList, uploadedUrl].slice(0, 5);
             return {
               ...prev,
-              customImage: nextList[0] || reader.result,
+              customImage: nextList[0] || uploadedUrl,
               imagesList: nextList
             };
           });
-        };
-        reader.readAsDataURL(file);
-      });
+        }
+      }
+      showToast('تم ضغط ورفع صور المنتج بنجاح ✓', 'success');
     };
 
     const handleSaveNewPart = (e) => {
@@ -11365,24 +11934,26 @@ model OrderInvoice {
   const renderEditPartModal = () => {
     if (!editingPartObj) return null;
 
-    const handleEditPartImageUpload = (e) => {
-      const files = Array.from(e.target.files || []);
+    const handleEditPartImageUpload = async (e) => {
+      const files = Array.from(e.target.files || []).slice(0, 5);
       if (files.length === 0) return;
-      files.forEach(file => {
-        const reader = new CompressedImageReader();
-        reader.onload = () => {
+      showToast('جاري ضغط ورفع صور المنتج تلقائياً (أقصى 900px وجودة 72%)...', 'info');
+      for (const file of files) {
+        const uploadedUrl = await processAndUploadImage(file, 'parts');
+        if (uploadedUrl) {
           setEditingPartObj(prev => {
+            if (!prev) return prev;
             const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : (prev.image ? [prev.image] : []);
-            const nextList = [...currentList, reader.result].slice(0, 5);
+            const nextList = [...currentList, uploadedUrl].slice(0, 5);
             return {
               ...prev,
-              image: nextList[0] || reader.result,
+              image: nextList[0] || uploadedUrl,
               imagesList: nextList
             };
           });
-        };
-        reader.readAsDataURL(file);
-      });
+        }
+      }
+      showToast('تم ضغط ورفع صور المنتج بنجاح ✓', 'success');
     };
 
     const handleSaveEditedPart = (e) => {
@@ -11610,14 +12181,14 @@ model OrderInvoice {
   const renderEditModelModal = () => {
     if (!editingModelObj) return null;
 
-    const handleEditModelImageUpload = (e) => {
+    const handleEditModelImageUpload = async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new CompressedImageReader();
-      reader.onload = () => {
-        setEditingModelObj(prev => ({ ...prev, image: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      const uploadedUrl = await processAndUploadImage(file, 'models');
+      if (uploadedUrl) {
+        setEditingModelObj(prev => (prev ? { ...prev, image: uploadedUrl } : prev));
+        showToast('تم ضغط ورفع صورة الموديل بنجاح ✓', 'success');
+      }
     };
 
     const handleSaveModel = (e) => {
