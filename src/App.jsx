@@ -312,22 +312,42 @@ const PART_IMAGES = {
   logo: HMARKET_LOGO
 };
 
+const CREDIT_PAYMENT_ID = 'آجل / على الحساب';
+
+const INITIAL_PAYMENT_METHODS = [
+  { id: 'كاش عند الاستلام', label: 'كاش عند الاستلام', desc: 'ادفع كاش للمندوب وقت ما تستلم وتعاين القطع', enabled: true, type: 'cash' },
+  { id: CREDIT_PAYMENT_ID, label: 'آجل / على الحساب', desc: 'الفاتورة بتتسجّل على كشف حساب المحل بتاعك', enabled: true, type: 'credit' },
+  { id: 'حساب بنكي / إنستا باي', label: 'حساب بنكي / إنستا باي', desc: 'حوّل على حساب الشركة (CIB) أو إنستا باي', enabled: true, type: 'transfer' },
+  { id: 'Apple Pay / بطاقة بنكية', label: 'بطاقة بنكية / Apple Pay', desc: 'دفع إلكتروني فوري وآمن من غير أي رسوم زيادة', enabled: true, type: 'card' }
+];
+
+const getPaymentMethods = (settings) =>
+  settings && Array.isArray(settings.paymentMethods) && settings.paymentMethods.length > 0
+    ? settings.paymentMethods
+    : INITIAL_PAYMENT_METHODS;
+
+const normalizeDigits = (str) =>
+  String(str || '')
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
+
 const INITIAL_SITE_SETTINGS = {
   storeName: 'H-market',
   storeSubtitle: 'MOBILE ACCESSORIES & SPARE PARTS SHOP',
-  storeTagline: 'وجهتك المتكاملة لكل ما يخص الموبايل، الإكسسوارات الأصلية، الشواحن، السماعات، وقطع الغيار للجملة والقطاعي',
+  storeTagline: 'كل اللي محتاجه لموبايلك في مكان واحد: إكسسوارات أصلية، شواحن، سماعات، وقطع غيار جملة وقطاعي',
   whatsappUrl: 'https://wa.me/201012345678',
   whatsappNumber: '01012345678',
   facebookUrl: 'https://facebook.com/hmarket.official',
   instagramUrl: 'https://instagram.com/hmarket.official',
   hotline: '19950',
-  workingHours: 'يومياً من 10 صباحاً حتى 11 مساءً',
-  termsTitle: 'قواعد العمل والشروط والأحكام العامة',
-  termsText: 'جميع المنتجات المعروضة في H-market مفحوصة ومضمونة. الأسعار يتم تحديثها لحظياً، ويتم تأكيد الطلبية وحجز الكمية فور إتمام الطلب.',
+  workingHours: 'كل يوم من 10 الصبح لحد 11 بالليل',
+  termsTitle: 'قواعد الشغل والشروط العامة',
+  termsText: 'كل المنتجات في H-market متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
   returnPolicyTitle: 'سياسة الاسترجاع والضمان (القطع والإكسسوارات)',
-  returnPolicyText: 'الضمان ساري لمدة 7 إلى 14 يوماً من تاريخ الاستلام. يشترط في قطع الغيار بقاء الختم المائي والاستيكر الأصلي بحالة المصنع بدون لزق أو لحام، وفي الإكسسوارات الحفاظ على العلبة الأصلية والسيريال.',
+  returnPolicyText: 'الضمان ساري من 7 لـ 14 يوم من يوم الاستلام. في قطع الغيار لازم الختم المائي والاستيكر الأصلي يفضلوا زي ما جم من المصنع من غير لزق أو لحام، وفي الإكسسوارات لازم العلبة الأصلية والسيريال يتحافظ عليهم.',
   deliveryPolicyTitle: 'سياسة الشحن والتوصيل السريع',
-  deliveryPolicyText: 'التوصيل متاح لجميع المحافظات ومراكز الصيانة والمحلات خلال 24 إلى 48 ساعة، مع إمكانية المعاينة والفحص عند الاستلام.',
+  deliveryPolicyText: 'بنوصّل لكل المحافظات والمحلات ومراكز الصيانة في خلال 24 لـ 48 ساعة، وتقدر تعاين وتفحص القطع وقت الاستلام.',
+  paymentMethods: INITIAL_PAYMENT_METHODS,
   supabaseUrl: '',
   supabaseAnonKey: ''
 };
@@ -1078,6 +1098,7 @@ export default function App() {
   // Unique ID for this browser tab instance to prevent infinite ping-pong loops
   const myTabId = useMemo(() => Math.random().toString(36).slice(2) + '_' + Date.now(), []);
   const isIncomingSyncRef = React.useRef(false);
+  const isCustomerMutatingCloudRef = React.useRef(false);
   const lastSavedPayloadRef = React.useRef('');
 
   // ============================================================================
@@ -1876,6 +1897,19 @@ export default function App() {
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [useWalletBalance, setUseWalletBalance] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('كاش عند الاستلام');
+  const [placingOrder, setPlacingOrder] = useState(false);
+
+  // لو طريقة الدفع المختارة اتقفلت من الأدمن، اختار أول طريقة مفتوحة تلقائي
+  useEffect(() => {
+    const enabled = getPaymentMethods(siteSettings).filter(m => m.enabled);
+    if (enabled.length > 0 && !enabled.some(m => m.id === paymentMethod)) {
+      setPaymentMethod(enabled[0].id);
+    }
+  }, [siteSettings.paymentMethods]);
+
+  const updatePaymentMethods = (mutator) => {
+    setSiteSettings(prev => ({ ...prev, paymentMethods: mutator(getPaymentMethods(prev)) }));
+  };
   const [deliveryFeeBase] = useState(65);
 
   // --- Active User & Pricing Group Resolution ---
@@ -1952,8 +1986,8 @@ export default function App() {
     const targetClient = clients.find(c => c.id === normalizedRole);
     showToast(
       targetClient
-        ? `مرحباً بك "${targetClient.name}" في ${siteSettings.storeName || 'H-market'} — تم تحديث أسعار المتجر والسلة لحسابكم.`
-        : 'أنت الآن تتصفح المتجر كزائر (يمكنك تسجيل الدخول أو تقديم طلب فتح حساب جديد).',
+        ? `أهلاً بيك "${targetClient.name}" في ${siteSettings.storeName || 'H-market'} — الأسعار والسلة اتحدّثت على حسابك.`
+        : 'إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).',
       'info'
     );
   };
@@ -1974,12 +2008,7 @@ export default function App() {
       }
 
       if (nextQty > part.stock) {
-        showToast(`عفواً، الكمية المتاحة في المخزن من "${part.name}" هي ${part.stock} قطع فقط.`, 'warning');
-        return prev;
-      }
-
-      if (part.maxOrderQty && nextQty > part.maxOrderQty) {
-        showToast(`الحد الأقصى المسموح به في الفاتورة الواحدة لهذا الصنف هو ${part.maxOrderQty} قطع.`, 'warning');
+        showToast(`معلش، الكمية المتاحة في المخزن من "${part.name}" هي ${part.stock} قطع بس.`, 'warning');
         return prev;
       }
 
@@ -1991,11 +2020,32 @@ export default function App() {
     });
   };
 
+  // تحديد الكمية بالكتابة المباشرة (من غير حد أقصى للطلب، بس مش أكتر من المتاح في المخزن)
+  const setCartQtyDirect = (partId, rawValue) => {
+    const part = parts.find(p => p.id === partId);
+    if (!part) return;
+    let qty = parseInt(normalizeDigits(rawValue).replace(/[^\d]/g, ''), 10);
+    if (isNaN(qty) || qty < 0) qty = 0;
+    if (qty > part.stock) {
+      showToast(`معلش، المتاح في المخزن من "${part.name}" هو ${part.stock} قطع بس.`, 'warning');
+      qty = part.stock;
+    }
+    setCart(prev => {
+      if (qty <= 0) {
+        const copy = { ...prev };
+        delete copy[partId];
+        return copy;
+      }
+      const chosenColor = selectedColors[partId] || prev[partId]?.color || part.colors[0] || 'قياسي';
+      return { ...prev, [partId]: { qty, color: chosenColor } };
+    });
+  };
+
   const handleWaitlistRequest = (partId) => {
     setParts(prev =>
       prev.map(p => (p.id === partId ? { ...p, waitlistCount: p.waitlistCount + 1 } : p))
     );
-    showToast('تم تسجيل طلبك في قائمة الانتظار! سنرسل لك إشعاراً فور دخول الشحنة للمخزن.', 'success');
+    showToast('سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.', 'success');
   };
 
   // --- Filtered Parts for Storefront (Bilingual + Aliases + Cross-Compatibility) ---
@@ -2063,7 +2113,7 @@ export default function App() {
     Object.entries(cart).forEach(([partId, itemData]) => {
       const part = parts.find(p => p.id === partId);
       if (!part || itemData.qty <= 0) return;
-      const validQty = Math.min(itemData.qty, part.stock, part.maxOrderQty || 999);
+      const validQty = Math.min(itemData.qty, part.stock);
       if (validQty <= 0) return;
 
       const priceInfo = calculatePartPrice(part, currentGroup);
@@ -2141,16 +2191,36 @@ export default function App() {
 
   // --- Place Order Handler ---
   const handlePlaceOrder = () => {
+    if (placingOrder) return;
+    setPlacingOrder(true);
+    try {
+      placeOrderInner();
+    } catch (err) {
+      console.error('place order failed', err);
+      showToast('حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (' + (err && err.message ? err.message : '') + ')', 'error');
+    } finally {
+      setTimeout(() => setPlacingOrder(false), 700);
+    }
+  };
+
+  const placeOrderInner = () => {
     if (!currentClient) {
       setLoginModalOpen(true);
       return;
     }
     if (cartSummary.items.length === 0) {
-      showToast('السلة فارغة! أضف قطع غيار أولاً.', 'warning');
+      showToast('السلة فاضية! ضيف قطع غيار الأول.', 'warning');
       return;
     }
+    const enabledPayMethods = getPaymentMethods(siteSettings).filter(m => m.enabled);
+    const chosenPay = enabledPayMethods.find(m => m.id === paymentMethod);
+    if (!chosenPay) {
+      showToast('اختار طريقة الدفع الأول.', 'warning');
+      return;
+    }
+    const paymentLabel = chosenPay.id === CREDIT_PAYMENT_ID ? CREDIT_PAYMENT_ID : chosenPay.label || chosenPay.id;
     if (paymentMethod === 'آجل / على الحساب' && !cartSummary.canOrderOnCredit) {
-      showToast('قيمة الطلب تتجاوز الحد الائتماني المتاح لحسابكم. يرجى اختيار وسيلة دفع أخرى أو سداد جزء من المديونية.', 'error');
+      showToast('قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.', 'error');
       return;
     }
 
@@ -2162,6 +2232,11 @@ export default function App() {
         ? currentClient.secondaryAddress
         : customAddressText || currentClient.address;
 
+    if (!String(chosenAddr || '').trim()) {
+      showToast('اكتب عنوان التوصيل الأول.', 'warning');
+      return;
+    }
+
     const newOrder = {
       id: newOrderId,
       clientId: currentClient.id,
@@ -2171,7 +2246,7 @@ export default function App() {
       exchangeRateUsed: currentCurrency.rateFromBase,
       createdAt: '2026-11-01 06:00',
       status: 'تم الاستلام',
-      paymentMethod,
+      paymentMethod: paymentLabel,
       address: chosenAddr,
       notes: orderNotes,
       deliveryFeeBase: cartSummary.deliveryFeeBase,
@@ -2215,7 +2290,7 @@ export default function App() {
               date: '2026-11-01 06:00',
               type: 'wallet_deduct',
               ref: newOrderId,
-              desc: `خصم من الرصيد الدائن لسداد فاتورة ${newOrderId}`,
+              desc: `خصم من رصيدك الدائن لسداد فاتورة ${newOrderId}`,
               amount: -cartSummary.walletDeductedBase,
               balanceAfter: updatedBalance
             });
@@ -2228,7 +2303,7 @@ export default function App() {
               date: '2026-11-01 06:00',
               type: 'invoice',
               ref: newOrderId,
-              desc: `فاتورة مشتريات آجلة على الحساب (${newOrderId})`,
+              desc: `فاتورة مشتريات آجل على الحساب (${newOrderId})`,
               amount: -cartSummary.finalPayableBase,
               balanceAfter: updatedBalance
             });
@@ -2258,8 +2333,8 @@ export default function App() {
     const clientOrderNotif = {
       id: `ntf_${Date.now()}_cli`,
       target: currentClient.id,
-      title: `تم استلام طلبك #${newOrderId}`,
-      msg: `تم تسجيل فاتورتك بنجاح وجاري تحضير القطع في المخزن (${cartSummary.totalQty} قطع).`,
+      title: `استلمنا طلبك #${newOrderId}`,
+      msg: `فاتورتك اتسجّلت وبنجهّز القطع في المخزن (${cartSummary.totalQty} قطع).`,
       time: 'الآن',
       read: false,
       orderId: newOrderId
@@ -2290,7 +2365,7 @@ export default function App() {
     setOrderNotes('');
     setClientTab('account');
     setAccountSubTab('orders');
-    showToast(`🔔 تم تأكيد الطلب رقم ${newOrderId} بنجاح وإرسال إشعار فوري للإدارة والمخزن!`, 'success');
+    showToast(`🔔 طلبك رقم ${newOrderId} اتأكّد وبعتنا إشعار للإدارة والمخزن!`, 'success');
   };
 
   // --- Quick Re-Order from Past Invoice ---
@@ -2302,7 +2377,7 @@ export default function App() {
     order.items.forEach(item => {
       const part = parts.find(p => p.id === item.partId);
       if (part && part.stock > 0) {
-        const allowedQty = Math.min(item.qty, part.stock, part.maxOrderQty || 99);
+        const allowedQty = Math.min(item.qty, part.stock);
         newCart[part.id] = { qty: allowedQty, color: item.color };
         addedCount++;
       } else {
@@ -2315,8 +2390,8 @@ export default function App() {
     setCartDrawerOpen(true);
     showToast(
       skippedCount > 0
-        ? `تمت إضافة ${addedCount} أصناف متاحة للسلة (وتخطي ${skippedCount} صنف غير متوفر حالياً).`
-        : `تمت إعادة إضافة جميع أصناف الفاتورة ${order.id} إلى السلة بنجاح!`,
+        ? `ضفنا ${addedCount} أصناف متاحة للسلة (وعدّينا ${skippedCount} صنف مش متوفر دلوقتي).`
+        : `رجّعنا كل أصناف الفاتورة ${order.id} للسلة!`,
       'success'
     );
   };
@@ -2833,15 +2908,15 @@ export default function App() {
             <div className="absolute bottom-2.5 right-2.5">
               {isOutOfStock ? (
                 <span className="px-2.5 py-1 rounded-lg bg-rose-600 text-white text-[11px] font-bold shadow">
-                  نفذت الكمية
+                  الكمية خلصت
                 </span>
               ) : isLowStock ? (
                 <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-slate-950 text-[11px] font-extrabold shadow">
-                  كمية محدودة: متبقي {part.stock}
+                  كمية محدودة: فاضل {part.stock}
                 </span>
               ) : (
                 <span className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[11px] font-bold shadow">
-                  متوفر بالمخزن ({part.stock})
+                  متوفر في المخزن ({part.stock})
                 </span>
               )}
             </div>
@@ -2849,7 +2924,7 @@ export default function App() {
             {inCartQty > 0 && (
               <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg bg-emerald-500 text-white text-xs font-extrabold shadow flex items-center gap-1">
                 <Check className="w-3.5 h-3.5" />
-                بالسلة: {inCartQty}
+                في السلة: {inCartQty}
               </div>
             )}
           </div>
@@ -2858,7 +2933,7 @@ export default function App() {
           <div className="p-4 space-y-2.5">
             <div className="flex items-center justify-between text-[11px] text-slate-500">
               <span className="font-bold text-indigo-600">{part.category}</span>
-              <span>حد الطلب: {part.maxOrderQty} قطع</span>
+              <span>المتاح: {part.stock} قطعة</span>
             </div>
 
             <h3
@@ -2938,20 +3013,26 @@ export default function App() {
               className="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 border border-amber-500/30 text-xs font-bold transition flex items-center gap-1.5"
             >
               <Bell className="w-3.5 h-3.5" />
-              أبلغني عند التوفر ({part.waitlistCount})
+              نبّهني لما يتوفر ({part.waitlistCount})
             </button>
           ) : (
             <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl p-1 shadow-xs">
               <button
                 onClick={() => updateCartQty(part.id, 1)}
                 className="w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition font-bold"
-                title="زيادة الكمية"
+                title="زوّد الكمية"
               >
                 <Plus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-extrabold text-sm text-slate-900">
-                {inCartQty}
-              </span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min="0"
+                value={inCartQty}
+                onFocus={e => e.target.select()}
+                onChange={e => setCartQtyDirect(part.id, e.target.value)}
+                className="w-14 text-center font-extrabold text-sm text-slate-900 border border-slate-200 rounded-lg py-1"
+              />
               <button
                 onClick={() => updateCartQty(part.id, -1)}
                 disabled={inCartQty === 0}
@@ -2960,7 +3041,7 @@ export default function App() {
                     ? 'bg-slate-200 hover:bg-rose-100 hover:text-rose-700 text-slate-800'
                     : 'bg-slate-100 text-slate-300 cursor-not-allowed'
                 }`}
-                title="تقليل الكمية"
+                title="قلّل الكمية"
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -2978,7 +3059,7 @@ export default function App() {
           href={siteSettings.whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          title="تواصل عبر واتساب"
+          title="كلّمنا على واتساب"
           className={`w-9 h-9 rounded-xl flex items-center justify-center transition duration-300 hover:scale-110 shadow-xs ${
             isDark
               ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-slate-950'
@@ -3088,7 +3169,7 @@ export default function App() {
               }`}
             >
               <Search className="w-4 h-4 stroke-[2.5]" />
-              <span>محرك البحث والكتالوج ({parts.length})</span>
+              <span>دوّر في الكتالوج ({parts.length})</span>
             </button>
 
             {currentClient ? (
@@ -3143,7 +3224,7 @@ export default function App() {
                         </button>
                       </div>
                       {myNotifs.length === 0 ? (
-                        <div className="py-6 text-center text-slate-400">لا توجد إشعارات جديدة</div>
+                        <div className="py-6 text-center text-slate-400">مفيش إشعارات جديدة</div>
                       ) : (
                         <div className="space-y-1.5 max-h-64 overflow-y-auto">
                           {myNotifs.map(n => (
@@ -3197,7 +3278,7 @@ export default function App() {
                   onClick={() => {
                     setActiveRole('guest');
                     setClientTab('home');
-                    showToast('تم تسجيل الخروج من الحساب بنجاح.', 'info');
+                    showToast('خرجت من حسابك.', 'info');
                   }}
                   className="p-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white transition"
                   title="تسجيل الخروج"
@@ -3215,7 +3296,7 @@ export default function App() {
                   className="px-3.5 py-2.5 rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1.5"
                 >
                   <Lock className="w-3.5 h-3.5" />
-                  دخول الحساب
+                  دخول
                 </button>
                 <button
                   onClick={() => {
@@ -3263,14 +3344,14 @@ export default function App() {
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-black">
                 <Search className="w-3.5 h-3.5" />
-                <span>محرك البحث والكتالوج الشامل الفوري</span>
+                <span>دوّر في الكتالوج كله</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
               </div>
               <h2 className="text-lg sm:text-2xl font-black tracking-wide">
-                ابحث عن أي قطعة غيار، إكسسوار، أو موديل هاتف
+                دوّر على أي قطعة غيار أو إكسسوار أو موديل موبايل
               </h2>
               <p className="text-xs text-slate-300">
-                أكثر من <span className="font-bold text-cyan-300 font-mono">{parts.length}</span> صنف وموديل متوفر بالمخزن وجاهز للشحن الفوري
+                أكثر من <span className="font-bold text-cyan-300 font-mono">{parts.length}</span> صنف وموديل متوفر في المخزن وجاهز يتشحن على طول
               </p>
             </div>
 
@@ -3283,20 +3364,20 @@ export default function App() {
                 <Search className="w-5 h-5 stroke-[2.5]" />
               </div>
               <span className="text-xs sm:text-sm text-slate-700 font-bold px-3 flex-1 select-none">
-                اضغط هنا للبحث الفوري والفلترة الشاملة...
+                دوس هنا للبحث والفلترة...
               </span>
               <button
                 type="button"
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-l from-blue-600 to-cyan-600 text-white font-black text-xs shadow-md shadow-blue-500/25 group-hover:brightness-110 transition shrink-0"
               >
-                بحث الكتالوج ↵
+                دوّر ↵
               </button>
             </div>
           </div>
 
           {/* Quick Categories & Search Shortcuts */}
           <div className="pt-3 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto text-xs font-bold scrollbar-none">
-            <span className="text-slate-400 text-[11px] shrink-0">أشهر الأقسام:</span>
+            <span className="text-slate-400 text-[11px] shrink-0">أكتر الأقسام طلباً:</span>
             {['شاشات', 'بطاريات', 'فلاتات وبوردات', 'كاميرات', 'شواحن وكابلات', 'جرابات وحمايات'].map(cat => (
               <button
                 key={cat}
@@ -3318,14 +3399,14 @@ export default function App() {
           <div className="bg-white rounded-2xl p-3 border border-slate-200 shadow-xs flex items-center gap-2 flex-wrap">
             <span className="text-xs font-extrabold text-slate-700 flex items-center gap-1">
               <Tag className="w-3.5 h-3.5 text-rose-600" />
-              أكواد خصم فعالة:
+              أكواد خصم شغّالة:
             </span>
             {activePromos.slice(0, 4).map(prm => (
               <span
                 key={prm.id}
                 onClick={() => {
                   setPromoCodeInput(prm.code);
-                  showToast(`تم نسخ الكود (${prm.code}): ${prm.description}`, 'info');
+                  showToast(`نسخنا الكود (${prm.code}): ${prm.description}`, 'info');
                 }}
                 className="px-2.5 py-1 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-extrabold font-mono cursor-pointer hover:bg-rose-100 transition"
                 title={prm.description}
@@ -3411,11 +3492,11 @@ export default function App() {
                   <div className="relative z-10 pt-5 px-4 flex flex-wrap items-center justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="px-5 py-2.5 rounded-xl bg-white text-slate-950 font-extrabold text-xs shadow-md group-hover:bg-amber-400 transition flex items-center gap-2">
-                        <span>{mainAd.buttonText || 'عرض تفاصيل العرض والطلب'}</span>
+                        <span>{mainAd.buttonText || 'شوف تفاصيل العرض واطلب'}</span>
                         <ChevronLeft className="w-4 h-4" />
                       </span>
                       <span className="text-[11px] text-slate-300 font-semibold">
-                        اضغط على الإعلان لفتح التفاصيل والطلب المباشر
+                        دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول
                       </span>
                     </div>
 
@@ -3487,10 +3568,10 @@ export default function App() {
             <div>
               <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
                 <Smartphone className="w-5 h-5 text-blue-600" />
-                تصفح قطع الغيار حسب موديل الهاتف
+                اتصفّح قطع الغيار على حسب موديل الموبايل
               </h3>
               <p className="text-xs text-slate-500">
-                اضغط على أي موديل لفتح كافة قطع الغيار المتوافقة معه فوراً
+                دوس على أي موديل وشوف كل القطع اللي بتناسبه
               </p>
             </div>
             <button
@@ -3500,7 +3581,7 @@ export default function App() {
               }}
               className="text-xs font-extrabold text-blue-600 hover:underline flex items-center gap-1"
             >
-              <span>عرض جميع الموديلات والبحث المتقدم</span>
+              <span>شوف كل الموديلات والبحث المتقدم</span>
               <ChevronLeft className="w-4 h-4" />
             </button>
           </div>
@@ -3564,7 +3645,7 @@ export default function App() {
                   onClick={() => setClientTab('search')}
                   className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1"
                 >
-                  <span>عرض الكل في صفحة البحث</span>
+                  <span>شوف الكل في صفحة البحث</span>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
               </div>
@@ -3587,7 +3668,7 @@ export default function App() {
       type="button"
       onClick={() => setCartDrawerOpen(true)}
       className="fixed bottom-6 left-6 z-40 group flex items-center gap-3 bg-gradient-to-l from-slate-900 via-indigo-950 to-slate-900 hover:from-emerald-600 hover:to-teal-600 text-white p-3.5 rounded-full shadow-2xl border-2 border-emerald-400/70 hover:scale-105 transition-all duration-300"
-      title="اضغط لفتح سلة المشتريات ومراجعة الأصناف"
+      title="دوس عشان تفتح السلة وتراجع الأصناف"
     >
       <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-emerald-500 text-slate-950 shadow-md">
         <ShoppingCart className="w-5 h-5 stroke-[2.5]" />
@@ -3621,7 +3702,7 @@ export default function App() {
                 صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)
               </div>
               <h2 className="text-xl sm:text-2xl font-extrabold">
-                ابحث بالموديل، اسم القطعة، درجة الجودة، أو كود التوافق
+                دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق
               </h2>
             </div>
 
@@ -3630,7 +3711,7 @@ export default function App() {
               className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              العودة للواجهة الرئيسية والعروض
+              ارجع للرئيسية والعروض
             </button>
           </div>
 
@@ -3641,7 +3722,7 @@ export default function App() {
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="ابحث الآن عن أي قطعة غيار أو موديل هاتف (مثال: شاشة ايفون 15 برو ماكس، فلاتة شحن S24، بطارية)..."
+              placeholder="دوّر دلوقتي على أي قطعة غيار أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن S24، بطارية)..."
               className="w-full pr-12 pl-28 py-3.5 rounded-2xl bg-white text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/40 shadow-inner"
             />
             {searchQuery && (
@@ -3650,7 +3731,7 @@ export default function App() {
                 className="absolute left-3 top-1/2 -translate-y-1/2 px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold flex items-center gap-1"
               >
                 <X className="w-3.5 h-3.5" />
-                مسح البحث
+                امسح البحث
               </button>
             )}
           </div>
@@ -3699,7 +3780,7 @@ export default function App() {
 
           {/* Parent Mobile Models Strip with Thumbnail Images */}
           <div className="pt-3 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-xs font-bold text-slate-500 shrink-0">موديلات الهواتف:</span>
+            <span className="text-xs font-bold text-slate-500 shrink-0">موديلات الموبايلات:</span>
             <button
               onClick={() => setSelectedModelId('ALL')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition ${
@@ -3745,14 +3826,14 @@ export default function App() {
                 onChange={e => setStoreSortBy(e.target.value)}
                 className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-800"
               >
-                <option value="date_desc">الأحدث إضافة أولاً</option>
-                <option value="date_asc">الأقدم إضافة أولاً</option>
+                <option value="date_desc">الأحدث الأول</option>
+                <option value="date_asc">الأقدم الأول</option>
                 <option value="name_asc">الاسم: (أ - ي)</option>
                 <option value="name_desc">الاسم: (ي - أ)</option>
-                <option value="stock_desc">العدد: الأكثر كمية</option>
+                <option value="stock_desc">العدد: الأكتر كمية</option>
                 <option value="stock_asc">العدد: الأقل كمية</option>
-                <option value="price_asc">السعر: الأقل للأعلى</option>
-                <option value="price_desc">السعر: الأعلى للأقل</option>
+                <option value="price_asc">السعر: من الأقل للأعلى</option>
+                <option value="price_desc">السعر: من الأعلى للأقل</option>
               </select>
 
               <select
@@ -3761,9 +3842,9 @@ export default function App() {
                 className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-800"
               >
                 <option value="ALL">حالة المخزون: الكل</option>
-                <option value="IN_STOCK">المتوفر بالمخزن فقط</option>
+                <option value="IN_STOCK">المتوفر في المخزن بس</option>
                 <option value="LOW_STOCK">كميات محدودة</option>
-                <option value="OUT_OF_STOCK">نفذت الكمية</option>
+                <option value="OUT_OF_STOCK">الكمية خلصت</option>
               </select>
 
               <select
@@ -3780,7 +3861,7 @@ export default function App() {
             </div>
 
             <div className="text-slate-500 font-bold">
-              النتائج المعروضة: <span className="text-blue-600 font-extrabold">{filteredParts.length}</span> قطعة غيار
+              النتايج: <span className="text-blue-600 font-extrabold">{filteredParts.length}</span> قطعة غيار
             </div>
           </div>
         </div>
@@ -3789,7 +3870,7 @@ export default function App() {
         {filteredParts.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
             <Search className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-base font-bold text-slate-800">لا توجد قطع غيار مطابقة لبحثك</h3>
+            <h3 className="text-base font-bold text-slate-800">مفيش قطع غيار مطابقة لبحثك</h3>
             <button
               onClick={() => {
                 setSearchQuery('');
@@ -3801,7 +3882,7 @@ export default function App() {
               }}
               className="mt-4 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold"
             >
-              إظهار جميع قطع الغيار
+              اعرض كل قطع الغيار
             </button>
           </div>
         ) : (
@@ -3822,16 +3903,16 @@ export default function App() {
         <div className="max-w-xl mx-auto my-12 bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-4">
           <Lock className="w-12 h-12 text-blue-600 mx-auto" />
           <h2 className="text-lg font-extrabold text-slate-900">
-            يرجى تسجيل الدخول لإتمام الطلب وحساب أسعار مجموعتك
+            سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك
           </h2>
           <p className="text-xs text-slate-600">
-            بمجرد اختيار حساب التاجر، سيتم تلقائياً تحديث أسعار وعملة السلة لتطابق شريحة الخصم الخاصة بكم.
+            أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.
           </p>
           <button
             onClick={() => setLoginModalOpen(true)}
             className="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold"
           >
-            تسجيل دخول التجار الآن
+            سجّل دخول دلوقتي
           </button>
         </div>
       );
@@ -3842,17 +3923,17 @@ export default function App() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-xl font-extrabold text-slate-900">
-              إتمام الطلب والمحاسبة — {currentClient.name}
+              كمّل الطلب وادفع — {currentClient.name}
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              يرجى مراجعة عنوان التوصيل وتحديد طريقة السداد المناسبة لإرسال الطلب للمخزن
+              راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن
             </p>
           </div>
           <button
             onClick={() => setClientTab('store')}
             className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1"
           >
-            العودة لإضافة قطع أخرى
+            ارجع ضيف قطع تانية
             <ChevronLeft className="w-4 h-4" />
           </button>
         </div>
@@ -3864,7 +3945,7 @@ export default function App() {
             <div className="bg-white rounded-2xl p-5 border border-slate-200 space-y-3">
               <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-blue-600" />
-                1. عنوان توصيل الطلبية (عناوين المحل المسجلة)
+                1. عنوان توصيل الطلب (عناوين المحل المسجّلة)
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label
@@ -3896,7 +3977,7 @@ export default function App() {
                 onClick={() => setCheckoutAddressChoice('custom')}
                 className="text-xs font-bold text-blue-600 hover:underline"
               >
-                + التوصيل لعنوان آخر مؤقت لهذه الفاتورة
+                + وصّل لعنوان تاني للفاتورة دي بس
               </button>
 
               {checkoutAddressChoice === 'custom' && (
@@ -3904,7 +3985,7 @@ export default function App() {
                   type="text"
                   value={customAddressText}
                   onChange={e => setCustomAddressText(e.target.value)}
-                  placeholder="اكتب العنوان التفصيلي ورقم التليفون المستلم..."
+                  placeholder="اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم..."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs"
                 />
               )}
@@ -3914,29 +3995,29 @@ export default function App() {
             <div className="bg-white rounded-2xl p-5 border border-slate-200 space-y-3">
               <h3 className="text-sm font-extrabold text-slate-900 flex items-center gap-2">
                 <Wallet className="w-4 h-4 text-emerald-600" />
-                2. موقف المحفظة والائتمان التجاري (له / عليه)
+                2. حالة المحفظة والآجل (ليك / عليك)
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-xs">
                 <div>
-                  <span className="text-slate-500 block">رصيد الحساب الحالي:</span>
+                  <span className="text-slate-500 block">رصيد حسابك دلوقتي:</span>
                   <span
                     className={`text-sm font-extrabold ${
                       currentClient.walletBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'
                     }`}
                   >
-                    {currentClient.walletBalance >= 0 ? 'دائن (لكم): ' : 'مدين (عليكم): '}
+                    {currentClient.walletBalance >= 0 ? 'دائن (ليك): ' : 'مدين (عليك): '}
                     {formatMoney(Math.abs(currentClient.walletBalance))}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">سقف الائتمان المسموح (الآجل):</span>
+                  <span className="text-slate-500 block">سقف الآجل المسموح:</span>
                   <span className="text-sm font-extrabold text-slate-900">
                     {formatMoney(currentClient.creditLimit)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-slate-500 block">الرصيد المتاح للسحب الآجل:</span>
+                  <span className="text-slate-500 block">المتاح تسحبه آجل:</span>
                   <span className="text-sm font-extrabold text-blue-700">
                     {formatMoney(cartSummary.remainingCreditLimitBase)}
                   </span>
@@ -3953,7 +4034,7 @@ export default function App() {
                       className="w-4 h-4 accent-emerald-600"
                     />
                     <span className="text-xs font-bold text-emerald-900">
-                      استخدام الرصيد الدائن المتاح في المحفظة ({formatMoney(currentClient.walletBalance)}) لخصمه من الفاتورة
+                      استخدم رصيدك الدائن في المحفظة ({formatMoney(currentClient.walletBalance)}) واخصمه من الفاتورة
                     </span>
                   </div>
                   <span className="text-xs font-extrabold text-emerald-700">
@@ -3971,18 +4052,20 @@ export default function App() {
               </h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                {[
-                  { id: 'كاش عند الاستلام', desc: 'الدفع نقداً لمندوب التوصيل عند استلام ومراجعة القطع' },
-                  {
-                    id: 'آجل / على الحساب',
-                    desc: cartSummary.canOrderOnCredit
-                      ? 'تسجيل الفاتورة على كشف الحساب الآجل للمحل'
-                      : 'غير متاح: الفاتورة تتجاوز سقف الائتمان المتبقي',
-                    disabled: !cartSummary.canOrderOnCredit
-                  },
-                  { id: 'حساب بنكي / إنستا باي', desc: 'تحويل فوري على حساب الشركة بالبنك التجاري الدولي CIB' },
-                  { id: 'Apple Pay / بطاقة بنكية', desc: 'دفع إلكتروني فوري آمن بدون رسوم إضافية' }
-                ].map(pm => (
+                {getPaymentMethods(siteSettings)
+                  .filter(m => m.enabled)
+                  .map(m => ({
+                    id: m.id,
+                    label: m.label || m.id,
+                    desc:
+                      m.id === CREDIT_PAYMENT_ID
+                        ? cartSummary.canOrderOnCredit
+                          ? m.desc
+                          : 'مش متاح: الفاتورة أكبر من سقف الآجل المتبقي'
+                        : m.desc,
+                    disabled: m.id === CREDIT_PAYMENT_ID && !cartSummary.canOrderOnCredit
+                  }))
+                  .map(pm => (
                   <button
                     key={pm.id}
                     disabled={pm.disabled}
@@ -3996,7 +4079,7 @@ export default function App() {
                     }`}
                   >
                     <div className="font-extrabold text-slate-900 flex items-center justify-between">
-                      <span>{pm.id}</span>
+                      <span>{pm.label}</span>
                       {paymentMethod === pm.id && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
                     </div>
                     <div className="text-[11px] text-slate-500 mt-1">{pm.desc}</div>
@@ -4008,13 +4091,13 @@ export default function App() {
             {/* 4. Order Notes */}
             <div className="bg-white rounded-2xl p-5 border border-slate-200 space-y-2">
               <label className="text-xs font-extrabold text-slate-900 block">
-                4. ملاحظات الفاتورة أو تعليمات التغليف للمخزن:
+                4. ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:
               </label>
               <textarea
                 rows={2}
                 value={orderNotes}
                 onChange={e => setOrderNotes(e.target.value)}
-                placeholder="مثال: يرجى إرفاق لاصق وتربروف مع الشاشات، أو الاتصال قبل وصول المندوب بنصف ساعة..."
+                placeholder="مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة..."
                 className="w-full p-3 rounded-xl border border-slate-200 text-xs"
               />
             </div>
@@ -4064,22 +4147,22 @@ export default function App() {
                         p => p.code.toUpperCase() === codeClean && p.active
                       );
                       if (!foundPromo) {
-                        showToast('كود الخصم غير صالح أو منتهي الصلاحية! جرب VIP5 أو CASH200 أو FREESHIP', 'warning');
+                        showToast('كود الخصم مش صالح أو خلصت مدته! جرّب VIP5 أو CASH200 أو FREESHIP', 'warning');
                         return;
                       }
                       if (foundPromo.usedCount >= foundPromo.usageLimit) {
-                        showToast('عفواً، وصل هذا الكود للحد الأقصى من مرات الاستخدام.', 'warning');
+                        showToast('معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.', 'warning');
                         return;
                       }
                       if (cartSummary.subtotalBase < Number(foundPromo.minOrderAmount || 0)) {
                         showToast(
-                          `الحد الأدنى لتفعيل الكود (${foundPromo.code}) هو ${formatMoney(foundPromo.minOrderAmount)}`,
+                          `أقل فاتورة عشان الكود يشتغل (${foundPromo.code}) هو ${formatMoney(foundPromo.minOrderAmount)}`,
                           'warning'
                         );
                         return;
                       }
                       setAppliedPromo(foundPromo);
-                      showToast(`تم تفعيل كود الخصم (${foundPromo.code}): ${foundPromo.description}`, 'success');
+                      showToast(`فعّلنا كود الخصم (${foundPromo.code}): ${foundPromo.description}`, 'success');
                     }}
                     className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold"
                   >
@@ -4114,27 +4197,28 @@ export default function App() {
                   </div>
                 )}
                 <div className="flex justify-between text-slate-600">
-                  <span>رسوم التوصيل السريع للمحل:</span>
+                  <span>مصاريف التوصيل السريع:</span>
                   <span className="font-bold">{formatMoney(cartSummary.deliveryFeeBase)}</span>
                 </div>
                 {cartSummary.walletDeductedBase > 0 && (
                   <div className="flex justify-between text-emerald-700 font-bold">
-                    <span>مخصوم من رصيد المحفظة الدائن:</span>
+                    <span>متخصوم من رصيد المحفظة:</span>
                     <span>-{formatMoney(cartSummary.walletDeductedBase)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
-                  <span>الصافي المطلوب سداده:</span>
+                  <span>الصافي اللي هتدفعه:</span>
                   <span className="text-blue-600">{formatMoney(cartSummary.finalPayableBase)}</span>
                 </div>
               </div>
 
               <button
                 onClick={handlePlaceOrder}
+                disabled={placingOrder}
                 className="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-5 h-5" />
-                تأكيد وإرسال الطلب الآن
+                أكّد وابعت الطلب
               </button>
             </div>
           </div>
@@ -4173,7 +4257,7 @@ export default function App() {
     setClients(prev =>
       prev.map(c => (c.id === currentClient.id ? { ...c, avatarImage: uploadedUrl } : c))
     );
-    showToast('تم ضغط ورفع الصورة الشخصية للحساب بنجاح!', 'success');
+    showToast('الصورة اتحفظت!', 'success');
   };
 
   const handleSaveClientProfile = (e) => {
@@ -4197,29 +4281,29 @@ export default function App() {
           : c
       )
     );
-    showToast('تم حفظ وتحديث بيانات البروفايل والعناوين بنجاح!', 'success');
+    showToast('بياناتك وعناوينك اتحفظت!', 'success');
   };
 
   const handleChangeClientPassword = (e) => {
     e.preventDefault();
     if (!currentClient) return;
     if (passwordForm.current !== currentClient.password) {
-      showToast('كلمة المرور الحالية غير صحيحة!', 'error');
+      showToast('كلمة المرور الحالية غلط!', 'error');
       return;
     }
     if (!passwordForm.next || passwordForm.next.length < 3) {
-      showToast('يرجى إدخال كلمة مرور جديدة قوية (3 أحرف أو أرقام على الأقل).', 'warning');
+      showToast('اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).', 'warning');
       return;
     }
     if (passwordForm.next !== passwordForm.confirm) {
-      showToast('كلمة المرور الجديدة وتأكيدها غير متطابقين!', 'warning');
+      showToast('كلمة المرور الجديدة والتأكيد مش زي بعض!', 'warning');
       return;
     }
     setClients(prev =>
       prev.map(c => (c.id === currentClient.id ? { ...c, password: passwordForm.next } : c))
     );
     setPasswordForm({ current: '', next: '', confirm: '' });
-    showToast('تم تغيير كلمة المرور الخاصة بحسابكم بنجاح!', 'success');
+    showToast('كلمة المرور اتغيّرت!', 'success');
   };
 
   // --- Client Orders Section (Collapsible [ + / - ], Filter & Search, Cancel Before Delivery, Print Only After Delivered) ---
@@ -4257,9 +4341,9 @@ export default function App() {
         <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-base font-extrabold text-slate-900">سجل الطلبات والفواتير اللحظية</h2>
+              <h2 className="text-base font-extrabold text-slate-900">سجل طلباتك وفواتيرك</h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                اضغط على زر <span className="font-mono font-bold">[ + / - ]</span> بجانب أي طلب لفتح أو طي تفاصيله، مع إمكانية البحث والفلترة وإلغاء الطلب قبل التوصيل
+                دوس على زرار <span className="font-mono font-bold">[ + / - ]</span> جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -4272,14 +4356,14 @@ export default function App() {
                 }}
                 className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
               >
-                + فتح الكل
+                + افتح الكل
               </button>
               <button
                 type="button"
                 onClick={() => setExpandedClientOrders({})}
                 className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
               >
-                - طي الكل
+                - اقفل الكل
               </button>
             </div>
           </div>
@@ -4292,7 +4376,7 @@ export default function App() {
                 type="text"
                 value={clientOrdersSearch}
                 onChange={e => setClientOrdersSearch(e.target.value)}
-                placeholder="ابحث برقم الفاتورة (INV-...) أو اسم قطعة الغيار أو التاريخ..."
+                placeholder="دوّر برقم الفاتورة (INV-...) أو اسم القطعة أو التاريخ..."
                 className="w-full pr-9 pl-3 py-2 rounded-xl border border-slate-300 bg-slate-50"
               />
             </div>
@@ -4313,8 +4397,8 @@ export default function App() {
               onChange={e => setClientOrdersSort(e.target.value)}
               className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 font-bold"
             >
-              <option value="date_desc">الأحدث أولاً</option>
-              <option value="date_asc">الأقدم أولاً</option>
+              <option value="date_desc">الأحدث الأول</option>
+              <option value="date_asc">الأقدم الأول</option>
               <option value="total_desc">الأعلى قيمة</option>
               <option value="total_asc">الأقل قيمة</option>
             </select>
@@ -4324,7 +4408,7 @@ export default function App() {
         {filteredMyOrders.length === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 space-y-3">
             <Package className="w-10 h-10 text-slate-300 mx-auto" />
-            <div className="text-sm font-bold text-slate-700">لا توجد طلبات مطابقة للفلتر الحالي</div>
+            <div className="text-sm font-bold text-slate-700">مفيش طلبات مطابقة للفلتر ده</div>
             <button
               onClick={() => {
                 setClientOrdersSearch('');
@@ -4332,7 +4416,7 @@ export default function App() {
               }}
               className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold"
             >
-              عرض كافة الطلبات
+              اعرض كل الطلبات
             </button>
           </div>
         ) : (
@@ -4369,7 +4453,7 @@ export default function App() {
                             ? 'bg-slate-900 text-white border-slate-900'
                             : 'bg-white text-slate-800 border-slate-300 hover:bg-slate-100'
                         }`}
-                        title={isExpanded ? 'طي تفاصيل الطلب (-)' : 'فتح تفاصيل الطلب (+)'}
+                        title={isExpanded ? 'اقفل تفاصيل الطلب (-)' : 'افتح تفاصيل الطلب (+)'}
                       >
                         {isExpanded ? '−' : '+'}
                       </button>
@@ -4397,7 +4481,7 @@ export default function App() {
                           className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
                         >
                           <Printer className="w-3.5 h-3.5" />
-                          طباعة الفاتورة الرسمية
+                          اطبع الفاتورة الرسمية
                         </button>
                       )}
 
@@ -4408,7 +4492,7 @@ export default function App() {
                           className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 text-xs font-bold flex items-center gap-1 transition"
                         >
                           <Ban className="w-3.5 h-3.5" />
-                          إلغاء الطلب قبل الشحن
+                          إلغي الطلب قبل الشحن
                         </button>
                       )}
 
@@ -4417,7 +4501,7 @@ export default function App() {
                         className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
-                        إعادة الطلب
+                        اطلب تاني
                       </button>
 
                       {order.status === 'تم التسليم' && (
@@ -4426,7 +4510,7 @@ export default function App() {
                           className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 border border-amber-500/30 text-xs font-bold flex items-center gap-1.5"
                         >
                           <RotateCcw className="w-3.5 h-3.5" />
-                          طلب استرجاع ضمان
+                          اطلب استرجاع بالضمان
                         </button>
                       )}
                     </div>
@@ -4438,7 +4522,7 @@ export default function App() {
                       {order.adminEdited && (
                         <div className="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2 text-xs text-amber-900 font-semibold">
                           <RefreshCw className="w-4 h-4 text-amber-600 shrink-0" />
-                          <span>تحديث من الإدارة على الفاتورة: {order.adminEditNote}</span>
+                          <span>تعديل من الإدارة على الفاتورة: {order.adminEditNote}</span>
                         </div>
                       )}
 
@@ -4446,7 +4530,7 @@ export default function App() {
                         {order.status === 'ملغي' ? (
                           <div className="p-3 rounded-xl bg-rose-50 text-rose-700 font-bold text-xs flex items-center gap-2">
                             <Ban className="w-4 h-4" />
-                            تم إلغاء هذا الطلب وإعادة الكميات للمخزن وتسوية الحساب.
+                            الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.
                           </div>
                         ) : (
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -4507,7 +4591,7 @@ export default function App() {
                             عنوان التوصيل: {order.address} {order.notes && ` • ملاحظات: ${order.notes}`}
                             {!canClientPrintInvoice && order.status !== 'ملغي' && (
                               <span className="block text-[11px] text-amber-700 font-semibold mt-0.5">
-                                * طباعة الفاتورة الرسمية تتاح تلقائياً فور تأكيد استلام الطلبية (تم التسليم).
+                                * تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).
                               </span>
                             )}
                           </div>
@@ -4542,21 +4626,21 @@ export default function App() {
                 isCredit ? 'text-emerald-600' : 'text-rose-600'
               }`}
             >
-              {isCredit ? 'رصيد دائن (لكم): ' : 'مديونية (عليكم): '}
+              {isCredit ? 'رصيد دائن (ليك): ' : 'مديونية (عليك): '}
               {formatMoney(Math.abs(currentClient.walletBalance))}
             </div>
             <div className="text-[11px] text-slate-400 mt-1">
-              يُحدث تلقائياً مع الفواتير والمدفوعات والمرتجعات
+              بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات
             </div>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-            <div className="text-xs text-slate-500 font-semibold">سقف التعامل الآجل المسموح</div>
+            <div className="text-xs text-slate-500 font-semibold">سقف الآجل المسموح</div>
             <div className="text-2xl font-extrabold text-slate-900 mt-1">
               {formatMoney(currentClient.creditLimit)}
             </div>
             <div className="text-[11px] text-slate-500 mt-1">
-              المتاح للسحب الآجل حالياً: <span className="font-bold text-blue-600">{formatMoney(cartSummary.remainingCreditLimitBase)}</span>
+              المتاح تسحبه آجل دلوقتي: <span className="font-bold text-blue-600">{formatMoney(cartSummary.remainingCreditLimitBase)}</span>
             </div>
           </div>
 
@@ -4566,7 +4650,7 @@ export default function App() {
               {currentCurrency.name} ({currentCurrency.symbol})
             </div>
             <div className="text-[11px] text-slate-400 mt-1">
-              جميع الفواتير وكشف الحساب معروضة بعملة حسابكم
+              كل الفواتير وكشف الحساب معروضة بعملة حسابك
             </div>
           </div>
         </div>
@@ -4629,10 +4713,10 @@ export default function App() {
         <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-base font-extrabold text-slate-900">
-              الاسترجاع وضمان قطع الغيار (خلال 7 أيام من التسليم)
+              الاسترجاع وضمان قطع الغيار (في خلال 7 أيام من التسليم)
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
-              يشترط للاستبدال أو الاسترجاع أن تكون القطعة بحالة المصنع وبالختم الأصلي وبدون لحام أو تركيب نهائي
+              عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي
             </p>
           </div>
           {deliveredOrders.length > 0 && (
@@ -4641,7 +4725,7 @@ export default function App() {
               className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
-              تقديم طلب مرتجع جديد
+              قدّم طلب مرتجع جديد
             </button>
           )}
         </div>
@@ -4649,7 +4733,7 @@ export default function App() {
         <div className="space-y-3">
           {myReturns.length === 0 ? (
             <div className="bg-white rounded-2xl p-10 text-center border border-slate-200 text-xs text-slate-400">
-              لا توجد طلبات استرجاع مسجلة.
+              مفيش طلبات استرجاع مسجّلة.
             </div>
           ) : (
             myReturns.map(ret => (
@@ -4729,7 +4813,7 @@ export default function App() {
       setComplaints(prev => [newTck, ...prev]);
       setNewComplaintSubject('');
       setNewComplaintMsg('');
-      showToast('تم إرسال رسالتك إلى الإدارة بنجاح، وسيتم الرد عليكم قريباً.', 'success');
+      showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
     };
 
     const handleClientSendFollowup = (ticketId) => {
@@ -4756,7 +4840,7 @@ export default function App() {
         )
       );
       setClientFollowupText(prev => ({ ...prev, [ticketId]: '' }));
-      showToast('تم إرسال ردك الإضافي في المحادثة!', 'success');
+      showToast('ردّك اتبعت!', 'success');
     };
 
     return (
@@ -4765,7 +4849,7 @@ export default function App() {
           onSubmit={handleSendComplaint}
           className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-3 h-fit"
         >
-          <h3 className="text-sm font-extrabold text-slate-900">إرسال تذكرة دعم أو طلب توفير صنف</h3>
+          <h3 className="text-sm font-extrabold text-slate-900">ابعت شكوى أو اطلب صنف</h3>
           <div>
             <label className="text-xs text-slate-500 block mb-1">نوع الرسالة:</label>
             <select
@@ -4797,7 +4881,7 @@ export default function App() {
               required
               value={newComplaintMsg}
               onChange={e => setNewComplaintMsg(e.target.value)}
-              placeholder="اكتب تفاصيل الشكوى أو الصنف المطلوب توفيره..."
+              placeholder="اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر..."
               className="w-full p-2.5 rounded-xl border border-slate-200 text-xs"
             />
           </div>
@@ -4805,7 +4889,7 @@ export default function App() {
             type="submit"
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold"
           >
-            إرسال للإدارة
+            ابعت للإدارة
           </button>
         </form>
 
@@ -4813,7 +4897,7 @@ export default function App() {
           <h3 className="text-sm font-extrabold text-slate-900">رسائلي وتذاكر الدعم السابقة</h3>
           {myTickets.length === 0 ? (
             <div className="bg-white rounded-2xl p-8 text-center border border-slate-200 text-xs text-slate-400">
-              لا توجد رسائل سابقة.
+              مفيش رسائل قبل كده.
             </div>
           ) : (
             myTickets.map(tck => (
@@ -4865,7 +4949,7 @@ export default function App() {
                     onChange={e =>
                       setClientFollowupText(prev => ({ ...prev, [tck.id]: e.target.value }))
                     }
-                    placeholder="أضف رداً أو استفساراً إضافياً في هذه التذكرة..."
+                    placeholder="ضيف رد أو سؤال تاني في الرسالة دي..."
                     className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs"
                   />
                   <button
@@ -4873,7 +4957,7 @@ export default function App() {
                     onClick={() => handleClientSendFollowup(tck.id)}
                     className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold"
                   >
-                    إرسال رد
+                    ابعت الرد
                   </button>
                 </div>
               </div>
@@ -4901,7 +4985,7 @@ export default function App() {
                 البيانات الأساسية والصورة الشخصية والعناوين
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                حدث اسم المحل أو المركز، الصورة الرمزية، أرقام التواصل وعناوين الشحن
+                عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن
               </p>
             </div>
           </div>
@@ -4914,7 +4998,7 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-2">
                 <label className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold cursor-pointer flex items-center gap-1.5">
                   <Upload className="w-3.5 h-3.5" />
-                  رفع صورة من جهازك
+                  ارفع صورة من جهازك
                   <input
                     type="file"
                     accept="image/*"
@@ -4929,13 +5013,13 @@ export default function App() {
                     onClick={() => setProfileForm(prev => ({ ...prev, avatarImage: '' }))}
                     className="px-2.5 py-1.5 rounded-xl bg-slate-200 text-slate-700 text-xs font-bold"
                   >
-                    استخدام الأيقونة الملونة
+                    استخدم الأيقونة الملوّنة
                   </button>
                 )}
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                <span className="text-[11px] text-slate-500">أو اختر لون الشعار:</span>
+                <span className="text-[11px] text-slate-500">أو اختار لون الشعار:</span>
                 {AVATAR_PRESETS.map(preset => (
                   <button
                     key={preset.id}
@@ -5034,7 +5118,7 @@ export default function App() {
             className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-xs flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            حفظ التغييرات على البروفايل
+            احفظ التغييرات
           </button>
         </form>
 
@@ -5049,7 +5133,7 @@ export default function App() {
               تغيير كلمة المرور والأمان
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              يمكنك تحديث كلمة السر الخاصة بحسابك في أي وقت
+              تقدر تغيّر كلمة السر في أي وقت
             </p>
           </div>
 
@@ -5061,7 +5145,7 @@ export default function App() {
                 required
                 value={passwordForm.current}
                 onChange={e => setPasswordForm(prev => ({ ...prev, current: e.target.value }))}
-                placeholder="أدخل كلمة المرور الحالية..."
+                placeholder="اكتب كلمة المرور الحالية..."
                 className="w-full p-2.5 rounded-xl border border-slate-300"
               />
             </div>
@@ -5073,7 +5157,7 @@ export default function App() {
                 required
                 value={passwordForm.next}
                 onChange={e => setPasswordForm(prev => ({ ...prev, next: e.target.value }))}
-                placeholder="أدخل كلمة المرور الجديدة..."
+                placeholder="اكتب كلمة المرور الجديدة..."
                 className="w-full p-2.5 rounded-xl border border-slate-300"
               />
             </div>
@@ -5085,7 +5169,7 @@ export default function App() {
                 required
                 value={passwordForm.confirm}
                 onChange={e => setPasswordForm(prev => ({ ...prev, confirm: e.target.value }))}
-                placeholder="أعد كتابة كلمة المرور الجديدة..."
+                placeholder="اكتب كلمة المرور الجديدة تاني..."
                 className="w-full p-2.5 rounded-xl border border-slate-300"
               />
             </div>
@@ -5095,7 +5179,7 @@ export default function App() {
             type="submit"
             className="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold"
           >
-            تحديث كلمة المرور
+            غيّر كلمة المرور
           </button>
         </form>
       </div>
@@ -5108,7 +5192,7 @@ export default function App() {
       return (
         <div className="max-w-md mx-auto my-12 bg-white p-8 rounded-2xl border border-slate-200 text-center space-y-4">
           <Lock className="w-10 h-10 text-blue-600 mx-auto" />
-          <h3 className="text-base font-extrabold text-slate-900">يرجى تسجيل الدخول للوصول لحسابك</h3>
+          <h3 className="text-base font-extrabold text-slate-900">سجّل دخولك عشان تفتح حسابك</h3>
           <button
             onClick={() => {
               setAuthModalTab('login');
@@ -5116,7 +5200,7 @@ export default function App() {
             }}
             className="px-6 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-extrabold"
           >
-            تسجيل الدخول الآن
+            سجّل دخول دلوقتي
           </button>
         </div>
       );
@@ -5161,7 +5245,7 @@ export default function App() {
                   currentClient.walletBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
                 }`}
               >
-                {currentClient.walletBalance >= 0 ? 'رصيد لكم: ' : 'مديونية: '}
+                {currentClient.walletBalance >= 0 ? 'رصيد ليك: ' : 'مديونية: '}
                 {formatMoney(Math.abs(currentClient.walletBalance))}
               </div>
             </div>
@@ -5170,7 +5254,7 @@ export default function App() {
               onClick={() => setClientTab('store')}
               className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold transition"
             >
-              + طلب قطع غيار جديدة
+              + اطلب قطع غيار جديدة
             </button>
           </div>
         </div>
@@ -5246,9 +5330,9 @@ export default function App() {
 
     if (isSyncedMatch || isMasterFallback) {
       setAdminAuthenticated(true);
-      showToast('تم تسجيل الدخول إلى لوحة تحكم الإدارة بنجاح!', 'success');
+      showToast('دخلت لوحة تحكم الإدارة!', 'success');
     } else {
-      showToast('اسم المستخدم أو كلمة المرور غير صحيحة!', 'error');
+      showToast('اسم المستخدم أو كلمة المرور غلط!', 'error');
     }
   };
 
@@ -5264,7 +5348,7 @@ export default function App() {
             </div>
             <div>
               <h3 className="text-base font-extrabold text-slate-900">{confirmDialog.title}</h3>
-              <p className="text-xs text-slate-500 mt-0.5">يرجى التأكيد للمتابعة، هذا الإجراء نهائي.</p>
+              <p className="text-xs text-slate-500 mt-0.5">أكّد عشان تكمّل، الإجراء ده نهائي.</p>
             </div>
           </div>
           <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-xs font-bold text-slate-700 leading-relaxed">
@@ -5740,6 +5824,100 @@ export default function App() {
             <Save className="w-4 h-4" />
             <span>حفظ وتأكيد الإعدادات في السيرفر ✓</span>
           </button>
+        </div>
+
+        {/* Payment Methods Control */}
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 space-y-3 text-xs">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <h4 className="font-extrabold text-slate-900 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-indigo-600" />
+              طرق الدفع اللي بتظهر للعميل
+            </h4>
+            <button
+              type="button"
+              onClick={() =>
+                updatePaymentMethods(list => [
+                  ...list,
+                  {
+                    id: `custom_${Date.now()}`,
+                    label: 'طريقة دفع جديدة',
+                    desc: 'اكتب هنا تفاصيل الدفع (رقم المحفظة، اسم الحساب...)',
+                    enabled: true,
+                    type: 'custom'
+                  }
+                ])
+              }
+              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold"
+            >
+              + ضيف طريقة دفع
+            </button>
+          </div>
+          <p className="text-slate-500">
+            شغّل أو اقفل أي طريقة، وعدّل اسمها ووصفها. الطرق المقفولة مش هتظهر للعميل في صفحة الدفع. بعد التعديل دوس على زرار "حفظ" عشان يتسجّل.
+          </p>
+          {getPaymentMethods(siteSettings).filter(m => m.enabled).length === 0 && (
+            <div className="p-2.5 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 font-bold">
+              تنبيه: كل طرق الدفع مقفولة، العميل مش هيعرف يكمّل الطلب. شغّل طريقة واحدة على الأقل.
+            </div>
+          )}
+          <div className="space-y-2.5">
+            {getPaymentMethods(siteSettings).map(pm => (
+              <div
+                key={pm.id}
+                className={`p-3 rounded-xl border bg-white grid grid-cols-1 md:grid-cols-12 gap-2 items-center ${
+                  pm.enabled ? 'border-emerald-300' : 'border-slate-200 opacity-70'
+                }`}
+              >
+                <label className="md:col-span-2 flex items-center gap-2 font-extrabold cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!pm.enabled}
+                    onChange={e =>
+                      updatePaymentMethods(list =>
+                        list.map(x => (x.id === pm.id ? { ...x, enabled: e.target.checked } : x))
+                      )
+                    }
+                    className="w-4 h-4 accent-emerald-600"
+                  />
+                  {pm.enabled ? 'شغّالة' : 'مقفولة'}
+                </label>
+                <input
+                  type="text"
+                  value={pm.label || ''}
+                  onChange={e =>
+                    updatePaymentMethods(list =>
+                      list.map(x => (x.id === pm.id ? { ...x, label: e.target.value } : x))
+                    )
+                  }
+                  placeholder="اسم الطريقة"
+                  className="md:col-span-3 p-2 rounded-lg border border-slate-300 font-bold"
+                />
+                <input
+                  type="text"
+                  value={pm.desc || ''}
+                  onChange={e =>
+                    updatePaymentMethods(list =>
+                      list.map(x => (x.id === pm.id ? { ...x, desc: e.target.value } : x))
+                    )
+                  }
+                  placeholder="الوصف اللي هيظهر للعميل"
+                  className="md:col-span-6 p-2 rounded-lg border border-slate-300"
+                />
+                {pm.type === 'custom' ? (
+                  <button
+                    type="button"
+                    onClick={() => updatePaymentMethods(list => list.filter(x => x.id !== pm.id))}
+                    className="md:col-span-1 p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 flex items-center justify-center"
+                    title="امسح الطريقة دي"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <span className="md:col-span-1" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Store Name & Social Media Links */}
@@ -7283,7 +7461,7 @@ export default function App() {
                 <th className="p-3">اسم قطعة الغيار</th>
                 <th className="p-3">الكمية المتاحة</th>
                 <th className="p-3">حد النواقص</th>
-                <th className="p-3">أقصى كمية للطلب</th>
+                <th className="p-3 text-slate-400" title="الحد ده اتلغى: العميل يقدر يطلب أي كمية (في حدود المتاح في المخزن)">أقصى كمية للطلب (متوقّف)</th>
                 <th className="p-3">سعر التكلفة (ج.م)</th>
                 <th className="p-3">سعر البيع الأساسي (ج.م)</th>
                 <th className="p-3">هامش الربح</th>
@@ -9316,7 +9494,7 @@ model OrderInvoice {
 
           <div className="flex-1 overflow-y-auto py-4 space-y-3">
             {cartSummary.items.length === 0 ? (
-              <div className="text-center py-12 text-xs text-slate-400">السلة فارغة حالياً</div>
+              <div className="text-center py-12 text-xs text-slate-400">السلة فاضية دلوقتي</div>
             ) : (
               cartSummary.items.map(item => (
                 <div
@@ -9336,7 +9514,15 @@ model OrderInvoice {
                     >
                       <Plus className="w-3.5 h-3.5" />
                     </button>
-                    <span className="w-6 text-center text-xs font-extrabold">{item.qty}</span>
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      value={item.qty}
+                      onFocus={e => e.target.select()}
+                      onChange={e => setCartQtyDirect(item.part.id, e.target.value)}
+                      className="w-14 text-center text-xs font-extrabold border border-slate-200 rounded-lg py-1"
+                    />
                     <button
                       onClick={() => updateCartQty(item.part.id, -1)}
                       className="w-7 h-7 rounded bg-slate-200 text-slate-800 flex items-center justify-center"
@@ -9365,7 +9551,7 @@ model OrderInvoice {
               }}
               className="w-full py-3 rounded-xl bg-emerald-600 text-white text-xs font-extrabold"
             >
-              الانتقال لإتمام الطلب والمحاسبة
+              كمّل الطلب وادفع
             </button>
           </div>
         </div>
@@ -9394,20 +9580,20 @@ model OrderInvoice {
 
   const handleClientLoginSubmit = (e) => {
     e.preventDefault();
-    const idClean = clientLoginIdentifier.trim().toLowerCase();
+    const idClean = normalizeDigits(clientLoginIdentifier).trim().toLowerCase();
     const matchedClient = clients.find(
       c =>
-        c.phone.trim() === idClean ||
+        String(c.phone || '').trim() === idClean ||
         (c.email && c.email.trim().toLowerCase() === idClean)
     );
 
     if (!matchedClient) {
-      showToast('لم يتم العثور على حساب مسجل بهذا الرقم أو البريد الإلكتروني. يمكنك تقديم طلب فتح حساب جديد.', 'error');
+      showToast('مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.', 'error');
       return;
     }
 
     if (matchedClient.password !== clientLoginPassword) {
-      showToast('كلمة المرور غير صحيحة! يرجى التأكد والمحاولة مرة أخرى.', 'error');
+      showToast('كلمة المرور غلط! اتأكد وجرّب تاني.', 'error');
       return;
     }
 
@@ -9426,37 +9612,37 @@ model OrderInvoice {
     const nameWords = rawName.split(/\s+/).filter(Boolean);
     if (!rawName || nameWords.length < 2 || rawName.length < 5) {
       errs.name = isIndiv
-        ? 'يرجى كتابة اسمك بالكامل ثنائياً أو ثلاثياً (5 أحرف على الأقل)'
-        : 'يرجى كتابة اسم المالك أو المسؤول ثنائياً على الأقل';
+        ? 'اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)'
+        : 'اكتب اسم المالك أو المسؤول ثنائي على الأقل';
     }
 
     if (!isIndiv && (!regForm.shopName.trim() || regForm.shopName.trim().length < 3)) {
-      errs.shopName = 'يرجى كتابة اسم المحل أو مركز الصيانة بشكل صحيح (3 أحرف على الأقل)';
+      errs.shopName = 'اكتب اسم المحل أو مركز الصيانة صح (3 حروف على الأقل)';
     }
 
     // 2. Phone validation (Egyptian 11 digits starting with 010, 011, 012, 015 OR valid international +10 digits)
-    const cleanPhone = regForm.phone.trim().replace(/\s+/g, '');
+    const cleanPhone = normalizeDigits(regForm.phone).trim().replace(/\s+/g, '');
     const egPhoneRegex = /^(010|011|012|015)[0-9]{8}$/;
     const intlPhoneRegex = /^\+?[0-9]{10,14}$/;
     if (!cleanPhone || (!egPhoneRegex.test(cleanPhone) && !intlPhoneRegex.test(cleanPhone))) {
-      errs.phone = 'رقم الموبايل يجب أن يكون صحيحاً مكوناً من 11 رقماً ويبدأ بـ (010 أو 011 أو 012 أو 015)';
-    } else if (clients.some(c => c.phone.trim() === cleanPhone)) {
-      errs.phone = 'رقم الهاتف هذا مسجل بالفعل لحساب آخر! يمكنك تسجيل الدخول به مباشرة.';
+      errs.phone = 'رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)';
+    } else if (clients.some(c => String(c.phone || '').trim() === cleanPhone)) {
+      errs.phone = 'الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.';
     }
 
     // 3. Address validation (detailed address, >= 8 chars)
     if (!regForm.address.trim() || regForm.address.trim().length < 8) {
-      errs.address = 'يرجى كتابة العنوان بالتفصيل (المحافظة والمدينة والشارع) لضمان دقة الشحن والتسليم';
+      errs.address = 'اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح';
     }
 
     // 4. Password validation (at least 6 chars)
     if (!regForm.password || regForm.password.length < 6) {
-      errs.password = 'كلمة المرور يجب ألا تقل عن 6 أحرف أو أرقام';
+      errs.password = 'كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل';
     }
 
     // 5. Password Confirmation
     if (regForm.confirmPassword !== undefined && regForm.password !== regForm.confirmPassword) {
-      errs.confirmPassword = 'كلمتا المرور غير متطابقتين، يرجى إعادة التأكيد بدقة';
+      errs.confirmPassword = 'كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط';
     }
 
     setRegErrors(errs);
@@ -9466,11 +9652,25 @@ model OrderInvoice {
   const handleSubmitRegistrationRequest = (e) => {
     e.preventDefault();
     if (!validateRegistration()) {
-      showToast('يرجى تصحيح الأخطاء الموضحة باللون الأحمر في النموذج.', 'warning');
+      showToast('صحّح الحقول الحمرا في الفورم.', 'warning');
+      setTimeout(() => {
+        try {
+          document.getElementById('reg-form-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {}
+      }, 80);
       return;
     }
+    try {
+      submitRegistrationRequestInner();
+    } catch (err) {
+      console.error('registration failed', err);
+      showToast('حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (' + (err && err.message ? err.message : '') + ')', 'error');
+    }
+  };
 
-    const cleanPhone = regForm.phone.trim().replace(/\s+/g, '');
+  const submitRegistrationRequestInner = () => {
+
+    const cleanPhone = normalizeDigits(regForm.phone).trim().replace(/\s+/g, '');
     const isIndiv = regForm.accountCategory === 'individual';
     const clientName = isIndiv ? regForm.ownerName.trim() : regForm.shopName.trim();
     const ownerName = regForm.ownerName.trim() || clientName;
@@ -9528,7 +9728,7 @@ model OrderInvoice {
       notes: ''
     });
     showToast(
-      `تم إرسال طلب إنشاء حسابك (${clientName}) إلى الإدارة بنجاح! سيتم تأكيد وتفعيل حسابكم فوراً.`,
+      `طلب فتح حسابك (${clientName}) اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.`,
       'success'
     );
   };
@@ -9545,10 +9745,10 @@ model OrderInvoice {
               </div>
               <div>
                 <h3 className="text-base font-extrabold text-slate-900">
-                  بوابة حسابات التجار والمحلات
+                  حسابات التجار والمحلات
                 </h3>
                 <p className="text-xs text-slate-500">
-                  سجل دخولك لحسابك المعتمد أو قدم طلب فتح حساب جديد للإدارة
+                  سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة
                 </p>
               </div>
             </div>
@@ -9587,14 +9787,14 @@ model OrderInvoice {
             <form onSubmit={handleClientLoginSubmit} className="space-y-4 text-xs">
               <div>
                 <label className="font-bold text-slate-700 block mb-1.5">
-                  رقم الموبايل أو البريد الإلكتروني المسجل:
+                  رقم الموبايل أو الإيميل المسجّل:
                 </label>
                 <input
                   type="text"
                   required
                   value={clientLoginIdentifier}
                   onChange={e => setClientLoginIdentifier(e.target.value)}
-                  placeholder="أدخل رقم الموبايل (مثال: 01012345678)..."
+                  placeholder="اكتب رقم الموبايل (مثلاً: 01012345678)..."
                   className="w-full px-3.5 py-3 rounded-xl border border-slate-300 font-mono font-bold text-slate-900"
                 />
               </div>
@@ -9608,7 +9808,7 @@ model OrderInvoice {
                   required
                   value={clientLoginPassword}
                   onChange={e => setClientLoginPassword(e.target.value)}
-                  placeholder="أدخل كلمة المرور..."
+                  placeholder="اكتب كلمة المرور..."
                   className="w-full px-3.5 py-3 rounded-xl border border-slate-300 font-mono"
                 />
               </div>
@@ -9617,25 +9817,34 @@ model OrderInvoice {
                 type="submit"
                 className="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold text-sm shadow-md transition"
               >
-                تسجيل الدخول وتحديث الأسعار
+                ادخل وحدّث الأسعار
               </button>
 
               <div className="pt-2 border-t border-slate-100 text-center">
-                <span className="text-slate-500">ليس لديك حساب تاجر حتى الآن؟ </span>
+                <span className="text-slate-500">لسه معندكش حساب؟ </span>
                 <button
                   type="button"
                   onClick={() => setAuthModalTab('register')}
                   className="font-extrabold text-blue-600 hover:underline"
                 >
-                  اضغط هنا لتقديم طلب إنشاء حساب للإدارة
+                  دوس هنا واطلب فتح حساب
                 </button>
               </div>
             </form>
           ) : (
             <form onSubmit={handleSubmitRegistrationRequest} className="space-y-4 text-xs">
+              {Object.values(regErrors).some(Boolean) && (
+                <div
+                  id="reg-form-top"
+                  className="p-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-700 font-bold flex items-center gap-2"
+                >
+                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                  <span>في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.</span>
+                </div>
+              )}
               {/* Persona Selector: Individual vs Merchant */}
               <div>
-                <label className="font-extrabold text-slate-800 block mb-2">اختر نوع الحساب:</label>
+                <label className="font-extrabold text-slate-800 block mb-2">اختار نوع الحساب:</label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <div
                     onClick={() => {
@@ -9660,7 +9869,7 @@ model OrderInvoice {
                     <div>
                       <div className="font-black text-slate-900 text-xs">شخص عادي (استخدام شخصي)</div>
                       <div className="text-[10px] text-slate-500 leading-relaxed mt-0.5">
-                        شراء قطع غيار وإكسسوارات لجهازك بأسعار التجزئة مع تفعيل الحساب فوراً
+                        اشتري قطع غيار وإكسسوارات لموبايلك بأسعار القطاعي
                       </div>
                     </div>
                   </div>
@@ -9688,7 +9897,7 @@ model OrderInvoice {
                     <div>
                       <div className="font-black text-slate-900 text-xs">صاحب محل أو مركز صيانة</div>
                       <div className="text-[10px] text-slate-500 leading-relaxed mt-0.5">
-                        حساب تاجر معتمد للحصول على أسعار الجملة وخصومات التوزيع
+                        حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع
                       </div>
                     </div>
                   </div>
@@ -9708,7 +9917,7 @@ model OrderInvoice {
                         setRegForm(p => ({ ...p, shopName: e.target.value }));
                         if (regErrors.shopName) setRegErrors(p => ({ ...p, shopName: null }));
                       }}
-                      placeholder="مثال: مركز الأهرام لصيانة الهواتف الذكية..."
+                      placeholder="مثلاً: مركز الأهرام لصيانة الموبايلات..."
                       className={`w-full p-2.5 rounded-xl border font-bold text-slate-900 transition ${
                         regErrors.shopName ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-400' : 'border-slate-300'
                       }`}
@@ -9723,7 +9932,7 @@ model OrderInvoice {
 
                 <div className={regForm.accountCategory === 'individual' ? 'sm:col-span-2' : ''}>
                   <label className="font-bold text-slate-700 block mb-1">
-                    {regForm.accountCategory === 'individual' ? 'الاسم بالكامل (ثنائياً أو ثلاثياً) *' : 'اسم المالك أو الفني المسؤول *'}
+                    {regForm.accountCategory === 'individual' ? 'الاسم بالكامل (ثنائي أو ثلاثي) *' : 'اسم المالك أو الفني المسؤول *'}
                   </label>
                   <input
                     type="text"
@@ -9733,7 +9942,7 @@ model OrderInvoice {
                       setRegForm(p => ({ ...p, ownerName: e.target.value }));
                       if (regErrors.name) setRegErrors(p => ({ ...p, name: null }));
                     }}
-                    placeholder={regForm.accountCategory === 'individual' ? 'مثال: محمود أحمد حسن...' : 'مثال: م. محمد إبراهيم...'}
+                    placeholder={regForm.accountCategory === 'individual' ? 'مثلاً: محمود أحمد حسن...' : 'مثلاً: م. محمد إبراهيم...'}
                     className={`w-full p-2.5 rounded-xl border font-bold text-slate-900 transition ${
                       regErrors.name ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-400' : 'border-slate-300'
                     }`}
@@ -9794,7 +10003,7 @@ model OrderInvoice {
                       setRegForm(p => ({ ...p, address: e.target.value }));
                       if (regErrors.address) setRegErrors(p => ({ ...p, address: null }));
                     }}
-                    placeholder="مثال: الدقهلية، أجا، شارع الجيش بجوار مسجد النور..."
+                    placeholder="مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور..."
                     className={`w-full p-2.5 rounded-xl border font-medium text-slate-900 transition ${
                       regErrors.address ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-400' : 'border-slate-300'
                     }`}
@@ -9807,7 +10016,7 @@ model OrderInvoice {
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">كلمة المرور (6 خانات على الأقل) *</label>
+                  <label className="font-bold text-slate-700 block mb-1">كلمة المرور (6 على الأقل) *</label>
                   <input
                     type="password"
                     required
@@ -9816,7 +10025,7 @@ model OrderInvoice {
                       setRegForm(p => ({ ...p, password: e.target.value }));
                       if (regErrors.password) setRegErrors(p => ({ ...p, password: null }));
                     }}
-                    placeholder="اختر كلمة مرور قوية..."
+                    placeholder="اختار كلمة مرور قوية..."
                     className={`w-full p-2.5 rounded-xl border font-mono transition ${
                       regErrors.password ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-400' : 'border-slate-300'
                     }`}
@@ -9838,7 +10047,7 @@ model OrderInvoice {
                       setRegForm(p => ({ ...p, confirmPassword: e.target.value }));
                       if (regErrors.confirmPassword) setRegErrors(p => ({ ...p, confirmPassword: null }));
                     }}
-                    placeholder="أعد إدخال نفس كلمة المرور..."
+                    placeholder="اكتب نفس كلمة المرور تاني..."
                     className={`w-full p-2.5 rounded-xl border font-mono transition ${
                       regErrors.confirmPassword ? 'border-rose-500 bg-rose-50/40 ring-1 ring-rose-400' : 'border-slate-300'
                     }`}
@@ -9860,7 +10069,7 @@ model OrderInvoice {
                 }`}
               >
                 <Check className="w-4 h-4 stroke-[3]" />
-                {regForm.accountCategory === 'individual' ? 'إرسال بياناتي وتأكيد إنشاء الحساب الشخصي' : 'إرسال طلب فتح حساب المحل / التاجر للإدارة'}
+                {regForm.accountCategory === 'individual' ? 'ابعت بياناتي واعمل الحساب' : 'ابعت طلب فتح حساب المحل للإدارة'}
               </button>
             </form>
           )}
@@ -10362,7 +10571,7 @@ model OrderInvoice {
     const handleSubmitReturn = (e) => {
       e.preventDefault();
       if (!retPledge) {
-        showToast('يجب الموافقة على إقرار حالة المصنع والختم الأصلي لإرسال طلب الاسترجاع.', 'warning');
+        showToast('لازم توافق على إقرار حالة المصنع والختم الأصلي عشان تبعت طلب الاسترجاع.', 'warning');
         return;
       }
       const newRet = {
@@ -10388,7 +10597,7 @@ model OrderInvoice {
       setRetPledge(false);
       setClientTab('account');
       setAccountSubTab('returns');
-      showToast('تم إرسال طلب الاسترجاع وصور الفحص لقسم الضمان بنجاح!', 'success');
+      showToast('طلب الاسترجاع والصور وصلوا لقسم الضمان!', 'success');
     };
 
     return (
@@ -10399,7 +10608,7 @@ model OrderInvoice {
         >
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="text-base font-extrabold text-slate-900">
-              طلب استرجاع ضمان — فاتورة {returnModalOrder.id}
+              طلب استرجاع بالضمان — فاتورة {returnModalOrder.id}
             </h3>
             <button
               type="button"
@@ -10412,7 +10621,7 @@ model OrderInvoice {
 
           <div className="space-y-3 text-xs">
             <div>
-              <label className="font-bold text-slate-700 block mb-1">اختر القطعة المراد إرجاعها:</label>
+              <label className="font-bold text-slate-700 block mb-1">اختار القطعة اللي عايز ترجّعها:</label>
               <select
                 value={selectedItem.partId}
                 onChange={e => setRetPartId(e.target.value)}
@@ -10433,14 +10642,14 @@ model OrderInvoice {
                 required
                 value={retReason}
                 onChange={e => setRetReason(e.target.value)}
-                placeholder="اشرح العيب الذي ظهر أثناء التجربة الخارجية قبل اللزق..."
+                placeholder="اشرح العيب اللي ظهر وقت التجربة قبل اللزق..."
                 className="w-full p-2.5 rounded-xl border border-slate-300"
               />
             </div>
 
             <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
               <span className="text-slate-600">صور القطعة والختم المائي المرفقة:</span>
-              <span className="font-bold text-emerald-700">تم إرفاق صورتين للفحص ✓</span>
+              <span className="font-bold text-emerald-700">ضفنا صورتين للفحص ✓</span>
             </div>
 
             <label className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-200 cursor-pointer">
@@ -10451,7 +10660,7 @@ model OrderInvoice {
                 className="mt-0.5 w-4 h-4 accent-amber-600"
               />
               <span className="font-bold text-amber-950 leading-relaxed">
-                أقر بأن القطعة بحالة المصنع وبالختم والاستيكر الأصلي وبدون أي لحام أو تركيب نهائي.
+                أقرّ إن القطعة زي ما جت من المصنع وعليها الختم والاستيكر الأصلي ومن غير أي لحام أو تركيب نهائي.
               </span>
             </label>
           </div>
@@ -10460,7 +10669,7 @@ model OrderInvoice {
             type="submit"
             className="w-full py-3 rounded-xl bg-blue-600 text-white text-xs font-extrabold"
           >
-            إرسال طلب الاسترجاع للمراجعة
+            ابعت طلب الاسترجاع للمراجعة
           </button>
         </form>
       </div>
@@ -10530,7 +10739,7 @@ model OrderInvoice {
             })
             .from(el)
             .save();
-          showToast(`تم تجهيز وتحميل الفاتورة (${order.id}.pdf) بنجاح!`, 'success');
+          showToast(`الفاتورة اتحمّلت (${order.id}.pdf) بنجاح!`, 'success');
         } else {
           triggerStandalonePrintWindow();
         }
@@ -12283,7 +12492,7 @@ model OrderInvoice {
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-cyan-400" />
             <h3 className="text-base font-extrabold text-white">
-              قواعد العمل والشروط والأحكام وسياسات الضمان والشحن لدى {siteSettings.storeName || 'H-market'}
+              شروطنا وسياسات الضمان والشحن عند {siteSettings.storeName || 'H-market'}
             </h3>
           </div>
 
@@ -12367,7 +12576,7 @@ model OrderInvoice {
     <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4 shadow-xs">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[200] max-w-md w-full px-4 shadow-xs">
           <div
             className={`p-3.5 rounded-2xl shadow-2xl border text-xs font-extrabold flex items-center justify-between gap-2 ${
               toast.type === 'error'
