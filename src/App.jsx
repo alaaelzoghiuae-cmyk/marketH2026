@@ -2396,18 +2396,53 @@ export default function App() {
   };
   const [announceBoxOpen, setAnnounceBoxOpen] = useState(false);
   const [headerCompact, setHeaderCompact] = useState(false);
+  const [headerFullH, setHeaderFullH] = useState(0);
+  const headerInnerRef = React.useRef(null);
+  const headerCompactRef = React.useRef(false);
+  headerCompactRef.current = headerCompact;
+
+  // الهيدر بيحجز ارتفاعه الكامل دايماً (من غير ما الصفحة تتحرك لما يصغر) عشان مايحصلش تذبذب
   useEffect(() => {
-    let lastY = window.scrollY || 0;
+    const el = headerInnerRef.current;
+    if (!el) return undefined;
+    const measure = force => {
+      if (headerCompactRef.current) return;
+      const h = el.offsetHeight;
+      if (h) setHeaderFullH(prev => (force ? h : Math.max(prev, h)));
+    };
+    measure(true);
+    const onResize = () => measure(true);
+    let ro;
+    if (window.ResizeObserver) {
+      ro = new ResizeObserver(() => measure(false));
+      ro.observe(el);
+    }
+    window.addEventListener('resize', onResize);
+    return () => {
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', onResize);
+    };
+  }, [appPortal, lang]);
+
+  useEffect(() => {
+    let lastY = Math.max(0, window.scrollY || 0);
     let ticking = false;
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       window.requestAnimationFrame(() => {
-        const y = window.scrollY || 0;
-        if (y < 70) setHeaderCompact(false);
-        else if (y > lastY + 8) setHeaderCompact(true);
-        else if (y < lastY - 8) setHeaderCompact(false);
-        lastY = y;
+        const y = Math.max(0, window.scrollY || 0);
+        const delta = y - lastY;
+        if (y < 40) {
+          setHeaderCompact(false);
+          lastY = y;
+        } else if (delta > 10 && y > 140) {
+          setHeaderCompact(true);
+          lastY = y;
+        } else if (delta < -10) {
+          setHeaderCompact(false);
+          lastY = y;
+        }
         ticking = false;
       });
     };
@@ -3718,7 +3753,11 @@ export default function App() {
     const unreadCount = myNotifs.filter(n => !n.read).length;
 
     return (
-      <header className="bg-[#0d151c] text-white border-b border-cyan-500/20 sticky top-0 z-40 shadow-xl">
+      <header
+        className="sticky top-0 z-40 pointer-events-none"
+        style={headerFullH ? { height: headerFullH } : undefined}
+      >
+      <div ref={headerInnerRef} className="pointer-events-auto bg-[#0d151c] text-white border-b border-cyan-500/20 shadow-xl">
         <div className={`max-w-7xl mx-auto px-3 sm:px-4 transition-all duration-300 flex items-center justify-between gap-2 ${headerCompact ? 'py-1.5' : 'py-2.5'}`}>
           {/* Brand */}
           <div onClick={() => setClientTab('home')} className="flex items-center gap-2.5 cursor-pointer group min-w-0">
@@ -3954,6 +3993,7 @@ export default function App() {
             )}
           </div>
         </div>
+      </div>
       </header>
     );
   };
