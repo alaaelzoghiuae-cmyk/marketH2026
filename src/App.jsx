@@ -613,7 +613,7 @@ We may amend these terms at any time; changes apply from the moment they are pub
 13) Governing law and disputes
 These terms are governed by Egyptian law. We try to resolve any dispute amicably first; otherwise it is referred to the competent authority (including the Consumer Protection Agency) or the competent Egyptian courts.`;
 
-const EN_DICT = {"إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","إغلاق":"Close","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك": "Welcome", "الأسعار والسلة اتحدّثت على حسابك.": "Prices and cart were updated for your account.", "إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).": "You are browsing as a guest (you can log in or request a new account).", "معلش، الكمية المتاحة في المخزن من": "Sorry, the available stock of", "معلش، المتاح في المخزن من": "Sorry, the available stock of", "قطع بس.": "pieces only.", "قياسي": "Standard", "سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.": "We added you to the waitlist! We'll notify you as soon as stock arrives.", "حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (": "Something went wrong while sending the order, please try again. (", "السلة فاضية! ضيف منتجات الأول.": "Your cart is empty! Add products first.", "اختار طريقة الدفع الأول.": "Please choose a payment method first.", "آجل / على الحساب": "Credit / On account", "قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.": "The order exceeds your available credit limit. Choose another payment method or settle part of your balance.", "اكتب عنوان التوصيل الأول.": "Please enter the delivery address first.", "تم الاستلام": "Received", "استلمنا طلبك": "Order received", "فاتورتك اتسجّلت وبنجهّز القطع في المخزن (": "Your invoice is registered and we are preparing your items (", "قطع).": "pcs).", "طلبك رقم": "Your order No.", "اتأكّد وبعتنا إشعار للإدارة والمخزن!": "is confirmed and the team has been notified!", "ضفنا": "Added", "أصناف متاحة للسلة (وعدّينا": "available items to the cart (skipped", "صنف مش متوفر دلوقتي).": "unavailable items).", "رجّعنا كل أصناف الفاتورة": "All invoice items were re-added", "للسلة!": "to the cart!", "الصورة السابقة": "Previous image", "الصورة التالية": "Next image", "عرض التفاصيل والصورة المكبرة": "View details and enlarged image", "الكمية خلصت": "Out of stock", "كمية محدودة: فاضل": "Limited stock: only", "متوفر في المخزن (": "In stock (", "في السلة:": "In cart:", "المتاح:": "Available:", "قطعة": "pcs", "التوافق:": "Compatible:", "اللون:": "Color:", "سعر الوحدة": "Unit price", "نبّهني لما يتوفر (": "Notify me when available (", "زوّد الكمية": "Increase quantity", "قلّل الكمية": "Decrease quantity", "كلّمنا على واتساب": "Chat on WhatsApp", "صفحتنا على فيسبوك": "Our Facebook page", "حسابنا على إنستجرام": "Our Instagram", "الرئيسية والعروض": "Home & offers", "دوّر في الكتالوج (": "Search the catalog (", "طلباتي": "My orders", "إشعارات الطلبات": "Order notifications", "إشعارات الطلبات اللحظية": "Live order notifications", "مفيش إشعارات جديدة": "No new notifications", "رصيد:": "Balance:", "مديونية:": "Debt:", "خرجت من حسابك.": "You have logged out.", "تسجيل الخروج": "Log out", "دخول": "Log in", "طلب فتح حساب": "Request an account", "السلة": "Cart", "دوّر في الكتالوج كله": "Search the whole catalog", "دوّر على أي منتج أو إكسسوار أو موديل موبايل": "Search any product, accessory or phone model", "أكثر من": "More than", "صنف وموديل متوفر في المخزن وجاهز يتشحن على طول": "items and models in stock, ready to ship right away", "دوس هنا للبحث والفلترة...": "Tap here to search and filter...", "دوّر": "Search", "أكتر الأقسام طلباً:": "Top categories:", "شاشات": "Screens", "بطاريات": "Batteries", "فلاتات وبوردات": "Flex cables & boards", "كاميرات": "Cameras", "شواحن وكابلات": "Chargers & cables", "جرابات وحمايات": "Cases & protectors", "أكواد خصم شغّالة:": "Active discount codes:", "نسخنا الكود (": "Code copied (", "الإعلان السابق": "Previous ad", "الإعلان التالي": "Next ad", "إعلان": "Ad", "من": "of", "شوف تفاصيل العرض واطلب": "View offer details & order", "دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول": "Tap the ad to see details and order directly", "اتصفّح المنتجات على حسب موديل الموبايل": "Browse products by phone model", "دوس على أي موديل وشوف كل المنتجات اللي بتناسبه": "Tap any model to see all compatible products", "شوف كل الموديلات والبحث المتقدم": "All models & advanced search", "قطع متاحة": "pcs available", "قسم مميز": "Featured", "شوف الكل في صفحة البحث": "See all in search", "دوس عشان تفتح السلة وتراجع الأصناف": "Tap to open the cart and review items", "سلة المشتريات": "Shopping cart", "صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)": "Instant search & full catalog (cart saved automatically)", "دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق": "Search by model, product name, quality or compatibility code", "ارجع للرئيسية والعروض": "Back to home & offers", "دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن": "Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex", "، بطارية)...": ", battery)...", "امسح البحث": "Clear search", "الفلاتر الشغّالة:": "Active filters:", "موديل": "Model", "فلتر المخزون": "Stock filter", "بحث:": "Search:", "مسح كل الفلاتر": "Clear all filters", "الماركة:": "Brand:", "كل الماركات": "All brands", "التصنيف:": "Category:", "كل المنتجات (": "All products (", "موديلات الموبايلات:": "Phone models:", "كل الموديلات (": "All models (", "فلترة وترتيب:": "Filter & sort:", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "الاسم: (أ - ي)": "Name: (A - Z)", "الاسم: (ي - أ)": "Name: (Z - A)", "العدد: الأكتر كمية": "Stock: highest", "العدد: الأقل كمية": "Stock: lowest", "السعر: من الأقل للأعلى": "Price: low to high", "السعر: من الأعلى للأقل": "Price: high to low", "حالة المخزون: الكل": "Stock: all", "المتوفر في المخزن بس": "In stock only", "كميات محدودة": "Limited quantities", "النتايج:": "Results:", "منتج": "products", "مفيش منتجات مطابقة لبحثك": "No products match your search", "اعرض كل المنتجات": "Show all products", "سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك": "Log in first to complete your order and see your group prices", "أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.": "Once you log in with your trader account, cart prices and currency update automatically to your discount tier.", "سجّل دخول دلوقتي": "Log in now", "كمّل الطلب وادفع —": "Checkout —", "راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن": "Review the delivery address, choose a payment method and send the order", "ارجع ضيف قطع تانية": "Back to add more items", "عنوان توصيل الطلب (عناوين المحل المسجّلة)": "Delivery address (your saved addresses)", "العنوان الأساسي للمحل": "Main address", "عنوان الفرع الثاني": "Second branch address", "وصّل لعنوان تاني للفاتورة دي بس": "Deliver to another address for this invoice only", "اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...": "Write the full address and the receiver phone number...", "حالة المحفظة والآجل (ليك / عليك)": "Wallet & credit status", "رصيد حسابك دلوقتي:": "Current balance:", "دائن (ليك):": "Credit (yours):", "مدين (عليك):": "Debit (you owe):", "سقف الآجل المسموح:": "Credit limit:", "المتاح تسحبه آجل:": "Available on credit:", "استخدم رصيدك الدائن في المحفظة (": "Use your wallet credit (", "واخصمه من الفاتورة": "and deduct it from the invoice", "طريقة الدفع": "Payment method", "مش متاح: الفاتورة أكبر من سقف الآجل المتبقي": "Unavailable: invoice exceeds remaining credit", "ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:": "Invoice notes or packing instructions:", "مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...": "e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...", "ملخص الفاتورة (": "Invoice summary (", "قطع)": "pcs)", "الكمية:": "Qty:", "كود خصم (مثال:": "Discount code (e.g.", "أو": "or", "كود الخصم مش صالح أو خلصت مدته! جرّب": "Invalid or expired discount code! Try", "معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.": "Sorry, this code reached its maximum number of uses.", "أقل فاتورة عشان الكود يشتغل (": "Minimum order for this code (", "فعّلنا كود الخصم (": "Discount code applied (", "تطبيق": "Apply", "مفعل:": "Active:", "إلغاء": "Cancel", "إجمالي قيمة الأصناف:": "Items subtotal:", "كوبون الخصم (": "Discount coupon (", "مصاريف التوصيل السريع:": "Express delivery fee:", "متخصوم من رصيد المحفظة:": "Deducted from wallet:", "الصافي اللي هتدفعه:": "Net amount to pay:", "أكّد وابعت الطلب": "Confirm & send order", "الصورة اتحفظت!": "Photo saved!", "بياناتك وعناوينك اتحفظت!": "Your details and addresses were saved!", "كلمة المرور الحالية غلط!": "Current password is incorrect!", "اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).": "Enter a new password (at least 3 characters).", "كلمة المرور الجديدة والتأكيد مش زي بعض!": "New password and confirmation do not match!", "كلمة المرور اتغيّرت!": "Password changed!", "جاري التجهيز": "Preparing", "جاهز للتسليم": "Ready for delivery", "في الطريق (دليفري)": "On the way (delivery)", "تم التسليم": "Delivered", "سجل طلباتك وفواتيرك": "Your orders & invoices", "دوس على زرار": "Tap the button", "جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل": "next to any order to expand or collapse its details. You can search, filter and cancel before delivery", "افتح الكل": "Expand all", "اقفل الكل": "Collapse all", "دوّر برقم الفاتورة (": "Search by invoice number (", "أو اسم القطعة أو التاريخ...": "or product name or date...", "جميع الحالات (": "All statuses (", "الأعلى قيمة": "Highest value", "الأقل قيمة": "Lowest value", "مفيش طلبات مطابقة للفلتر ده": "No orders match this filter", "اعرض كل الطلبات": "Show all orders", "اقفل تفاصيل الطلب (-)": "Collapse order details (-)", "افتح تفاصيل الطلب (": "Expand order details (", "قطع •": "pcs •", "الحالة:": "Status:", "السداد:": "Payment:", "اطبع الفاتورة الرسمية": "Print official invoice", "ملغي": "Cancelled", "إلغي الطلب قبل الشحن": "Cancel order before shipping", "اطلب تاني": "Reorder", "اطلب استرجاع بالضمان": "Request warranty return", "تعديل من الإدارة على الفاتورة:": "Admin update on the invoice:", "الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.": "This order was cancelled; stock was returned and the account settled.", "الكود": "Code", "الصنف والجودة": "Item & quality", "اللون": "Color", "الكمية": "Qty", "الإجمالي": "Total", "عنوان التوصيل:": "Delivery address:", "ملاحظات:": "Notes:", "تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).": "You can print the official invoice once you confirm you received the order (Delivered).", "إجمالي الفاتورة شامل التوصيل:": "Invoice total incl. delivery:", "صافي رصيد المحفظة والحساب": "Net wallet & account balance", "رصيد دائن (ليك):": "Credit balance (yours):", "مديونية (عليك):": "Debt (you owe):", "بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات": "Updates automatically with invoices, payments and returns", "سقف الآجل المسموح": "Credit limit", "المتاح تسحبه آجل دلوقتي:": "Available on credit now:", "عملة التعامل في الفواتير": "Invoice currency", "كل الفواتير وكشف الحساب معروضة بعملة حسابك": "All invoices and statements are shown in your account currency", "كشف الحساب التفصيلي وحركات المحفظة": "Detailed statement & wallet transactions", "حركات مالية": "transactions", "التاريخ": "Date", "رقم المرجع": "Reference", "البيان والتفاصيل": "Description", "قيمة الحركة": "Amount", "الرصيد بعد الحركة": "Balance after", "له": "Credit", "عليه": "Debit", "الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)": "Returns & product warranty (within 7 days of delivery)", "عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي": "To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation", "قدّم طلب مرتجع جديد": "Submit a new return request", "مفيش طلبات استرجاع مسجّلة.": "No return requests yet.", "فاتورة رقم:": "Invoice No.:", "مقبول": "Accepted", "مرفوض": "Rejected", "حالة الطلب:": "Order status:", "القيمة:": "Value:", "سبب الاسترجاع:": "Return reason:", "رد قسم الضمان والفحص الفني:": "Warranty & technical inspection reply:", "مقترح توفير صنف": "Item request", "مفتوح": "Open", "رسالتك وصلت للإدارة وهنرد عليك قريب.": "Your message reached the admin; we will reply soon.", "ردّك اتبعت!": "Your reply was sent!", "ابعت شكوى أو اطلب صنف": "Send a complaint or request an item", "نوع الرسالة:": "Message type:", "شكوى شحن وتوصيل": "Shipping complaint", "استفسار مالي / فواتير": "Billing inquiry", "أخرى": "Other", "العنوان:": "Subject:", "عنوان مختصر للرسالة...": "Short subject...", "التفاصيل:": "Details:", "اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...": "Write the complaint details or the item you want us to stock...", "ابعت للإدارة": "Send to admin", "رسائلي وتذاكر الدعم السابقة": "My messages & previous tickets", "مفيش رسائل قبل كده.": "No previous messages.", "تم الرد": "Replied", "رد الإدارة": "Admin reply", "ضيف رد أو سؤال تاني في الرسالة دي...": "Add another reply or question...", "ابعت الرد": "Send reply", "البيانات الأساسية والصورة الشخصية والعناوين": "Basic details, photo & addresses", "عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن": "Edit shop name, photo, contact numbers and shipping addresses", "صورة الحساب / شعار المحل:": "Account photo / shop logo:", "ارفع صورة من جهازك": "Upload a photo", "استخدم الأيقونة الملوّنة": "Use colored icon", "أو اختار لون الشعار:": "Or pick a logo color:", "حروف الشعار": "Logo letters", "اسم المحل / الشركة / المركز:": "Shop / company name:", "اسم المسؤول / صاحب الحساب:": "Owner name:", "رقم الموبايل (المستخدم للدخول):": "Mobile (used to log in):", "البريد الإلكتروني:": "Email:", "العنوان الأساسي للتوصيل:": "Main delivery address:", "عنوان الفرع الثاني (اختياري):": "Second address (optional):", "احفظ التغييرات": "Save changes", "تغيير كلمة المرور والأمان": "Change password & security", "تقدر تغيّر كلمة السر في أي وقت": "You can change your password anytime", "كلمة المرور الحالية:": "Current password:", "اكتب كلمة المرور الحالية...": "Enter current password...", "كلمة المرور الجديدة:": "New password:", "اكتب كلمة المرور الجديدة...": "Enter new password...", "تأكيد كلمة المرور الجديدة:": "Confirm new password:", "اكتب كلمة المرور الجديدة تاني...": "Re-enter new password...", "غيّر كلمة المرور": "Change password", "سجّل دخولك عشان تفتح حسابك": "Log in to open your account", "البروفايل وإعدادات الحساب": "Profile & settings", "طلباتي وفواتيري": "My orders & invoices", "المحفظة وكشف الحساب": "Wallet & statement", "المرتجعات والضمان": "Returns & warranty", "الشكاوى وطلبات الأصناف": "Complaints & item requests", "حساب معتمد نشط ✓": "Active verified account ✓", "المسؤول:": "Owner:", "الجوال:": "Mobile:", "صافي رصيد المحفظة": "Net wallet balance", "رصيد ليك:": "Credit:", "اطلب منتجات جديدة": "Order new products", "لوحة تحكم الحساب": "Account dashboard", "سلة المشتريات (": "Shopping cart (", "السلة فاضية دلوقتي": "Your cart is empty", "السعر:": "Price:", "إجمالي السلة:": "Cart total:", "كمّل الطلب وادفع": "Checkout", "مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.": "No account found with this phone or email. You can request a new account.", "كلمة المرور غلط! اتأكد وجرّب تاني.": "Wrong password! Please check and try again.", "اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)": "Enter your full name (at least 5 characters)", "اكتب اسم المالك أو المسؤول ثنائي على الأقل": "Enter the owner name (first and last)", "اكتب اسم المحل أو مركز الصيانة صح (3 حروف على الأقل)": "Enter the shop or center name (at least 3 characters)", "رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)": "Phone must be 11 digits starting with 010, 011, 012 or 015", "الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.": "This number is already registered! You can log in with it directly.", "اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح": "Enter the full address (governorate, city, street) so delivery is accurate", "كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل": "Password must be at least 6 characters", "كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط": "Passwords do not match, please retype them", "لازم توافق على الشروط والأحكام عشان تكمّل": "You must accept the Terms & Conditions to continue", "صحّح الحقول الحمرا في الفورم.": "Please fix the red fields in the form.", "حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (": "Something went wrong while sending your request, please try again. (", "عميل فردي (شخص عادي)": "Individual customer", "أهلاً بيك يا": "Welcome", "حسابك اتفتح وإنت دخلت عليه.": "your account is ready and you are logged in.", "طلب فتح حسابك (": "Your account request (", "اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.": "was sent to admin! We will verify and activate it soon.", "حسابات التجار والمحلات": "Trader & shop accounts", "سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة": "Log in or request a new account", "تسجيل الدخول لحسابي": "Log in to my account", "طلب فتح حساب جديد": "Request a new account", "رقم الموبايل أو الإيميل المسجّل:": "Registered phone or email:", "اكتب رقم الموبايل (مثلاً: 01012345678)...": "Enter phone number (e.g. 01012345678)...", "كلمة المرور (": "Password (", "اكتب كلمة المرور...": "Enter password...", "ادخل وحدّث الأسعار": "Log in & update prices", "لسه معندكش حساب؟": "Don't have an account?", "دوس هنا واطلب فتح حساب": "Tap here to request one", "في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.": "Some details are missing or wrong, please fix the red fields below.", "اختار نوع الحساب:": "Choose account type:", "شخص عادي (استخدام شخصي)": "Individual (personal use)", "عميل فردي (استخدام شخصي)": "Individual (personal use)", "اشتري منتجات وإكسسوارات لموبايلك بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة": "Buy products and accessories at retail prices; your account opens instantly with no approval", "مركز صيانة ومبيعات منتجات": "Repair center & product sales", "صاحب محل أو مركز صيانة": "Shop or repair center owner", "حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع": "Trader account for wholesale prices and distribution discounts", "اسم المحل / مركز الصيانة / الشركة *": "Shop / repair center / company name *", "مثلاً: مركز الأهرام لصيانة الموبايلات...": "e.g. Al-Ahram Mobile Repair Center...", "الاسم بالكامل (ثنائي أو ثلاثي) *": "Full name *", "اسم المالك أو الفني المسؤول *": "Owner / technician name *", "مثلاً: محمود أحمد حسن...": "e.g. Mahmoud Ahmed Hassan...", "مثلاً: م. محمد إبراهيم...": "e.g. Mohamed Ibrahim...", "رقم الموبايل (للتواصل والدخول) *": "Mobile number (for contact & login) *", "نوع النشاط التجاري:": "Business type:", "محل إكسسوارات وجوالات": "Mobile & accessories shop", "تاجر جملة وموزع محلي": "Wholesaler / local distributor", "فني صيانة مستقل": "Independent repair technician", "العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *": "Full address (governorate - city - street) *", "مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...": "e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...", "كلمة المرور (6 على الأقل) *": "Password (min. 6) *", "اختار كلمة مرور قوية...": "Choose a strong password...", "تأكيد كلمة المرور *": "Confirm password *", "اكتب نفس كلمة المرور تاني...": "Re-enter the same password...", "الشروط والأحكام": "Terms & Conditions", "قرأت الشروط والأحكام وموافق عليها *": "I have read and agree to the Terms & Conditions *", "اعمل الحساب وادخل على طول": "Create account & log in", "ابعت طلب فتح حساب المحل للإدارة": "Send shop account request to admin", "قيد المراجعة": "Under review", "طلب الاسترجاع والصور وصلوا لقسم الضمان!": "Your return request and photos reached the warranty department!", "طلب استرجاع بالضمان — فاتورة": "Warranty return request — invoice", "اختار القطعة اللي عايز ترجّعها:": "Choose the item to return:", "سعر الفاتورة:": "Invoice price:", "اشرح حالة القطعة والعيب:": "Describe the item condition and the defect:", "اكتب حالة القطعة والعيب اللي ظهر...": "Describe the condition and defect...", "صور للقطعة (اختياري — من 1 لـ 5):": "Photos (optional — 1 to 5):", "ابعت طلب الاسترجاع للمراجعة": "Submit return request for review", "ج.م)": "EGP)", "ج.م": "EGP", "شروطنا وسياسات الضمان والشحن عند": "Our terms, warranty & shipping policies at", "واتساب وخدمة العملاء:": "WhatsApp & customer service:", "مواعيد العمل:": "Working hours:", "تابعنا وتواصل معنا:": "Follow & contact us:", "جميع الحقوق محفوظة.": "All rights reserved.", "فاتورة مبيعات رسمية (": "Official sales invoice (", "إذن تحضير مخزني (بدون أسعار لعمال المخزن)": "Warehouse picking slip (no prices)", "نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)": "Official customer invoice copy (after delivery)", "فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:": "Sales & warranty invoice — WhatsApp / customer service:", "رقم الفاتورة:": "Invoice No.:", "التاريخ:": "Date:", "بيانات المحل / العميل المستلم:": "Customer details:", "تفاصيل الشحنة والسداد:": "Shipment & payment:", "طريقة الدفع:": "Payment method:", "إجمالي عدد القطع بالفاتورة:": "Total pieces:", "قطع": "pcs", "كود": "Code", "بيان الصنف ودرجة الجودة": "Item & quality", "مراجعة وفحص المخزن": "Warehouse check", "سليم ومختوم بختم الضمان": "OK & warranty-sealed", "شروط الضمان والاسترجاع (": "Warranty & return terms (", "الموقف المالي الحالي للحساب:": "Current account balance:", "رصيد دائن لكم": "Credit balance", "مديونية عليكم": "Debt", "الخصم المطبق:": "Discount applied:", "رسوم الشحن والتوصيل:": "Delivery fee:", "الصافي النهائي للفاتورة:": "Invoice net total:", "تحميل الفاتورة كملف": "Download invoice as", "مباشر (": "directly (", "طباعة ورقية فورية": "Print now", "دوس عشان تكبّر الصورة": "Tap to enlarge photo", "الموديل الأساسي:": "Main model:", "سعر الوحدة:": "Unit price:", "نفذت الكمية حالياً": "Currently out of stock", "متوفر بالمخزن (": "In stock (", "المواصفات الفنية والتفاصيل:": "Specifications & details:", "الموديلات المتوافقة معها القطعة:": "Compatible models:", "اختر اللون / النسخة:": "Choose color / version:", "أبلغني فور توفر القطعة بالمخزن": "Notify me when it is back in stock", "تمت إضافة": "Added", "إلى سلة المشتريات!": "to your cart!", "تأكيد الكمية بالسلة (": "Confirm cart quantity (", "إضافة للسلة الآن": "Add to cart", "ملاحظة": "Note", "الصورة": "Image", "صورة": "Photo", "الفاتورة": "Invoice"};
+const EN_DICT = {"تصفّح المنتجات (":"Browse products (","الرئيسية والعروض":"Home & offers","إشعارات":"Alerts","حسابي":"Account","خروج":"Log out","الماركة":"Brand","التصنيف":"Category","الموديل":"Model","الكل":"All","اختار الماركة":"Choose brand","اختار التصنيف":"Choose category","اختار الموديل":"Choose model","كل الماركات":"All brands","كل التصنيفات":"All categories","كل الموديلات":"All models","دوّر هنا...":"Search here...","عرض النتايج (":"Show results (","مفيش نتايج":"No results","الأقسام الأكتر طلباً":"Top categories","منتج متاح":"products available","شوف كل المنتجات ›":"All products ›","الأكتر طلباً":"Top seller","مشاركة":"Share","تصفّح":"Browse","طباعة الفاتورة":"Print invoice","إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","إغلاق":"Close","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك": "Welcome", "الأسعار والسلة اتحدّثت على حسابك.": "Prices and cart were updated for your account.", "إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).": "You are browsing as a guest (you can log in or request a new account).", "معلش، الكمية المتاحة في المخزن من": "Sorry, the available stock of", "معلش، المتاح في المخزن من": "Sorry, the available stock of", "قطع بس.": "pieces only.", "قياسي": "Standard", "سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.": "We added you to the waitlist! We'll notify you as soon as stock arrives.", "حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (": "Something went wrong while sending the order, please try again. (", "السلة فاضية! ضيف منتجات الأول.": "Your cart is empty! Add products first.", "اختار طريقة الدفع الأول.": "Please choose a payment method first.", "آجل / على الحساب": "Credit / On account", "قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.": "The order exceeds your available credit limit. Choose another payment method or settle part of your balance.", "اكتب عنوان التوصيل الأول.": "Please enter the delivery address first.", "تم الاستلام": "Received", "استلمنا طلبك": "Order received", "فاتورتك اتسجّلت وبنجهّز القطع في المخزن (": "Your invoice is registered and we are preparing your items (", "قطع).": "pcs).", "طلبك رقم": "Your order No.", "اتأكّد وبعتنا إشعار للإدارة والمخزن!": "is confirmed and the team has been notified!", "ضفنا": "Added", "أصناف متاحة للسلة (وعدّينا": "available items to the cart (skipped", "صنف مش متوفر دلوقتي).": "unavailable items).", "رجّعنا كل أصناف الفاتورة": "All invoice items were re-added", "للسلة!": "to the cart!", "الصورة السابقة": "Previous image", "الصورة التالية": "Next image", "عرض التفاصيل والصورة المكبرة": "View details and enlarged image", "الكمية خلصت": "Out of stock", "كمية محدودة: فاضل": "Limited stock: only", "متوفر في المخزن (": "In stock (", "في السلة:": "In cart:", "المتاح:": "Available:", "قطعة": "pcs", "التوافق:": "Compatible:", "اللون:": "Color:", "سعر الوحدة": "Unit price", "نبّهني لما يتوفر (": "Notify me when available (", "زوّد الكمية": "Increase quantity", "قلّل الكمية": "Decrease quantity", "كلّمنا على واتساب": "Chat on WhatsApp", "صفحتنا على فيسبوك": "Our Facebook page", "حسابنا على إنستجرام": "Our Instagram", "الرئيسية والعروض": "Home & offers", "دوّر في الكتالوج (": "Search the catalog (", "طلباتي": "My orders", "إشعارات الطلبات": "Order notifications", "إشعارات الطلبات اللحظية": "Live order notifications", "مفيش إشعارات جديدة": "No new notifications", "رصيد:": "Balance:", "مديونية:": "Debt:", "خرجت من حسابك.": "You have logged out.", "تسجيل الخروج": "Log out", "دخول": "Log in", "طلب فتح حساب": "Request an account", "السلة": "Cart", "دوّر في الكتالوج كله": "Search the whole catalog", "دوّر على أي منتج أو إكسسوار أو موديل موبايل": "Search any product, accessory or phone model", "أكثر من": "More than", "صنف وموديل متوفر في المخزن وجاهز يتشحن على طول": "items and models in stock, ready to ship right away", "دوس هنا للبحث والفلترة...": "Tap here to search and filter...", "دوّر": "Search", "أكتر الأقسام طلباً:": "Top categories:", "شاشات": "Screens", "بطاريات": "Batteries", "فلاتات وبوردات": "Flex cables & boards", "كاميرات": "Cameras", "شواحن وكابلات": "Chargers & cables", "جرابات وحمايات": "Cases & protectors", "أكواد خصم شغّالة:": "Active discount codes:", "نسخنا الكود (": "Code copied (", "الإعلان السابق": "Previous ad", "الإعلان التالي": "Next ad", "إعلان": "Ad", "من": "of", "شوف تفاصيل العرض واطلب": "View offer details & order", "دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول": "Tap the ad to see details and order directly", "اتصفّح المنتجات على حسب موديل الموبايل": "Browse products by phone model", "دوس على أي موديل وشوف كل المنتجات اللي بتناسبه": "Tap any model to see all compatible products", "شوف كل الموديلات والبحث المتقدم": "All models & advanced search", "قطع متاحة": "pcs available", "قسم مميز": "Featured", "شوف الكل في صفحة البحث": "See all in search", "دوس عشان تفتح السلة وتراجع الأصناف": "Tap to open the cart and review items", "سلة المشتريات": "Shopping cart", "صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)": "Instant search & full catalog (cart saved automatically)", "دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق": "Search by model, product name, quality or compatibility code", "ارجع للرئيسية والعروض": "Back to home & offers", "دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن": "Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex", "، بطارية)...": ", battery)...", "امسح البحث": "Clear search", "الفلاتر الشغّالة:": "Active filters:", "موديل": "Model", "فلتر المخزون": "Stock filter", "بحث:": "Search:", "مسح كل الفلاتر": "Clear all filters", "الماركة:": "Brand:", "كل الماركات": "All brands", "التصنيف:": "Category:", "كل المنتجات (": "All products (", "موديلات الموبايلات:": "Phone models:", "كل الموديلات (": "All models (", "فلترة وترتيب:": "Filter & sort:", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "الاسم: (أ - ي)": "Name: (A - Z)", "الاسم: (ي - أ)": "Name: (Z - A)", "العدد: الأكتر كمية": "Stock: highest", "العدد: الأقل كمية": "Stock: lowest", "السعر: من الأقل للأعلى": "Price: low to high", "السعر: من الأعلى للأقل": "Price: high to low", "حالة المخزون: الكل": "Stock: all", "المتوفر في المخزن بس": "In stock only", "كميات محدودة": "Limited quantities", "النتايج:": "Results:", "منتج": "products", "مفيش منتجات مطابقة لبحثك": "No products match your search", "اعرض كل المنتجات": "Show all products", "سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك": "Log in first to complete your order and see your group prices", "أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.": "Once you log in with your trader account, cart prices and currency update automatically to your discount tier.", "سجّل دخول دلوقتي": "Log in now", "كمّل الطلب وادفع —": "Checkout —", "راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن": "Review the delivery address, choose a payment method and send the order", "ارجع ضيف قطع تانية": "Back to add more items", "عنوان توصيل الطلب (عناوين المحل المسجّلة)": "Delivery address (your saved addresses)", "العنوان الأساسي للمحل": "Main address", "عنوان الفرع الثاني": "Second branch address", "وصّل لعنوان تاني للفاتورة دي بس": "Deliver to another address for this invoice only", "اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...": "Write the full address and the receiver phone number...", "حالة المحفظة والآجل (ليك / عليك)": "Wallet & credit status", "رصيد حسابك دلوقتي:": "Current balance:", "دائن (ليك):": "Credit (yours):", "مدين (عليك):": "Debit (you owe):", "سقف الآجل المسموح:": "Credit limit:", "المتاح تسحبه آجل:": "Available on credit:", "استخدم رصيدك الدائن في المحفظة (": "Use your wallet credit (", "واخصمه من الفاتورة": "and deduct it from the invoice", "طريقة الدفع": "Payment method", "مش متاح: الفاتورة أكبر من سقف الآجل المتبقي": "Unavailable: invoice exceeds remaining credit", "ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:": "Invoice notes or packing instructions:", "مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...": "e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...", "ملخص الفاتورة (": "Invoice summary (", "قطع)": "pcs)", "الكمية:": "Qty:", "كود خصم (مثال:": "Discount code (e.g.", "أو": "or", "كود الخصم مش صالح أو خلصت مدته! جرّب": "Invalid or expired discount code! Try", "معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.": "Sorry, this code reached its maximum number of uses.", "أقل فاتورة عشان الكود يشتغل (": "Minimum order for this code (", "فعّلنا كود الخصم (": "Discount code applied (", "تطبيق": "Apply", "مفعل:": "Active:", "إلغاء": "Cancel", "إجمالي قيمة الأصناف:": "Items subtotal:", "كوبون الخصم (": "Discount coupon (", "مصاريف التوصيل السريع:": "Express delivery fee:", "متخصوم من رصيد المحفظة:": "Deducted from wallet:", "الصافي اللي هتدفعه:": "Net amount to pay:", "أكّد وابعت الطلب": "Confirm & send order", "الصورة اتحفظت!": "Photo saved!", "بياناتك وعناوينك اتحفظت!": "Your details and addresses were saved!", "كلمة المرور الحالية غلط!": "Current password is incorrect!", "اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).": "Enter a new password (at least 3 characters).", "كلمة المرور الجديدة والتأكيد مش زي بعض!": "New password and confirmation do not match!", "كلمة المرور اتغيّرت!": "Password changed!", "جاري التجهيز": "Preparing", "جاهز للتسليم": "Ready for delivery", "في الطريق (دليفري)": "On the way (delivery)", "تم التسليم": "Delivered", "سجل طلباتك وفواتيرك": "Your orders & invoices", "دوس على زرار": "Tap the button", "جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل": "next to any order to expand or collapse its details. You can search, filter and cancel before delivery", "افتح الكل": "Expand all", "اقفل الكل": "Collapse all", "دوّر برقم الفاتورة (": "Search by invoice number (", "أو اسم القطعة أو التاريخ...": "or product name or date...", "جميع الحالات (": "All statuses (", "الأعلى قيمة": "Highest value", "الأقل قيمة": "Lowest value", "مفيش طلبات مطابقة للفلتر ده": "No orders match this filter", "اعرض كل الطلبات": "Show all orders", "اقفل تفاصيل الطلب (-)": "Collapse order details (-)", "افتح تفاصيل الطلب (": "Expand order details (", "قطع •": "pcs •", "الحالة:": "Status:", "السداد:": "Payment:", "اطبع الفاتورة الرسمية": "Print official invoice", "ملغي": "Cancelled", "إلغي الطلب قبل الشحن": "Cancel order before shipping", "اطلب تاني": "Reorder", "اطلب استرجاع بالضمان": "Request warranty return", "تعديل من الإدارة على الفاتورة:": "Admin update on the invoice:", "الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.": "This order was cancelled; stock was returned and the account settled.", "الكود": "Code", "الصنف والجودة": "Item & quality", "اللون": "Color", "الكمية": "Qty", "الإجمالي": "Total", "عنوان التوصيل:": "Delivery address:", "ملاحظات:": "Notes:", "تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).": "You can print the official invoice once you confirm you received the order (Delivered).", "إجمالي الفاتورة شامل التوصيل:": "Invoice total incl. delivery:", "صافي رصيد المحفظة والحساب": "Net wallet & account balance", "رصيد دائن (ليك):": "Credit balance (yours):", "مديونية (عليك):": "Debt (you owe):", "بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات": "Updates automatically with invoices, payments and returns", "سقف الآجل المسموح": "Credit limit", "المتاح تسحبه آجل دلوقتي:": "Available on credit now:", "عملة التعامل في الفواتير": "Invoice currency", "كل الفواتير وكشف الحساب معروضة بعملة حسابك": "All invoices and statements are shown in your account currency", "كشف الحساب التفصيلي وحركات المحفظة": "Detailed statement & wallet transactions", "حركات مالية": "transactions", "التاريخ": "Date", "رقم المرجع": "Reference", "البيان والتفاصيل": "Description", "قيمة الحركة": "Amount", "الرصيد بعد الحركة": "Balance after", "له": "Credit", "عليه": "Debit", "الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)": "Returns & product warranty (within 7 days of delivery)", "عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي": "To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation", "قدّم طلب مرتجع جديد": "Submit a new return request", "مفيش طلبات استرجاع مسجّلة.": "No return requests yet.", "فاتورة رقم:": "Invoice No.:", "مقبول": "Accepted", "مرفوض": "Rejected", "حالة الطلب:": "Order status:", "القيمة:": "Value:", "سبب الاسترجاع:": "Return reason:", "رد قسم الضمان والفحص الفني:": "Warranty & technical inspection reply:", "مقترح توفير صنف": "Item request", "مفتوح": "Open", "رسالتك وصلت للإدارة وهنرد عليك قريب.": "Your message reached the admin; we will reply soon.", "ردّك اتبعت!": "Your reply was sent!", "ابعت شكوى أو اطلب صنف": "Send a complaint or request an item", "نوع الرسالة:": "Message type:", "شكوى شحن وتوصيل": "Shipping complaint", "استفسار مالي / فواتير": "Billing inquiry", "أخرى": "Other", "العنوان:": "Subject:", "عنوان مختصر للرسالة...": "Short subject...", "التفاصيل:": "Details:", "اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...": "Write the complaint details or the item you want us to stock...", "ابعت للإدارة": "Send to admin", "رسائلي وتذاكر الدعم السابقة": "My messages & previous tickets", "مفيش رسائل قبل كده.": "No previous messages.", "تم الرد": "Replied", "رد الإدارة": "Admin reply", "ضيف رد أو سؤال تاني في الرسالة دي...": "Add another reply or question...", "ابعت الرد": "Send reply", "البيانات الأساسية والصورة الشخصية والعناوين": "Basic details, photo & addresses", "عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن": "Edit shop name, photo, contact numbers and shipping addresses", "صورة الحساب / شعار المحل:": "Account photo / shop logo:", "ارفع صورة من جهازك": "Upload a photo", "استخدم الأيقونة الملوّنة": "Use colored icon", "أو اختار لون الشعار:": "Or pick a logo color:", "حروف الشعار": "Logo letters", "اسم المحل / الشركة / المركز:": "Shop / company name:", "اسم المسؤول / صاحب الحساب:": "Owner name:", "رقم الموبايل (المستخدم للدخول):": "Mobile (used to log in):", "البريد الإلكتروني:": "Email:", "العنوان الأساسي للتوصيل:": "Main delivery address:", "عنوان الفرع الثاني (اختياري):": "Second address (optional):", "احفظ التغييرات": "Save changes", "تغيير كلمة المرور والأمان": "Change password & security", "تقدر تغيّر كلمة السر في أي وقت": "You can change your password anytime", "كلمة المرور الحالية:": "Current password:", "اكتب كلمة المرور الحالية...": "Enter current password...", "كلمة المرور الجديدة:": "New password:", "اكتب كلمة المرور الجديدة...": "Enter new password...", "تأكيد كلمة المرور الجديدة:": "Confirm new password:", "اكتب كلمة المرور الجديدة تاني...": "Re-enter new password...", "غيّر كلمة المرور": "Change password", "سجّل دخولك عشان تفتح حسابك": "Log in to open your account", "البروفايل وإعدادات الحساب": "Profile & settings", "طلباتي وفواتيري": "My orders & invoices", "المحفظة وكشف الحساب": "Wallet & statement", "المرتجعات والضمان": "Returns & warranty", "الشكاوى وطلبات الأصناف": "Complaints & item requests", "حساب معتمد نشط ✓": "Active verified account ✓", "المسؤول:": "Owner:", "الجوال:": "Mobile:", "صافي رصيد المحفظة": "Net wallet balance", "رصيد ليك:": "Credit:", "اطلب منتجات جديدة": "Order new products", "لوحة تحكم الحساب": "Account dashboard", "سلة المشتريات (": "Shopping cart (", "السلة فاضية دلوقتي": "Your cart is empty", "السعر:": "Price:", "إجمالي السلة:": "Cart total:", "كمّل الطلب وادفع": "Checkout", "مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.": "No account found with this phone or email. You can request a new account.", "كلمة المرور غلط! اتأكد وجرّب تاني.": "Wrong password! Please check and try again.", "اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)": "Enter your full name (at least 5 characters)", "اكتب اسم المالك أو المسؤول ثنائي على الأقل": "Enter the owner name (first and last)", "اكتب اسم المحل أو مركز الصيانة صح (3 حروف على الأقل)": "Enter the shop or center name (at least 3 characters)", "رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)": "Phone must be 11 digits starting with 010, 011, 012 or 015", "الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.": "This number is already registered! You can log in with it directly.", "اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح": "Enter the full address (governorate, city, street) so delivery is accurate", "كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل": "Password must be at least 6 characters", "كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط": "Passwords do not match, please retype them", "لازم توافق على الشروط والأحكام عشان تكمّل": "You must accept the Terms & Conditions to continue", "صحّح الحقول الحمرا في الفورم.": "Please fix the red fields in the form.", "حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (": "Something went wrong while sending your request, please try again. (", "عميل فردي (شخص عادي)": "Individual customer", "أهلاً بيك يا": "Welcome", "حسابك اتفتح وإنت دخلت عليه.": "your account is ready and you are logged in.", "طلب فتح حسابك (": "Your account request (", "اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.": "was sent to admin! We will verify and activate it soon.", "حسابات التجار والمحلات": "Trader & shop accounts", "سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة": "Log in or request a new account", "تسجيل الدخول لحسابي": "Log in to my account", "طلب فتح حساب جديد": "Request a new account", "رقم الموبايل أو الإيميل المسجّل:": "Registered phone or email:", "اكتب رقم الموبايل (مثلاً: 01012345678)...": "Enter phone number (e.g. 01012345678)...", "كلمة المرور (": "Password (", "اكتب كلمة المرور...": "Enter password...", "ادخل وحدّث الأسعار": "Log in & update prices", "لسه معندكش حساب؟": "Don't have an account?", "دوس هنا واطلب فتح حساب": "Tap here to request one", "في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.": "Some details are missing or wrong, please fix the red fields below.", "اختار نوع الحساب:": "Choose account type:", "شخص عادي (استخدام شخصي)": "Individual (personal use)", "عميل فردي (استخدام شخصي)": "Individual (personal use)", "اشتري منتجات وإكسسوارات لموبايلك بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة": "Buy products and accessories at retail prices; your account opens instantly with no approval", "مركز صيانة ومبيعات منتجات": "Repair center & product sales", "صاحب محل أو مركز صيانة": "Shop or repair center owner", "حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع": "Trader account for wholesale prices and distribution discounts", "اسم المحل / مركز الصيانة / الشركة *": "Shop / repair center / company name *", "مثلاً: مركز الأهرام لصيانة الموبايلات...": "e.g. Al-Ahram Mobile Repair Center...", "الاسم بالكامل (ثنائي أو ثلاثي) *": "Full name *", "اسم المالك أو الفني المسؤول *": "Owner / technician name *", "مثلاً: محمود أحمد حسن...": "e.g. Mahmoud Ahmed Hassan...", "مثلاً: م. محمد إبراهيم...": "e.g. Mohamed Ibrahim...", "رقم الموبايل (للتواصل والدخول) *": "Mobile number (for contact & login) *", "نوع النشاط التجاري:": "Business type:", "محل إكسسوارات وجوالات": "Mobile & accessories shop", "تاجر جملة وموزع محلي": "Wholesaler / local distributor", "فني صيانة مستقل": "Independent repair technician", "العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *": "Full address (governorate - city - street) *", "مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...": "e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...", "كلمة المرور (6 على الأقل) *": "Password (min. 6) *", "اختار كلمة مرور قوية...": "Choose a strong password...", "تأكيد كلمة المرور *": "Confirm password *", "اكتب نفس كلمة المرور تاني...": "Re-enter the same password...", "الشروط والأحكام": "Terms & Conditions", "قرأت الشروط والأحكام وموافق عليها *": "I have read and agree to the Terms & Conditions *", "اعمل الحساب وادخل على طول": "Create account & log in", "ابعت طلب فتح حساب المحل للإدارة": "Send shop account request to admin", "قيد المراجعة": "Under review", "طلب الاسترجاع والصور وصلوا لقسم الضمان!": "Your return request and photos reached the warranty department!", "طلب استرجاع بالضمان — فاتورة": "Warranty return request — invoice", "اختار القطعة اللي عايز ترجّعها:": "Choose the item to return:", "سعر الفاتورة:": "Invoice price:", "اشرح حالة القطعة والعيب:": "Describe the item condition and the defect:", "اكتب حالة القطعة والعيب اللي ظهر...": "Describe the condition and defect...", "صور للقطعة (اختياري — من 1 لـ 5):": "Photos (optional — 1 to 5):", "ابعت طلب الاسترجاع للمراجعة": "Submit return request for review", "ج.م)": "EGP)", "ج.م": "EGP", "شروطنا وسياسات الضمان والشحن عند": "Our terms, warranty & shipping policies at", "واتساب وخدمة العملاء:": "WhatsApp & customer service:", "مواعيد العمل:": "Working hours:", "تابعنا وتواصل معنا:": "Follow & contact us:", "جميع الحقوق محفوظة.": "All rights reserved.", "فاتورة مبيعات رسمية (": "Official sales invoice (", "إذن تحضير مخزني (بدون أسعار لعمال المخزن)": "Warehouse picking slip (no prices)", "نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)": "Official customer invoice copy (after delivery)", "فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:": "Sales & warranty invoice — WhatsApp / customer service:", "رقم الفاتورة:": "Invoice No.:", "التاريخ:": "Date:", "بيانات المحل / العميل المستلم:": "Customer details:", "تفاصيل الشحنة والسداد:": "Shipment & payment:", "طريقة الدفع:": "Payment method:", "إجمالي عدد القطع بالفاتورة:": "Total pieces:", "قطع": "pcs", "كود": "Code", "بيان الصنف ودرجة الجودة": "Item & quality", "مراجعة وفحص المخزن": "Warehouse check", "سليم ومختوم بختم الضمان": "OK & warranty-sealed", "شروط الضمان والاسترجاع (": "Warranty & return terms (", "الموقف المالي الحالي للحساب:": "Current account balance:", "رصيد دائن لكم": "Credit balance", "مديونية عليكم": "Debt", "الخصم المطبق:": "Discount applied:", "رسوم الشحن والتوصيل:": "Delivery fee:", "الصافي النهائي للفاتورة:": "Invoice net total:", "تحميل الفاتورة كملف": "Download invoice as", "مباشر (": "directly (", "طباعة ورقية فورية": "Print now", "دوس عشان تكبّر الصورة": "Tap to enlarge photo", "الموديل الأساسي:": "Main model:", "سعر الوحدة:": "Unit price:", "نفذت الكمية حالياً": "Currently out of stock", "متوفر بالمخزن (": "In stock (", "المواصفات الفنية والتفاصيل:": "Specifications & details:", "الموديلات المتوافقة معها القطعة:": "Compatible models:", "اختر اللون / النسخة:": "Choose color / version:", "أبلغني فور توفر القطعة بالمخزن": "Notify me when it is back in stock", "تمت إضافة": "Added", "إلى سلة المشتريات!": "to your cart!", "تأكيد الكمية بالسلة (": "Confirm cart quantity (", "إضافة للسلة الآن": "Add to cart", "ملاحظة": "Note", "الصورة": "Image", "صورة": "Photo", "الفاتورة": "Invoice"};
 const EN_KEYS = Object.keys(EN_DICT).sort((a, b) => b.length - a.length);
 const AR_TEST = /[\u0600-\u06FF]/;
 const isArLetter = ch => !!ch && AR_TEST.test(ch);
@@ -2396,6 +2396,8 @@ export default function App() {
   };
   const [announceBoxOpen, setAnnounceBoxOpen] = useState(false);
   const [headerCompact, setHeaderCompact] = useState(false);
+  const [filterSheet, setFilterSheet] = useState(null);
+  const [filterSheetQuery, setFilterSheetQuery] = useState('');
   const [headerFullH, setHeaderFullH] = useState(0);
   const headerInnerRef = React.useRef(null);
   const headerCompactRef = React.useRef(false);
@@ -2682,6 +2684,34 @@ export default function App() {
   };
 
   // --- Filtered Parts for Storefront (Bilingual + Aliases + Cross-Compatibility) ---
+  // أكتر الأقسام طلباً: من التصنيفات اللي فيها بضاعة متاحة فعلاً
+  const getTopCategories = () => {
+    const sold = {};
+    orders.forEach(o => (o.items || []).forEach(it => { sold[it.sku] = (sold[it.sku] || 0) + (it.qty || 0); }));
+    const stats = {};
+    parts.forEach(pt => {
+      if (!pt.category || pt.stock <= 0) return;
+      const pr = calculatePartPrice(pt, currentGroup);
+      if (pr.baseEgpPrice <= 0) return;
+      if (pt.customGroupPrices && Number(pt.customGroupPrices[currentGroup?.id]) === 0) return;
+      const st = stats[pt.category] || (stats[pt.category] = { cat: pt.category, count: 0, sold: 0 });
+      st.count += 1;
+      st.sold += sold[pt.sku] || 0;
+    });
+    return Object.values(stats).sort((x, y) => y.sold - x.sold || y.count - x.count).slice(0, 8);
+  };
+  const categoryEmoji = cat => {
+    if (/شاش/.test(cat)) return '📱';
+    if (/بطار/.test(cat)) return '🔋';
+    if (/شاحن|كابل|وصل/.test(cat)) return '🔌';
+    if (/كام/.test(cat)) return '📷';
+    if (/سماع|صوت/.test(cat)) return '🎧';
+    if (/جراب|حماي|اسكرين|زجاج/.test(cat)) return '🛡️';
+    if (/فلات|بورد|ماذر/.test(cat)) return '⚙️';
+    return '🧩';
+  };
+  const CATEGORY_GRADS = ['from-blue-500 to-cyan-500', 'from-emerald-500 to-teal-500', 'from-amber-500 to-orange-500', 'from-rose-500 to-pink-500', 'from-violet-500 to-purple-500', 'from-sky-500 to-indigo-500', 'from-lime-500 to-green-600', 'from-fuchsia-500 to-rose-500'];
+
   const partPassesStoreFilters = (part, ignoreCategory = false) => {
     // 1. Zero Price Hiding
     const priceInfo = calculatePartPrice(part, currentGroup);
@@ -3758,51 +3788,48 @@ export default function App() {
         style={headerFullH ? { height: headerFullH } : undefined}
       >
       <div ref={headerInnerRef} className="pointer-events-auto bg-[#0d151c] text-white border-b border-cyan-500/20 shadow-xl">
-        <div className={`max-w-7xl mx-auto px-3 sm:px-4 transition-all duration-300 flex items-center justify-between gap-2 ${headerCompact ? 'py-1.5' : 'py-2.5'}`}>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
           {/* Brand */}
-          <div onClick={() => setClientTab('home')} className="flex items-center gap-2.5 cursor-pointer group min-w-0">
+          <div onClick={() => setClientTab('home')} className="flex items-center gap-2.5 cursor-pointer min-w-0">
             <img
               src={HMARKET_LOGO}
               alt="Logo"
-              className={`${headerCompact ? 'w-9 h-9' : 'w-11 h-11'} rounded-xl object-cover border-2 border-cyan-400/40 shadow-lg transition-all duration-300 shrink-0`}
+              className="w-11 h-11 rounded-xl object-cover border-2 border-cyan-400/40 shadow-lg shrink-0"
             />
-            <div className="min-w-0">
-              <h1 className={`${headerCompact ? 'text-base' : 'text-lg sm:text-xl'} font-black tracking-wide bg-gradient-to-l from-cyan-300 via-teal-200 to-blue-400 bg-clip-text text-transparent truncate transition-all`}>
+            <div className="min-w-0 hidden min-[420px]:block">
+              <h1 className="text-base sm:text-xl font-black tracking-wide bg-gradient-to-l from-cyan-300 via-teal-200 to-blue-400 bg-clip-text text-transparent truncate">
                 {siteSettings.storeName || 'H-market'}
               </h1>
-              {!headerCompact && (
-                <p className="text-[10px] sm:text-[11px] text-slate-400 truncate hidden sm:block">
-                  {siteSettings.storeSubtitle || siteSettings.storeTagline}
-                </p>
-              )}
+              <p className="text-[11px] text-slate-400 truncate hidden md:block">
+                {siteSettings.storeSubtitle || siteSettings.storeTagline}
+              </p>
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <div className="hidden xl:flex items-center pl-2 ml-1 border-l border-slate-800">
-              {renderSocialIconsGroup(true)}
-            </div>
-
+          {/* Actions: كل زرار عليه اسمه */}
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {headerCompact && (
               <button
                 type="button"
                 onClick={() => setClientTab('search')}
-                className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center"
-                title="دوّر"
+                className="w-[54px] h-12 rounded-xl bg-blue-600 text-white flex flex-col items-center justify-center gap-0.5"
               >
-                <Search className="w-4 h-4" />
+                <Search className="w-5 h-5" />
+                <span className="text-[10px] font-bold">تصفّح</span>
               </button>
             )}
+            <div className="hidden xl:flex items-center pl-2 ml-1 border-l border-slate-800">
+              {renderSocialIconsGroup(true)}
+            </div>
 
             <button
               type="button"
               onClick={() => changeLang(lang === 'en' ? 'ar' : 'en')}
-              className="h-10 px-2.5 rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 flex items-center gap-1.5"
+              className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-slate-800 hover:bg-slate-700 text-cyan-300"
               title="Language / اللغة"
             >
-              <Globe className="w-4 h-4" />
-              <span className="hidden sm:inline">{lang === 'en' ? 'عربي' : 'English'}</span>
+              <Globe className="w-5 h-5" />
+              <span className="text-[10px] font-bold text-slate-300">{lang === 'en' ? 'عربي' : 'English'}</span>
             </button>
 
             {currentClient ? (
@@ -3816,10 +3843,11 @@ export default function App() {
                         prev.map(n => (n.target === currentClient.id ? { ...n, read: true } : n))
                       );
                     }}
-                    className="relative w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 transition flex items-center justify-center"
+                    className="relative w-[54px] h-12 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 transition flex flex-col items-center justify-center gap-0.5"
                     title="إشعارات الطلبات"
                   >
-                    <Bell className="w-4 h-4" />
+                    <Bell className="w-5 h-5" />
+                    <span className="text-[10px] font-bold text-slate-300">إشعارات</span>
                     {unreadCount > 0 && (
                       <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                         {unreadCount}
@@ -3874,20 +3902,15 @@ export default function App() {
                     setClientTab('account');
                     setAccountSubTab('profile');
                   }}
-                  className={`h-10 pl-2.5 pr-1.5 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+                  className={`w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition border ${
                     clientTab === 'account' && accountSubTab === 'profile'
                       ? 'border-cyan-400 bg-cyan-500/20 text-white'
-                      : 'border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-100'
+                      : 'border-transparent bg-slate-800 hover:bg-slate-700 text-slate-100'
                   }`}
+                  title={currentClient.name}
                 >
-                  {renderClientAvatar(currentClient, 'w-7 h-7 text-xs')}
-                  <div className="text-right hidden md:block">
-                    <div className="font-extrabold text-[11px] leading-tight truncate max-w-[110px]">{currentClient.name}</div>
-                    <div className="text-[10px] text-teal-300 font-bold">
-                      {currentClient.walletBalance >= 0 ? 'رصيد: ' : 'مديونية: '}
-                      {formatMoney(Math.abs(currentClient.walletBalance))}
-                    </div>
-                  </div>
+                  {renderClientAvatar(currentClient, 'w-6 h-6 text-[10px]')}
+                  <span className="text-[10px] font-bold text-slate-300">حسابي</span>
                 </button>
 
                 <button
@@ -3896,10 +3919,11 @@ export default function App() {
                     setClientTab('home');
                     showToast('خرجت من حسابك.', 'info');
                   }}
-                  className="hidden sm:flex w-10 h-10 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-300 hover:text-white transition items-center justify-center"
+                  className="hidden sm:flex w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-rose-500/15 hover:bg-rose-600 text-rose-300 hover:text-white"
                   title="تسجيل الخروج"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-5 h-5" />
+                  <span className="text-[10px] font-bold">خروج</span>
                 </button>
               </>
             ) : (
@@ -3909,67 +3933,68 @@ export default function App() {
                     setAuthModalTab('login');
                     setLoginModalOpen(true);
                   }}
-                  className="h-10 px-3 rounded-xl text-xs font-extrabold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 transition flex items-center gap-1.5"
+                  className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30"
                 >
-                  <Lock className="w-3.5 h-3.5" />
-                  دخول
+                  <Lock className="w-5 h-5" />
+                  <span className="text-[10px] font-bold text-slate-200">دخول</span>
                 </button>
                 <button
                   onClick={() => {
                     setAuthModalTab('register');
                     setLoginModalOpen(true);
                   }}
-                  className="h-10 px-3 rounded-xl text-xs font-extrabold bg-gradient-to-l from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 transition flex items-center gap-1.5"
+                  className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-gradient-to-b from-cyan-400 to-teal-500 hover:brightness-110 text-slate-950"
                 >
-                  <User className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">طلب فتح حساب</span>
-                  <span className="sm:hidden">حساب جديد</span>
+                  <User className="w-5 h-5" />
+                  <span className="text-[10px] font-extrabold">حساب جديد</span>
                 </button>
               </>
             )}
 
             <button
               onClick={() => setCartDrawerOpen(true)}
-              className="relative h-10 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition flex items-center gap-1.5"
+              className="relative min-w-[58px] h-12 px-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition flex flex-col items-center justify-center gap-0.5"
             >
-              <ShoppingCart className="w-4 h-4" />
-              {cartSummary.totalQty > 0 ? (
-                <span className="font-extrabold">
-                  {cartSummary.totalQty}
-                  <span className="hidden sm:inline"> • {formatMoney(cartSummary.subtotalBase)}</span>
-                </span>
-              ) : (
-                <span className="hidden sm:inline">السلة</span>
-              )}
+              <ShoppingCart className="w-5 h-5" />
+              <span className="text-[10px] font-extrabold">
+                {cartSummary.totalQty > 0 ? (
+                  <>
+                    {cartSummary.totalQty}
+                    <span className="hidden sm:inline"> • {formatMoney(cartSummary.subtotalBase)}</span>
+                  </>
+                ) : (
+                  'السلة'
+                )}
+              </span>
             </button>
           </div>
         </div>
 
-        {/* Navigation row (hides when scrolling down, returns when scrolling up) */}
+        {/* Navigation tabs (بتختفي لما تنزل وترجع لما تطلع) */}
         <div className={`overflow-hidden transition-all duration-300 ${headerCompact ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}>
           <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-2.5 flex items-center gap-2">
             <button
               onClick={() => setClientTab('home')}
-              className={`h-10 px-3.5 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 shrink-0 ${
+              className={`flex-1 h-11 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 ${
                 clientTab === 'home' || clientTab === 'store'
                   ? 'bg-gradient-to-l from-cyan-500 to-teal-500 text-slate-950 shadow-md shadow-cyan-500/20'
                   : 'bg-slate-800/90 text-slate-200 hover:bg-slate-700'
               }`}
             >
               <Sparkles className="w-4 h-4" />
-              <span>الرئيسية</span>
+              الرئيسية والعروض
             </button>
 
             <button
               onClick={() => setClientTab('search')}
-              className={`h-10 flex-1 min-w-0 px-4 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+              className={`flex-1 h-11 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 ${
                 clientTab === 'search'
-                  ? 'bg-cyan-500/15 border-cyan-400 text-cyan-200'
-                  : 'bg-slate-800/70 border-slate-700 text-slate-300 hover:bg-slate-800'
+                  ? 'bg-gradient-to-l from-cyan-500 to-teal-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                  : 'bg-slate-800/90 text-slate-200 hover:bg-slate-700'
               }`}
             >
-              <Search className="w-4 h-4 shrink-0" />
-              <span className="truncate">دوّر في الكتالوج ({parts.length})</span>
+              <Search className="w-4 h-4" />
+              تصفّح المنتجات ({parts.length})
             </button>
 
             {currentClient && (
@@ -3978,17 +4003,14 @@ export default function App() {
                   setClientTab('account');
                   setAccountSubTab('orders');
                 }}
-                className={`h-10 px-3.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shrink-0 ${
+                className={`flex-1 h-11 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 ${
                   clientTab === 'account' && accountSubTab === 'orders'
-                    ? 'bg-cyan-500 text-slate-950 font-extrabold'
-                    : 'bg-slate-800 text-slate-200 hover:bg-slate-700'
+                    ? 'bg-gradient-to-l from-cyan-500 to-teal-500 text-slate-950 shadow-md shadow-cyan-500/20'
+                    : 'bg-slate-800/90 text-slate-200 hover:bg-slate-700'
                 }`}
               >
                 <Package className="w-4 h-4" />
-                <span className="hidden sm:inline">طلباتي</span>
-                <span className="px-1.5 rounded-full bg-cyan-400/20 text-cyan-300 text-[10px] font-extrabold">
-                  {orders.filter(o => o.clientId === currentClient.id).length}
-                </span>
+                طلباتي ({orders.filter(o => o.clientId === currentClient.id).length})
               </button>
             )}
           </div>
@@ -4093,47 +4115,57 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Categories & Search Shortcuts */}
-          <div className="pt-3 border-t border-slate-800/80 flex items-center gap-2 overflow-x-auto text-xs font-bold scrollbar-none">
-            <span className="text-slate-400 text-[11px] shrink-0">أكتر الأقسام طلباً:</span>
-            {(() => {
-              const sold = {};
-              orders.forEach(o => (o.items || []).forEach(it => { sold[it.sku] = (sold[it.sku] || 0) + (it.qty || 0); }));
-              const stats = {};
-              parts.forEach(pt => {
-                if (!pt.category || pt.stock <= 0) return;
-                const pr = calculatePartPrice(pt, currentGroup);
-                if (pr.baseEgpPrice <= 0) return;
-                if (pt.customGroupPrices && Number(pt.customGroupPrices[currentGroup?.id]) === 0) return;
-                const st = stats[pt.category] || (stats[pt.category] = { count: 0, sold: 0 });
-                st.count += 1;
-                st.sold += sold[pt.sku] || 0;
-              });
-              const list = Object.entries(stats)
-                .sort((x, y) => y[1].sold - x[1].sold || y[1].count - x[1].count)
-                .slice(0, 8);
-              if (list.length === 0) return <span className="text-slate-500 text-[11px]">مفيش أقسام متاحة دلوقتي</span>;
-              return list.map(([cat, st]) => (
+        </div>
+
+        {/* Top Categories (واضحة ومن البضاعة المتاحة) */}
+        {(() => {
+          const tops = getTopCategories();
+          if (tops.length === 0) return null;
+          return (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-base sm:text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                  <span className="text-xl">🔥</span> الأقسام الأكتر طلباً
+                </h3>
                 <button
-                  key={cat}
                   type="button"
                   onClick={() => {
-                    setSelectedBrand('ALL');
-                    setSelectedModelId('ALL');
-                    setSearchQuery('');
-                    setStoreStockFilter('ALL');
-                    setSelectedCategory(cat);
+                    setSelectedBrand('ALL'); setSelectedModelId('ALL'); setSelectedCategory('ALL'); setSearchQuery(''); setStoreStockFilter('ALL');
                     setClientTab('search');
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-cyan-500/20 hover:text-cyan-300 border border-slate-700 text-slate-300 text-[11px] shrink-0 transition flex items-center gap-1.5"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-800"
                 >
-                  {cat}
-                  <span className="px-1.5 rounded-full bg-cyan-500/15 text-cyan-300 text-[10px] font-extrabold">{st.count}</span>
+                  شوف كل المنتجات ›
                 </button>
-              ));
-            })()}
-          </div>
-        </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {tops.map((t, i) => (
+                  <button
+                    key={t.cat}
+                    type="button"
+                    onClick={() => {
+                      setSelectedBrand('ALL'); setSelectedModelId('ALL'); setSearchQuery(''); setStoreStockFilter('ALL');
+                      setSelectedCategory(t.cat);
+                      setClientTab('search');
+                    }}
+                    className="relative overflow-hidden rounded-2xl p-3.5 bg-white border border-slate-200 hover:border-blue-400 hover:shadow-lg transition flex items-center gap-3 text-right"
+                  >
+                    <span className={`w-12 h-12 rounded-xl bg-gradient-to-br ${CATEGORY_GRADS[i % CATEGORY_GRADS.length]} flex items-center justify-center text-2xl shrink-0 shadow-md`}>
+                      {categoryEmoji(t.cat)}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block font-extrabold text-slate-900 text-sm truncate">{t.cat}</span>
+                      <span className="block text-[11px] text-emerald-700 font-bold">{t.count} منتج متاح</span>
+                    </span>
+                    {i < 3 && t.sold > 0 && (
+                      <span className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-extrabold">الأكتر طلباً</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Active Promos Strip */}
         {activePromos.length > 0 && (
@@ -4468,120 +4500,60 @@ export default function App() {
           </div>
         )}
 
-        {/* Hierarchical Mobile Models & Category Filter Box */}
-        <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-bold text-slate-500 ml-1">الماركة:</span>
-              {dynamicBrands.map(b => (
-                <button
-                  key={b}
-                  onClick={() => {
-                    setSelectedBrand(b);
-                    setSelectedModelId('ALL');
-                  }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                    selectedBrand === b
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {b === 'ALL' ? 'كل الماركات' : b}
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-bold text-slate-500 ml-1">التصنيف:</span>
-              {dynamicCategories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                    selectedCategory === cat
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {cat === 'ALL' ? `كل المنتجات (${facetTotal})` : `${cat} (${catCounts[cat] || 0})`}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Parent Mobile Models Strip with Thumbnail Images */}
-          {siteSettings.showHomeModels !== false && (
-          <div className="pt-3 border-t border-slate-100 flex items-center gap-2 overflow-x-auto pb-1">
-            <span className="text-xs font-bold text-slate-500 shrink-0">موديلات الموبايلات:</span>
-            <button
-              onClick={() => setSelectedModelId('ALL')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition ${
-                selectedModelId === 'ALL'
-                  ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
-              }`}
+        {/* Compact filter bar: كل فلتر بيفتح قايمة منظمة */}
+        <div className="bg-white rounded-2xl p-3 border border-slate-200 shadow-xs space-y-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+            {[
+              ['brand', 'الماركة', selectedBrand === 'ALL' ? 'الكل' : selectedBrand, selectedBrand !== 'ALL'],
+              ['category', 'التصنيف', selectedCategory === 'ALL' ? 'الكل' : selectedCategory, selectedCategory !== 'ALL'],
+              ...(siteSettings.showHomeModels !== false
+                ? [['model', 'الموديل', selectedModelId === 'ALL' ? 'الكل' : (models.find(m => m.id === selectedModelId) || {}).name || '—', selectedModelId !== 'ALL']]
+                : [])
+            ].map(([key, label, value, active]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => {
+                  setFilterSheetQuery('');
+                  setFilterSheet(key);
+                }}
+                className={`px-3 py-2 rounded-xl border text-right flex items-center justify-between gap-2 transition ${
+                  active ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:bg-slate-100'
+                }`}
+              >
+                <span className="min-w-0">
+                  <span className="block text-[10px] font-bold text-slate-500">{label}</span>
+                  <span className={`block text-xs font-extrabold truncate ${active ? 'text-blue-700' : 'text-slate-800'}`}>{value}</span>
+                </span>
+                <span className="text-slate-400 text-xs shrink-0">▾</span>
+              </button>
+            ))}
+            <select
+              value={storeSortBy}
+              onChange={e => setStoreSortBy(e.target.value)}
+              className="px-3 py-3 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs text-slate-800"
             >
-              كل الموديلات ({parts.length})
-            </button>
-            {models
-              .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
-              .map(m => (
-                <button
-                  key={m.id}
-                  onClick={() => setSelectedModelId(m.id)}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold shrink-0 transition flex items-center gap-2 ${
-                    selectedModelId === m.id
-                      ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
-                  }`}
-                >
-                  <img
-                    src={m.image || PART_IMAGES.screen}
-                    alt={m.name}
-                    className="w-5 h-5 rounded-md object-cover"
-                  />
-                  <span>{m.name}</span>
-                </button>
-              ))}
+              <option value="date_desc">الأحدث الأول</option>
+              <option value="date_asc">الأقدم الأول</option>
+              <option value="name_asc">الاسم: (أ - ي)</option>
+              <option value="name_desc">الاسم: (ي - أ)</option>
+              <option value="stock_desc">العدد: الأكتر كمية</option>
+              <option value="stock_asc">العدد: الأقل كمية</option>
+              <option value="price_asc">السعر: من الأقل للأعلى</option>
+              <option value="price_desc">السعر: من الأعلى للأقل</option>
+            </select>
           </div>
-          )}
-
-          {/* Advanced Sorting & Filtering Bar */}
-          <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-bold text-slate-500 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5 text-blue-600" />
-                فلترة وترتيب:
-              </span>
-
-              <select
-                value={storeSortBy}
-                onChange={e => setStoreSortBy(e.target.value)}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-800"
-              >
-                <option value="date_desc">الأحدث الأول</option>
-                <option value="date_asc">الأقدم الأول</option>
-                <option value="name_asc">الاسم: (أ - ي)</option>
-                <option value="name_desc">الاسم: (ي - أ)</option>
-                <option value="stock_desc">العدد: الأكتر كمية</option>
-                <option value="stock_asc">العدد: الأقل كمية</option>
-                <option value="price_asc">السعر: من الأقل للأعلى</option>
-                <option value="price_desc">السعر: من الأعلى للأقل</option>
-              </select>
-
-              <select
-                value={storeStockFilter}
-                onChange={e => setStoreStockFilter(e.target.value)}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-800"
-              >
-                <option value="ALL">حالة المخزون: الكل</option>
-                <option value="IN_STOCK">المتوفر في المخزن بس</option>
-                <option value="LOW_STOCK">كميات محدودة</option>
-                <option value="OUT_OF_STOCK">الكمية خلصت</option>
-              </select>
-
-            </div>
-
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <select
+              value={storeStockFilter}
+              onChange={e => setStoreStockFilter(e.target.value)}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-bold text-slate-800"
+            >
+              <option value="ALL">حالة المخزون: الكل</option>
+              <option value="IN_STOCK">المتوفر في المخزن بس</option>
+              <option value="LOW_STOCK">كميات محدودة</option>
+              <option value="OUT_OF_STOCK">الكمية خلصت</option>
+            </select>
             <div className="text-slate-500 font-bold">
               النتايج: <span className="text-blue-600 font-extrabold">{filteredParts.length}</span> منتج
             </div>
@@ -6175,25 +6147,32 @@ export default function App() {
 
     const navItems = [
       { id: 'overview', label: 'الرئيسية والإحصائيات', icon: TrendingUp, badge: null },
-      { id: 'site_settings', label: 'إعدادات الموقع والسوشيال والشروط', icon: Building2, badge: 'جديد' },
-      { id: 'storefront_cms', label: 'إدارة الواجهة والإعلانات والبارات', icon: Sparkles, badge: storeAds.length + showcaseBars.length },
-      { id: 'promos', label: 'أكواد الخصم والكوبونات', icon: Percent, badge: promoCodes.length },
-      { id: 'clients', label: 'إدارة الحسابات وطلبات التسجيل', icon: Users, badge: pendingReqCount > 0 ? `${pendingReqCount} جديد` : clients.length },
       { id: 'orders', label: 'الطلبات والفواتير اللحظية', icon: ClipboardList, badge: orders.length },
+      { id: 'clients', label: 'إدارة الحسابات وطلبات التسجيل', icon: Users, badge: pendingReqCount > 0 ? `${pendingReqCount} جديد` : clients.length },
+      { id: 'returns', label: 'المرتجعات والشكاوى', icon: RotateCcw, badge: pendingRetCount > 0 ? pendingRetCount : null },
       { id: 'catalog', label: 'الماركات والموديلات والتمبلت', icon: Layers, badge: models.length },
       { id: 'quick_stock', label: 'جرد وتحديث المخزن السريع', icon: Database, badge: parts.length },
       { id: 'groups', label: 'مجموعات التسعير والتوصيل', icon: Tag, badge: groups.length },
-      { id: 'returns', label: 'المرتجعات والشكاوى', icon: RotateCcw, badge: pendingRetCount > 0 ? pendingRetCount : null },
+      { id: 'storefront_cms', label: 'إدارة الواجهة والإعلانات والبارات', icon: Sparkles, badge: storeAds.length + showcaseBars.length },
+      { id: 'promos', label: 'أكواد الخصم والكوبونات', icon: Percent, badge: promoCodes.length },
+      { id: 'site_settings', label: 'إعدادات الموقع والسوشيال والشروط', icon: Building2, badge: 'جديد' },
       { id: 'schema', label: 'مخطط قاعدة البيانات (Schema)', icon: Cpu, badge: null }
     ];
 
-const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعدادات الموقع', storefront_cms: 'الواجهة والإعلانات', promos: 'الكوبونات', clients: 'الحسابات', orders: 'الطلبات', catalog: 'الماركات والموديلات', quick_stock: 'جرد المخزن', groups: 'التسعير والتوصيل', returns: 'المرتجعات والشكاوى', schema: 'قاعدة البيانات' };
+const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات والفواتير', clients: 'العملاء والحسابات', returns: 'المرتجعات والشكاوى', catalog: 'المنتجات والموديلات', quick_stock: 'المخزن (جرد سريع)', groups: 'الأسعار والتوصيل', storefront_cms: 'إعلانات الواجهة', promos: 'كوبونات الخصم', site_settings: 'إعدادات الموقع', schema: 'قاعدة البيانات' };
+    const adminNavDesc = { overview: 'ملخص اللي بيحصل دلوقتي', orders: 'استلام الطلبات وتجهيزها وطباعة الفواتير', clients: 'العملاء وطلبات فتح الحساب', returns: 'مراجعة المرتجعات والرد على الشكاوى', catalog: 'الماركات والموديلات وإضافة المنتجات', quick_stock: 'تعديل الكميات والأسعار بسرعة', groups: 'أسعار وتوصيل كل مجموعة عملاء', storefront_cms: 'الإعلانات والأقسام المميزة', promos: 'أكواد الخصم', site_settings: 'الدفع والإعلانات النصية والشروط', schema: 'هيكل قاعدة البيانات' };
+    const adminNavGroups = [
+      { title: 'الشغل اليومي', ids: ['overview', 'orders', 'clients', 'returns'] },
+      { title: 'المنتجات والمخزن', ids: ['catalog', 'quick_stock', 'groups'] },
+      { title: 'الموقع والعروض', ids: ['storefront_cms', 'promos', 'site_settings'] },
+      { title: 'النظام', ids: ['schema'] }
+    ];
     const currentNavItem = navItems.find(n => n.id === adminTab) || navItems[0];
 
     return (
       <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
         {/* Professional Right Sidebar for H-market Admin ERP */}
-        <aside className="w-full lg:w-72 bg-[#0d151c] text-white shrink-0 border-l border-slate-800 flex flex-col justify-between">
+        <aside className="w-full lg:w-72 bg-[#0d151c] text-white shrink-0 border-l border-slate-800 flex flex-col justify-between lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
           <div>
             {/* Brand Header */}
             <div className="p-5 border-b border-slate-800 flex items-center justify-between">
@@ -6238,9 +6217,13 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
               {navItems.map(item => {
                 const IconComp = item.icon;
                 const active = adminTab === item.id;
+                const grp = adminNavGroups.find(g => g.ids[0] === item.id);
                 return (
+                  <React.Fragment key={item.id}>
+                  {grp && (
+                    <div className="px-3.5 pt-3 pb-1 text-[10px] font-extrabold text-slate-500 tracking-wide">{grp.title}</div>
+                  )}
                   <button
-                    key={item.id}
                     onClick={() => setAdminTab(item.id)}
                     className={`w-full px-3.5 py-3 rounded-xl text-xs font-extrabold transition flex items-center justify-between gap-2 shrink-0 ${
                       active
@@ -6248,9 +6231,12 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
                         : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 text-right">
                       <IconComp className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
+                      <span>
+                        <span className="block">{adminShortLabels[item.id]}</span>
+                        <span className={`block text-[10px] font-medium leading-snug ${active ? 'text-slate-800' : 'text-slate-500'}`}>{adminNavDesc[item.id]}</span>
+                      </span>
                     </div>
                     {item.badge !== null && (
                       <span
@@ -6266,6 +6252,7 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
                       </span>
                     )}
                   </button>
+                  </React.Fragment>
                 );
               })}
             </div>
@@ -6308,6 +6295,10 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
 
         {/* Main Workspace Area */}
         <main className="flex-1 p-3 md:p-6 pb-24 lg:pb-6 overflow-x-hidden space-y-5">
+          <div className="hidden lg:block pb-1">
+            <h2 className="text-2xl font-extrabold text-slate-900">{adminShortLabels[currentNavItem.id]}</h2>
+            <p className="text-sm text-slate-500 mt-0.5">{adminNavDesc[currentNavItem.id]}</p>
+          </div>
           {/* Top Executive Status Bar + Notification Center + Server Save Confirmation */}
           <div className="bg-white rounded-2xl px-5 py-3.5 border border-slate-200 shadow-xs space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -6553,7 +6544,7 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
             { id: 'overview', label: 'الرئيسية', icon: TrendingUp },
             { id: 'orders', label: 'الطلبات', icon: ClipboardList },
             { id: 'clients', label: 'الحسابات', icon: Users, dot: pendingReqCount > 0 },
-            { id: 'returns', label: 'المرتجعات', icon: RotateCcw, dot: pendingRetCount > 0 }
+            { id: 'catalog', label: 'الموديلات', icon: Smartphone }
           ].map(it => {
             const Ico = it.icon;
             const active = adminTab === it.id;
@@ -7149,8 +7140,43 @@ const adminShortLabels = { overview: 'الرئيسية', site_settings: 'إعد�
   const renderAdminOverview = () => {
     const individualsCount = clients.filter(c => c.accountType === 'individual').length;
     const shopsCount = clients.length - individualsCount;
+    const newOrdersCount = orders.filter(o => o.status === 'جاري التجهيز').length;
+    const pendingRegCount = accountRequests.filter(r => r.status === 'pending').length;
+    const reviewRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
+    const lowStockCount = parts.filter(pt => pt.stock <= (pt.lowStockThreshold || 0)).length;
+    const shortcuts = [
+      { tab: 'orders', label: 'طلبات جديدة', n: newOrdersCount, hint: 'محتاجة تجهيز', tone: 'blue' },
+      { tab: 'clients', label: 'طلبات فتح حساب', n: pendingRegCount, hint: 'مستنية موافقتك', tone: 'amber' },
+      { tab: 'returns', label: 'مرتجعات', n: reviewRetCount, hint: 'محتاجة مراجعة', tone: 'rose' },
+      { tab: 'quick_stock', label: 'نواقص المخزن', n: lowStockCount, hint: 'خلصت أو قربت تخلص', tone: 'violet' }
+    ];
+    const toneCls = {
+      blue: 'border-blue-300 bg-blue-50 text-blue-800',
+      amber: 'border-amber-300 bg-amber-50 text-amber-900',
+      rose: 'border-rose-300 bg-rose-50 text-rose-800',
+      violet: 'border-violet-300 bg-violet-50 text-violet-800'
+    };
     return (
     <div className="space-y-6">
+      {/* Quick Shortcuts */}
+      <div>
+        <div className="text-sm font-extrabold text-slate-900 mb-2">محتاج اهتمامك دلوقتي</div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {shortcuts.map(sc => (
+            <button
+              key={sc.tab}
+              type="button"
+              onClick={() => { setAdminTab(sc.tab); window.scrollTo({ top: 0 }); }}
+              className={`p-4 rounded-2xl border-2 text-right transition hover:shadow-md ${sc.n > 0 ? toneCls[sc.tone] : 'border-slate-200 bg-white text-slate-500'}`}
+            >
+              <div className="text-3xl font-black">{sc.n}</div>
+              <div className="text-sm font-extrabold mt-1">{sc.label}</div>
+              <div className="text-[11px] font-medium opacity-80">{sc.n > 0 ? sc.hint : 'مفيش حاجة'}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Clients Summary */}
       <div className="bg-white p-5 rounded-2xl border border-indigo-200 shadow-sm bg-gradient-to-br from-white to-indigo-50/40">
         <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -12106,6 +12132,88 @@ model OrderInvoice {
     );
   };
 
+  // --- Filter bottom sheet (الماركة / التصنيف / الموديل) ---
+  const renderFilterSheet = () => {
+    if (!filterSheet) return null;
+    const q = filterSheetQuery.trim().toLowerCase();
+    let title = '';
+    let rows = [];
+    let current = 'ALL';
+    let pick = () => {};
+    if (filterSheet === 'brand') {
+      title = 'اختار الماركة';
+      rows = [{ id: 'ALL', label: 'كل الماركات' }, ...brands.map(b => ({ id: b, label: b }))];
+      current = selectedBrand;
+      pick = id => { setSelectedBrand(id); setSelectedModelId('ALL'); };
+    } else if (filterSheet === 'category') {
+      title = 'اختار التصنيف';
+      const counts = {};
+      parts.filter(pt => partPassesStoreFilters(pt, true)).forEach(pt => { counts[pt.category] = (counts[pt.category] || 0) + 1; });
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      rows = [{ id: 'ALL', label: 'كل التصنيفات', count: total }, ...Object.keys(counts).map(c => ({ id: c, label: c, count: counts[c] }))];
+      current = selectedCategory;
+      pick = id => setSelectedCategory(id);
+    } else {
+      title = 'اختار الموديل';
+      rows = [
+        { id: 'ALL', label: 'كل الموديلات' },
+        ...models
+          .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
+          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => pt.modelId === m.id).length }))
+      ];
+      current = selectedModelId;
+      pick = id => setSelectedModelId(id);
+    }
+    const shown = rows.filter(r => !q || r.label.toLowerCase().includes(q) || (r.sub || '').toLowerCase().includes(q));
+    return (
+      <div className="fixed inset-0 z-[60] bg-slate-950/60 flex items-end sm:items-center justify-center sm:p-4" onClick={() => setFilterSheet(null)}>
+        <div onClick={e => e.stopPropagation()} className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+          <div className="shrink-0 p-4 pb-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-extrabold text-slate-900">{title}</h3>
+              <button type="button" onClick={() => setFilterSheet(null)} className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            {rows.length > 8 && (
+              <input
+                type="text"
+                value={filterSheetQuery}
+                onChange={e => setFilterSheetQuery(e.target.value)}
+                placeholder="دوّر هنا..."
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-sm"
+              />
+            )}
+          </div>
+          <div className="flex-1 overflow-y-auto px-3 pb-2 space-y-1">
+            {shown.length === 0 && <div className="py-8 text-center text-xs text-slate-400">مفيش نتايج</div>}
+            {shown.map(r => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => { pick(r.id); setFilterSheet(null); }}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-right transition ${current === r.id ? 'bg-blue-50 border border-blue-300' : 'hover:bg-slate-50 border border-transparent'}`}
+              >
+                {r.image && <img src={r.image} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />}
+                <span className="flex-1 min-w-0">
+                  <span className="block text-sm font-extrabold text-slate-900 truncate">{r.label}</span>
+                  {r.sub && <span className="block text-[11px] text-slate-500">{r.sub}</span>}
+                </span>
+                {r.count !== undefined && <span className="text-[11px] font-bold text-slate-500 shrink-0">{r.count}</span>}
+                {current === r.id && <span className="text-blue-600 font-black shrink-0">✓</span>}
+              </button>
+            ))}
+          </div>
+          <div className="shrink-0 p-3 border-t border-slate-200" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+            <button type="button" onClick={() => setFilterSheet(null)} className="w-full py-3 rounded-xl bg-blue-600 text-white font-extrabold text-sm">
+              عرض النتايج ({filteredParts.length})
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // --- Image Lightbox (يستخدم في مراجعة صور المرتجعات) ---
   const renderLightbox = () => {
     if (!lightbox || !lightbox.list || lightbox.list.length === 0) return null;
@@ -12545,18 +12653,11 @@ ${footer}
 
           <div className="flex flex-wrap justify-end gap-2.5">
             <button
-              onClick={() => handleDownloadInvoicePdf(order, effectiveMode)}
-              className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition"
-            >
-              <FileText className="w-4 h-4" />
-              تحميل الفاتورة كملف PDF مباشر ({order.id}.pdf)
-            </button>
-            <button
               onClick={() => handlePrintInvoice(order, effectiveMode)}
-              className="px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-extrabold flex items-center justify-center gap-2 shadow-md transition"
             >
-              <Printer className="w-4 h-4" />
-              طباعة ورقية فورية
+              <Printer className="w-5 h-5" />
+              طباعة الفاتورة
             </button>
           </div>
         </div>
@@ -12585,15 +12686,16 @@ ${footer}
       >
         <div
           onClick={e => e.stopPropagation()}
-          className="bg-white w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[92vh] flex flex-col"
+          className="bg-white w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[84vh] sm:max-h-[90vh] flex flex-col"
         >
-          {/* Sticky top bar: always-visible close */}
-          <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2.5 border-b border-slate-200 bg-white">
+          <div className="sm:hidden pt-2 flex justify-center bg-white"><span className="w-10 h-1.5 rounded-full bg-slate-300" /></div>
+          {/* Sticky top bar */}
+          <div className="shrink-0 flex items-center justify-between gap-2 px-4 py-2 sm:py-2.5 border-b border-slate-200 bg-white">
             <div className="min-w-0">
               <div className="text-[11px] text-indigo-600 font-extrabold truncate">{targetPart.category}</div>
               <div className="font-extrabold text-slate-900 text-sm truncate">{targetPart.name}</div>
             </div>
-            <div className="flex items-center gap-1.5 shrink-0">
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => handleShareProduct(targetPart)}
@@ -12789,8 +12891,7 @@ ${footer}
 
           {/* Sticky add-to-cart bar */}
           <div
-            className="shrink-0 border-t border-slate-200 bg-white px-4 pt-3 flex items-center gap-2.5"
-            style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+            className="shrink-0 border-t border-slate-200 bg-white px-4 pt-3 pb-2 sm:pb-3 flex items-center gap-2.5"
           >
             {isOutOfStock ? (
               <button
@@ -12861,6 +12962,27 @@ ${footer}
                 )}
               </>
             )}
+          </div>
+
+          {/* أزرار الإغلاق والمشاركة قريبة من صباع العميل (موبايل) */}
+          <div
+            className="sm:hidden shrink-0 grid grid-cols-2 gap-2 px-4 bg-white"
+            style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
+          >
+            <button
+              type="button"
+              onClick={() => setSelectedDetailItem(null)}
+              className="py-3 rounded-xl bg-slate-100 text-slate-800 font-extrabold text-xs flex items-center justify-center gap-1.5"
+            >
+              <X className="w-4 h-4" /> إغلاق
+            </button>
+            <button
+              type="button"
+              onClick={() => handleShareProduct(targetPart)}
+              className="py-3 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-extrabold text-xs flex items-center justify-center gap-1.5"
+            >
+              <Share2 className="w-4 h-4" /> مشاركة
+            </button>
           </div>
         </div>
       </div>
@@ -14227,6 +14349,7 @@ ${footer}
   // ============================================================================
   const backCandidates = [
     [!!lightbox, () => setLightbox(null)],
+    [!!filterSheet, () => setFilterSheet(null)],
     [adminMenuOpen, () => setAdminMenuOpen(false)],
     [!!confirmDialog, () => setConfirmDialog(null)],
     [!!printModalOrder, () => setPrintModalOrder(null)],
@@ -14378,6 +14501,7 @@ ${footer}
       {renderProductOrAdDetailModal()}
       {renderPartGroupPricesModal()}
       {renderConfirmDialogModal()}
+      {renderFilterSheet()}
       {renderLightbox()}
     </div>
   );
