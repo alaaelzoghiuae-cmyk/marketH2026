@@ -1720,11 +1720,14 @@ export default function App() {
 
   // --- Product / Ad Detail Modal & Collapsible States ---
   const [selectedDetailItem, setSelectedDetailItem] = useState(null); // { type: 'part' | 'ad', part, ad }
-  const [expandedClientOrders, setExpandedClientOrders] = useState({ 'INV-1045': true, 'INV-1048': true });
+  const [expandedClientOrders, setExpandedClientOrders] = useState({});
   const [clientOrdersSearch, setClientOrdersSearch] = useState('');
   const [clientOrdersStatusFilter, setClientOrdersStatusFilter] = useState('ALL');
   const [clientOrdersSort, setClientOrdersSort] = useState('date_desc');
   const [collapsedAdminModels, setCollapsedAdminModels] = useState({});
+  const [expandedAdminBrands, setExpandedAdminBrands] = useState({});
+  const [expandedAdminModels, setExpandedAdminModels] = useState({});
+  const storeGridTopRef = useRef(null);
   const [activeCatalogPricingGroupId, setActiveCatalogPricingGroupId] = useState('ALL');
   const [brandDeleteProtectionModal, setBrandDeleteProtectionModal] = useState(null); // { brandName, affectedModelsCount, affectedPartsCount, targetBrand }
 
@@ -3968,7 +3971,24 @@ export default function App() {
     setGridLimit(18);
   }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy]);
 
-  // Toggle Targeted Ad Star/Check on a Product or Model (Req 7)
+  // Smooth scroll to top of products grid whenever storePage changes
+  useEffect(() => {
+    if (clientTab === 'search') {
+      const timer = requestAnimationFrame(() => {
+        if (storeGridTopRef.current) {
+          const rect = storeGridTopRef.current.getBoundingClientRect();
+          const targetY = Math.max(0, rect.top + window.scrollY - 96);
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+      return () => cancelAnimationFrame(timer);
+    }
+    return undefined;
+  }, [storePage]);
+
+  // Toggle Star on a Product or Model for Ads
   const handleToggleTargetedAdPart = (partObj, e) => {
     if (e) e.stopPropagation();
     const nextPromoted = !partObj.isPromotedAd;
@@ -3976,9 +3996,9 @@ export default function App() {
     const targetUrl = `${window.location.origin}${window.location.pathname}#p-${encodeURIComponent(partObj.id)}`;
     if (nextPromoted) {
       try { navigator.clipboard && navigator.clipboard.writeText(targetUrl); } catch (err) {}
-      showToast(`⭐ تم تمييز "${partObj.name}" للإعلانات الموجهة ونسخ رابط التحميل المباشر لتوفير الـ Egress ✓`, 'success');
+      showToast(`⭐ تمت إضافة "${partObj.name}" لقائمة الإعلانات ونسخ الرابط المباشر ✓`, 'success');
     } else {
-      showToast(`تم إلغاء تمييز الإعلان الموجه عن "${partObj.name}".`, 'info');
+      showToast(`تمت إزالة "${partObj.name}" من قائمة الإعلانات.`, 'info');
     }
   };
 
@@ -3989,9 +4009,9 @@ export default function App() {
     const targetUrl = `${window.location.origin}${window.location.pathname}#m-${encodeURIComponent(modelObj.id)}`;
     if (nextPromoted) {
       try { navigator.clipboard && navigator.clipboard.writeText(targetUrl); } catch (err) {}
-      showToast(`⭐ تم ربط موديل "${modelObj.name}" بالإعلانات الموجهة ونسخ رابط التوجيه المباشر ✓`, 'success');
+      showToast(`⭐ تمت إضافة موديل "${modelObj.name}" لقائمة الإعلانات ونسخ الرابط المباشر ✓`, 'success');
     } else {
-      showToast(`تم إلغاء ربط الإعلان الموجه عن موديل "${modelObj.name}".`, 'info');
+      showToast(`تمت إزالة موديل "${modelObj.name}" من قائمة الإعلانات.`, 'info');
     }
   };
   const [sheetExpanded, setSheetExpanded] = useState(false);
@@ -6181,7 +6201,7 @@ export default function App() {
       setStoreStockFilter('ALL');
     };
 
-    // --- Req 4: Pagination Logic (Max 18 on Page 1 -> "إظهار المزيد" +8 (total 26) -> 8-by-8 subsequent pages) ---
+    // Pagination: 18 initial on Page 1 -> "إظهار المزيد" (+8 = 26) -> 8-by-8 subsequent pages
     const FIRST_PAGE_INITIAL = 18;
     const LOAD_MORE_STEP = 8;
     const FIRST_PAGE_MAX = FIRST_PAGE_INITIAL + LOAD_MORE_STEP; // 26
@@ -6215,16 +6235,12 @@ export default function App() {
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
         {renderSourcingBanner()}
 
-        {/* 1. Instant Search Box + Hierarchical Bottom Filter Strips (Req 3 & Req 9) */}
+        {/* Search Header */}
         <div className="bg-gradient-to-l from-slate-900 via-slate-800 to-indigo-950 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-white shadow-lg space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[11px] font-bold mb-1">
-                <Zap className="w-3.5 h-3.5" />
-                <span>بحث هرمي ذكي: البراند ← الموديل ← التصنيف</span>
-              </div>
               <h2 className="text-base sm:text-2xl font-extrabold">
-                ابحث باسم القطعة أو الموديل أو اختر من الشرائط بالأسفل
+                دوّر بالموديل أو اسم المنتج أو كود التوافق
               </h2>
             </div>
 
@@ -6244,7 +6260,7 @@ export default function App() {
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="ابحث باسم المنتج، الموديل، الكود SKU، أو رقم البوردة..."
+              placeholder="ابحث باسم المنتج، الموديل، أو الكود..."
               className="w-full pr-12 pl-24 py-3 rounded-2xl bg-white text-slate-900 placeholder-slate-400 text-sm font-bold focus:outline-none focus:ring-4 focus:ring-cyan-500/40 shadow-inner"
             />
             {searchQuery && (
@@ -6259,174 +6275,110 @@ export default function App() {
           </div>
         </div>
 
-        {/* Hierarchical Filter Strips Container: (1) البراند -> (2) الموديل -> (3) التصنيف + شريط الترتيب */}
-        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-xs space-y-3.5">
-          {/* الشريط 1: اختيار البراند (Brand Strip) */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-500">
-              <span>1. اختر البراند (الماركة):</span>
-              {selectedBrand !== 'ALL' && (
-                <button
-                  type="button"
-                  onClick={() => { setSelectedBrand('ALL'); setSelectedModelId('ALL'); }}
-                  className="text-blue-600 hover:underline"
-                >
-                  عرض كل البراندات
-                </button>
-              )}
-            </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-              <button
-                type="button"
-                onClick={() => { setSelectedBrand('ALL'); setSelectedModelId('ALL'); }}
-                className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold border transition ${
-                  selectedBrand === 'ALL'
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-400'
+        {/* Hierarchical Dropdown Filter Bar (البراند <- الموديل <- التصنيف <- الترتيب) */}
+        <div ref={storeGridTopRef} className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200 shadow-xs space-y-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {/* 1. القائمة المنسدلة للبراند */}
+            <div>
+              <label className="block text-[11px] font-extrabold text-slate-500 mb-1">1. البراند (الماركة):</label>
+              <select
+                value={selectedBrand}
+                onChange={e => {
+                  setSelectedBrand(e.target.value);
+                  setSelectedModelId('ALL');
+                }}
+                className={`w-full px-3 py-2.5 rounded-xl border font-extrabold text-xs transition ${
+                  selectedBrand !== 'ALL'
+                    ? 'border-blue-600 bg-blue-50 text-blue-950'
+                    : 'border-slate-300 bg-slate-50 text-slate-800'
                 }`}
               >
-                الكل ({brands.length})
-              </button>
-              {brands.map(br => {
-                const active = selectedBrand === br;
-                const mdlCount = models.filter(m => m.brand === br).length;
-                return (
-                  <button
-                    key={br}
-                    type="button"
-                    onClick={() => {
-                      setSelectedBrand(active ? 'ALL' : br);
-                      setSelectedModelId('ALL');
-                    }}
-                    className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-extrabold border transition flex items-center gap-1.5 ${
-                      active
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-500/20'
-                        : 'bg-white text-slate-800 border-slate-200 hover:border-blue-400'
-                    }`}
-                  >
-                    <Smartphone className={`w-3.5 h-3.5 ${active ? 'text-amber-300' : 'text-blue-600'}`} />
-                    <span>{br}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                      {mdlCount}
-                    </span>
-                  </button>
-                );
-              })}
+                <option value="ALL">كل البراندات ({brands.length})</option>
+                {brands.map(br => (
+                  <option key={br} value={br}>
+                    {br} ({models.filter(m => m.brand === br).length} موديل)
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          {/* الشريط 2: اختيار الموديل في شريط مصغر (Compact Horizontal Models Strip) */}
-          {siteSettings.showHomeModels !== false && modelsForSelectedBrand.length > 0 && (
-            <div className="space-y-1.5 pt-2 border-t border-slate-100">
-              <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-500">
-                <span>2. اختر جهاز الموبايل ({selectedBrand === 'ALL' ? 'كل الموديلات' : `موديلات ${selectedBrand}`}):</span>
-                {selectedModelId !== 'ALL' && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedModelId('ALL')}
-                    className="text-blue-600 hover:underline"
-                  >
-                    إلغاء تحديد الموديل
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-                <button
-                  type="button"
-                  onClick={() => setSelectedModelId('ALL')}
-                  className={`shrink-0 px-3 py-2 rounded-xl text-xs font-extrabold border transition ${
-                    selectedModelId === 'ALL'
-                      ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                      : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-400'
-                  }`}
-                >
-                  كل الأجهزة ({modelsForSelectedBrand.length})
-                </button>
+            {/* 2. القائمة المنسدلة للأجهزة / الموديلات */}
+            <div>
+              <label className="block text-[11px] font-extrabold text-slate-500 mb-1">2. الجهاز (الموديل):</label>
+              <select
+                value={selectedModelId}
+                onChange={e => setSelectedModelId(e.target.value)}
+                className={`w-full px-3 py-2.5 rounded-xl border font-extrabold text-xs transition ${
+                  selectedModelId !== 'ALL'
+                    ? 'border-indigo-600 bg-indigo-50 text-indigo-950'
+                    : 'border-slate-300 bg-slate-50 text-slate-800'
+                }`}
+              >
+                <option value="ALL">
+                  {selectedBrand === 'ALL'
+                    ? `كل الأجهزة (${modelsForSelectedBrand.length})`
+                    : `كل أجهزة ${selectedBrand} (${modelsForSelectedBrand.length})`}
+                </option>
                 {modelsForSelectedBrand.map(mdl => {
-                  const active = String(selectedModelId) === String(mdl.id);
-                  const count = parts.filter(p => String(p.modelId) === String(mdl.id)).length;
+                  const cnt = parts.filter(p => String(p.modelId) === String(mdl.id)).length;
                   return (
-                    <button
-                      key={mdl.id}
-                      type="button"
-                      onClick={() => setSelectedModelId(active ? 'ALL' : mdl.id)}
-                      className={`shrink-0 px-2.5 py-1.5 rounded-xl border text-right transition flex items-center gap-2 ${
-                        active
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-950 ring-2 ring-indigo-500/20 font-extrabold'
-                          : 'border-slate-200 bg-white hover:border-indigo-400 text-slate-800 font-bold'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-lg overflow-hidden bg-slate-900 shrink-0">
-                        <BlurFitImage src={mdl.image || PART_IMAGES.screen} alt={mdl.name} />
-                      </div>
-                      <div className="text-xs truncate max-w-[130px]">{mdl.name}</div>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${active ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                        {count}
-                      </span>
-                    </button>
+                    <option key={mdl.id} value={mdl.id}>
+                      {mdl.name} ({cnt} منتج)
+                    </option>
                   );
                 })}
-              </div>
+              </select>
             </div>
-          )}
 
-          {/* الشريط 3: اختيار التصنيف (Category Strip: بطاريات، شاشات، فلاتات...) */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-100">
-            <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-500">
-              <span>3. اختر التصنيف (شاشات، بطاريات، فلاتات شحن...):</span>
-              {selectedCategory !== 'ALL' && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategory('ALL')}
-                  className="text-blue-600 hover:underline"
-                >
-                  كل التصنيفات
-                </button>
-              )}
-            </div>
-            <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-              <button
-                type="button"
-                onClick={() => setSelectedCategory('ALL')}
-                className={`shrink-0 px-3.5 py-1.5 rounded-full border text-xs font-extrabold transition ${
-                  selectedCategory === 'ALL'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-emerald-400'
+            {/* 3. القائمة المنسدلة للتصنيف */}
+            <div>
+              <label className="block text-[11px] font-extrabold text-slate-500 mb-1">3. التصنيف:</label>
+              <select
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+                className={`w-full px-3 py-2.5 rounded-xl border font-extrabold text-xs transition ${
+                  selectedCategory !== 'ALL'
+                    ? 'border-emerald-600 bg-emerald-50 text-emerald-950'
+                    : 'border-slate-300 bg-slate-50 text-slate-800'
                 }`}
               >
-                كل التصنيفات ({facetTotal})
-              </button>
-              {dynamicCategories.filter(c => c !== 'ALL').map(cat => {
-                const active = selectedCategory === cat;
-                const cnt = catCounts[cat] || 0;
-                return (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setSelectedCategory(active ? 'ALL' : cat)}
-                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-bold transition ${
-                      active
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-white text-slate-700 border-slate-200 hover:border-emerald-400'
-                    }`}
-                  >
-                    <span className="text-sm leading-none">{categoryEmoji(cat)}</span>
-                    <span>{cat}</span>
-                    <span className={`text-[10px] font-extrabold ${active ? 'text-white/90' : 'text-slate-400'}`}>{cnt}</span>
-                  </button>
-                );
-              })}
+                <option value="ALL">كل التصنيفات ({facetTotal})</option>
+                {dynamicCategories.filter(c => c !== 'ALL').map(cat => (
+                  <option key={cat} value={cat}>
+                    {cat} ({catCounts[cat] || 0})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 4. القائمة المنسدلة للترتيب */}
+            <div>
+              <label className="block text-[11px] font-extrabold text-slate-500 mb-1">4. ترتيب حسب:</label>
+              <select
+                value={storeSortBy}
+                onChange={e => setStoreSortBy(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-extrabold text-xs text-slate-900"
+              >
+                <option value="date_desc">الأحدث أولاً</option>
+                <option value="date_asc">الأقدم أولاً</option>
+                <option value="price_asc">السعر: من الأقل للأعلى</option>
+                <option value="price_desc">السعر: من الأعلى للأقل</option>
+                <option value="stock_desc">الكمية: الأكثر توفراً</option>
+                <option value="stock_asc">الكمية: الأقل توفراً</option>
+                <option value="name_asc">الاسم: (أ - ي)</option>
+                <option value="name_desc">الاسم: (ي - أ)</option>
+              </select>
             </div>
           </div>
 
-          {/* شريط ترتيب المنتجات (الأحدث أولاً) وعداد النتائج */}
+          {/* Results Summary + Clear Filters + Labeled Mobile View Toggle Buttons */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2.5 border-t border-slate-100 text-xs">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-slate-500 font-bold">
-                المنتجات المطابقة: <span className="text-blue-600 font-extrabold">{totalItems}</span>
+              <span className="text-slate-600 font-bold">
+                النتائج: <span className="text-blue-600 font-extrabold">{totalItems}</span>
                 {totalItems > 0 && (
                   <span className="text-slate-400 mr-1">
-                    (معروض {rangeStart} – {rangeEnd})
+                    (عرض {rangeStart} – {rangeEnd})
                   </span>
                 )}
               </span>
@@ -6436,37 +6388,38 @@ export default function App() {
                   onClick={clearAllStoreFilters}
                   className="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-extrabold text-[11px]"
                 >
-                  × مسح كل الفلاتر
+                  × مسح الفلاتر
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <label className="text-[11px] font-extrabold text-slate-600">ترتيب حسب:</label>
-              <select
-                value={storeSortBy}
-                onChange={e => setStoreSortBy(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 font-extrabold text-xs text-slate-900"
+            {/* Mobile Layout Switcher with Explicit Text Labels */}
+            <div className="sm:hidden flex items-center bg-slate-100 rounded-xl p-1 border border-slate-200 gap-1">
+              <button
+                type="button"
+                onClick={() => changeCols(1)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center gap-1 ${
+                  mobileCols === 1 ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600'
+                }`}
               >
-                <option value="date_desc">الأحدث أولاً (الافتراضي)</option>
-                <option value="date_asc">الأقدم أولاً</option>
-                <option value="price_asc">السعر: من الأقل للأعلى</option>
-                <option value="price_desc">السعر: من الأعلى للأقل</option>
-                <option value="stock_desc">الكمية: الأكثر توفراً</option>
-                <option value="stock_asc">الكمية: الأقل توفراً</option>
-                <option value="name_asc">الاسم: (أ - ي)</option>
-                <option value="name_desc">الاسم: (ي - أ)</option>
-              </select>
-
-              <div className="sm:hidden flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
-                <button type="button" onClick={() => changeCols(1)} className={`px-2 py-1 rounded-md text-[10px] font-extrabold ${mobileCols === 1 ? 'bg-slate-900 text-white' : 'text-slate-600'}`}>☰</button>
-                <button type="button" onClick={() => changeCols(2)} className={`px-2 py-1 rounded-md text-[10px] font-extrabold ${mobileCols === 2 ? 'bg-slate-900 text-white' : 'text-slate-600'}`}>▦</button>
-              </div>
+                <span>☰</span>
+                <span>عرض عادي</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => changeCols(2)}
+                className={`px-3 py-1.5 rounded-lg text-[11px] font-extrabold transition flex items-center gap-1 ${
+                  mobileCols === 2 ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600'
+                }`}
+              >
+                <span>▦</span>
+                <span>عرض مربعات</span>
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Product Grid with Strict 18 -> +8 -> 8x8 Pagination (Req 4) */}
+        {/* Product Grid */}
         {totalItems === 0 ? (
           <div className="bg-white rounded-2xl p-12 text-center border border-slate-200">
             <Search className="w-12 h-12 text-slate-300 mx-auto mb-3" />
@@ -6484,39 +6437,32 @@ export default function App() {
               {visibleParts.map(part => renderProductCard(part))}
             </div>
 
-            {/* Step 1: On Page 1, after showing 18 products, show "إظهار المزيد" to load +8 products */}
+            {/* Button to show +8 more products on Page 1 */}
             {canShowMoreEightOnPage1 && (
-              <div className="flex flex-col items-center justify-center py-4 gap-2">
+              <div className="flex justify-center py-3">
                 <button
                   type="button"
                   onClick={() => setStoreExtraEightShown(true)}
                   className="px-6 py-3 rounded-2xl bg-gradient-to-l from-slate-900 via-indigo-950 to-slate-900 hover:from-blue-600 hover:to-cyan-600 text-white text-xs sm:text-sm font-extrabold shadow-lg transition flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4 text-cyan-300" />
-                  <span>إظهار المزيد (+{Math.min(LOAD_MORE_STEP, totalItems - FIRST_PAGE_INITIAL)} منتجات إضافية)</span>
+                  <span>إظهار المزيد (+{Math.min(LOAD_MORE_STEP, totalItems - FIRST_PAGE_INITIAL)} منتجات)</span>
                 </button>
-                <span className="text-[11px] text-slate-500 font-bold">
-                  معروض حالياً 18 منتج من أصل {totalItems} (لتوفير الباندويث وسرعة التصفح)
-                </span>
               </div>
             )}
 
-            {/* Step 2: After clicking "إظهار المزيد", show 8-by-8 Page Navigation Bar */}
+            {/* Page Navigation Bar (8-by-8) */}
             {showPageNavigator && totalPages > 1 && (
               <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
                 <div className="text-xs font-bold text-slate-600">
                   صفحة <span className="font-extrabold text-blue-600">{safePage}</span> من <span className="font-extrabold">{totalPages}</span>
-                  <span className="text-slate-400 mr-2">(نظام انتقال 8 منتجات في كل صفحة تالية)</span>
                 </div>
 
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     type="button"
                     disabled={safePage <= 1}
-                    onClick={() => {
-                      setStorePage(p => Math.max(1, p - 1));
-                      try { window.scrollTo({ top: 180, behavior: 'smooth' }); } catch (e) {}
-                    }}
+                    onClick={() => setStorePage(p => Math.max(1, p - 1))}
                     className="px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 text-xs font-extrabold disabled:opacity-40"
                   >
                     السابق
@@ -6534,7 +6480,6 @@ export default function App() {
                           onClick={() => {
                             setStorePage(p);
                             setStoreExtraEightShown(true);
-                            try { window.scrollTo({ top: 180, behavior: 'smooth' }); } catch (e) {}
                           }}
                           className={`w-9 h-9 rounded-xl text-xs font-extrabold transition ${
                             safePage === p
@@ -6553,11 +6498,10 @@ export default function App() {
                     onClick={() => {
                       setStoreExtraEightShown(true);
                       setStorePage(p => Math.min(totalPages, p + 1));
-                      try { window.scrollTo({ top: 180, behavior: 'smooth' }); } catch (e) {}
                     }}
                     className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-xs font-extrabold disabled:opacity-40 transition"
                   >
-                    الصفحة التالية (8 منتجات) ←
+                    الصفحة التالية ←
                   </button>
                 </div>
               </div>
@@ -10028,53 +9972,58 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         ? nonDefaultGroups.slice(0, 2)
         : nonDefaultGroups.filter(g => g.id === activeCatalogPricingGroupId);
 
-    const brandModelsForStrip = models.filter(m => adminCatalogBrand === 'ALL' || m.brand === adminCatalogBrand);
-    const filteredModels = models.filter(m => {
-      if (adminCatalogBrand !== 'ALL' && m.brand !== adminCatalogBrand) return false;
-      if (adminSelectedModelId !== 'ALL' && String(m.id) !== String(adminSelectedModelId)) return false;
-      if (adminCatalogSearch.trim() !== '') {
-        const q = adminCatalogSearch.trim().toLowerCase();
-        const modelMatch = `${m.brand} ${m.name} ${m.aliases || ''}`.toLowerCase().includes(q);
-        const childPartsMatch = parts
-          .filter(p => String(p.modelId) === String(m.id))
-          .some(p => `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(q));
-        return modelMatch || childPartsMatch;
+    const searchQ = adminCatalogSearch.trim().toLowerCase();
+
+    const visibleBrands = brands.filter(b => {
+      if (adminCatalogBrand !== 'ALL' && b !== adminCatalogBrand) return false;
+      if (searchQ !== '') {
+        if (b.toLowerCase().includes(searchQ)) return true;
+        const bModels = models.filter(m => m.brand === b);
+        return bModels.some(m => {
+          const mMatch = `${m.brand} ${m.name} ${m.aliases || ''}`.toLowerCase().includes(searchQ);
+          if (mMatch) return true;
+          return parts
+            .filter(p => String(p.modelId) === String(m.id))
+            .some(p => `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(searchQ));
+        });
       }
       return true;
     });
 
+    const toggleBrandBar = (brandName) => {
+      setExpandedAdminBrands(prev => ({ ...prev, [brandName]: !prev[brandName] }));
+    };
+
+    const toggleModelBar = (modelId) => {
+      setExpandedAdminModels(prev => ({ ...prev, [modelId]: !prev[modelId] }));
+    };
+
+    const collapseAllBars = () => {
+      setExpandedAdminBrands({});
+      setExpandedAdminModels({});
+    };
+
     return (
       <div className="space-y-5">
-        {/* Top Control Header: Brands Manager & Auto-Template Customizer Buttons */}
+        {/* Top Control Header: Add Model Form, Brands Manager & Auto-Template Customizer */}
         <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
             <div>
               <h2 className="text-base font-extrabold text-slate-900">
-                هيكلة الماركات والموديلات وقطع الغيار والتمبلت (مصمم لإدارة +3000 قطعة و +20 مجموعة)
+                البراندات والموديلات والمنتجات (شرائط قابلة للتوسع عند الضغط على +)
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                اضغط <span className="font-mono font-bold">[ + / - ]</span> بجانب اسم أي موديل لفتح أو تصغير نافذته، وارفع صور الموديلات والقطع، وابحث عن أي مجموعة تسعير بسهولة
+                جميع الشرائط في الوضع المصغر افتراضياً لسرعة التصفح — اضغط <span className="font-mono font-bold">[ + ]</span> على البراند لإظهار موديلاته، ثم اضغط <span className="font-mono font-bold">[ + ]</span> على الموديل لإظهار منتجاته
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  const nextState = {};
-                  models.forEach(m => { nextState[m.id] = true; });
-                  setCollapsedAdminModels(nextState);
-                }}
+                onClick={collapseAllBars}
                 className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold"
               >
-                − تصغير كل الموديلات
-              </button>
-              <button
-                type="button"
-                onClick={() => setCollapsedAdminModels({})}
-                className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold"
-              >
-                + فتح كل الموديلات
+                − طي وإغلاق كل الشرائط
               </button>
 
               <button
@@ -10083,7 +10032,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
               >
                 <Save className="w-4 h-4" />
-                <span>حفظ وتأكيد الكتالوج في السيرفر ✓</span>
+                <span>حفظ وتأكيد الكتالوج ✓</span>
               </button>
 
               <button
@@ -10091,7 +10040,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
               >
                 <Smartphone className="w-4 h-4 text-amber-400" />
-                إدارة الماركات ({brands.length})
+                إدارة البراندات ({brands.length})
               </button>
 
               <button
@@ -10099,16 +10048,16 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
               >
                 <Layers className="w-4 h-4" />
-                تخصيص التمبلت التلقائي ({enabledCount} قطع جاهزة)
+                تخصيص التمبلت التلقائي ({enabledCount})
               </button>
             </div>
           </div>
 
-          {/* Add New Mobile Model Form (With Model Image Upload / Picker!) */}
+          {/* Add New Mobile Model Form */}
           <form onSubmit={handleCreateModelWithTemplate} className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-extrabold text-slate-900">
-                + إضافة موديل هاتف جديد للكتالوج (مع صورة الموديل وتنزيل التمبلت):
+                + إضافة موديل هاتف جديد للبراند ({newModelBrand}):
               </span>
               <div className="flex items-center gap-2 text-xs">
                 <img
@@ -10148,7 +10097,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 >
                   {brands.map(b => (
                     <option key={b} value={b}>
-                      ماركة: {b}
+                      البراند: {b}
                     </option>
                   ))}
                 </select>
@@ -10156,16 +10105,16 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                   type="button"
                   onClick={() => setBrandManagerOpen(true)}
                   className="px-2.5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold"
-                  title="إضافة أو تعديل ماركة"
+                  title="إضافة أو تعديل براند"
                 >
                   + نوع
                 </button>
               </div>
 
               <input
+                id="elzoghbi-new-model-name-input"
                 type="text"
                 required
-                id="elzoghbi-new-model-name-input"
                 value={newModelName}
                 onChange={e => setNewModelName(e.target.value)}
                 placeholder="اسم الموديل (مثال: iPhone 16 Pro Max)..."
@@ -10201,7 +10150,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             </div>
           </form>
 
-          {/* Admin Catalog Filter, Sort & Group Column Selector Bar (Solves 20+ Groups Clutter!) */}
+          {/* Search, Filter & Pricing Group Selector */}
           <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 text-xs">
             <div className="flex flex-wrap items-center gap-2 flex-1">
               <div className="relative flex-1 min-w-[200px]">
@@ -10210,8 +10159,8 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                   type="text"
                   value={adminCatalogSearch}
                   onChange={e => setAdminCatalogSearch(e.target.value)}
-                  placeholder="بحث سريع وسط +3000 قطعة باسم الموديل، اسم القطعة، أو الكود SKU..."
-                  className="w-full pr-9 pl-3 py-2 rounded-xl border border-slate-300"
+                  placeholder="ابحث باسم البراند، الموديل، اسم القطعة، أو الكود SKU..."
+                  className="w-full pr-9 pl-3 py-2 rounded-xl border border-slate-300 font-bold"
                 />
               </div>
 
@@ -10220,7 +10169,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 onChange={e => setAdminCatalogBrand(e.target.value)}
                 className="px-3 py-2 rounded-xl border border-slate-300 bg-slate-50 font-bold"
               >
-                <option value="ALL">الماركة: الكل ({brands.length})</option>
+                <option value="ALL">البراند: الكل ({brands.length})</option>
                 {brands.map(b => (
                   <option key={b} value={b}>{b}</option>
                 ))}
@@ -10250,14 +10199,12 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 <option value="price_asc">السعر: الأقل أولاً</option>
               </select>
 
-              {/* Smart Group Column Filter for 20+ Pricing Groups */}
               <select
                 value={activeCatalogPricingGroupId}
                 onChange={e => setActiveCatalogPricingGroupId(e.target.value)}
                 className="px-3 py-2 rounded-xl border border-blue-300 bg-blue-50 text-blue-950 font-extrabold"
-                title="اختر مجموعة تسعير محددة لتعديل أسعارها في الجدول أو افتح نافذة كل المجموعات"
               >
-                <option value="ALL">عرض أول مجموعتين بالجدول (أو اختر مجموعة من {nonDefaultGroups.length})</option>
+                <option value="ALL">عرض أول مجموعتين بالجدول (من {nonDefaultGroups.length})</option>
                 {nonDefaultGroups.map(g => (
                   <option key={g.id} value={g.id}>
                     تركيز تعديل أسعار: {g.name} ({g.currency})
@@ -10268,527 +10215,440 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
           </div>
         </div>
 
-        {/* Req 9 & Req 7: Horizontal Strip View (شريط البراندات مع زر إضافة موديل -> شريط الموديلات المصغر مع زر إضافة منتج وعلامة الإعلان الموجه) */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs space-y-4">
-          {/* 1. شريط البراندات الأفقي + زر إضافة موديل */}
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
-                <Smartphone className="w-4 h-4 text-blue-600" />
-                1. شريط البراندات (اضغط على البراند لعرض أجهزته في الشريط المصغر):
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const inputEl = document.getElementById('elzoghbi-new-model-name-input');
-                    if (inputEl) {
-                      inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                      inputEl.focus();
-                    }
-                  }}
-                  className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-1 shadow-xs"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  + إضافة موديل ({adminCatalogBrand === 'ALL' ? newModelBrand : adminCatalogBrand})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBrandManagerOpen(true)}
-                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
-                >
-                  + براند جديد
-                </button>
-              </div>
-            </div>
+        {/* Stacked Collapsible Brand Bars -> Click [+] to reveal Model Bars -> Click [+] to reveal Products */}
+        <div className="space-y-3">
+          {visibleBrands.map(brandName => {
+            const isBrandOpen = !!expandedAdminBrands[brandName];
+            const brandModels = models.filter(m => {
+              if (m.brand !== brandName) return false;
+              if (searchQ !== '') {
+                const mMatch = `${m.brand} ${m.name} ${m.aliases || ''}`.toLowerCase().includes(searchQ);
+                if (mMatch) return true;
+                return parts
+                  .filter(p => String(p.modelId) === String(m.id))
+                  .some(p => `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(searchQ));
+              }
+              return true;
+            });
+            const brandModelIds = new Set(brandModels.map(m => String(m.id)));
+            const brandPartsCount = parts.filter(p => brandModelIds.has(String(p.modelId))).length;
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminCatalogBrand('ALL');
-                  setAdminSelectedModelId('ALL');
-                }}
-                className={`shrink-0 px-4 py-2 rounded-xl text-xs font-extrabold border transition ${
-                  adminCatalogBrand === 'ALL'
-                    ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-blue-400'
-                }`}
-              >
-                كل البراندات ({brands.length})
-              </button>
-              {brands.map(b => {
-                const active = adminCatalogBrand === b;
-                const cnt = models.filter(m => m.brand === b).length;
-                return (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => {
-                      setAdminCatalogBrand(b);
-                      setNewModelBrand(b);
-                      setAdminSelectedModelId('ALL');
-                    }}
-                    className={`shrink-0 px-4 py-2 rounded-xl text-xs font-extrabold border transition flex items-center gap-1.5 ${
-                      active
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-xs ring-2 ring-blue-500/20'
-                        : 'bg-white text-slate-800 border-slate-200 hover:border-blue-400'
-                    }`}
-                  >
-                    <span>{b}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
-                      {cnt}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* 2. شريط الأجهزة (الموديلات) المصغر + زر إضافة منتج مباشر + نجمة الإعلان الموجه */}
-          <div className="space-y-2 pt-3 border-t border-slate-100">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-xs font-extrabold text-slate-800">
-                2. شريط الموديلات المصغر ({brandModelsForStrip.length} جهاز) — اختر الموديل لعرض منتجاته أو اضغط (+ منتج):
-              </span>
-              {adminSelectedModelId !== 'ALL' && (
-                <button
-                  type="button"
-                  onClick={() => setAdminSelectedModelId('ALL')}
-                  className="text-xs font-bold text-blue-600 hover:underline"
-                >
-                  عرض كل الموديلات تحت بعض ({brandModelsForStrip.length})
-                </button>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2.5 overflow-x-auto pb-1.5" style={{ scrollbarWidth: 'none' }}>
-              <button
-                type="button"
-                onClick={() => setAdminSelectedModelId('ALL')}
-                className={`shrink-0 px-3.5 py-2.5 rounded-xl text-xs font-extrabold border transition ${
-                  adminSelectedModelId === 'ALL'
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-indigo-400'
-                }`}
-              >
-                عرض الكل ({brandModelsForStrip.length})
-              </button>
-
-              {brandModelsForStrip.map(mdl => {
-                const isSelected = String(adminSelectedModelId) === String(mdl.id);
-                const pCount = parts.filter(p => String(p.modelId) === String(mdl.id)).length;
-                return (
+            return (
+              <div key={brandName} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+                {/* Level 1: Collapsible Brand Bar Header (Closed by default!) */}
+                <div className="p-3.5 sm:p-4 bg-gradient-to-l from-slate-900 via-slate-800 to-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
                   <div
-                    key={mdl.id}
-                    onClick={() => {
-                      setAdminSelectedModelId(isSelected ? 'ALL' : mdl.id);
-                      setCollapsedAdminModels(prev => ({ ...prev, [mdl.id]: false }));
-                    }}
-                    className={`shrink-0 p-2.5 rounded-2xl border cursor-pointer transition flex items-center gap-2.5 ${
-                      isSelected
-                        ? 'border-indigo-600 bg-indigo-50/80 ring-2 ring-indigo-500/20'
-                        : 'border-slate-200 bg-white hover:border-indigo-300'
-                    }`}
+                    onClick={() => toggleBrandBar(brandName)}
+                    className="flex items-center gap-3 cursor-pointer select-none flex-1 min-w-[200px]"
                   >
-                    <div className="w-9 h-9 rounded-xl overflow-hidden bg-slate-900 shrink-0">
-                      <BlurFitImage src={mdl.image || PART_IMAGES.screen} alt={mdl.name} />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[10px] font-bold text-indigo-600 leading-none">{mdl.brand}</div>
-                      <div className="text-xs font-extrabold text-slate-900 truncate max-w-[130px]">{mdl.name}</div>
-                      <div className="text-[10px] text-slate-500 font-bold">{pCount} منتج</div>
-                    </div>
-
-                    {/* زر ربط الموديل بإعلان موجه (نجمة / علامة صح) */}
                     <button
                       type="button"
-                      onClick={(e) => handleToggleTargetedAdModel(mdl, e)}
-                      title={mdl.isPromotedAd ? 'مرتبط بإعلان موجه ✓ (اضغط للإلغاء)' : 'ربط الموديل بإعلان موجه ونسخ رابطه المباشر'}
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold border transition ${
-                        mdl.isPromotedAd
-                          ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-xs'
-                          : 'bg-slate-100 text-slate-400 border-slate-200 hover:text-amber-500'
+                      className={`w-9 h-9 rounded-xl font-mono font-black text-lg flex items-center justify-center transition ${
+                        isBrandOpen
+                          ? 'bg-cyan-400 text-slate-950 shadow-sm'
+                          : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm'
                       }`}
+                      title={isBrandOpen ? 'إغلاق شريط البراند (−)' : 'فتح شريط البراند وعرض الموديلات (+)'}
                     >
-                      {mdl.isPromotedAd ? '✓' : '⭐'}
+                      {isBrandOpen ? '−' : '+'}
                     </button>
 
-                    {/* زر إضافة منتج داخل شريط الموديل مباشرة */}
+                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
+                      <Smartphone className="w-5 h-5 text-cyan-300" />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-black text-base sm:text-lg tracking-wide">{brandName}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-cyan-300 text-[11px] font-extrabold border border-white/10">
+                          {brandModels.length} موديل
+                        </span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-extrabold border border-emerald-400/20">
+                          {brandPartsCount} منتج
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 mt-0.5">
+                        {isBrandOpen ? 'اضغط (−) لإغلاق شريط البراند' : 'اضغط (+) لإظهار شرائط الموديلات التابعة لهذا البراند'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Button inside Brand Bar: + إضافة موديل */}
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setAddingPartToModel({
-                          model: mdl,
-                          sku: `PRT-${mdl.name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}`,
-                          category: 'شاشات كاملة',
-                          name: `قطعة غيار ${mdl.name} `,
-                          qualityGrade: 'أصلي توكيل Service Pack',
-                          colorsText: 'أسود, أبيض',
-                          compatibleText: mdl.name,
-                          warrantyText: 'ضمان تجربة 14 يوم قبل اللزق',
-                          imageKey: 'screen',
-                          customImage: '',
-                          imagesList: [],
-                          description: '',
-                          stock: 12,
-                          lowStockThreshold: 4,
-                          maxOrderQty: 6,
-                          costPrice: 1000,
-                          basePrice: 1350
-                        });
+                        setNewModelBrand(brandName);
+                        const inputEl = document.getElementById('elzoghbi-new-model-name-input');
+                        if (inputEl) {
+                          inputEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          inputEl.focus();
+                        }
                       }}
-                      className="px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-[11px] font-extrabold flex items-center gap-0.5 shrink-0"
-                      title={`إضافة منتج جديد لموديل ${mdl.name}`}
+                      className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
                     >
-                      <Plus className="w-3 h-3" />
-                      <span>منتج</span>
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Hierarchical Collapsible Models & Their Parts List */}
-        <div className="space-y-4">
-          {filteredModels.map(model => {
-            const isCollapsed = !!collapsedAdminModels[model.id];
-            const modelParts = parts
-              .filter(p => {
-                if (String(p.modelId) !== String(model.id)) return false;
-                if (adminStockFilter === 'IN_STOCK' && p.stock <= 0) return false;
-                if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > p.lowStockThreshold)) return false;
-                if (adminStockFilter === 'OUT_OF_STOCK' && p.stock > 0) return false;
-                if (adminCatalogSearch.trim() !== '') {
-                  const q = adminCatalogSearch.trim().toLowerCase();
-                  const modelMatches = `${model.brand} ${model.name} ${model.aliases || ''}`.toLowerCase().includes(q);
-                  if (!modelMatches) {
-                    return `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(q);
-                  }
-                }
-                return true;
-              })
-              .sort((a, b) => {
-                if (adminCatalogSort === 'name_asc') return a.name.localeCompare(b.name, 'ar');
-                if (adminCatalogSort === 'stock_desc') return b.stock - a.stock;
-                if (adminCatalogSort === 'stock_asc') return a.stock - b.stock;
-                if (adminCatalogSort === 'price_desc') return b.basePrice - a.basePrice;
-                if (adminCatalogSort === 'price_asc') return a.basePrice - b.basePrice;
-                return (b.createdAt || '').localeCompare(a.createdAt || '');
-              });
-
-            return (
-              <div key={model.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-                {/* Collapsible Model Header with [ + / - ] Toggle, Model Image, Add Part, Apply Template, Edit/Delete */}
-                <div className="p-3.5 bg-slate-900 text-white flex flex-wrap items-center justify-between gap-3">
-                  <div
-                    onClick={() => toggleModelCollapse(model.id)}
-                    className="flex items-center gap-3 cursor-pointer select-none"
-                  >
-                    <button
-                      type="button"
-                      className={`w-8 h-8 rounded-xl font-mono font-extrabold text-base flex items-center justify-center transition ${
-                        isCollapsed
-                          ? 'bg-amber-500 text-slate-950'
-                          : 'bg-slate-800 text-white hover:bg-slate-700 border border-slate-700'
-                      }`}
-                      title={isCollapsed ? 'فتح نافذة قطع الموديل (+)' : 'تصغير نافذة الموديل (-)'}
-                    >
-                      {isCollapsed ? '+' : '−'}
-                    </button>
-
-                    <img
-                      src={model.image || PART_IMAGES.screen}
-                      alt={model.name}
-                      className="w-10 h-10 rounded-xl object-cover border border-white/20 bg-slate-950 shrink-0"
-                    />
-
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30 font-extrabold text-[11px]">
-                          {model.brand}
-                        </span>
-                        <span className="font-extrabold text-sm sm:text-base">{model.name}</span>
-                      </div>
-                      <div className="text-[11px] text-slate-400">
-                        {modelParts.length} قطع غيار • {isCollapsed ? 'اضغط (+) لعرض وتعديل القطع' : 'اضغط (−) لتصغير النافذة'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={(e) => handleToggleTargetedAdModel(model, e)}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1 transition ${
-                        model.isPromotedAd
-                          ? 'bg-amber-400 text-slate-950 shadow-xs'
-                          : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-400/30'
-                      }`}
-                      title="ربط الموديل بإعلان موجه لتوجيه التحميل وتوفير الـ Egress"
-                    >
-                      <span>{model.isPromotedAd ? '✓ إعلان موجه' : '⭐ ربط بإعلان'}</span>
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        setAddingPartToModel({
-                          model,
-                          sku: `PRT-${model.name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}`,
-                          category: 'شاشات كاملة',
-                          name: `قطعة غيار ${model.name} `,
-                          qualityGrade: 'أصلي توكيل Service Pack',
-                          colorsText: 'أسود, أبيض',
-                          compatibleText: model.name,
-                          warrantyText: 'ضمان تجربة 14 يوم قبل اللزق',
-                          imageKey: 'screen',
-                          customImage: '',
-                          imagesList: [],
-                          description: '',
-                          stock: 12,
-                          lowStockThreshold: 4,
-                          maxOrderQty: 6,
-                          costPrice: 1000,
-                          basePrice: 1350
-                        })
-                      }
-                      className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center gap-1 shadow-xs"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      إضافة قطعة
-                    </button>
-
-                    <button
-                      onClick={() => handleInjectMissingTemplatesIntoModel(model)}
-                      className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1"
-                    >
-                      <Layers className="w-3.5 h-3.5" />
-                      تنزيل التمبلت
-                    </button>
-
-                    <button
-                      onClick={() => setEditingModelObj({ ...model })}
-                      className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1"
-                    >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      تعديل وصورة
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteModel(model)}
-                      className="px-2.5 py-1.5 rounded-xl bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold flex items-center gap-1 transition"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Plus className="w-4 h-4" />
+                      <span>إضافة موديل في {brandName}</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Collapsible Parts Table Inside Model */}
-                {!isCollapsed && (
-                  <div className="p-4 overflow-x-auto">
-                    {modelParts.length === 0 ? (
-                      <div className="py-6 text-center text-xs text-slate-400 space-y-2">
-                        <div>لا توجد قطع غيار مطابقة أو مضافة داخل هذا الموديل حالياً.</div>
-                        <button
-                          onClick={() => handleInjectMissingTemplatesIntoModel(model)}
-                          className="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold"
-                        >
-                          + توليد وتنزيل قطع الغيار من التمبلت الآن
-                        </button>
+                {/* Level 2: Collapsible Model Bars inside Brand (Mounted ONLY when Brand Bar is opened via +) */}
+                {isBrandOpen && (
+                  <div className="p-3 sm:p-4 bg-slate-50/70 space-y-2.5 border-t border-slate-200">
+                    {brandModels.length === 0 ? (
+                      <div className="py-6 text-center text-xs text-slate-400 font-bold">
+                        لا توجد موديلات مضافة داخل براند {brandName} حالياً. اضغط "إضافة موديل" بالأعلى لإضافة أول جهاز.
                       </div>
                     ) : (
-                      <table className="w-full text-right text-xs">
-                        <thead>
-                          <tr className="text-slate-500 border-b border-slate-200">
-                            <th className="pb-2">الصورة والكود</th>
-                            <th className="pb-2">اسم القطعة والتصنيف</th>
-                            <th className="pb-2">الكمية بالمخزن</th>
-                            <th className="pb-2">التكلفة</th>
-                            <th className="pb-2">السعر الأساسي</th>
-                            {displayedGroupsInTable.map(g => (
-                              <th key={g.id} className="pb-2 text-blue-700">
-                                سعر ({g.name})
-                              </th>
-                            ))}
-                            <th className="pb-2">كل المجموعات ({nonDefaultGroups.length})</th>
-                            <th className="pb-2 text-left">إجراءات</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {modelParts.map(part => (
-                            <tr key={part.id} className="hover:bg-slate-50/80">
-                              <td className="py-2.5">
-                                <div className="flex items-center gap-2">
-                                  <img
-                                    src={part.image}
-                                    alt={part.name}
-                                    className="w-10 h-10 rounded-lg object-cover border border-slate-200 bg-slate-900 shrink-0"
-                                  />
-                                  <div>
-                                    <div className="font-mono font-bold text-[11px] text-slate-700">{part.sku}</div>
-                                    <div className="text-[10px] text-slate-400">{part.createdAt || '2026-10-30'}</div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-2.5 font-bold text-slate-900">
-                                <div>{part.name}</div>
-                                <div className="flex items-center gap-1.5 mt-0.5">
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700">
-                                    {part.category}
-                                  </span>
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
-                                    {part.qualityGrade}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-2.5">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={part.stock}
-                                  onChange={e => {
-                                    const val = Math.max(0, Number(e.target.value));
-                                    setParts(prev =>
-                                      prev.map(p => (p.id === part.id ? { ...p, stock: val } : p))
-                                    );
-                                  }}
-                                  className={`w-16 px-2 py-1 rounded-lg border font-extrabold ${
-                                    part.stock === 0
-                                      ? 'border-rose-400 bg-rose-50 text-rose-800'
-                                      : part.stock <= part.lowStockThreshold
-                                      ? 'border-amber-400 bg-amber-50 text-amber-900'
-                                      : 'border-slate-300'
-                                  }`}
-                                />
-                              </td>
-                              <td className="py-2.5">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={part.costPrice}
-                                  onChange={e => {
-                                    const val = Math.max(0, Number(e.target.value));
-                                    setParts(prev =>
-                                      prev.map(p => (p.id === part.id ? { ...p, costPrice: val } : p))
-                                    );
-                                  }}
-                                  className="w-20 px-2 py-1 rounded-lg border border-slate-200 font-mono text-rose-700 font-bold"
-                                />
-                              </td>
-                              <td className="py-2.5">
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={part.basePrice}
-                                  onChange={e => {
-                                    const val = Math.max(0, Number(e.target.value));
-                                    setParts(prev =>
-                                      prev.map(p => (p.id === part.id ? { ...p, basePrice: val } : p))
-                                    );
-                                  }}
-                                  className="w-20 px-2 py-1 rounded-lg border border-slate-300 font-extrabold text-slate-900"
-                                />
-                              </td>
-                              {displayedGroupsInTable.map(g => {
-                                const calc = calculatePartPrice(part, g);
-                                return (
-                                  <td key={g.id} className="py-2.5">
-                                    <input
-                                      type="number"
-                                      value={
-                                        part.customGroupPrices?.[g.id] !== undefined
-                                          ? part.customGroupPrices[g.id]
-                                          : calc.baseEgpPrice
-                                      }
-                                      onChange={e => {
-                                        const val = Number(e.target.value);
-                                        setParts(prev =>
-                                          prev.map(p =>
-                                            p.id === part.id
-                                              ? {
-                                                  ...p,
-                                                  customGroupPrices: {
-                                                    ...(p.customGroupPrices || {}),
-                                                    [g.id]: val
-                                                  }
-                                                }
-                                              : p
-                                          )
-                                        );
-                                      }}
-                                      className={`w-20 px-2 py-1 rounded border text-xs font-bold ${
-                                        calc.isBelowCost
-                                          ? 'border-rose-500 bg-rose-50 text-rose-800'
-                                          : calc.hasCustomOverride
-                                          ? 'border-blue-500 bg-blue-50 text-blue-900'
-                                          : 'border-slate-200'
-                                      }`}
-                                    />
-                                    {calc.isBelowCost && (
-                                      <div className="text-[10px] text-rose-600 font-bold">
-                                        أقل من التكلفة!
-                                      </div>
-                                    )}
-                                  </td>
-                                );
-                              })}
-                              <td className="py-2.5">
+                      brandModels.map(model => {
+                        const isModelOpen = !!expandedAdminModels[model.id];
+                        const modelPartsCount = parts.filter(p => String(p.modelId) === String(model.id)).length;
+
+                        // Compute and sort modelParts ONLY when this specific Model Bar is opened via +
+                        const modelParts = isModelOpen
+                          ? parts
+                              .filter(p => {
+                                if (String(p.modelId) !== String(model.id)) return false;
+                                if (adminStockFilter === 'IN_STOCK' && p.stock <= 0) return false;
+                                if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > p.lowStockThreshold)) return false;
+                                if (adminStockFilter === 'OUT_OF_STOCK' && p.stock > 0) return false;
+                                if (searchQ !== '') {
+                                  const modelMatches = `${model.brand} ${model.name} ${model.aliases || ''}`.toLowerCase().includes(searchQ);
+                                  if (!modelMatches) {
+                                    return `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(searchQ);
+                                  }
+                                }
+                                return true;
+                              })
+                              .sort((a, b) => {
+                                if (adminCatalogSort === 'name_asc') return a.name.localeCompare(b.name, 'ar');
+                                if (adminCatalogSort === 'stock_desc') return b.stock - a.stock;
+                                if (adminCatalogSort === 'stock_asc') return a.stock - b.stock;
+                                if (adminCatalogSort === 'price_desc') return b.basePrice - a.basePrice;
+                                if (adminCatalogSort === 'price_asc') return a.basePrice - b.basePrice;
+                                return (b.createdAt || '').localeCompare(a.createdAt || '');
+                              })
+                          : [];
+
+                        return (
+                          <div key={model.id} className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                            {/* Collapsible Model Bar Header (Closed by default!) */}
+                            <div className="p-3 bg-slate-800 text-white flex flex-wrap items-center justify-between gap-2.5">
+                              <div
+                                onClick={() => toggleModelBar(model.id)}
+                                className="flex items-center gap-2.5 cursor-pointer select-none flex-1 min-w-[180px]"
+                              >
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    setGroupModalSearchQuery('');
-                                    setPartGroupPricesModalPart(part.id);
-                                  }}
-                                  className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-[11px] flex items-center gap-1"
+                                  className={`w-8 h-8 rounded-lg font-mono font-extrabold text-base flex items-center justify-center transition ${
+                                    isModelOpen
+                                      ? 'bg-cyan-400 text-slate-950'
+                                      : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                                  }`}
+                                  title={isModelOpen ? 'إغلاق شريط الموديل (−)' : 'فتح شريط الموديل وعرض المنتجات (+)'}
                                 >
-                                  <Tag className="w-3 h-3" />
-                                  تسعير {groups.length} مجموعات
+                                  {isModelOpen ? '−' : '+'}
                                 </button>
-                              </td>
-                              <td className="py-2.5 text-left">
-                                <div className="flex items-center justify-end gap-1.5">
-                                  <button
-                                    type="button"
-                                    onClick={(e) => handleToggleTargetedAdPart(part, e)}
-                                    className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
-                                      part.isPromotedAd
-                                        ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-xs'
-                                        : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200'
-                                    }`}
-                                    title={part.isPromotedAd ? 'مرتبط بإعلان موجه ✓ (تم نسخ الرابط المباشر)' : 'تمييز المنتج بعلامة ⭐/✓ للإعلانات الموجهة ونسخ رابطه'}
-                                  >
-                                    {part.isPromotedAd ? '✓ موجه' : '⭐ إعلان'}
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      setEditingPartObj({
-                                        ...part,
-                                        colorsText: (part.colors || []).join(', '),
-                                        compatibleText: (part.compatibleModels || []).join(', '),
-                                        imagesList: Array.isArray(part.images) && part.images.length > 0 ? [...part.images] : (part.image ? [part.image] : [])
-                                      })
-                                    }
-                                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 transition"
-                                    title="تعديل بيانات وصورة القطعة"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeletePart(part)}
-                                    className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition"
-                                    title="حذف القطعة"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+
+                                <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/20 bg-slate-950 shrink-0">
+                                  <BlurFitImage src={model.image || PART_IMAGES.screen} alt={model.name} />
                                 </div>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-extrabold text-sm">{model.name}</span>
+                                    <span className="px-2 py-0.5 rounded bg-white/10 text-cyan-300 font-bold text-[10px]">
+                                      {modelPartsCount} منتج
+                                    </span>
+                                  </div>
+                                  <div className="text-[10px] text-slate-300">
+                                    {isModelOpen ? 'اضغط (−) لإخفاء المنتجات' : 'اضغط (+) لإظهار وتعديل منتجات الموديل'}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Model Bar Action Buttons (Star, + إضافة منتج, التمبلت, تعديل, حذف) */}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => handleToggleTargetedAdModel(model, e)}
+                                  className={`px-2.5 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1 transition ${
+                                    model.isPromotedAd
+                                      ? 'bg-amber-400 text-slate-950 shadow-xs'
+                                      : 'bg-slate-700 hover:bg-slate-600 text-amber-300 border border-amber-400/30'
+                                  }`}
+                                  title="تعليم الموديل بنجمة ليظهر في قائمة ربط الإعلانات"
+                                >
+                                  <span>{model.isPromotedAd ? '⭐ مميز للإعلان ✓' : '⭐ للإعلان'}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setAddingPartToModel({
+                                      model,
+                                      sku: `PRT-${model.name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase()}-${Math.floor(10 + Math.random() * 89)}`,
+                                      category: 'شاشات كاملة',
+                                      name: `قطعة غيار ${model.name} `,
+                                      qualityGrade: 'أصلي توكيل Service Pack',
+                                      colorsText: 'أسود, أبيض',
+                                      compatibleText: model.name,
+                                      warrantyText: 'ضمان تجربة 14 يوم قبل اللزق',
+                                      imageKey: 'screen',
+                                      customImage: '',
+                                      imagesList: [],
+                                      description: '',
+                                      stock: 12,
+                                      lowStockThreshold: 4,
+                                      maxOrderQty: 6,
+                                      costPrice: 1000,
+                                      basePrice: 1350
+                                    })
+                                  }
+                                  className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold flex items-center gap-1 shadow-xs"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  إضافة منتج
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleInjectMissingTemplatesIntoModel(model)}
+                                  className="px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center gap-1"
+                                >
+                                  <Layers className="w-3.5 h-3.5" />
+                                  التمبلت
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingModelObj({ ...model })}
+                                  className="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold flex items-center gap-1"
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  تعديل
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteModel(model)}
+                                  className="px-2 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white text-xs font-bold flex items-center gap-1 transition"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Level 3: Products Table inside Model (Mounted ONLY when Model Bar is opened via +) */}
+                            {isModelOpen && (
+                              <div className="p-4 overflow-x-auto bg-white">
+                                {modelParts.length === 0 ? (
+                                  <div className="py-6 text-center text-xs text-slate-400 space-y-2">
+                                    <div>لا توجد منتجات مضافة داخل هذا الموديل حالياً.</div>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleInjectMissingTemplatesIntoModel(model)}
+                                      className="px-3.5 py-1.5 rounded-xl bg-indigo-600 text-white font-bold"
+                                    >
+                                      + توليد وتنزيل قطع الغيار من التمبلت الآن
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <table className="w-full text-right text-xs">
+                                    <thead>
+                                      <tr className="text-slate-500 border-b border-slate-200">
+                                        <th className="pb-2">الصورة والكود</th>
+                                        <th className="pb-2">اسم القطعة والتصنيف</th>
+                                        <th className="pb-2">الكمية بالمخزن</th>
+                                        <th className="pb-2">التكلفة</th>
+                                        <th className="pb-2">السعر الأساسي</th>
+                                        {displayedGroupsInTable.map(g => (
+                                          <th key={g.id} className="pb-2 text-blue-700">
+                                            سعر ({g.name})
+                                          </th>
+                                        ))}
+                                        <th className="pb-2">كل المجموعات ({nonDefaultGroups.length})</th>
+                                        <th className="pb-2 text-left">إجراءات</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-100">
+                                      {modelParts.map(part => (
+                                        <tr key={part.id} className="hover:bg-slate-50/80">
+                                          <td className="py-2.5">
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shrink-0">
+                                                <BlurFitImage src={part.image} alt={part.name} />
+                                              </div>
+                                              <div>
+                                                <div className="font-mono font-bold text-[11px] text-slate-700">{part.sku}</div>
+                                                <div className="text-[10px] text-slate-400">{part.createdAt || '2026-10-30'}</div>
+                                              </div>
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5 font-bold text-slate-900">
+                                            <div>{part.name}</div>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700">
+                                                {part.category}
+                                              </span>
+                                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                                                {part.qualityGrade}
+                                              </span>
+                                            </div>
+                                          </td>
+                                          <td className="py-2.5">
+                                            <input
+                                              type="number"
+                                              min={0}
+                                              value={part.stock}
+                                              onChange={e => {
+                                                const val = Math.max(0, Number(e.target.value));
+                                                setParts(prev =>
+                                                  prev.map(p => (p.id === part.id ? { ...p, stock: val } : p))
+                                                );
+                                              }}
+                                              className={`w-16 px-2 py-1 rounded-lg border font-extrabold ${
+                                                part.stock === 0
+                                                  ? 'border-rose-400 bg-rose-50 text-rose-800'
+                                                  : part.stock <= part.lowStockThreshold
+                                                  ? 'border-amber-400 bg-amber-50 text-amber-900'
+                                                  : 'border-slate-300'
+                                              }`}
+                                            />
+                                          </td>
+                                          <td className="py-2.5">
+                                            <input
+                                              type="number"
+                                              min={0}
+                                              value={part.costPrice}
+                                              onChange={e => {
+                                                const val = Math.max(0, Number(e.target.value));
+                                                setParts(prev =>
+                                                  prev.map(p => (p.id === part.id ? { ...p, costPrice: val } : p))
+                                                );
+                                              }}
+                                              className="w-20 px-2 py-1 rounded-lg border border-slate-200 font-mono text-rose-700 font-bold"
+                                            />
+                                          </td>
+                                          <td className="py-2.5">
+                                            <input
+                                              type="number"
+                                              min={0}
+                                              value={part.basePrice}
+                                              onChange={e => {
+                                                const val = Math.max(0, Number(e.target.value));
+                                                setParts(prev =>
+                                                  prev.map(p => (p.id === part.id ? { ...p, basePrice: val } : p))
+                                                );
+                                              }}
+                                              className="w-20 px-2 py-1 rounded-lg border border-slate-300 font-extrabold text-slate-900"
+                                            />
+                                          </td>
+                                          {displayedGroupsInTable.map(g => {
+                                            const calc = calculatePartPrice(part, g);
+                                            return (
+                                              <td key={g.id} className="py-2.5">
+                                                <input
+                                                  type="number"
+                                                  value={
+                                                    part.customGroupPrices?.[g.id] !== undefined
+                                                      ? part.customGroupPrices[g.id]
+                                                      : calc.baseEgpPrice
+                                                  }
+                                                  onChange={e => {
+                                                    const val = Number(e.target.value);
+                                                    setParts(prev =>
+                                                      prev.map(p =>
+                                                        p.id === part.id
+                                                          ? {
+                                                              ...p,
+                                                              customGroupPrices: {
+                                                                ...(p.customGroupPrices || {}),
+                                                                [g.id]: val
+                                                              }
+                                                            }
+                                                          : p
+                                                      )
+                                                    );
+                                                  }}
+                                                  className={`w-20 px-2 py-1 rounded border text-xs font-bold ${
+                                                    calc.isBelowCost
+                                                      ? 'border-rose-500 bg-rose-50 text-rose-800'
+                                                      : calc.hasCustomOverride
+                                                      ? 'border-blue-500 bg-blue-50 text-blue-900'
+                                                      : 'border-slate-200'
+                                                  }`}
+                                                />
+                                                {calc.isBelowCost && (
+                                                  <div className="text-[10px] text-rose-600 font-bold">
+                                                    أقل من التكلفة!
+                                                  </div>
+                                                )}
+                                              </td>
+                                            );
+                                          })}
+                                          <td className="py-2.5">
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                setGroupModalSearchQuery('');
+                                                setPartGroupPricesModalPart(part.id);
+                                              }}
+                                              className="px-2.5 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-extrabold text-[11px] flex items-center gap-1"
+                                            >
+                                              <Tag className="w-3 h-3" />
+                                              تسعير {groups.length} مجموعات
+                                            </button>
+                                          </td>
+                                          <td className="py-2.5 text-left">
+                                            <div className="flex items-center justify-end gap-1.5">
+                                              <button
+                                                type="button"
+                                                onClick={(e) => handleToggleTargetedAdPart(part, e)}
+                                                className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
+                                                  part.isPromotedAd
+                                                    ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-xs'
+                                                    : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200'
+                                                }`}
+                                                title="تعليم المنتج بنجمة ليظهر في قائمة الإعلانات والبارات"
+                                              >
+                                                {part.isPromotedAd ? '⭐ مميز ✓' : '⭐ للإعلان'}
+                                              </button>
+                                              <button
+                                                onClick={() =>
+                                                  setEditingPartObj({
+                                                    ...part,
+                                                    colorsText: (part.colors || []).join(', '),
+                                                    compatibleText: (part.compatibleModels || []).join(', '),
+                                                    imagesList: Array.isArray(part.images) && part.images.length > 0 ? [...part.images] : (part.image ? [part.image] : [])
+                                                  })
+                                                }
+                                                className="p-1.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 transition"
+                                                title="تعديل بيانات وصورة القطعة"
+                                              >
+                                                <Edit3 className="w-3.5 h-3.5" />
+                                              </button>
+                                              <button
+                                                onClick={() => handleDeletePart(part)}
+                                                className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white transition"
+                                                title="حذف القطعة"
+                                              >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                              </button>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
                 )}
@@ -10802,19 +10662,26 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
   // --- 4. Admin Quick Stock Spreadsheet Audit Table (with Search, Filter & Sort) ---
   const [quickStockSearch, setQuickStockSearch] = useState('');
+  const [quickStockBrand, setQuickStockBrand] = useState('ALL');
+  const [quickStockModel, setQuickStockModel] = useState('ALL');
   const [quickStockCat, setQuickStockCat] = useState('ALL');
   const [quickStockSort, setQuickStockSort] = useState('stock_asc');
 
-  // Reset admin quick stock page to 1 when search/category/sort changes
+  // Reset admin quick stock page to 1 when search/brand/model/category/sort changes
   useEffect(() => {
     setQuickStockPage(1);
-  }, [quickStockSearch, quickStockCat, quickStockSort]);
+  }, [quickStockSearch, quickStockBrand, quickStockModel, quickStockCat, quickStockSort]);
 
   const renderAdminQuickStock = () => {
     const QUICK_STOCK_MAX_PER_PAGE = 100;
     const categoriesList = ['ALL', ...Array.from(new Set(parts.map(p => p.category)))];
+    const quickStockModelsForBrand = models.filter(m => quickStockBrand === 'ALL' || m.brand === quickStockBrand);
+    const brandModelIdsSet = new Set(quickStockModelsForBrand.map(m => String(m.id)));
+
     const filteredAuditParts = parts
       .filter(p => {
+        if (quickStockBrand !== 'ALL' && !brandModelIdsSet.has(String(p.modelId))) return false;
+        if (quickStockModel !== 'ALL' && String(p.modelId) !== String(quickStockModel)) return false;
         if (quickStockCat !== 'ALL' && p.category !== quickStockCat) return false;
         if (quickStockSearch.trim() !== '') {
           const q = quickStockSearch.trim().toLowerCase();
@@ -10843,15 +10710,15 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="text-base font-extrabold text-slate-900">
-                جدول الجرد وتحديث المخزن والأسعار السريع (بحد أقصى 100 منتج في الصفحة الواحدة)
+                جدول الجرد وتحديث المخزن والأسعار السريع
               </h2>
               <p className="text-xs text-slate-500">
-                مقسّم إلى 100 منتج لكل صفحة لضمان سرعة المراجعة والأداء الفائق وتقليل استهلاك الذاكرة
+                اختر البراند والموديل والتصنيف والترتيب من القوائم المنسدلة وعدّل الكميات والأسعار مباشرة
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-extrabold text-blue-700 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
-                معروض {totalStockItems > 0 ? startIdx + 1 : 0} – {Math.min(totalStockItems, startIdx + pagedAuditParts.length)} من أصل {totalStockItems} صنف
+                معروض {totalStockItems > 0 ? startIdx + 1 : 0} – {Math.min(totalStockItems, startIdx + pagedAuditParts.length)} من {totalStockItems} صنف
               </span>
               <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200">
                 حفظ تلقائي وفوري ✓
@@ -10859,61 +10726,93 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-xs">
+          {/* Search Input + 4 Dropdown Menus: Brand -> Model -> Category -> Sort */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 text-xs">
             <input
               type="text"
               value={quickStockSearch}
               onChange={e => setQuickStockSearch(e.target.value)}
               placeholder="ابحث باسم القطعة أو الكود SKU..."
-              className="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold"
+              className="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-bold"
             />
+
+            <select
+              value={quickStockBrand}
+              onChange={e => {
+                setQuickStockBrand(e.target.value);
+                setQuickStockModel('ALL');
+              }}
+              className="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-extrabold text-slate-800"
+            >
+              <option value="ALL">البراند: الكل ({brands.length})</option>
+              {brands.map(b => (
+                <option key={b} value={b}>البراند: {b}</option>
+              ))}
+            </select>
+
+            <select
+              value={quickStockModel}
+              onChange={e => setQuickStockModel(e.target.value)}
+              className="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-extrabold text-slate-800"
+            >
+              <option value="ALL">
+                {quickStockBrand === 'ALL'
+                  ? `الموديل: الكل (${quickStockModelsForBrand.length})`
+                  : `موديلات ${quickStockBrand} (${quickStockModelsForBrand.length})`}
+              </option>
+              {quickStockModelsForBrand.map(m => (
+                <option key={m.id} value={m.id}>{m.name}</option>
+              ))}
+            </select>
+
             <select
               value={quickStockCat}
               onChange={e => setQuickStockCat(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold"
+              className="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-extrabold text-slate-800"
             >
               {categoriesList.map(c => (
                 <option key={c} value={c}>
-                  {c === 'ALL' ? 'التصنيف: جميع القطع' : c}
+                  {c === 'ALL' ? 'التصنيف: الكل' : `التصنيف: ${c}`}
                 </option>
               ))}
             </select>
+
             <select
               value={quickStockSort}
               onChange={e => setQuickStockSort(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-slate-300 bg-white font-bold"
+              className="px-3 py-2.5 rounded-xl border border-slate-300 bg-white font-extrabold text-slate-800"
             >
-              <option value="stock_asc">الترتيب بالعدد: الأقل كمية أولاً (النواقص)</option>
-              <option value="stock_desc">الترتيب بالعدد: الأكثر كمية أولاً</option>
-              <option value="date_desc">الترتيب بالتاريخ: الأحدث أولاً</option>
-              <option value="name_asc">الترتيب بالاسم: (أ - ي)</option>
-              <option value="price_desc">الترتيب بالسعر: الأعلى سعراً</option>
+              <option value="stock_asc">الترتيب: الأقل كمية أولاً (النواقص)</option>
+              <option value="stock_desc">الترتيب: الأكثر كمية أولاً</option>
+              <option value="date_desc">الترتيب: الأحدث أولاً</option>
+              <option value="name_asc">الترتيب: الاسم (أ - ي)</option>
+              <option value="price_desc">الترتيب: الأعلى سعراً</option>
             </select>
+          </div>
 
-            {totalStockPages > 1 && (
-              <div className="flex items-center gap-1 bg-white px-2 py-1 rounded-xl border border-slate-300">
+          {totalStockPages > 1 && (
+            <div className="flex items-center justify-between pt-1 text-xs">
+              <span className="text-slate-500 font-bold">صفحة {currentStockPage} من {totalStockPages}</span>
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
                   disabled={currentStockPage <= 1}
                   onClick={() => setQuickStockPage(p => Math.max(1, p - 1))}
-                  className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 font-extrabold disabled:opacity-40"
+                  className="px-3 py-1 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 font-extrabold disabled:opacity-40"
                 >
                   السابق
                 </button>
-                <span className="px-2 font-extrabold text-slate-800">
-                  صفحة {currentStockPage} / {totalStockPages}
-                </span>
                 <button
                   type="button"
                   disabled={currentStockPage >= totalStockPages}
                   onClick={() => setQuickStockPage(p => Math.min(totalStockPages, p + 1))}
-                  className="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-extrabold disabled:opacity-40"
+                  className="px-3 py-1 rounded-lg bg-slate-900 text-white font-extrabold disabled:opacity-40"
                 >
                   التالي
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="overflow-x-auto">
@@ -10928,7 +10827,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 <th className="p-3">سعر التكلفة (ج.م)</th>
                 <th className="p-3">سعر البيع الأساسي (ج.م)</th>
                 <th className="p-3">هامش الربح</th>
-                <th className="p-3">إعلان موجه</th>
+                <th className="p-3">نجمة الإعلانات</th>
                 <th className="p-3">تم البيع</th>
                 <th className="p-3">حذف</th>
               </tr>
@@ -11019,9 +10918,9 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                             ? 'bg-amber-400 text-slate-950 border-amber-500'
                             : 'bg-white text-slate-500 border-slate-300 hover:text-amber-600'
                         }`}
-                        title="ربط بإعلان موجه ونسخ الرابط المباشر"
+                        title="تعليم بنجمة ليظهر في الإعلانات والبارات"
                       >
-                        {part.isPromotedAd ? '✓ مرتبط بإعلان' : '⭐ ربط'}
+                        {part.isPromotedAd ? '⭐ مميز ✓' : '⭐ نجمة'}
                       </button>
                     </td>
                     <td className="p-3">
@@ -11049,11 +10948,10 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
           </table>
         </div>
 
-        {/* Bottom Pagination Bar for 100/page Quick Stock */}
         {totalStockPages > 1 && (
           <div className="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
             <span className="font-bold text-slate-600">
-              صفحة {currentStockPage} من {totalStockPages} (الحد الأقصى 100 منتج لكل صفحة)
+              صفحة {currentStockPage} من {totalStockPages}
             </span>
             <div className="flex items-center gap-1.5 flex-wrap">
               <button
@@ -11086,7 +10984,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 onClick={() => setQuickStockPage(p => Math.min(totalStockPages, p + 1))}
                 className="px-3.5 py-2 rounded-xl bg-slate-900 text-white font-extrabold disabled:opacity-40"
               >
-                التالي (الـ 100 التالية) ←
+                التالي ←
               </button>
             </div>
           </div>
@@ -11808,26 +11706,33 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               <input type="text" value={adForm.buttonText} onChange={e => setAdForm(p => ({ ...p, buttonText: e.target.value }))} placeholder="نص الزرار" className="p-2.5 rounded-xl border border-slate-300 bg-white" />
               <select value={adForm.linkedPartId} onChange={e => setAdForm(p => ({ ...p, linkedPartId: e.target.value }))} className="md:col-span-2 p-2.5 rounded-xl border border-blue-300 bg-white font-bold text-blue-950">
                 <option value="">بدون ربط (إعلان للعرض فقط)</option>
-                {(models.some(m => m.isPromotedAd) || parts.some(pt => pt.isPromotedAd)) && (
-                  <optgroup label="⭐ العناصر المميزة بعلامة (✓ / ⭐) للإعلانات الموجهة (توفير الـ Egress)">
-                    {models.filter(m => m.isPromotedAd).map(m => (
-                      <option key={`mdl_${m.id}`} value={`mdl:${m.id}`}>⭐✓ الموديل الموجه: {m.brand} — {m.name}</option>
-                    ))}
-                    {parts.filter(pt => pt.isPromotedAd).map(pt => (
-                      <option key={`prm_${pt.id}`} value={pt.id}>⭐✓ المنتج الموجه: {pt.name}</option>
-                    ))}
+                {models.filter(m => m.isPromotedAd || `mdl:${m.id}` === adForm.linkedPartId).length > 0 && (
+                  <optgroup label="📱 الموديلات المعلمة بنجمة (⭐)">
+                    {models
+                      .filter(m => m.isPromotedAd || `mdl:${m.id}` === adForm.linkedPartId)
+                      .map(m => (
+                        <option key={`mdl_${m.id}`} value={`mdl:${m.id}`}>
+                          ⭐ الموديل: {m.brand} — {m.name}
+                        </option>
+                      ))}
                   </optgroup>
                 )}
-                <optgroup label="📱 ربط الإعلان بموديل هاتف كامل">
-                  {models.map(m => (
-                    <option key={`all_mdl_${m.id}`} value={`mdl:${m.id}`}>الموديل: {m.brand} — {m.name} {m.isPromotedAd ? "(✓)" : ""}</option>
-                  ))}
-                </optgroup>
-                <optgroup label="🧩 ربط الإعلان بمنتج محدد">
-                  {parts.map(pt => (
-                    <option key={pt.id} value={pt.id}>المنتج: {pt.name} {pt.isPromotedAd ? "(✓)" : ""}</option>
-                  ))}
-                </optgroup>
+                {parts.filter(pt => pt.isPromotedAd || pt.id === adForm.linkedPartId).length > 0 && (
+                  <optgroup label="🧩 المنتجات المعلمة بنجمة (⭐)">
+                    {parts
+                      .filter(pt => pt.isPromotedAd || pt.id === adForm.linkedPartId)
+                      .map(pt => (
+                        <option key={`prm_${pt.id}`} value={pt.id}>
+                          ⭐ المنتج: {pt.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                )}
+                {!models.some(m => m.isPromotedAd) && !parts.some(pt => pt.isPromotedAd) && (
+                  <option value="" disabled>
+                    💡 علّم بنجمة (⭐) على أي موديل أو منتج في الكتالوج أو المخزن ليظهر هنا
+                  </option>
+                )}
               </select>
             </div>
 
@@ -12010,38 +11915,46 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
           <div>
             <label className="font-bold text-slate-700 block mb-1.5">
-              اختر المنتجات التي تظهر داخل هذا البار:
+              اختر المنتجات التي تظهر داخل هذا البار (تظهر هنا المنتجات المعلمة بنجمة ⭐ فقط):
             </label>
-            <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2 bg-white rounded-xl border border-slate-200">
-              {parts.map(p => {
-                const checked = newBarForm.selectedPartIds.includes(p.id);
-                return (
-                  <label
-                    key={p.id}
-                    className={`px-2.5 py-1.5 rounded-lg border cursor-pointer flex items-center gap-1.5 ${
-                      checked
-                        ? 'bg-blue-50 border-blue-500 text-blue-950 font-bold'
-                        : 'border-slate-200 text-slate-600'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={e => {
-                        const isChk = e.target.checked;
-                        setNewBarForm(prev => ({
-                          ...prev,
-                          selectedPartIds: isChk
-                            ? [...prev.selectedPartIds, p.id]
-                            : prev.selectedPartIds.filter(id => id !== p.id)
-                        }));
-                      }}
-                      className="accent-blue-600"
-                    />
-                    <span>{p.name}</span>
-                  </label>
-                );
-              })}
+            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-white rounded-xl border border-slate-200">
+              {parts.filter(p => p.isPromotedAd).length === 0 ? (
+                <div className="w-full py-3 text-center text-slate-400 font-bold">
+                  لم تقم بتعليم أي منتج بنجمة (⭐) بعد — اضغط على زر (⭐) بجانب أي منتج في قسم الموديلات أو المخزن ليظهر هنا مباشرة.
+                </div>
+              ) : (
+                parts
+                  .filter(p => p.isPromotedAd)
+                  .map(p => {
+                    const checked = newBarForm.selectedPartIds.includes(p.id);
+                    return (
+                      <label
+                        key={p.id}
+                        className={`px-2.5 py-1.5 rounded-lg border cursor-pointer flex items-center gap-1.5 ${
+                          checked
+                            ? 'bg-blue-50 border-blue-500 text-blue-950 font-bold'
+                            : 'border-slate-200 text-slate-600'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={e => {
+                            const isChk = e.target.checked;
+                            setNewBarForm(prev => ({
+                              ...prev,
+                              selectedPartIds: isChk
+                                ? [...prev.selectedPartIds, p.id]
+                                : prev.selectedPartIds.filter(id => id !== p.id)
+                            }));
+                          }}
+                          className="accent-blue-600"
+                        />
+                        <span>⭐ {p.name}</span>
+                      </label>
+                    );
+                  })
+              )}
             </div>
           </div>
 
@@ -14979,12 +14892,55 @@ model OrderInvoice {
     if (!b.active) return null;
     const th = getAdTheme(b);
     const dark = !(th.light && b.layout !== 'full');
+    const hasImage = !!b.image && b.layout !== 'text';
+    const fit = b.imageFit === 'contain' ? 'object-contain' : 'object-cover';
+    const overlay = Math.min(90, Math.max(0, Number(b.overlay === undefined ? 55 : b.overlay)));
+
     return (
       <div
         onClick={openSourcing}
-        className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-3 sm:p-4 h-[84px] sm:h-[100px] flex flex-col justify-center cursor-pointer shadow-lg border border-white/10 hover:shadow-xl transition`}
+        className={`relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} px-4 py-4 sm:px-7 sm:py-5 min-h-[118px] sm:min-h-[132px] flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 cursor-pointer shadow-lg border border-white/10 hover:shadow-xl transition`}
       >
-        <AdContent ad={{ ...b, linkedPartId: 'sourcing' }} compact rtl={!i18nActive} />
+        {b.layout === 'full' && hasImage && (
+          <>
+            <img src={b.image} alt="" draggable={false} className={`absolute inset-0 w-full h-full ${fit} pointer-events-none`} />
+            <div className="absolute inset-0 bg-black pointer-events-none" style={{ opacity: overlay / 100 }} />
+          </>
+        )}
+        {b.layout === 'blend' && hasImage && (
+          <img
+            src={b.image}
+            alt=""
+            draggable={false}
+            className={`absolute top-0 left-0 h-full w-2/5 ${fit} pointer-events-none opacity-85`}
+            style={{ WebkitMaskImage: 'linear-gradient(to right, #000 35%, transparent 100%)', maskImage: 'linear-gradient(to right, #000 35%, transparent 100%)' }}
+          />
+        )}
+
+        <div className="relative z-10 space-y-1.5 max-w-2xl">
+          {b.showBadge !== false && b.badge && (
+            <span className={`inline-flex items-center px-3 py-0.5 rounded-full text-[11px] font-extrabold shadow-xs ${dark ? 'bg-amber-400 text-slate-950' : 'bg-slate-900 text-amber-300'}`}>
+              {b.badge}
+            </span>
+          )}
+          <h3 className={`text-base sm:text-xl font-black leading-snug ${dark ? 'text-white' : 'text-slate-900'}`}>
+            {b.title}
+          </h3>
+          {b.subtitle && (
+            <p className={`text-xs sm:text-sm leading-relaxed ${dark ? 'text-slate-200' : 'text-slate-700'}`}>
+              {b.subtitle}
+            </p>
+          )}
+        </div>
+
+        {b.showButton !== false && (
+          <div className="relative z-10 shrink-0 flex items-center">
+            <span className={`inline-flex items-center gap-2 px-4 py-2.5 sm:px-5 sm:py-3 rounded-xl text-xs sm:text-sm font-extrabold shadow-md transition ${dark ? 'bg-white text-slate-950 hover:bg-amber-300' : 'bg-slate-900 text-white hover:bg-slate-800'}`}>
+              <span>{b.buttonText || 'اطلب منتجك دلوقتي'}</span>
+              <span>{!i18nActive ? '←' : '→'}</span>
+            </span>
+          </div>
+        )}
       </div>
     );
   };
