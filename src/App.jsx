@@ -769,11 +769,11 @@ function AdContent({ ad, compact, rtl }) {
             {ad.badge}
           </span>
         )}
-        <h2 className={`font-extrabold leading-tight ${compact ? 'text-sm line-clamp-2' : 'text-lg sm:text-3xl'} ${light ? 'text-slate-900' : 'text-white'}`}>
+        <h2 className={`font-extrabold leading-tight ${compact ? 'text-sm line-clamp-2' : 'text-lg sm:text-3xl line-clamp-2'} ${light ? 'text-slate-900' : 'text-white'}`}>
           {ad.title}
         </h2>
         {ad.subtitle && (
-          <p className={`leading-relaxed ${compact ? 'text-[11px] line-clamp-1' : 'text-xs sm:text-sm'} ${light ? 'text-slate-700' : 'text-slate-200'}`}>
+          <p className={`leading-relaxed ${compact ? 'text-[11px] line-clamp-1' : 'text-xs sm:text-sm line-clamp-2'} ${light ? 'text-slate-700' : 'text-slate-200'}`}>
             {ad.subtitle}
           </p>
         )}
@@ -953,6 +953,14 @@ const SRC_DEPOSIT_LABEL = {
   received: 'تم استلام العربون ✓',
   refund_due: 'العربون في انتظار الرد',
   refunded: 'تم رد العربون ✓'
+};
+
+const B64_UPLOAD_CACHE = new Map();
+const b64Key = str => {
+  let h = 5381;
+  const step = Math.max(1, Math.floor(str.length / 4000));
+  for (let i = 0; i < str.length; i += step) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
+  return `${str.length}_${h}`;
 };
 
 const CREDIT_PAYMENT_ID = 'آجل / على الحساب';
@@ -1834,7 +1842,8 @@ export default function App() {
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, w, h);
             ctx.drawImage(img, 0, 0, w, h);
-            const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            let compressedDataUrl = canvas.toDataURL('image/webp', quality);
+            if (!compressedDataUrl.startsWith('data:image/webp')) compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
             resolve(compressedDataUrl);
           } catch (err) {
             resolve(srcUrl);
@@ -1871,39 +1880,87 @@ export default function App() {
     return new Blob([u8arr], { type: mime });
   };
 
-  // --- Upload Image to Supabase Storage Bucket (`product-images`) with Automatic Compressed Fallback ---
-  const processAndUploadImage = async (fileOrDataUrl, folder = 'parts') => {
-    const compressedDataUrl = await compressImageDataUrl(fileOrDataUrl, 900, 0.72);
-    if (!compressedDataUrl || !compressedDataUrl.startsWith('data:image/')) {
-      return compressedDataUrl;
-    }
-
+  // --- رفع ملف (صورة WebP أو PDF) على Supabase Storage وإرجاع الرابط فقط ---
+  const uploadBlobToStorage = async (blob, folder, ext, contentType) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) {
-      return compressedDataUrl;
-    }
-
+    if (!isValid) return null;
     try {
-      const blob = dataUrlToBlob(compressedDataUrl);
-      const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+      const fileName = `${folder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const uploadRes = await fetch(`${sbUrl}/storage/v1/object/product-images/${fileName}`, {
         method: 'POST',
         headers: {
           apikey: sbKey,
           Authorization: `Bearer ${sbKey}`,
-          'Content-Type': 'image/jpeg',
-          'x-upsert': 'true'
+          'Content-Type': contentType,
+          'x-upsert': 'true',
+          'cache-control': 'max-age=31536000'
         },
         body: blob
       });
+      if (uploadRes.ok) return `${sbUrl}/storage/v1/object/public/product-images/${fileName}`;
+    } catch (err) {}
+    return null;
+  };
 
-      if (uploadRes.ok) {
-        return `${sbUrl}/storage/v1/object/public/product-images/${fileName}`;
-      }
-    } catch (err) {
-      // Fall back to compressedDataUrl (100-180KB) if bucket not created yet
+  // أي صورة جديدة: بتتضغط WebP وبتترفع Storage ونخزن الرابط بس (ممنوع Base64 داخل الداتا)
+  const processAndUploadImage = async (fileOrDataUrl, folder = 'parts') => {
+    if (typeof fileOrDataUrl === 'string' && /^https?:\/\//i.test(fileOrDataUrl)) return fileOrDataUrl;
+    const compressedDataUrl = await compressImageDataUrl(fileOrDataUrl, 900, 0.78);
+    if (!compressedDataUrl || !compressedDataUrl.startsWith('data:image/')) {
+      return compressedDataUrl;
     }
-    return compressedDataUrl;
+    const { isValid } = getSupabaseConfig();
+    if (!isValid) {
+      // وضع محلي بدون سيرفر فقط (مفيش Supabase متوصّل)
+      return compressedDataUrl;
+    }
+    const mime = (compressedDataUrl.match(/^data:(image\/[a-z0-9+.-]+)/i) || [])[1] || 'image/webp';
+    const ext = mime.includes('webp') ? 'webp' : mime.includes('png') ? 'png' : 'jpg';
+    const url = await uploadBlobToStorage(dataUrlToBlob(compressedDataUrl), folder, ext, mime);
+    if (url) return url;
+    showToast('فشل رفع الصورة على الـ Storage. اتأكد من الـ bucket (product-images) وصلاحياته وجرّب تاني.', 'error');
+    return '';
+  };
+
+  // شبكة أمان: قبل أي حفظ على السيرفر، أي Base64 يتحوّل لرابط Storage (أو يتشال من الـ payload لو الرفع فشل)
+  const externalizeBase64Deep = async root => {
+    const { isValid } = getSupabaseConfig();
+    if (!isValid || !root) return root;
+    let failed = 0;
+    const handleString = async str => {
+      const isImg = str.startsWith('data:image/');
+      const isPdf = str.startsWith('data:application/pdf');
+      if ((!isImg && !isPdf) || str.length < 1500) return str;
+      const key = b64Key(str);
+      if (B64_UPLOAD_CACHE.has(key)) return B64_UPLOAD_CACHE.get(key);
+      const mime = (str.match(/^data:([^;]+)/) || [])[1] || 'image/webp';
+      const ext = isPdf ? 'pdf' : mime.includes('webp') ? 'webp' : mime.includes('png') ? 'png' : 'jpg';
+      let blob;
+      try { blob = dataUrlToBlob(str); } catch (e) { failed += 1; return ''; }
+      const url = await uploadBlobToStorage(blob, isPdf ? 'files' : 'auto', ext, mime);
+      if (url) { B64_UPLOAD_CACHE.set(key, url); return url; }
+      failed += 1;
+      return '';
+    };
+    const walk = async node => {
+      if (typeof node === 'string') return handleString(node);
+      if (Array.isArray(node)) {
+        let changed = false;
+        const out = [];
+        for (const it of node) { const r = await walk(it); if (r !== it) changed = true; out.push(r); }
+        return changed ? out : node;
+      }
+      if (node && typeof node === 'object') {
+        let changed = false;
+        const out = {};
+        for (const k of Object.keys(node)) { const v = node[k]; const r = await walk(v); if (r !== v) changed = true; out[k] = r; }
+        return changed ? out : node;
+      }
+      return node;
+    };
+    const res = await walk(root);
+    if (failed > 0) showToast(`${failed} صورة/ملف ماتحمّلوش على الـ Storage فمش هيتحفظوا على السيرفر لحد ما الرفع ينجح.`, 'warning');
+    return res;
   };
 
   // --- One-Click Batch Migration of Existing Base64 Images Inside Row to Supabase Storage ---
@@ -2120,8 +2177,9 @@ export default function App() {
 
     try {
       while (pendingSaveBundleRef.current !== null) {
-        const latestBundle = pendingSaveBundleRef.current;
+        const rawBundle = pendingSaveBundleRef.current;
         pendingSaveBundleRef.current = null;
+        const latestBundle = await externalizeBase64Deep(rawBundle);
         await executeSingleCloudSaveWithRetry(latestBundle, showSuccessToast && pendingSaveBundleRef.current === null);
       }
     } finally {
@@ -2246,7 +2304,9 @@ export default function App() {
   useEffect(() => {
     if (appPortal === 'admin' && adminAuthenticated) {
       loadVisitStats();
-      const t = setInterval(loadVisitStats, 60000);
+      const t = setInterval(() => {
+        if (document.visibilityState === 'visible') loadVisitStats();
+      }, 120000);
       return () => clearInterval(t);
     }
     return undefined;
@@ -2606,9 +2666,36 @@ export default function App() {
   };
 
   useEffect(() => {
+    // أول تحميل مرة واحدة، وبعدها كل 30 ثانية وبس لما التاب ظاهر (بيتوقف لو المستخدم سابه)
+    const POLL_MS = 30000;
+    let timer = null;
+    const tick = () => {
+      if (document.visibilityState === 'visible') pullFromSupabaseCloud(true);
+    };
+    const start = () => {
+      if (!timer) timer = setInterval(tick, POLL_MS);
+    };
+    const stop = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+    const onVis = () => {
+      if (document.visibilityState === 'visible') {
+        tick();
+        start();
+      } else {
+        stop();
+      }
+    };
     pullFromSupabaseCloud(true);
-    const interval = setInterval(() => pullFromSupabaseCloud(true), 3500);
-    return () => clearInterval(interval);
+    if (document.visibilityState === 'visible') start();
+    document.addEventListener('visibilitychange', onVis);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVis);
+    };
   }, [siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey, adminAuthenticated, appPortal]);
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
@@ -2654,6 +2741,7 @@ export default function App() {
   const [announceBoxOpen, setAnnounceBoxOpen] = useState(false);
   const [headerCompact, setHeaderCompact] = useState(false);
   const [filterSheet, setFilterSheet] = useState(null);
+  const [gridLimit, setGridLimit] = useState(24);
   const [sheetExpanded, setSheetExpanded] = useState(false);
   const [sheetDrag, setSheetDrag] = useState(0);
   const [sheetDragging, setSheetDragging] = useState(false);
@@ -4168,7 +4256,7 @@ export default function App() {
                               onClick={() => {
                                 setNotifDropdownOpen(false);
                                 setClientTab('account');
-                                setAccountSubTab('orders');
+                                setAccountSubTab(n.type === 'sourcing' ? 'sourcing' : 'orders');
                               }}
                               className="p-2.5 rounded-xl bg-slate-50 hover:bg-cyan-50 cursor-pointer transition"
                             >
@@ -4429,7 +4517,7 @@ export default function App() {
                       if (swipeSuppressRef.current || !linked) return;
                       setSelectedDetailItem({ type: 'ad', ad: mainAd, part: linked });
                     }}
-                    className={`${sideAds.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'} relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 sm:p-8 flex flex-col justify-between gap-3 min-h-[170px] sm:min-h-[295px] ${linked ? 'cursor-pointer' : ''} shadow-xl border border-white/10 select-none`}
+                    className={`${sideAds.length > 0 ? 'lg:col-span-2' : 'lg:col-span-3'} relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 sm:p-8 flex flex-col justify-between gap-3 h-[190px] sm:h-[295px] ${linked ? 'cursor-pointer' : ''} shadow-xl border border-white/10 select-none`}
                   >
                     <AdContent ad={mainAd} rtl={!i18nActive} />
 
@@ -4489,7 +4577,7 @@ export default function App() {
                       <div
                         key={ad.id}
                         onClick={() => linkedPart && setSelectedDetailItem({ type: 'ad', ad, part: linkedPart })}
-                        className={`relative flex-1 rounded-3xl overflow-hidden bg-gradient-to-l ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 flex flex-col justify-center ${linkedPart ? 'cursor-pointer' : ''} shadow-md border border-white/10 min-h-[135px]`}
+                        className={`relative flex-1 rounded-3xl overflow-hidden bg-gradient-to-l ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 flex flex-col justify-center ${linkedPart ? 'cursor-pointer' : ''} shadow-md border border-white/10 h-[135px]`}
                       >
                         <AdContent ad={ad} compact rtl={!i18nActive} />
                       </div>
@@ -4940,7 +5028,14 @@ export default function App() {
           </div>
         ) : (
           <div className={`grid ${mobileCols === 2 ? 'grid-cols-2 hm-grid2 gap-2.5' : 'grid-cols-1 gap-5'} sm:grid-cols-2 lg:grid-cols-3 sm:gap-5`}>
-            {filteredParts.map(part => renderProductCard(part))}
+            {filteredParts.slice(0, gridLimit).map(part => renderProductCard(part))}
+            {filteredParts.length > gridLimit && (
+              <div id="grid-more" className="col-span-full flex justify-center py-3">
+                <button type="button" onClick={() => setGridLimit(l => l + 24)} className="px-5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-extrabold">
+                  عرض المزيد ({filteredParts.length - gridLimit})
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -6312,6 +6407,17 @@ export default function App() {
               + اطلب منتجات جديدة
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setActiveRole('guest');
+              setClientTab('home');
+              showToast('خرجت من حسابك.', 'info');
+            }}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-rose-500/20 hover:bg-rose-600 text-rose-200 hover:text-white border border-rose-400/40 text-xs font-extrabold flex items-center justify-center gap-2 transition"
+          >
+            <LogOut className="w-4 h-4" /> تسجيل الخروج
+          </button>
         </div>
 
         {/* Account Navigation Layout (Sidebar + Main Panel) */}
@@ -6799,7 +6905,10 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                               key={n.id}
                               onClick={() => {
                                 setNotifications(prev => prev.map(x => (x.id === n.id ? { ...x, read: true } : x)));
-                                if (n.type === 'account_request' || n.reqId) {
+                                if (n.type === 'sourcing') {
+                                  setAdminTab('sourcing');
+                                  if (n.srcId) setOpenAdminCards(prev => ({ ...prev, [`src_${n.srcId}`]: true }));
+                                } else if (n.type === 'account_request' || n.reqId) {
                                   setAdminTab('clients');
                                 } else {
                                   setAdminTab('orders');
@@ -9862,7 +9971,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                 const th = getAdTheme(adForm);
                 const dark = !(th.light && adForm.layout !== 'full');
                 return (
-                  <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-5 sm:p-8 flex flex-col justify-center min-h-[220px] shadow-lg border border-white/10 ${adForm.active ? '' : 'opacity-60 grayscale'}`}>
+                  <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-5 sm:p-8 flex flex-col justify-center h-[220px] shadow-lg border border-white/10 ${adForm.active ? '' : 'opacity-60 grayscale'}`}>
                     <AdContent ad={adForm} rtl />
                   </div>
                 );
@@ -9971,7 +10080,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             const scheduled = !adInSchedule(ad);
             return (
               <div key={ad.id} className="rounded-2xl border border-slate-200 bg-white overflow-hidden text-xs">
-                <div className={`relative bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 min-h-[130px] flex flex-col justify-center ${ad.active && !scheduled ? '' : 'opacity-50 grayscale'}`}>
+                <div className={`relative bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-4 h-[130px] flex flex-col justify-center ${ad.active && !scheduled ? '' : 'opacity-50 grayscale'}`}>
                   <AdContent ad={ad} compact rtl />
                 </div>
                 <div className="p-3 space-y-2.5">
@@ -12606,7 +12715,8 @@ model OrderInvoice {
                         const done = [];
                         for (const f of files) {
                           try {
-                            done.push(await compressImageDataUrl(f, 900, 0.7));
+                            const u = await processAndUploadImage(f, 'returns');
+                            if (u) done.push(u);
                           } catch (err) {}
                         }
                         setRetPhotos(prev => [...prev, ...done].slice(0, 5));
@@ -12664,6 +12774,7 @@ model OrderInvoice {
   const adminNotify = (title, msg, extra = {}) => ({
     id: `ntf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     target: 'admin',
+    type: 'sourcing',
     title,
     msg,
     time: 'الآن',
@@ -12673,6 +12784,7 @@ model OrderInvoice {
   const clientNotify = (clientId, title, msg) => ({
     id: `ntf_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     target: clientId,
+    type: 'sourcing',
     title,
     msg,
     time: 'الآن',
@@ -12730,7 +12842,7 @@ model OrderInvoice {
       unreadClient: false,
       closed: false
     };
-    const notif = adminNotify(`طلب منتج من برّه: ${req.name}`, `${currentClient.name} (${phone}) بعت طلب جديد #${req.id}`);
+    const notif = adminNotify(`طلب منتج من برّه: ${req.name}`, `${currentClient.name} (${phone}) بعت طلب جديد #${req.id}`, { srcId: req.id });
     setSourcingRequests(prev => [req, ...prev]);
     setNotifications(prev => [notif, ...prev]);
     cloudSourcingUpdate(list => [req, ...list.filter(r => r.id !== req.id)], notif);
@@ -12746,8 +12858,8 @@ model OrderInvoice {
     e.target.value = '';
     if (!file) return;
     try {
-      const data = await compressImageDataUrl(file, 1000, 0.7);
-      setSrcForm(prev => ({ ...prev, image: data }));
+      const data = await processAndUploadImage(file, 'sourcing');
+      if (data) setSrcForm(prev => ({ ...prev, image: data }));
     } catch (err) {
       showToast('معرفتش أقرا الصورة، جرّب صورة تانية.', 'warning');
     }
@@ -12758,7 +12870,10 @@ model OrderInvoice {
     e.target.value = '';
     const done = [];
     for (const f of files) {
-      try { done.push(await compressImageDataUrl(f, 1000, 0.7)); } catch (err) {}
+      try {
+        const u = await processAndUploadImage(f, 'chat');
+        if (u) done.push(u);
+      } catch (err) {}
     }
     setSrcDraftImgs(prev => ({ ...prev, [reqId]: [...(prev[reqId] || []), ...done].slice(0, 3) }));
   };
@@ -12768,7 +12883,14 @@ model OrderInvoice {
     if (!file) return;
     if (file.size > 2.5 * 1024 * 1024) { showToast('ملف الـ PDF كبير (الحد 2.5 ميجا).', 'warning'); return; }
     try {
-      const data = await readFileAsDataUrl(file);
+      const { isValid } = getSupabaseConfig();
+      let data;
+      if (isValid) {
+        data = await uploadBlobToStorage(file, 'files', 'pdf', 'application/pdf');
+        if (!data) { showToast('فشل رفع الـ PDF على الـ Storage.', 'error'); return; }
+      } else {
+        data = await readFileAsDataUrl(file);
+      }
       setSrcDraftPdf(prev => ({ ...prev, [reqId]: { name: file.name, data } }));
     } catch (err) {
       showToast('معرفتش أقرا الملف.', 'warning');
@@ -12801,7 +12923,7 @@ model OrderInvoice {
     const preview = text || (images.length ? '📷 صورة' : '📄 ملف');
     const notif =
       side === 'client'
-        ? adminNotify(`رسالة جديدة في طلب ${req.id}`, `${req.clientName}: ${preview}`)
+        ? adminNotify(`رسالة جديدة في طلب ${req.id}`, `${req.clientName}: ${preview}`, { srcId: req.id })
         : clientNotify(req.clientId, `رد جديد على طلبك (${req.name})`, preview);
     setSourcingRequests(prev => apply(prev));
     setNotifications(prev => [notif, ...prev]);
@@ -12826,7 +12948,7 @@ model OrderInvoice {
           ? { ...r, status: 'ملغي', closed: true, updatedAt: stamp, depositStatus: hadDeposit ? 'refund_due' : r.depositStatus === 'requested' ? 'none' : r.depositStatus, unreadAdmin: true }
           : r
       );
-    const notif = adminNotify(`العميل لغى الطلب ${req.id}`, `${req.clientName} لغى طلب (${req.name})${hadDeposit ? ' — لازم ترد العربون.' : ''}`);
+    const notif = adminNotify(`العميل لغى الطلب ${req.id}`, `${req.clientName} لغى طلب (${req.name})${hadDeposit ? ' — لازم ترد العربون.' : ''}`, { srcId: req.id });
     setSourcingRequests(prev => apply(prev));
     setNotifications(prev => [notif, ...prev]);
     cloudSourcingUpdate(apply, notif);
@@ -12985,7 +13107,7 @@ model OrderInvoice {
     return (
       <div
         onClick={openSourcing}
-        className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-3 sm:p-4 min-h-[76px] sm:min-h-[96px] flex flex-col justify-center cursor-pointer shadow-lg border border-white/10 hover:shadow-xl transition`}
+        className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${dark ? 'text-white' : 'text-slate-900'} p-3 sm:p-4 h-[84px] sm:h-[100px] flex flex-col justify-center cursor-pointer shadow-lg border border-white/10 hover:shadow-xl transition`}
       >
         <AdContent ad={{ ...b, linkedPartId: 'sourcing' }} compact rtl={!i18nActive} />
       </div>
@@ -13247,7 +13369,7 @@ model OrderInvoice {
             <div className="space-y-4">
               <div>
                 <div className="font-bold text-slate-700 mb-1.5">معاينة البنر (فوق البحث عند العميل):</div>
-                <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${th.light && banner.layout !== 'full' ? 'text-slate-900' : 'text-white'} p-5 sm:p-8 min-h-[150px] flex flex-col justify-center shadow-lg ${banner.active ? '' : 'opacity-50 grayscale'}`}>
+                <div className={`relative rounded-3xl overflow-hidden bg-gradient-to-r ${th.grad} ${th.light && banner.layout !== 'full' ? 'text-slate-900' : 'text-white'} p-5 sm:p-8 h-[150px] flex flex-col justify-center shadow-lg ${banner.active ? '' : 'opacity-50 grayscale'}`}>
                   <AdContent ad={{ ...banner, linkedPartId: 'x' }} rtl />
                 </div>
               </div>
@@ -15804,6 +15926,18 @@ ${footer}
     setSheetDragging(false);
   }, [selectedDetailItem]);
 
+  useEffect(() => {
+    setGridLimit(24);
+  }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeSortBy, storeStockFilter]);
+  useEffect(() => {
+    if (clientTab !== 'search' || typeof IntersectionObserver === 'undefined') return undefined;
+    const el = document.getElementById('grid-more');
+    if (!el) return undefined;
+    const io = new IntersectionObserver(es => { if (es[0].isIntersecting) setGridLimit(l => l + 24); }, { rootMargin: '500px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [gridLimit, filteredParts.length, clientTab]);
+
   // --- English / Arabic switch for the customer storefront (DOM translator) ---
   const rootRef = React.useRef(null);
   const i18nActive = lang === 'en' && appPortal !== 'admin';
@@ -15828,6 +15962,16 @@ ${footer}
       i18nRestoreNode(root);
     };
   }, [i18nActive]);
+
+  // نخلي صفحتي الرئيسية والبحث متركّبين (مخفيين) عشان الرجوع يبقى فوري من غير إعادة بناء
+  const homeElRef = React.useRef(null);
+  const searchElRef = React.useRef(null);
+  const homeActiveNow = clientTab === 'home' || clientTab === 'store';
+  const searchActiveNow = clientTab === 'search';
+  if (appPortal !== 'admin') {
+    if (homeActiveNow) homeElRef.current = renderHomeView();
+    if (searchActiveNow) searchElRef.current = renderStorefront();
+  }
 
   // ============================================================================
   // MAIN RENDER (COMPLETELY SEPARATED STOREFRONT vs ADMIN DASHBOARD PORTAL)
@@ -15885,8 +16029,8 @@ ${footer}
           <div>
             {renderAnnouncements()}
             {renderClientHeader()}
-            {(clientTab === 'home' || clientTab === 'store') && renderHomeView()}
-            {clientTab === 'search' && renderStorefront()}
+            {homeElRef.current && <div className={homeActiveNow ? '' : 'hidden'}>{homeElRef.current}</div>}
+            {searchElRef.current && <div className={searchActiveNow ? '' : 'hidden'}>{searchElRef.current}</div>}
             {clientTab === 'checkout' && renderCheckoutView()}
             {clientTab === 'account' && renderClientAccountPortal()}
           </div>
