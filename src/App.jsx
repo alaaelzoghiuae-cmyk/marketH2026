@@ -2294,8 +2294,16 @@ export default function App() {
         }),
         body: JSON.stringify(payload)
       });
-      return res.ok;
-    } catch (err) {}
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error(`❌ [H-market] فشل الحفظ في جدول ${realTable}:`, res.status, errText);
+        return false;
+      }
+      console.log(`✅ [H-market] تم تأكيد وحفظ التعديل في جدول ${realTable} بنجاح!`);
+      return true;
+    } catch (err) {
+      console.error(`❌ [H-market] خطأ أثناء الحفظ في ${realTable}:`, err);
+    }
     return false;
   };
 
@@ -2622,7 +2630,13 @@ export default function App() {
           if (Array.isArray(data.returnsList)) setReturnsList(data.returnsList);
           if (Array.isArray(data.complaints)) setComplaints(data.complaints);
           if (Array.isArray(data.notifications)) setNotifications(data.notifications);
-          if (Array.isArray(data.parts)) setParts(data.parts);
+          if (Array.isArray(data.parts)) {
+            setParts(prevParts => {
+              const incomingIds = new Set(data.parts.map(p => p.id));
+              const localUnsaved = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !incomingIds.has(p.id));
+              return [...localUnsaved, ...data.parts];
+            });
+          }
 
           if (data.senderRole === 'admin') {
             if (data.siteSettings) setSiteSettings(data.siteSettings);
