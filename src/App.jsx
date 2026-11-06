@@ -2151,12 +2151,10 @@ export default function App() {
   const sbHeaders = (sbKey, extra = {}) => {
     const headers = {
       apikey: sbKey,
+      Authorization: `Bearer ${sbKey}`,
       'Content-Type': 'application/json',
       ...extra
     };
-    if (sbKey && (sbKey.startsWith('ey') || sbKey.startsWith('eyJ'))) {
-      headers.Authorization = `Bearer ${sbKey}`;
-    }
     return headers;
   };
 
@@ -2700,8 +2698,9 @@ export default function App() {
 
       if (Array.isArray(partsRows) && partsRows.length > 0) {
         setParts(prevParts => {
-          const serverIds = new Set(partsRows.map(r => r.id));
-          const localOnly = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !serverIds.has(p.id));
+          const serverIds = new Set(partsRows.map(r => String(r.id)));
+          const baseParts = (Array.isArray(prevParts) && prevParts.length > 0) ? prevParts : (loadPersisted('parts', []) || []);
+          const localOnly = baseParts.filter(p => p && p.id && !serverIds.has(String(p.id)));
           const merged = [...localOnly, ...partsRows];
           try { window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(merged)); } catch (e) {}
           return merged;
@@ -3198,9 +3197,9 @@ export default function App() {
     if (priceInfo.baseEgpPrice <= 0) return false;
     if (part.customGroupPrices && Number(part.customGroupPrices[currentGroup?.id]) === 0) return false;
 
-    const modelObj = models.find(m => m.id === part.modelId);
+    const modelObj = models.find(m => String(m.id) === String(part.modelId));
     if (selectedBrand !== 'ALL' && modelObj?.brand !== selectedBrand) return false;
-    if (selectedModelId !== 'ALL' && part.modelId !== selectedModelId) {
+    if (selectedModelId !== 'ALL' && String(part.modelId) !== String(selectedModelId)) {
       const targetModelName = models.find(m => m.id === selectedModelId)?.name;
       if (!targetModelName || !(part.compatibleModels || []).some(cm => cm.includes(targetModelName))) {
         return false;
@@ -4830,7 +4829,7 @@ export default function App() {
 
           <div className="grid grid-rows-2 grid-flow-col auto-cols-[8.6rem] gap-2 overflow-x-auto pb-1 lg:grid-rows-none lg:grid-flow-row lg:grid-cols-5 lg:auto-cols-auto lg:overflow-visible lg:gap-3" style={{ scrollbarWidth: 'none' }}>
             {models.map(mdl => {
-              const count = parts.filter(p => p.modelId === mdl.id).length;
+              const count = parts.filter(p => String(p.modelId) === String(mdl.id)).length;
               return (
                 <div
                   key={mdl.id}
@@ -4857,6 +4856,36 @@ export default function App() {
           </div>
         </div>
 
+        )}
+
+        {/* Latest Added Products Strip on Customer Home */}
+        {parts.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold bg-emerald-600 text-white">
+                    وصل حديثاً ✨
+                  </span>
+                  <h3 className="text-lg font-extrabold text-slate-900">أحدث المنتجات وقطع الغيار المضافة</h3>
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5">كل القطع الجديدة المضافة بالمخزن جاهزة للطلب</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setClientTab('search')}
+                className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1"
+              >
+                <span>تصفح كل المنتجات ({parts.length})</span>
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {parts.slice(0, 8).map(part => renderProductCard(part))}
+            </div>
+          </section>
         )}
 
         {/* Admin-Curated Product Showcase Bars (بارات عرض المنتجات والعروض) */}
@@ -8579,14 +8608,14 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
   };
 
   const handleDeleteModel = (modelObj) => {
-    const childCount = parts.filter(p => p.modelId === modelObj.id).length;
+    const childCount = parts.filter(p => String(p.modelId) === String(modelObj.id)).length;
     askConfirmDelete(
       'حذف الموديل وجميع قطع غياره',
       `هل أنت متأكد من حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له (${childCount} قطعة) بشكل نهائي؟`,
       () => {
         lastLocalMutationAtRef.current = Date.now();
         setModels(prev => prev.filter(m => m.id !== modelObj.id));
-        setParts(prev => prev.filter(p => p.modelId !== modelObj.id));
+        setParts(prev => prev.filter(p => String(p.modelId) !== String(modelObj.id)));
         sbDelete('mobile_models', modelObj.id);
         showToast(`تم حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له.`, 'info');
       }
@@ -8611,7 +8640,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         const q = adminCatalogSearch.trim().toLowerCase();
         const modelMatch = `${m.brand} ${m.name} ${m.aliases || ''}`.toLowerCase().includes(q);
         const childPartsMatch = parts
-          .filter(p => p.modelId === m.id)
+          .filter(p => String(p.modelId) === String(m.id))
           .some(p => `${p.name} ${p.sku} ${p.category} ${p.qualityGrade}`.toLowerCase().includes(q));
         return modelMatch || childPartsMatch;
       }
@@ -8848,7 +8877,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             const isCollapsed = !!collapsedAdminModels[model.id];
             const modelParts = parts
               .filter(p => {
-                if (p.modelId !== model.id) return false;
+                if (String(p.modelId) !== String(model.id)) return false;
                 if (adminStockFilter === 'IN_STOCK' && p.stock <= 0) return false;
                 if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > p.lowStockThreshold)) return false;
                 if (adminStockFilter === 'OUT_OF_STOCK' && p.stock > 0) return false;
@@ -13702,7 +13731,7 @@ model OrderInvoice {
         { id: 'ALL', label: 'كل الموديلات' },
         ...models
           .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
-          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => pt.modelId === m.id).length }))
+          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => String(pt.modelId) === String(m.id)).length }))
       ];
       current = selectedModelId;
       pick = id => setSelectedModelId(id);
@@ -14241,7 +14270,7 @@ ${footer}
     const inCartQty = cart[targetPart.id]?.qty || 0;
     const isOutOfStock = targetPart.stock <= 0 || !!targetPart.soldOut;
     const activeColor = selectedColors[targetPart.id] || cart[targetPart.id]?.color || targetPart.colors[0];
-    const modelObj = models.find(m => m.id === targetPart.modelId);
+    const modelObj = models.find(m => String(m.id) === String(targetPart.modelId));
     const imagesList = getPartImagesList(targetPart);
     const safeIdx = detailImageIdx % imagesList.length;
     const activeModalImg = imagesList[safeIdx] || targetPart.image;
@@ -15283,10 +15312,23 @@ ${footer}
       };
 
       lastLocalMutationAtRef.current = Date.now();
-      setParts(prev => [newPart, ...prev]);
-      sbUpsert('spare_parts', newPart);
+      setParts(prev => {
+        const next = [newPart, ...(Array.isArray(prev) ? prev : []).filter(p => p.id !== newPart.id)];
+        try { window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(next)); } catch (e) {}
+        return next;
+      });
       setAddingPartToModel(null);
-      showToast(`تمت إضافة "${newPart.name}" بصورتها داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
+      showToast(`جاري حفظ "${newPart.name}" وتثبيتها سحابياً...`, 'info');
+
+      // Persist directly to Supabase with instant verification
+      (async () => {
+        const ok = await sbUpsert('spare_parts', newPart);
+        if (ok) {
+          showToast(`تم تثبيت وحفظ "${newPart.name}" في السيرفر بنجاح ✓`, 'success');
+        } else {
+          showToast(`تم حفظ "${newPart.name}" محلياً، وجاري إعادة المحاولة في السيرفر`, 'warning');
+        }
+      })();
     };
 
     const previewImg =
