@@ -1014,8 +1014,8 @@ const INITIAL_SITE_SETTINGS = {
   bannerColor: 'amber',
   registrationTermsTitle: 'الشروط والأحكام',
   registrationTermsText: DEFAULT_REGISTRATION_TERMS,
-  supabaseUrl: '',
-  supabaseAnonKey: ''
+  supabaseUrl: 'https://pomuumsgsujcgvamaxmr.supabase.co',
+  supabaseAnonKey: 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q'
 };
 
 const QUALITY_GRADE_SUGGESTIONS = [
@@ -1824,12 +1824,15 @@ export default function App() {
       savedKey = window.localStorage.getItem('hmarket_sb_key') || '';
     } catch (e) {}
 
+    const DEFAULT_SB_URL = 'https://pomuumsgsujcgvamaxmr.supabase.co';
+    const DEFAULT_SB_KEY = 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q';
+
     const sbUrl = (
       envUrl ||
       window.__HMARKET_SUPABASE_URL__ ||
       siteSettings?.supabaseUrl ||
       savedUrl ||
-      ''
+      DEFAULT_SB_URL
     ).trim().replace(/\/$/, '');
 
     const sbKey = (
@@ -1837,7 +1840,7 @@ export default function App() {
       window.__HMARKET_SUPABASE_KEY__ ||
       siteSettings?.supabaseAnonKey ||
       savedKey ||
-      ''
+      DEFAULT_SB_KEY
     ).trim();
 
     const isValid = Boolean(sbUrl && sbKey && sbUrl.startsWith('http'));
@@ -2145,12 +2148,17 @@ export default function App() {
   // ============================================================================
   // NORMALIZED SUPABASE TABLE API HELPERS (Fixes Egress & Slashing Bandwidth by >90%)
   // ============================================================================
-  const sbHeaders = (sbKey, extra = {}) => ({
-    apikey: sbKey,
-    Authorization: `Bearer ${sbKey}`,
-    'Content-Type': 'application/json',
-    ...extra
-  });
+  const sbHeaders = (sbKey, extra = {}) => {
+    const headers = {
+      apikey: sbKey,
+      'Content-Type': 'application/json',
+      ...extra
+    };
+    if (sbKey && (sbKey.startsWith('ey') || sbKey.startsWith('eyJ'))) {
+      headers.Authorization = `Bearer ${sbKey}`;
+    }
+    return headers;
+  };
 
   const CAMEL_TO_SNAKE_MAP = {
     modelId: 'model_id',
