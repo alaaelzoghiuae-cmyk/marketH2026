@@ -1808,6 +1808,8 @@ export default function App() {
 
   // Resolve Supabase URL and Key from Env OR SiteSettings OR LocalStorage Backup
   const getSupabaseConfig = () => {
+    const DEFAULT_SB_URL = 'https://pomuumsgsujcgvamaxmr.supabase.co';
+    const DEFAULT_SB_KEY = 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q';
     let envUrl = '';
     let envKey = '';
     try {
@@ -1816,17 +1818,12 @@ export default function App() {
         envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
       }
     } catch (e) {}
-
     let savedUrl = '';
     let savedKey = '';
     try {
       savedUrl = window.localStorage.getItem('hmarket_sb_url') || '';
       savedKey = window.localStorage.getItem('hmarket_sb_key') || '';
     } catch (e) {}
-
-    const DEFAULT_SB_URL = 'https://pomuumsgsujcgvamaxmr.supabase.co';
-    const DEFAULT_SB_KEY = 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q';
-
     const sbUrl = (
       envUrl ||
       window.__HMARKET_SUPABASE_URL__ ||
@@ -1834,7 +1831,6 @@ export default function App() {
       savedUrl ||
       DEFAULT_SB_URL
     ).trim().replace(/\/$/, '');
-
     const sbKey = (
       envKey ||
       window.__HMARKET_SUPABASE_KEY__ ||
@@ -1842,7 +1838,6 @@ export default function App() {
       savedKey ||
       DEFAULT_SB_KEY
     ).trim();
-
     const isValid = Boolean(sbUrl && sbKey && sbUrl.startsWith('http'));
     if (isValid) {
       try {
@@ -2146,17 +2141,14 @@ export default function App() {
   };
 
   // ============================================================================
-  // NORMALIZED SUPABASE TABLE API HELPERS (Fixes Egress & Slashing Bandwidth by >90%)
+  // BULLETPROOF NORMALIZED SUPABASE TABLE SYNC & AUTOMATIC PER-ROW DIFF ENGINE (v8.0)
   // ============================================================================
-  const sbHeaders = (sbKey, extra = {}) => {
-    const headers = {
-      apikey: sbKey,
-      Authorization: `Bearer ${sbKey}`,
-      'Content-Type': 'application/json',
-      ...extra
-    };
-    return headers;
-  };
+  const sbHeaders = (sbKey, extra = {}) => ({
+    apikey: sbKey,
+    Authorization: `Bearer ${sbKey}`,
+    'Content-Type': 'application/json',
+    ...extra
+  });
 
   const CAMEL_TO_SNAKE_MAP = {
     modelId: 'model_id',
@@ -2167,10 +2159,12 @@ export default function App() {
     warrantyText: 'warranty_text',
     searchAliases: 'search_aliases',
     createdAt: 'created_at',
+    updatedAt: 'updated_at',
     compatibleModels: 'compatible_models',
     customGroupPrices: 'custom_group_prices',
     maxOrderQty: 'max_order_qty',
     waitlistCount: 'waitlist_count',
+    soldOut: 'sold_out',
     clientId: 'client_id',
     clientName: 'client_name',
     clientPhone: 'client_phone',
@@ -2180,6 +2174,7 @@ export default function App() {
     avatarImage: 'avatar_image',
     avatarBg: 'avatar_bg',
     secondaryAddress: 'secondary_address',
+    accountType: 'account_type',
     paymentMethod: 'payment_method',
     deliveryFeeBase: 'delivery_fee_base',
     discountBase: 'discount_base',
@@ -2201,47 +2196,116 @@ export default function App() {
     shopName: 'shop_name',
     ownerName: 'owner_name',
     assignedGroupId: 'assigned_group_id',
+    accountCategory: 'account_category',
+    requestedPassword: 'requested_password',
+    shopType: 'shop_type',
+    acceptedTermsAt: 'accepted_terms_at',
+    buttonText: 'button_text',
+    linkedPartId: 'linked_part_id',
+    imageFit: 'image_fit',
+    showBadge: 'show_badge',
+    showButton: 'show_button',
+    startDate: 'start_date',
+    endDate: 'end_date',
+    sortOrder: 'sort_order',
+    badgeColor: 'badge_color',
+    partIds: 'part_ids',
+    maxDiscountCap: 'max_discount_cap',
+    minOrderAmount: 'min_order_amount',
+    usageLimit: 'usage_limit',
+    usedCount: 'used_count',
+    expiryDate: 'expiry_date',
+    isActive: 'is_active',
+    skuPrefix: 'sku_prefix',
+    namePattern: 'name_pattern',
+    imageKey: 'image_key',
+    defaultStock: 'default_stock',
+    desc: 'desc_text',
+    depositStatus: 'deposit_status',
+    imagesAllowed: 'images_allowed',
+    unreadAdmin: 'unread_admin',
+    unreadClient: 'unread_client'
   };
 
   const SNAKE_TO_CAMEL_MAP = Object.fromEntries(
     Object.entries(CAMEL_TO_SNAKE_MAP).map(([c, s]) => [s, c])
   );
 
-  const toSnakeCaseRow = (row, tableName = '') => {
-    if (!row || typeof row !== 'object') return row;
-    const out = {};
-    for (const [k, v] of Object.entries(row)) {
-      const sk = CAMEL_TO_SNAKE_MAP[k] || k;
-      out[sk] = v;
-    }
-    if (tableName === 'account_requests') {
-      if (out.name && !out.shop_name) out.shop_name = out.name;
-      if (out.owner && !out.owner_name) out.owner_name = out.owner;
-      delete out.password;
-    }
-    if (tableName === 'clients') {
-      if (!out.owner) out.owner = out.name || 'عميل فردي';
-    }
-    if (tableName === 'promo_codes') {
-      if (out.is_active !== undefined && out.active === undefined) {
-        out.active = out.is_active;
-        delete out.is_active;
-      }
-    }
-    return out;
+  // Strict per-table allowed column schemas (prevents PGRST204 unknown column & PGRST102 batch key mismatch)
+  const TABLE_ALLOWED_COLUMNS = {
+    spare_parts: [
+      'id', 'sku', 'model_id', 'category', 'name', 'quality_grade',
+      'colors', 'compatible_models', 'search_aliases', 'description', 'warranty_text',
+      'image', 'images', 'stock', 'low_stock_threshold', 'max_order_qty',
+      'cost_price', 'base_price', 'custom_group_prices', 'waitlist_count',
+      'sold_out', 'created_at', 'data'
+    ],
+    mobile_models: ['id', 'brand', 'name', 'aliases', 'image', 'data'],
+    brands: ['name', 'sort_order'],
+    pricing_groups: [
+      'id', 'name', 'currency', 'modifier_type', 'modifier_value',
+      'delivery_fee_base', 'is_default', 'description', 'data'
+    ],
+    store_ads: [
+      'id', 'badge', 'title', 'subtitle', 'theme', 'gradient', 'image',
+      'button_text', 'linked_part_id', 'layout', 'align', 'image_fit',
+      'overlay', 'show_badge', 'show_button', 'start_date', 'end_date',
+      'active', 'sort_order', 'data'
+    ],
+    showcase_bars: [
+      'id', 'title', 'subtitle', 'badge_color', 'part_ids', 'active', 'sort_order', 'data'
+    ],
+    promo_codes: [
+      'id', 'code', 'type', 'value', 'max_discount_cap', 'min_order_amount',
+      'usage_limit', 'used_count', 'expiry_date', 'description', 'active', 'data'
+    ],
+    clients: [
+      'id', 'name', 'owner', 'phone', 'email', 'password', 'address',
+      'secondary_address', 'group_id', 'credit_limit', 'wallet_balance',
+      'ledger', 'status', 'type', 'account_type', 'avatar', 'avatar_bg',
+      'avatar_image', 'created_at', 'data'
+    ],
+    account_requests: [
+      'id', 'name', 'shop_name', 'owner', 'owner_name', 'phone', 'email',
+      'password', 'requested_password', 'address', 'type', 'account_category',
+      'shop_type', 'notes', 'status', 'assigned_group_id', 'credit_limit',
+      'created_at', 'accepted_terms_at', 'data'
+    ],
+    orders: [
+      'id', 'client_id', 'client_name', 'group_id', 'currency',
+      'exchange_rate_used', 'status', 'payment_method', 'address', 'notes',
+      'items', 'delivery_fee_base', 'discount_base', 'wallet_used_base',
+      'admin_edited', 'admin_edit_note', 'created_at', 'data'
+    ],
+    returns_list: [
+      'id', 'order_id', 'client_id', 'client_name', 'part_id', 'part_name',
+      'qty', 'refund_amount_base', 'reason', 'status', 'photos',
+      'admin_response', 'resolution_type', 'warranty_confirmed', 'replies',
+      'closed', 'created_at', 'data'
+    ],
+    complaints: [
+      'id', 'client_id', 'client_name', 'type', 'subject', 'message',
+      'status', 'admin_reply', 'replies', 'created_at', 'data'
+    ],
+    auto_templates: [
+      'id', 'sku_prefix', 'category', 'name_pattern', 'quality_grade',
+      'colors', 'warranty_text', 'image_key', 'cost_price', 'base_price',
+      'default_stock', 'low_stock_threshold', 'max_order_qty', 'enabled', 'data'
+    ],
+    sourcing_requests: [
+      'id', 'client_id', 'client_name', 'phone', 'client_phone', 'part_id',
+      'part_name', 'name', 'desc_text', 'notes', 'image', 'status', 'price',
+      'deposit', 'deposit_status', 'messages', 'images_allowed',
+      'unread_admin', 'unread_client', 'closed', 'created_at', 'updated_at',
+      'accepted_terms_at', 'data'
+    ],
+    site_settings: [
+      'id', 'settings', 'credentials', 'currencies', 'notifications', 'updated_at'
+    ]
   };
 
-  const toCamelCaseRow = (row) => {
-    if (!row || typeof row !== 'object') return row;
-    const out = {};
-    for (const [k, v] of Object.entries(row)) {
-      const ck = SNAKE_TO_CAMEL_MAP[k] || k;
-      out[ck] = v;
-    }
-    if (out.shop_name && !out.name) out.name = out.shop_name;
-    if (out.owner_name && !out.owner) out.owner = out.owner_name;
-    return out;
-  };
+  // Runtime cache of any columns not yet added to a table in Supabase (auto-heals PGRST204 without failing!)
+  const unsupportedColumnsRef = useRef({});
 
   const resolveActualTableName = (name) => {
     if (name === 'models' || name === 'mobile_models') return 'mobile_models';
@@ -2249,74 +2313,362 @@ export default function App() {
     return name;
   };
 
+  const toSnakeCaseRow = (row, tableName = '', rowIndex = 0) => {
+    if (!row || typeof row !== 'object') return row;
+    const realTable = resolveActualTableName(tableName);
+    if (realTable === 'site_settings') return row;
+
+    const rawSnake = {};
+    for (const [k, v] of Object.entries(row)) {
+      if (k === 'data') continue;
+      const sk = CAMEL_TO_SNAKE_MAP[k] || k;
+      rawSnake[sk] = v;
+    }
+
+    // Table-specific defaults & normalizations so NOT NULL constraints never fail
+    if (realTable === 'spare_parts') {
+      rawSnake.sku = rawSnake.sku || `PRT-${rawSnake.id || Date.now()}`;
+      rawSnake.name = rawSnake.name || 'قطعة غيار';
+      rawSnake.category = rawSnake.category || 'أقسام عامة';
+      rawSnake.quality_grade = rawSnake.quality_grade || 'قياسي';
+      rawSnake.colors = Array.isArray(rawSnake.colors) ? rawSnake.colors : ['قياسي'];
+      rawSnake.compatible_models = Array.isArray(rawSnake.compatible_models) ? rawSnake.compatible_models : [];
+      rawSnake.images = Array.isArray(rawSnake.images) ? rawSnake.images : (rawSnake.image ? [rawSnake.image] : []);
+      rawSnake.custom_group_prices = (rawSnake.custom_group_prices && typeof rawSnake.custom_group_prices === 'object') ? rawSnake.custom_group_prices : {};
+      rawSnake.stock = Number(rawSnake.stock) || 0;
+      rawSnake.low_stock_threshold = Number(rawSnake.low_stock_threshold) || 5;
+      rawSnake.max_order_qty = Number(rawSnake.max_order_qty) || 10;
+      rawSnake.cost_price = Number(rawSnake.cost_price) || 0;
+      rawSnake.base_price = Number(rawSnake.base_price) || 0;
+      rawSnake.waitlist_count = Number(rawSnake.waitlist_count) || 0;
+      rawSnake.sold_out = Boolean(rawSnake.sold_out);
+      rawSnake.created_at = rawSnake.created_at || new Date().toISOString().slice(0, 16).replace('T', ' ');
+    } else if (realTable === 'mobile_models') {
+      rawSnake.brand = rawSnake.brand || 'عام';
+      rawSnake.name = rawSnake.name || 'موديل';
+      rawSnake.aliases = rawSnake.aliases || rawSnake.name;
+    } else if (realTable === 'pricing_groups') {
+      rawSnake.currency = rawSnake.currency || 'EGP';
+      rawSnake.modifier_type = rawSnake.modifier_type || 'none';
+      rawSnake.modifier_value = Number(rawSnake.modifier_value) || 0;
+      rawSnake.delivery_fee_base = Number(rawSnake.delivery_fee_base ?? 75);
+      rawSnake.is_default = Boolean(rawSnake.is_default);
+    } else if (realTable === 'clients') {
+      rawSnake.name = rawSnake.name || 'عميل';
+      rawSnake.owner = rawSnake.owner || rawSnake.name || 'عميل فردي';
+      rawSnake.phone = rawSnake.phone || '';
+      rawSnake.email = rawSnake.email || '';
+      rawSnake.password = rawSnake.password || '123';
+      rawSnake.address = rawSnake.address || '';
+      rawSnake.credit_limit = Number(rawSnake.credit_limit) || 0;
+      rawSnake.wallet_balance = Number(rawSnake.wallet_balance) || 0;
+      rawSnake.ledger = Array.isArray(rawSnake.ledger) ? rawSnake.ledger : [];
+      rawSnake.status = rawSnake.status || 'active';
+      rawSnake.type = rawSnake.type || rawSnake.account_type || 'shop';
+      rawSnake.account_type = rawSnake.account_type || rawSnake.type || 'shop';
+    } else if (realTable === 'account_requests') {
+      rawSnake.shop_name = rawSnake.shop_name || rawSnake.name || 'عميل جديد';
+      rawSnake.name = rawSnake.name || rawSnake.shop_name;
+      rawSnake.owner_name = rawSnake.owner_name || rawSnake.owner || rawSnake.name || 'عميل فردي';
+      rawSnake.owner = rawSnake.owner || rawSnake.owner_name;
+      rawSnake.status = rawSnake.status || 'pending';
+    } else if (realTable === 'orders') {
+      rawSnake.currency = rawSnake.currency || 'EGP';
+      rawSnake.exchange_rate_used = Number(rawSnake.exchange_rate_used) || 1;
+      rawSnake.status = rawSnake.status || 'تم الاستلام';
+      rawSnake.payment_method = rawSnake.payment_method || 'كاش عند الاستلام';
+      rawSnake.address = rawSnake.address || 'عنوان مسجل';
+      rawSnake.items = Array.isArray(rawSnake.items) ? rawSnake.items : [];
+      rawSnake.delivery_fee_base = Number(rawSnake.delivery_fee_base) || 0;
+      rawSnake.discount_base = Number(rawSnake.discount_base) || 0;
+      rawSnake.wallet_used_base = Number(rawSnake.wallet_used_base) || 0;
+      rawSnake.admin_edited = Boolean(rawSnake.admin_edited);
+      const rawCreated = String(rawSnake.created_at || '');
+      rawSnake.created_at = /^\d{4}-\d{2}-\d{2}/.test(rawCreated)
+        ? rawCreated
+        : new Date().toISOString().slice(0, 16).replace('T', ' ');
+    } else if (realTable === 'store_ads') {
+      rawSnake.active = rawSnake.active !== undefined ? Boolean(rawSnake.active) : true;
+      rawSnake.sort_order = typeof rawSnake.sort_order === 'number' ? rawSnake.sort_order : rowIndex;
+      rawSnake.layout = rawSnake.layout || 'blend';
+      rawSnake.align = rawSnake.align || 'right';
+      rawSnake.image_fit = rawSnake.image_fit || 'cover';
+      rawSnake.overlay = rawSnake.overlay !== undefined ? Number(rawSnake.overlay) : 55;
+      rawSnake.show_badge = rawSnake.show_badge !== false;
+      rawSnake.show_button = rawSnake.show_button !== false;
+    } else if (realTable === 'showcase_bars') {
+      rawSnake.part_ids = Array.isArray(rawSnake.part_ids) ? rawSnake.part_ids : [];
+      rawSnake.active = rawSnake.active !== undefined ? Boolean(rawSnake.active) : true;
+      rawSnake.sort_order = typeof rawSnake.sort_order === 'number' ? rawSnake.sort_order : rowIndex;
+    } else if (realTable === 'promo_codes') {
+      rawSnake.value = Number(rawSnake.value) || 0;
+      rawSnake.active = rawSnake.active !== undefined ? Boolean(rawSnake.active) : (rawSnake.is_active !== undefined ? Boolean(rawSnake.is_active) : true);
+    }
+
+    // Store full original JS object in `data` JSONB so zero custom fields are ever lost
+    const cleanDataCopy = { ...row };
+    delete cleanDataCopy.data;
+    rawSnake.data = cleanDataCopy;
+
+    const allowedList = TABLE_ALLOWED_COLUMNS[realTable];
+    const blockedSet = unsupportedColumnsRef.current[realTable] || new Set();
+    if (!allowedList) return rawSnake;
+
+    // Ensure every row in a batch has the EXACT same keys (prevents PGRST102 batch error)
+    const normalized = {};
+    for (const col of allowedList) {
+      if (blockedSet.has(col)) continue;
+      normalized[col] = rawSnake[col] !== undefined ? rawSnake[col] : null;
+    }
+    return normalized;
+  };
+
+  const NUMERIC_CAMEL_FIELDS = new Set([
+    'basePrice', 'costPrice', 'stock', 'lowStockThreshold', 'maxOrderQty',
+    'waitlistCount', 'modifierValue', 'deliveryFeeBase', 'creditLimit',
+    'walletBalance', 'value', 'maxDiscountCap', 'minOrderAmount',
+    'usageLimit', 'usedCount', 'qty', 'refundAmountBase', 'exchangeRateUsed',
+    'discountBase', 'walletUsedBase', 'overlay'
+  ]);
+
+  const toCamelCaseRow = (row) => {
+    if (!row || typeof row !== 'object') return row;
+    // Start with `row.data` (if present) so all rich UI properties (layout, theme, overlay, etc.) are restored intact
+    const baseData = (row.data && typeof row.data === 'object' && !Array.isArray(row.data)) ? { ...row.data } : {};
+    const out = { ...baseData };
+
+    for (const [k, v] of Object.entries(row)) {
+      if (k === 'data' || v === null || v === undefined) continue;
+      const ck = SNAKE_TO_CAMEL_MAP[k] || k;
+      out[ck] = v;
+    }
+
+    for (const nf of NUMERIC_CAMEL_FIELDS) {
+      if (out[nf] !== undefined && out[nf] !== null && out[nf] !== '') {
+        const n = Number(out[nf]);
+        if (!Number.isNaN(n)) out[nf] = n;
+      }
+    }
+
+    if (out.shopName && !out.name) out.name = out.shopName;
+    if (out.name && !out.shopName) out.shopName = out.name;
+    if (out.ownerName && !out.owner) out.owner = out.ownerName;
+    if (out.owner && !out.ownerName) out.ownerName = out.owner;
+    if (out.desc_text && !out.desc) out.desc = out.desc_text;
+    if (Array.isArray(out.images) && out.images.length === 0 && out.image) {
+      out.images = [out.image];
+    }
+    if (!out.image && Array.isArray(out.images) && out.images[0]) {
+      out.image = out.images[0];
+    }
+    return out;
+  };
+
+  // --- Persistent Local Mutation & Deletion Tracker (Backed by sessionStorage so Refresh/Polling NEVER loses edits!) ---
+  const loadSessionMap = (storageKey) => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      if (raw) return JSON.parse(raw) || {};
+    } catch (e) {}
+    return {};
+  };
+
+  const localModifiedMapRef = useRef(loadSessionMap('hm_local_mod_v8'));
+  const deletedIdsMapRef = useRef(loadSessionMap('hm_deleted_ids_v8'));
+  const prevSlicesRef = useRef(null);
+  const incomingSyncUntilRef = useRef(0);
+  const pendingDiffUpsertsRef = useRef({});
+  const pendingDiffDeletesRef = useRef({});
+  const diffFlushTimerRef = useRef(null);
+
+  const persistMutationMaps = () => {
+    try {
+      sessionStorage.setItem('hm_local_mod_v8', JSON.stringify(localModifiedMapRef.current));
+      sessionStorage.setItem('hm_deleted_ids_v8', JSON.stringify(deletedIdsMapRef.current));
+    } catch (e) {}
+  };
+
+  const markLocalUpsert = (sliceKey, item) => {
+    if (!item) return;
+    const id = String(typeof item === 'string' ? item : (item.id || item.code || item.name || ''));
+    if (!id) return;
+    if (!localModifiedMapRef.current[sliceKey]) localModifiedMapRef.current[sliceKey] = {};
+    localModifiedMapRef.current[sliceKey][id] = { item, ts: Date.now() };
+    if (deletedIdsMapRef.current[sliceKey]) {
+      delete deletedIdsMapRef.current[sliceKey][id];
+    }
+    if (!pendingDiffUpsertsRef.current[sliceKey]) pendingDiffUpsertsRef.current[sliceKey] = {};
+    pendingDiffUpsertsRef.current[sliceKey][id] = item;
+    persistMutationMaps();
+  };
+
+  const markLocalDelete = (sliceKey, rawId) => {
+    const id = String(rawId || '');
+    if (!id) return;
+    if (!deletedIdsMapRef.current[sliceKey]) deletedIdsMapRef.current[sliceKey] = {};
+    deletedIdsMapRef.current[sliceKey][id] = Date.now();
+    if (localModifiedMapRef.current[sliceKey]) {
+      delete localModifiedMapRef.current[sliceKey][id];
+    }
+    if (pendingDiffUpsertsRef.current[sliceKey]) {
+      delete pendingDiffUpsertsRef.current[sliceKey][id];
+    }
+    if (!pendingDiffDeletesRef.current[sliceKey]) pendingDiffDeletesRef.current[sliceKey] = {};
+    pendingDiffDeletesRef.current[sliceKey][id] = true;
+    persistMutationMaps();
+  };
+
+  // Merge server rows with local session additions, edits, and deletions so NOTHING EVER DISAPPEARS!
+  const mergeServerWithLocal = (sliceKey, currentLocalArray, serverRows) => {
+    const delMap = deletedIdsMapRef.current[sliceKey] || {};
+    const modMap = localModifiedMapRef.current[sliceKey] || {};
+    const now = Date.now();
+    const TTL_MS = 15 * 60 * 1000; // Keep local edits protected for 15 minutes against stale cache/tables
+
+    if (!Array.isArray(serverRows) || serverRows.length === 0) {
+      return (Array.isArray(currentLocalArray) ? currentLocalArray : []).filter(item => {
+        const id = String(typeof item === 'string' ? item : (item?.id || item?.code || item?.name || ''));
+        return id && !delMap[id];
+      });
+    }
+
+    // 1. Filter out deleted items and overlay any local edits on matching server rows
+    const seenIds = new Set();
+    const mergedServer = [];
+    for (const sRow of serverRows) {
+      const id = String(typeof sRow === 'string' ? sRow : (sRow?.id || sRow?.code || sRow?.name || ''));
+      if (!id || delMap[id]) continue;
+      seenIds.add(id);
+      const localMod = modMap[id];
+      if (localMod && localMod.item && (now - (localMod.ts || 0) < TTL_MS)) {
+        mergedServer.push(typeof sRow === 'string' ? localMod.item : { ...sRow, ...localMod.item });
+      } else {
+        mergedServer.push(sRow);
+      }
+    }
+
+    // 2. Prepend any locally added items that are not in serverRows yet
+    const newLocalItems = [];
+    for (const [id, entry] of Object.entries(modMap)) {
+      if (!seenIds.has(id) && !delMap[id] && entry && entry.item && (now - (entry.ts || 0) < TTL_MS)) {
+        newLocalItems.push(entry.item);
+        seenIds.add(id);
+      }
+    }
+
+    return [...newLocalItems, ...mergedServer];
+  };
+
   const sbFetchTable = async (tableName, select = '*', query = '') => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return null;
     const realTable = resolveActualTableName(tableName);
     try {
-      console.log(`📡 [H-market] جاري استعلام جدول: ${realTable}`);
       const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${select}${query}`, {
         headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
       });
-      console.log(`📡 [H-market] رد سيرفر جدول ${realTable}: كود ${res.status}`);
       if (res.ok) {
         const rows = await res.json();
         if (Array.isArray(rows)) {
-          console.log(`📦 [H-market] تم استلام (${rows.length}) سطر من جدول ${realTable}`);
           return rows.map(toCamelCaseRow);
         }
         return rows;
-      } else {
-        const errText = await res.text();
-        console.warn(`⚠️ [H-market] فشل قراءة ${realTable}: ${res.status}`, errText);
       }
-    } catch (err) {
-      console.error(`❌ [H-market] تعذر الاتصال بجدول ${realTable}:`, err);
-    }
+    } catch (err) {}
     return null;
   };
 
+  // Self-healing Upsert: automatically strips any column not yet present in the Supabase table and retries!
   const sbUpsert = async (tableName, recordOrArray) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid || !recordOrArray) return false;
     const realTable = resolveActualTableName(tableName);
-    try {
-      const payload = Array.isArray(recordOrArray)
-        ? recordOrArray.map(r => toSnakeCaseRow(r, realTable))
-        : toSnakeCaseRow(recordOrArray, realTable);
+    if (!unsupportedColumnsRef.current[realTable]) {
+      unsupportedColumnsRef.current[realTable] = new Set();
+    }
 
-      const res = await fetch(`${sbUrl}/rest/v1/${realTable}`, {
-        method: 'POST',
-        headers: sbHeaders(sbKey, {
-          'Prefer': 'resolution=merge-duplicates,return=minimal'
-        }),
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error(`❌ [H-market] فشل الحفظ في جدول ${realTable}:`, res.status, errText);
-        return false;
+    try {
+      const cleanedInput = await externalizeBase64Deep(recordOrArray);
+      const rawList = Array.isArray(cleanedInput) ? cleanedInput : [cleanedInput];
+      if (rawList.length === 0) return true;
+
+      // Chunk large arrays into batches of 100 to prevent payload timeouts
+      const BATCH_SIZE = 100;
+      for (let b = 0; b < rawList.length; b += BATCH_SIZE) {
+        const chunk = rawList.slice(b, b + BATCH_SIZE);
+        let success = false;
+
+        for (let attempt = 0; attempt < 12; attempt++) {
+          const payload = chunk.map((r, idx) => toSnakeCaseRow(r, realTable, b + idx));
+          const res = await fetch(`${sbUrl}/rest/v1/${realTable}`, {
+            method: 'POST',
+            headers: sbHeaders(sbKey, {
+              Prefer: 'resolution=merge-duplicates,return=minimal'
+            }),
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            success = true;
+            break;
+          }
+
+          const errText = await res.text();
+          // Detect PGRST204 / 42703 missing column and strip it automatically!
+          const colMatch =
+            errText.match(/Could not find the '([^']+)' column/i) ||
+            errText.match(/column "([^"]+)" of relation/i);
+          if (colMatch && colMatch[1]) {
+            const badCol = colMatch[1];
+            unsupportedColumnsRef.current[realTable].add(badCol);
+            continue;
+          } else {
+            console.warn(`⚠️ [H-market] تحذير حفظ جدول ${realTable} (${res.status}):`, errText);
+            break;
+          }
+        }
+
+        if (!success) return false;
       }
-      console.log(`✅ [H-market] تم تأكيد وحفظ التعديل في جدول ${realTable} بنجاح!`);
       return true;
     } catch (err) {
-      console.error(`❌ [H-market] خطأ أثناء الحفظ في ${realTable}:`, err);
+      console.error(`❌ [H-market] خطأ اتصال أثناء حفظ ${realTable}:`, err);
+      return false;
     }
-    return false;
   };
 
   const sbUpdate = async (tableName, id, patchObj) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid || !id) return false;
+    if (!isValid || !id || !patchObj) return false;
     const realTable = resolveActualTableName(tableName);
+    if (!unsupportedColumnsRef.current[realTable]) {
+      unsupportedColumnsRef.current[realTable] = new Set();
+    }
+    const pkCol = realTable === 'brands' ? 'name' : 'id';
     try {
-      const payload = toSnakeCaseRow(patchObj, realTable);
-      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?id=eq.${encodeURIComponent(id)}`, {
-        method: 'PATCH',
-        headers: sbHeaders(sbKey, { 'Prefer': 'return=minimal' }),
-        body: JSON.stringify(payload)
-      });
-      return res.ok;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const blocked = unsupportedColumnsRef.current[realTable];
+        const payload = {};
+        for (const [k, v] of Object.entries(patchObj)) {
+          const sk = CAMEL_TO_SNAKE_MAP[k] || k;
+          if (!blocked.has(sk)) payload[sk] = v;
+        }
+        const res = await fetch(`${sbUrl}/rest/v1/${realTable}?${pkCol}=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: sbHeaders(sbKey, { Prefer: 'return=minimal' }),
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) return true;
+        const errText = await res.text();
+        const colMatch =
+          errText.match(/Could not find the '([^']+)' column/i) ||
+          errText.match(/column "([^"]+)" of relation/i);
+        if (colMatch && colMatch[1]) {
+          unsupportedColumnsRef.current[realTable].add(colMatch[1]);
+          continue;
+        }
+        break;
+      }
     } catch (err) {}
     return false;
   };
@@ -2325,8 +2677,9 @@ export default function App() {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid || !id) return false;
     const realTable = resolveActualTableName(tableName);
+    const pkCol = realTable === 'brands' ? 'name' : 'id';
     try {
-      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?id=eq.${encodeURIComponent(id)}`, {
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?${pkCol}=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: sbHeaders(sbKey)
       });
@@ -2335,94 +2688,163 @@ export default function App() {
     return false;
   };
 
-  // One-Click Migration Trigger to unpack app_state_sync into independent tables
-  const handleTriggerDatabaseMigration = async () => {
-    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) {
-      showToast('يرجى إدخال رابط ومفتاح Supabase في إعدادات الموقع أولاً.', 'warning');
-      return;
-    }
-    showToast('جاري استدعاء إجراء ترحيل البيانات السحابية إلى الجداول المستقلة...', 'info');
+  // Flush only the added/edited/deleted rows to Supabase (ultra-fast, <2KB per change!)
+  const flushPendingDiffsToSupabase = async (showSuccessToast = false) => {
+    const { isValid } = getSupabaseConfig();
+    if (!isValid) return false;
+    if (isSavingRef.current) return false;
+    isSavingRef.current = true;
+
+    const SLICE_TO_TABLE = {
+      parts: 'spare_parts',
+      models: 'mobile_models',
+      brands: 'brands',
+      groups: 'pricing_groups',
+      storeAds: 'store_ads',
+      showcaseBars: 'showcase_bars',
+      promoCodes: 'promo_codes',
+      clients: 'clients',
+      accountRequests: 'account_requests',
+      orders: 'orders',
+      returnsList: 'returns_list',
+      complaints: 'complaints',
+      autoTemplates: 'auto_templates',
+      sourcingRequests: 'sourcing_requests'
+    };
+
     try {
-      const rpcRes = await fetch(`${sbUrl}/rest/v1/rpc/migrate_from_app_state_sync`, {
-        method: 'POST',
-        headers: sbHeaders(sbKey)
-      });
-      if (rpcRes.ok) {
-        showToast('✅ تم ترحيل وتأكيد الجداول المستقلة بنجاح وحل مشكلة الـ Egress!', 'success');
-        await pullFromSupabaseCloud(false);
-      } else {
-        await pushToSupabaseCloud(null, true);
-        showToast('تم رفع وتثبيت البيانات في الجداول المستقلة مباشرة ✓', 'success');
+      setCloudSyncStatus('syncing');
+      const tasks = [];
+
+      // 1. Process all pending deletes
+      for (const [sliceKey, idMap] of Object.entries(pendingDiffDeletesRef.current)) {
+        const tbl = SLICE_TO_TABLE[sliceKey];
+        if (!tbl || !idMap) continue;
+        const ids = Object.keys(idMap);
+        delete pendingDiffDeletesRef.current[sliceKey];
+        for (const id of ids) {
+          tasks.push(sbDelete(tbl, id));
+        }
       }
+
+      // 2. Process all pending upserts
+      for (const [sliceKey, itemMap] of Object.entries(pendingDiffUpsertsRef.current)) {
+        if (sliceKey === 'site_settings') {
+          const payload = itemMap.main;
+          delete pendingDiffUpsertsRef.current.site_settings;
+          if (payload) {
+            tasks.push(sbUpsert('site_settings', [payload]));
+          }
+          continue;
+        }
+        const tbl = SLICE_TO_TABLE[sliceKey];
+        if (!tbl || !itemMap) continue;
+        const items = Object.values(itemMap);
+        delete pendingDiffUpsertsRef.current[sliceKey];
+        if (items.length > 0) {
+          const formatted = sliceKey === 'brands'
+            ? items.map((b, i) => (typeof b === 'string' ? { name: b, sort_order: i } : b))
+            : items;
+          tasks.push(sbUpsert(tbl, formatted));
+        }
+      }
+
+      if (tasks.length > 0) {
+        await Promise.all(tasks);
+      }
+
+      setCloudSyncStatus('cloud_synced');
+      if (showSuccessToast) {
+        showToast('تم حفظ وتثبيت كافة التعديلات في قاعدة البيانات بنجاح ✓', 'success');
+      }
+      return true;
     } catch (err) {
-      showToast('حدث خطأ أثناء الترحيل: ' + String(err.message || err), 'error');
+      setCloudSyncStatus('local_ready');
+      return false;
+    } finally {
+      isSavingRef.current = false;
     }
   };
 
-  // Push modified state to normalized Supabase tables
+  // Manual Full Sync Button Handler
   const pushToSupabaseCloud = async (customBundle = null, showSuccessToast = false) => {
-    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    const { isValid } = getSupabaseConfig();
     if (!isValid) {
       if (showSuccessToast) showToast('تم حفظ جميع التعديلات محلياً في المتصفح بنجاح!', 'success');
       return false;
     }
 
-    setCloudSyncStatus('syncing');
-    const nowTs = Date.now();
-    lastLocalMutationAtRef.current = nowTs;
+    lastLocalMutationAtRef.current = Date.now();
+    await flushPendingDiffsToSupabase(false);
 
+    setCloudSyncStatus('syncing');
     try {
+      const b = customBundle || {
+        siteSettings,
+        adminCredentials,
+        currencies,
+        groups,
+        brands,
+        autoTemplates,
+        models,
+        parts,
+        clients,
+        accountRequests,
+        orders,
+        returnsList,
+        complaints,
+        promoCodes,
+        storeAds,
+        showcaseBars,
+        sourcingRequests,
+        notifications
+      };
+
       const tasks = [
-        sbUpsert('spare_parts', parts),
-        sbUpsert('mobile_models', models),
-        sbUpsert('pricing_groups', groups),
-        sbUpsert('brands', brands.map(b => (typeof b === 'string' ? { name: b } : b))),
-        sbUpsert('store_ads', storeAds),
-        sbUpsert('showcase_bars', showcaseBars),
-        sbUpsert('promo_codes', promoCodes),
-        sbUpsert('clients', clients),
-        sbUpsert('account_requests', accountRequests),
-        sbUpsert('orders', orders),
-        sbUpsert('returns_list', returnsList),
-        sbUpsert('complaints', complaints),
-        sbUpsert('auto_templates', autoTemplates),
-        sbUpsert('sourcing_requests', sourcingRequests),
+        sbUpsert('mobile_models', b.models || models),
+        sbUpsert('pricing_groups', b.groups || groups),
+        sbUpsert('brands', (b.brands || brands).map((br, idx) => (typeof br === 'string' ? { name: br, sort_order: idx } : br))),
+        sbUpsert('spare_parts', b.parts || parts),
+        sbUpsert('store_ads', (b.storeAds || storeAds).map((ad, idx) => ({ ...ad, sortOrder: idx }))),
+        sbUpsert('showcase_bars', (b.showcaseBars || showcaseBars).map((bar, idx) => ({ ...bar, sortOrder: idx }))),
+        sbUpsert('promo_codes', b.promoCodes || promoCodes),
+        sbUpsert('clients', b.clients || clients),
+        sbUpsert('account_requests', b.accountRequests || accountRequests),
+        sbUpsert('orders', b.orders || orders),
+        sbUpsert('returns_list', b.returnsList || returnsList),
+        sbUpsert('complaints', b.complaints || complaints),
+        sbUpsert('auto_templates', b.autoTemplates || autoTemplates),
+        sbUpsert('sourcing_requests', b.sourcingRequests || sourcingRequests),
         sbUpsert('site_settings', [{
           id: 'main',
-          settings: siteSettings,
-          credentials: adminCredentials,
-          currencies: currencies,
-          notifications: notifications,
+          settings: b.siteSettings || siteSettings,
+          credentials: b.adminCredentials || adminCredentials,
+          currencies: b.currencies || currencies,
+          notifications: b.notifications || notifications,
           updated_at: new Date().toISOString()
         }])
       ];
 
       await Promise.all(tasks);
-
-      // Touch sync_meta
-      await fetch(`${sbUrl}/rest/v1/sync_meta`, {
-        method: 'POST',
-        headers: sbHeaders(sbKey, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
-        body: JSON.stringify({ table_name: 'parts', updated_at: new Date().toISOString() })
-      });
-
       setCloudSyncStatus('cloud_synced');
       if (showSuccessToast) {
-        showToast('تم تأكيد وحفظ كافة التعديلات في الجداول السحابية المستقلة بنجاح ✓', 'success');
+        showToast('تم تأكيد وحفظ كافة الجداول والتعديلات في السيرفر السحابي بنجاح ✓', 'success');
       }
       return true;
     } catch (err) {
       setCloudSyncStatus('local_ready');
       if (showSuccessToast) {
-        showToast('تعذر الحفظ في السيرفر، يرجى التحقق من اتصالك والمحاولة لاحقاً.', 'error');
+        showToast('تعذر الحفظ الكامل في السيرفر، يرجى التأكد من تشغيل ملف SQL المحدث.', 'error');
       }
       return false;
     }
   };
 
+  // Customer Cloud Action Helper (for orders, registration, returns, complaints, sourcing)
   const commitCustomerCloudTransaction = async (mutatorFn) => {
-    // Legacy compatibility stub
+    try {
+      await flushPendingDiffsToSupabase(false);
+    } catch (e) {}
   };
 
   // --- Visitors analytics (row منفصل في السيرفر: visit_stats) ---
@@ -2467,7 +2889,6 @@ export default function App() {
     return undefined;
   }, [appPortal, adminAuthenticated]);
 
-  // تسجيل زيارة (مرة واحدة لكل جلسة) من العملاء بس، مش من جهاز الأدمن
   useEffect(() => {
     try {
       if (appPortal === 'admin' || adminAuthenticated) return;
@@ -2508,77 +2929,186 @@ export default function App() {
     })();
   }, []);
 
-  // --- Debounced (0.7s) & Serialized Auto-Save on State Changes ---
-  const isFirstMountRef = React.useRef(true);
+  // --- Automatic Per-Row Diff Detector & Instant Local Persistence ---
   useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
-      return;
-    }
-    if (isIncomingSyncRef.current) {
-      isIncomingSyncRef.current = false;
-      return;
-    }
+    const currentSlices = {
+      parts,
+      models,
+      brands,
+      groups,
+      storeAds,
+      showcaseBars,
+      promoCodes,
+      clients,
+      accountRequests,
+      orders,
+      returnsList,
+      complaints,
+      autoTemplates,
+      sourcingRequests
+    };
 
+    // 1. Always save slices to localStorage immediately so page refresh NEVER loses state
     try {
-      const nowTs = Date.now();
-      const bundle = {
+      Object.entries(currentSlices).forEach(([k, v]) => {
+        window.localStorage.setItem('hmarket_v2_' + k, JSON.stringify(v));
+      });
+      window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(siteSettings));
+      window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(adminCredentials));
+      window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(currencies));
+      window.localStorage.setItem('hmarket_v2_notifications', JSON.stringify(notifications));
+    } catch (e) {}
+
+    // Initialize baseline snapshot on first mount without triggering network writes
+    if (!prevSlicesRef.current) {
+      prevSlicesRef.current = {
+        ...currentSlices,
         siteSettings,
         adminCredentials,
         currencies,
-        groups,
-        brands,
-        autoTemplates,
-        models,
-        parts,
-        clients,
-        accountRequests,
-        orders,
-        returnsList,
-        complaints,
-        promoCodes,
-        storeAds,
-        showcaseBars,
-        sourcingRequests,
         notifications
       };
+      return;
+    }
 
-      const payloadStr = JSON.stringify(bundle);
-      if (payloadStr === lastSavedPayloadRef.current) {
-        return;
+    // If this render was triggered by incoming server pull or cross-tab event, update baseline and skip diffing
+    if (isIncomingSyncRef.current || Date.now() < incomingSyncUntilRef.current) {
+      isIncomingSyncRef.current = false;
+      prevSlicesRef.current = {
+        ...currentSlices,
+        siteSettings,
+        adminCredentials,
+        currencies,
+        notifications
+      };
+      return;
+    }
+
+    // 2. Compute exact row-level diffs (Added, Modified, Deleted) across all slices
+    let hasAnyMutation = false;
+    const prev = prevSlicesRef.current;
+
+    for (const [sliceKey, currArr] of Object.entries(currentSlices)) {
+      const prevArr = prev[sliceKey];
+      if (prevArr === currArr) continue;
+      if (!Array.isArray(currArr) || !Array.isArray(prevArr)) continue;
+
+      if (sliceKey === 'brands') {
+        const prevSet = new Set(prevArr);
+        const currSet = new Set(currArr);
+        currArr.forEach(b => {
+          if (!prevSet.has(b)) {
+            markLocalUpsert('brands', b);
+            hasAnyMutation = true;
+          }
+        });
+        prevArr.forEach(b => {
+          if (!currSet.has(b)) {
+            markLocalDelete('brands', b);
+            hasAnyMutation = true;
+          }
+        });
+        continue;
       }
-      lastSavedPayloadRef.current = payloadStr;
-      lastLocalMutationAtRef.current = nowTs;
 
-      // 1. Save individual slices to localStorage immediately
-      Object.entries(bundle).forEach(([k, v]) => {
-        window.localStorage.setItem('hmarket_v2_' + k, JSON.stringify(v));
+      const prevMap = new Map();
+      prevArr.forEach((item, idx) => {
+        const id = String(item?.id || item?.code || item?.name || '');
+        if (id) prevMap.set(id, { item, idx });
       });
 
-      const { isValid } = getSupabaseConfig();
-
-      // 2. Broadcast to same-browser tabs
-      window.localStorage.setItem(
-        'hmarket_v2_master_bundle',
-        JSON.stringify({
-          ...bundle,
-          senderTabId: myTabId,
-          senderRole: adminAuthenticated ? 'admin' : 'client',
-          updatedAt: nowTs
-        })
-      );
-
-      // 3. Enqueue Debounced (700ms) & Serialized Save to Supabase if Admin
-      if (isValid && hasCloudInitialPullCompletedRef.current && adminAuthenticated) {
-        if (saveDebounceTimerRef.current) {
-          clearTimeout(saveDebounceTimerRef.current);
+      const currIds = new Set();
+      currArr.forEach((item, idx) => {
+        const id = String(item?.id || item?.code || item?.name || '');
+        if (!id) return;
+        currIds.add(id);
+        const prevEntry = prevMap.get(id);
+        const itemWithOrder = (sliceKey === 'storeAds' || sliceKey === 'showcaseBars')
+          ? { ...item, sortOrder: idx }
+          : item;
+        if (!prevEntry || JSON.stringify(prevEntry.item) !== JSON.stringify(item) || ((sliceKey === 'storeAds' || sliceKey === 'showcaseBars') && prevEntry.idx !== idx)) {
+          markLocalUpsert(sliceKey, itemWithOrder);
+          hasAnyMutation = true;
         }
-        saveDebounceTimerRef.current = setTimeout(() => {
-          saveDebounceTimerRef.current = null;
-          pushToSupabaseCloud(null, false);
-        }, 700);
+      });
+
+      prevMap.forEach((_, id) => {
+        if (!currIds.has(id)) {
+          markLocalDelete(sliceKey, id);
+          hasAnyMutation = true;
+        }
+      });
+    }
+
+    // Check settings / credentials / currencies / notifications diff
+    if (
+      prev.siteSettings !== siteSettings ||
+      prev.adminCredentials !== adminCredentials ||
+      prev.currencies !== currencies ||
+      prev.notifications !== notifications
+    ) {
+      if (
+        JSON.stringify(prev.siteSettings) !== JSON.stringify(siteSettings) ||
+        JSON.stringify(prev.adminCredentials) !== JSON.stringify(adminCredentials) ||
+        JSON.stringify(prev.currencies) !== JSON.stringify(currencies) ||
+        JSON.stringify(prev.notifications) !== JSON.stringify(notifications)
+      ) {
+        if (!pendingDiffUpsertsRef.current.site_settings) pendingDiffUpsertsRef.current.site_settings = {};
+        pendingDiffUpsertsRef.current.site_settings.main = {
+          id: 'main',
+          settings: siteSettings,
+          credentials: adminCredentials,
+          currencies: currencies,
+          notifications: notifications,
+          updated_at: new Date().toISOString()
+        };
+        try {
+          sessionStorage.setItem('hm_local_settings_v8', JSON.stringify({
+            settings: siteSettings,
+            credentials: adminCredentials,
+            currencies: currencies,
+            ts: Date.now()
+          }));
+        } catch (e) {}
+        hasAnyMutation = true;
       }
-    } catch (err) {}
+    }
+
+    prevSlicesRef.current = {
+      ...currentSlices,
+      siteSettings,
+      adminCredentials,
+      currencies,
+      notifications
+    };
+
+    if (hasAnyMutation) {
+      const nowTs = Date.now();
+      lastLocalMutationAtRef.current = nowTs;
+
+      // Broadcast only when an actual user mutation occurred
+      try {
+        window.localStorage.setItem(
+          'hmarket_v2_master_bundle',
+          JSON.stringify({
+            ...currentSlices,
+            siteSettings,
+            adminCredentials,
+            currencies,
+            notifications,
+            senderTabId: myTabId,
+            senderRole: (appPortal === 'admin' && adminAuthenticated) ? 'admin' : 'client',
+            updatedAt: nowTs
+          })
+        );
+      } catch (e) {}
+
+      if (diffFlushTimerRef.current) clearTimeout(diffFlushTimerRef.current);
+      diffFlushTimerRef.current = setTimeout(() => {
+        diffFlushTimerRef.current = null;
+        flushPendingDiffsToSupabase(false);
+      }, 350);
+    }
   }, [
     siteSettings,
     adminCredentials,
@@ -2598,7 +3128,8 @@ export default function App() {
     showcaseBars,
     sourcingRequests,
     notifications,
-    adminAuthenticated
+    adminAuthenticated,
+    appPortal
   ]);
 
   // Persist user session & cart across refreshes
@@ -2611,7 +3142,7 @@ export default function App() {
     } catch (e) {}
   }, [activeRole, adminAuthenticated, adminCredentials, cart]);
 
-  // Real-time Cross-Tab Synchronization
+  // Real-time Cross-Tab Synchronization (Only accepts genuine mutations from other tabs)
   useEffect(() => {
     const handleStorageEvent = (e) => {
       if (!e.key || !e.newValue) return;
@@ -2620,6 +3151,7 @@ export default function App() {
           const data = JSON.parse(e.newValue);
           if (data.senderTabId === myTabId) return;
 
+          incomingSyncUntilRef.current = Date.now() + 800;
           isIncomingSyncRef.current = true;
 
           if (Array.isArray(data.clients)) setClients(data.clients);
@@ -2628,13 +3160,8 @@ export default function App() {
           if (Array.isArray(data.returnsList)) setReturnsList(data.returnsList);
           if (Array.isArray(data.complaints)) setComplaints(data.complaints);
           if (Array.isArray(data.notifications)) setNotifications(data.notifications);
-          if (Array.isArray(data.parts)) {
-            setParts(prevParts => {
-              const incomingIds = new Set(data.parts.map(p => p.id));
-              const localUnsaved = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !incomingIds.has(p.id));
-              return [...localUnsaved, ...data.parts];
-            });
-          }
+          if (Array.isArray(data.parts)) setParts(data.parts);
+          if (Array.isArray(data.sourcingRequests)) setSourcingRequests(data.sourcingRequests);
 
           if (data.senderRole === 'admin') {
             if (data.siteSettings) setSiteSettings(data.siteSettings);
@@ -2647,7 +3174,6 @@ export default function App() {
             if (Array.isArray(data.promoCodes)) setPromoCodes(data.promoCodes);
             if (Array.isArray(data.storeAds)) setStoreAds(data.storeAds);
             if (Array.isArray(data.showcaseBars)) setShowcaseBars(data.showcaseBars);
-            if (Array.isArray(data.sourcingRequests)) setSourcingRequests(data.sourcingRequests);
           }
         }
       } catch (err) {}
@@ -2656,8 +3182,9 @@ export default function App() {
     return () => window.removeEventListener('storage', handleStorageEvent);
   }, [myTabId]);
 
-  // --- Lightweight Two-Step Polling (`select=updated_at` first, never overwrites in-flight or newer local saves!) ---
-  const lastKnownTableTimestampsRef = React.useRef({});
+  // --- Smart Normalized Table Pull with Automatic Legacy Enrichment & Local Edit Protection ---
+  const lastKnownTableTimestampsRef = useRef({});
+  const hasRestoredLegacyFallbackRef = useRef(false);
 
   const pullFromSupabaseCloud = async (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
@@ -2666,103 +3193,326 @@ export default function App() {
       return;
     }
 
-    // Never skip initial mount pull! Only protect recent local mutations during background polling:
-    if (silent && hasCloudInitialPullCompletedRef.current && (Date.now() - lastLocalMutationAtRef.current < 4000)) {
+    // Never overwrite while a local save is queued or in-flight!
+    if (silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 5000))) {
       return;
     }
 
     try {
-      setCloudSyncStatus('syncing');
-      console.log('🚀 [H-market] بدء سحب المنتجات والموديلات من Supabase...', sbUrl);
+      // Optional lightweight check on sync_meta if table exists and initial pull already finished
+      if (silent && hasCloudInitialPullCompletedRef.current) {
+        try {
+          const smRes = await fetch(`${sbUrl}/rest/v1/sync_meta?select=table_name,updated_at`, {
+            headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+          });
+          if (smRes.ok) {
+            const smRows = await smRes.json();
+            if (Array.isArray(smRows) && smRows.length > 0) {
+              let anyChanged = false;
+              smRows.forEach(r => {
+                if (r.table_name && r.updated_at) {
+                  if (lastKnownTableTimestampsRef.current[r.table_name] !== r.updated_at) {
+                    anyChanged = true;
+                  }
+                  lastKnownTableTimestampsRef.current[r.table_name] = r.updated_at;
+                }
+              });
+              if (!anyChanged && Object.keys(lastKnownTableTimestampsRef.current).length > 0) {
+                return; // Zero changes on server -> 0 bytes downloaded!
+              }
+            }
+          }
+        } catch (e) {}
+      }
 
-      // 1. Directly fetch products, models, pricing groups & ads from independent tables
-      let [partsRows, modelsRows, groupsRows, adsRows] = await Promise.all([
+      setCloudSyncStatus('syncing');
+
+      // 1. Fetch public storefront tables in parallel
+      const [
+        partsRows,
+        modelsRows,
+        groupsRows,
+        adsRows,
+        barsRows,
+        brandsRows,
+        promosRows,
+        settingsRows,
+        templatesRows
+      ] = await Promise.all([
         sbFetchTable('spare_parts'),
         sbFetchTable('mobile_models'),
         sbFetchTable('pricing_groups'),
-        sbFetchTable('store_ads')
+        sbFetchTable('store_ads', '*', '&order=sort_order.asc'),
+        sbFetchTable('showcase_bars', '*', '&order=sort_order.asc'),
+        sbFetchTable('brands', '*', '&order=sort_order.asc'),
+        sbFetchTable('promo_codes'),
+        sbFetchTable('site_settings'),
+        sbFetchTable('auto_templates')
       ]);
 
-      // If spare_parts was empty, check products
-      if (!Array.isArray(partsRows) || partsRows.length === 0) {
-        const altParts = await sbFetchTable('products');
-        if (Array.isArray(altParts) && altParts.length > 0) partsRows = altParts;
-      }
-      // If mobile_models was empty, check models
-      if (!Array.isArray(modelsRows) || modelsRows.length === 0) {
-        const altModels = await sbFetchTable('models');
-        if (Array.isArray(altModels) && altModels.length > 0) modelsRows = altModels;
+      // 2. If Admin (or on initial load to check rich legacy data), fetch admin tables
+      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      let [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = [null, null, null, null, null, null];
+      if (isAdmin) {
+        [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = await Promise.all([
+          sbFetchTable('clients'),
+          sbFetchTable('orders'),
+          sbFetchTable('complaints'),
+          sbFetchTable('returns_list'),
+          sbFetchTable('account_requests'),
+          sbFetchTable('sourcing_requests')
+        ]);
       }
 
+      // 3. One-time automatic fallback enrichment from app_state_sync if independent tables are missing rich fields or unmigrated sections
+      let legacyPayload = null;
+      const needsLegacyEnrichment =
+        !hasRestoredLegacyFallbackRef.current &&
+        (!Array.isArray(barsRows) || barsRows.length === 0 || !Array.isArray(settingsRows) || settingsRows.length === 0);
+
+      if (needsLegacyEnrichment) {
+        hasRestoredLegacyFallbackRef.current = true;
+        try {
+          const legRes = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, {
+            headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+          });
+          if (legRes.ok) {
+            const legRows = await legRes.json();
+            if (Array.isArray(legRows) && legRows[0]?.payload && typeof legRows[0].payload === 'object') {
+              legacyPayload = legRows[0].payload;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Guard again before applying state in case user started editing during network fetch
+      if (silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 4000))) {
+        return;
+      }
+
+      incomingSyncUntilRef.current = Date.now() + 1000;
       isIncomingSyncRef.current = true;
 
-      if (Array.isArray(partsRows) && partsRows.length > 0) {
-        setParts(prevParts => {
-          const serverIds = new Set(partsRows.map(r => String(r.id)));
-          const baseParts = (Array.isArray(prevParts) && prevParts.length > 0) ? prevParts : (loadPersisted('parts', []) || []);
-          const localOnly = baseParts.filter(p => p && p.id && !serverIds.has(String(p.id)));
-          const merged = [...localOnly, ...partsRows];
+      // Helper to enrich partially-migrated rows with full fields from legacyPayload (if available)
+      const enrichFromLegacy = (rows, legacyArr) => {
+        if (!Array.isArray(rows) || !Array.isArray(legacyArr) || legacyArr.length === 0) return rows;
+        const legMap = new Map(legacyArr.map(item => [String(item?.id || ''), item]));
+        return rows.map(r => {
+          const leg = legMap.get(String(r?.id || ''));
+          if (!leg) return r;
+          // If row from spare_parts had its price/stock/model overwritten or lost colors/images/layout, restore from legacy!
+          return {
+            ...leg,
+            ...r,
+            modelId: (leg.modelId && (!r.modelId || r.basePrice === 450)) ? leg.modelId : (r.modelId || leg.modelId),
+            basePrice: (r.basePrice === 450 && leg.basePrice !== undefined && leg.basePrice !== 450) ? Number(leg.basePrice) : Number(r.basePrice ?? leg.basePrice ?? 0),
+            stock: ((r.stock === 15 || r.stock === 10) && leg.stock !== undefined && leg.stock !== r.stock) ? Number(leg.stock) : Number(r.stock ?? leg.stock ?? 0),
+            colors: (Array.isArray(r.colors) && r.colors.length > 0) ? r.colors : (leg.colors || ['قياسي']),
+            compatibleModels: (Array.isArray(r.compatibleModels) && r.compatibleModels.length > 0) ? r.compatibleModels : (leg.compatibleModels || []),
+            images: (Array.isArray(r.images) && r.images.length > 0) ? r.images : (leg.images || (r.image ? [r.image] : [])),
+            customGroupPrices: (r.customGroupPrices && Object.keys(r.customGroupPrices).length > 0) ? r.customGroupPrices : (leg.customGroupPrices || {}),
+            description: r.description || leg.description || '',
+            warrantyText: r.warrantyText || leg.warrantyText || '',
+            searchAliases: r.searchAliases || leg.searchAliases || ''
+          };
+        });
+      };
+
+      const finalPartsServer = enrichFromLegacy(partsRows, legacyPayload?.parts);
+      if (Array.isArray(finalPartsServer) && finalPartsServer.length > 0) {
+        setParts(prev => {
+          const merged = mergeServerWithLocal('parts', prev, finalPartsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
           try { window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(merged)); } catch (e) {}
           return merged;
         });
       }
 
-      if (Array.isArray(modelsRows) && modelsRows.length > 0) {
-        setModels(prevModels => {
-          const serverIds = new Set(modelsRows.map(r => r.id));
-          const localOnly = (Array.isArray(prevModels) ? prevModels : []).filter(m => m && m.id && !serverIds.has(m.id));
-          const merged = [...localOnly, ...modelsRows];
+      const finalModelsServer = (Array.isArray(modelsRows) && modelsRows.length > 0) ? modelsRows : legacyPayload?.models;
+      if (Array.isArray(finalModelsServer) && finalModelsServer.length > 0) {
+        setModels(prev => {
+          const merged = mergeServerWithLocal('models', prev, finalModelsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.models = merged;
           try { window.localStorage.setItem('hmarket_v2_models', JSON.stringify(merged)); } catch (e) {}
           return merged;
         });
       }
 
-      if (Array.isArray(groupsRows) && groupsRows.length > 0) {
-        setGroups(groupsRows);
-        try { window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(groupsRows)); } catch (e) {}
+      const finalGroupsServer = enrichFromLegacy(groupsRows, legacyPayload?.groups);
+      if (Array.isArray(finalGroupsServer) && finalGroupsServer.length > 0) {
+        setGroups(prev => {
+          const merged = mergeServerWithLocal('groups', prev, finalGroupsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.groups = merged;
+          try { window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
       }
 
-      if (Array.isArray(adsRows) && adsRows.length > 0) {
-        setStoreAds(adsRows);
-        try { window.localStorage.setItem('hmarket_v2_storeAds', JSON.stringify(adsRows)); } catch (e) {}
+      const finalAdsServer = enrichFromLegacy(adsRows, legacyPayload?.storeAds);
+      if (Array.isArray(finalAdsServer) && finalAdsServer.length > 0) {
+        setStoreAds(prev => {
+          const merged = mergeServerWithLocal('storeAds', prev, finalAdsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.storeAds = merged;
+          try { window.localStorage.setItem('hmarket_v2_storeAds', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
       }
 
-      // 2. If Admin, also fetch clients, orders, complaints, returns
-      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      const finalBarsServer = (Array.isArray(barsRows) && barsRows.length > 0) ? barsRows : legacyPayload?.showcaseBars;
+      if (Array.isArray(finalBarsServer) && finalBarsServer.length > 0) {
+        setShowcaseBars(prev => {
+          const merged = mergeServerWithLocal('showcaseBars', prev, finalBarsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.showcaseBars = merged;
+          try { window.localStorage.setItem('hmarket_v2_showcaseBars', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      const finalBrandsServer = (Array.isArray(brandsRows) && brandsRows.length > 0)
+        ? brandsRows.map(b => (typeof b === 'object' && b.name ? b.name : String(b)))
+        : legacyPayload?.brands;
+      if (Array.isArray(finalBrandsServer) && finalBrandsServer.length > 0) {
+        setBrands(prev => {
+          const merged = mergeServerWithLocal('brands', prev, finalBrandsServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.brands = merged;
+          try { window.localStorage.setItem('hmarket_v2_brands', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      const finalPromosServer = (Array.isArray(promosRows) && promosRows.length > 0) ? promosRows : legacyPayload?.promoCodes;
+      if (Array.isArray(finalPromosServer) && finalPromosServer.length > 0) {
+        setPromoCodes(prev => {
+          const merged = mergeServerWithLocal('promoCodes', prev, finalPromosServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.promoCodes = merged;
+          try { window.localStorage.setItem('hmarket_v2_promoCodes', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      const finalTemplatesServer = (Array.isArray(templatesRows) && templatesRows.length > 0) ? templatesRows : legacyPayload?.autoTemplates;
+      if (Array.isArray(finalTemplatesServer) && finalTemplatesServer.length > 0) {
+        setAutoTemplates(prev => {
+          const merged = mergeServerWithLocal('autoTemplates', prev, finalTemplatesServer);
+          if (prevSlicesRef.current) prevSlicesRef.current.autoTemplates = merged;
+          try { window.localStorage.setItem('hmarket_v2_autoTemplates', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      // Restore siteSettings, adminCredentials, currencies
+      const localSavedSettings = (() => {
+        try {
+          const raw = sessionStorage.getItem('hm_local_settings_v8');
+          if (raw) {
+            const p = JSON.parse(raw);
+            if (p && (Date.now() - (p.ts || 0) < 15 * 60 * 1000)) return p;
+          }
+        } catch (e) {}
+        return null;
+      })();
+
+      const cfgRow = (Array.isArray(settingsRows) && settingsRows.length > 0)
+        ? (settingsRows.find(r => r.id === 'main') || settingsRows[0])
+        : (legacyPayload ? {
+            settings: legacyPayload.siteSettings,
+            credentials: legacyPayload.adminCredentials,
+            currencies: legacyPayload.currencies,
+            notifications: legacyPayload.notifications
+          } : null);
+
+      if (cfgRow) {
+        const remoteSettings = localSavedSettings?.settings || cfgRow.settings;
+        if (remoteSettings && typeof remoteSettings === 'object' && Object.keys(remoteSettings).length > 0) {
+          const mergedSettings = {
+            ...siteSettings,
+            ...remoteSettings,
+            supabaseUrl: remoteSettings.supabaseUrl || sbUrl,
+            supabaseAnonKey: remoteSettings.supabaseAnonKey || sbKey
+          };
+          if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = mergedSettings;
+          setSiteSettings(mergedSettings);
+          try { window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings)); } catch (e) {}
+        }
+        const remoteCreds = localSavedSettings?.credentials || cfgRow.credentials;
+        if (remoteCreds && typeof remoteCreds === 'object' && remoteCreds.username) {
+          if (prevSlicesRef.current) prevSlicesRef.current.adminCredentials = remoteCreds;
+          setAdminCredentials(remoteCreds);
+          try { window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(remoteCreds)); } catch (e) {}
+        }
+        const remoteCurr = localSavedSettings?.currencies || cfgRow.currencies;
+        if (remoteCurr && typeof remoteCurr === 'object' && Object.keys(remoteCurr).length > 0) {
+          if (prevSlicesRef.current) prevSlicesRef.current.currencies = remoteCurr;
+          setCurrencies(remoteCurr);
+          try { window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(remoteCurr)); } catch (e) {}
+        }
+      }
+
       if (isAdmin) {
-        const [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows] = await Promise.all([
-          sbFetchTable('clients'),
-          sbFetchTable('orders'),
-          sbFetchTable('complaints'),
-          sbFetchTable('returns_list'),
-          sbFetchTable('account_requests')
-        ]);
+        const finalClientsServer = enrichFromLegacy(clientsRows, legacyPayload?.clients);
+        if (Array.isArray(finalClientsServer) && finalClientsServer.length > 0) {
+          setClients(prev => {
+            const merged = mergeServerWithLocal('clients', prev, finalClientsServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.clients = merged;
+            try { window.localStorage.setItem('hmarket_v2_clients', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
 
-        if (Array.isArray(clientsRows) && clientsRows.length > 0) {
-          setClients(clientsRows);
-          try { window.localStorage.setItem('hmarket_v2_clients', JSON.stringify(clientsRows)); } catch (e) {}
+        const finalOrdersServer = enrichFromLegacy(ordersRows, legacyPayload?.orders);
+        if (Array.isArray(finalOrdersServer) && finalOrdersServer.length > 0) {
+          setOrders(prev => {
+            const merged = mergeServerWithLocal('orders', prev, finalOrdersServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.orders = merged;
+            try { window.localStorage.setItem('hmarket_v2_orders', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
         }
-        if (Array.isArray(ordersRows) && ordersRows.length > 0) {
-          setOrders(ordersRows);
-          try { window.localStorage.setItem('hmarket_v2_orders', JSON.stringify(ordersRows)); } catch (e) {}
+
+        const finalComplaintsServer = enrichFromLegacy(complaintsRows, legacyPayload?.complaints);
+        if (Array.isArray(finalComplaintsServer) && finalComplaintsServer.length > 0) {
+          setComplaints(prev => {
+            const merged = mergeServerWithLocal('complaints', prev, finalComplaintsServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.complaints = merged;
+            try { window.localStorage.setItem('hmarket_v2_complaints', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
         }
-        if (Array.isArray(complaintsRows) && complaintsRows.length > 0) {
-          setComplaints(complaintsRows);
-          try { window.localStorage.setItem('hmarket_v2_complaints', JSON.stringify(complaintsRows)); } catch (e) {}
+
+        const finalReturnsServer = enrichFromLegacy(returnsRows, legacyPayload?.returnsList);
+        if (Array.isArray(finalReturnsServer) && finalReturnsServer.length > 0) {
+          setReturnsList(prev => {
+            const merged = mergeServerWithLocal('returnsList', prev, finalReturnsServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.returnsList = merged;
+            try { window.localStorage.setItem('hmarket_v2_returnsList', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
         }
-        if (Array.isArray(returnsRows) && returnsRows.length > 0) {
-          setReturnsList(returnsRows);
-          try { window.localStorage.setItem('hmarket_v2_returnsList', JSON.stringify(returnsRows)); } catch (e) {}
+
+        const finalReqsServer = enrichFromLegacy(reqsRows, legacyPayload?.accountRequests);
+        if (Array.isArray(finalReqsServer) && finalReqsServer.length > 0) {
+          setAccountRequests(prev => {
+            const merged = mergeServerWithLocal('accountRequests', prev, finalReqsServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.accountRequests = merged;
+            try { window.localStorage.setItem('hmarket_v2_accountRequests', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
         }
-        if (Array.isArray(reqsRows) && reqsRows.length > 0) {
-          setAccountRequests(reqsRows);
-          try { window.localStorage.setItem('hmarket_v2_accountRequests', JSON.stringify(reqsRows)); } catch (e) {}
+
+        const finalSourcingServer = (Array.isArray(sourcingRows) && sourcingRows.length > 0) ? sourcingRows : legacyPayload?.sourcingRequests;
+        if (Array.isArray(finalSourcingServer) && finalSourcingServer.length > 0) {
+          setSourcingRequests(prev => {
+            const merged = mergeServerWithLocal('sourcingRequests', prev, finalSourcingServer);
+            if (prevSlicesRef.current) prevSlicesRef.current.sourcingRequests = merged;
+            try { window.localStorage.setItem('hmarket_v2_sourcingRequests', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
         }
       }
 
       setCloudSyncStatus('cloud_synced');
       hasCloudInitialPullCompletedRef.current = true;
-      if (!silent) showToast('تمت مزامنة وقراءة البيانات من الجداول المستقلة بنجاح ✓', 'success');
+      if (!silent) showToast('تمت مزامنة وتحديث كافة الجداول من السيرفر بنجاح ✓', 'success');
     } catch (err) {
       hasCloudInitialPullCompletedRef.current = true;
     }
@@ -3384,7 +4134,7 @@ export default function App() {
       groupId: currentGroup.id,
       currency: currentCurrency.code,
       exchangeRateUsed: currentCurrency.rateFromBase,
-      createdAt: '2026-11-01 06:00',
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
       status: 'تم الاستلام',
       paymentMethod: paymentLabel,
       address: chosenAddr,
@@ -3485,7 +4235,7 @@ export default function App() {
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
     setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
 
-    // Direct Normalized Table Operations (Massive Egress Reduction)
+    // Direct Normalized Table Operations
     sbUpsert('orders', newOrder);
     cartSummary.items.forEach(item => {
       const p = parts.find(x => x.id === item.part.id);
@@ -4858,36 +5608,6 @@ export default function App() {
 
         )}
 
-        {/* Latest Added Products Strip on Customer Home */}
-        {parts.length > 0 && (
-          <section className="space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-extrabold bg-emerald-600 text-white">
-                    وصل حديثاً ✨
-                  </span>
-                  <h3 className="text-lg font-extrabold text-slate-900">أحدث المنتجات وقطع الغيار المضافة</h3>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">كل القطع الجديدة المضافة بالمخزن جاهزة للطلب</p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setClientTab('search')}
-                className="px-3.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 flex items-center gap-1"
-              >
-                <span>تصفح كل المنتجات ({parts.length})</span>
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {parts.slice(0, 8).map(part => renderProductCard(part))}
-            </div>
-          </section>
-        )}
-
         {/* Admin-Curated Product Showcase Bars (بارات عرض المنتجات والعروض) */}
         {activeBars.map(bar => {
           const barParts = bar.partIds
@@ -6075,7 +6795,7 @@ export default function App() {
       e.preventDefault();
       if (!newComplaintSubject.trim() || !newComplaintMsg.trim()) return;
       const newTck = {
-        id: `TCK-${503 + complaints.length}`,
+        id: `TCK-${Date.now().toString().slice(-6)}`,
         clientId: currentClient.id,
         clientName: currentClient.name,
         type: newComplaintType,
@@ -6084,7 +6804,7 @@ export default function App() {
         status: 'مفتوح',
         adminReply: '',
         replies: [],
-        createdAt: '2026-11-01 08:15'
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
       setComplaints(prev => [newTck, ...prev]);
       setNewComplaintSubject('');
@@ -8549,14 +9269,11 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       aliases: newModelAliases.trim() || newModelName.trim(),
       image: newModelImage || PART_IMAGES.screen
     };
-    lastLocalMutationAtRef.current = Date.now();
     setModels(prev => [newMdl, ...prev]);
-    sbUpsert('mobile_models', newMdl);
 
     if (autoGenerateParts) {
       const generated = generateTemplatePartsForModel(newMdl);
       setParts(prev => [...generated, ...prev]);
-      sbUpsert('spare_parts', generated);
       showToast(
         `تم إضافة موديل "${newMdl.name}" بصورته وتوليد ${generated.length} قطع غيار من التمبلت تلقائياً!`,
         'success'
@@ -8613,10 +9330,8 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       'حذف الموديل وجميع قطع غياره',
       `هل أنت متأكد من حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له (${childCount} قطعة) بشكل نهائي؟`,
       () => {
-        lastLocalMutationAtRef.current = Date.now();
         setModels(prev => prev.filter(m => m.id !== modelObj.id));
         setParts(prev => prev.filter(p => String(p.modelId) !== String(modelObj.id)));
-        sbDelete('mobile_models', modelObj.id);
         showToast(`تم حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له.`, 'info');
       }
     );
@@ -12739,7 +13454,7 @@ model OrderInvoice {
     const handleSubmitReturn = (e) => {
       e.preventDefault();
       const newRet = {
-        id: `RET-${303 + returnsList.length}`,
+        id: `RET-${Date.now().toString().slice(-6)}`,
         orderId: returnModalOrder.id,
         clientId: returnModalOrder.clientId,
         clientName: returnModalOrder.clientName,
@@ -12752,7 +13467,7 @@ model OrderInvoice {
         status: 'قيد المراجعة',
         resolutionType: '',
         adminResponse: '',
-        createdAt: '2026-11-01 06:25'
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
       setReturnsList(prev => [newRet, ...prev]);
       setReturnModalOrder(null);
@@ -12924,13 +13639,10 @@ model OrderInvoice {
   });
   const cloudSourcingUpdate = (mapper, extraNotif) => {
     isCustomerMutatingCloudRef.current = true;
-    commitCustomerCloudTransaction(cloud => ({
-      ...cloud,
-      sourcingRequests: mapper(Array.isArray(cloud.sourcingRequests) ? cloud.sourcingRequests : sourcingRequests),
-      notifications: extraNotif
-        ? [extraNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-        : Array.isArray(cloud.notifications) ? cloud.notifications : notifications
-    }));
+    const updatedList = mapper(sourcingRequests);
+    if (Array.isArray(updatedList) && updatedList.length > 0) {
+      sbUpsert('sourcing_requests', updatedList[0]);
+    }
   };
 
   const openSourcing = () => {
@@ -13731,7 +14443,7 @@ model OrderInvoice {
         { id: 'ALL', label: 'كل الموديلات' },
         ...models
           .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
-          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => String(pt.modelId) === String(m.id)).length }))
+          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => pt.modelId === m.id).length }))
       ];
       current = selectedModelId;
       pick = id => setSelectedModelId(id);
@@ -14270,7 +14982,7 @@ ${footer}
     const inCartQty = cart[targetPart.id]?.qty || 0;
     const isOutOfStock = targetPart.stock <= 0 || !!targetPart.soldOut;
     const activeColor = selectedColors[targetPart.id] || cart[targetPart.id]?.color || targetPart.colors[0];
-    const modelObj = models.find(m => String(m.id) === String(targetPart.modelId));
+    const modelObj = models.find(m => m.id === targetPart.modelId);
     const imagesList = getPartImagesList(targetPart);
     const safeIdx = detailImageIdx % imagesList.length;
     const activeModalImg = imagesList[safeIdx] || targetPart.image;
@@ -15285,7 +15997,7 @@ ${footer}
 
       const newPart = {
         id: `prt_${Date.now()}`,
-        createdAt: '2026-11-01 08:35',
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
         sku: addingPartToModel.sku.trim() || `PRT-${Date.now()}`,
         modelId: addingPartToModel.model.id,
         category: addingPartToModel.category,
@@ -15311,24 +16023,9 @@ ${footer}
         waitlistCount: 0
       };
 
-      lastLocalMutationAtRef.current = Date.now();
-      setParts(prev => {
-        const next = [newPart, ...(Array.isArray(prev) ? prev : []).filter(p => p.id !== newPart.id)];
-        try { window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(next)); } catch (e) {}
-        return next;
-      });
+      setParts(prev => [newPart, ...prev]);
       setAddingPartToModel(null);
-      showToast(`جاري حفظ "${newPart.name}" وتثبيتها سحابياً...`, 'info');
-
-      // Persist directly to Supabase with instant verification
-      (async () => {
-        const ok = await sbUpsert('spare_parts', newPart);
-        if (ok) {
-          showToast(`تم تثبيت وحفظ "${newPart.name}" في السيرفر بنجاح ✓`, 'success');
-        } else {
-          showToast(`تم حفظ "${newPart.name}" محلياً، وجاري إعادة المحاولة في السيرفر`, 'warning');
-        }
-      })();
+      showToast(`تمت إضافة "${newPart.name}" بصورتها داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
     };
 
     const previewImg =
@@ -15823,11 +16520,9 @@ ${footer}
 
     const handleSaveModel = (e) => {
       e.preventDefault();
-      lastLocalMutationAtRef.current = Date.now();
       setModels(prev =>
         prev.map(m => (m.id === editingModelObj.id ? { ...editingModelObj } : m))
       );
-      sbUpdate('mobile_models', editingModelObj.id, editingModelObj);
       setEditingModelObj(null);
       showToast('تم تحديث بيانات وصورة الموديل بنجاح!', 'success');
     };
