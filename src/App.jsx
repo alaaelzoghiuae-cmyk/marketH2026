@@ -2256,17 +2256,25 @@ export default function App() {
     if (!isValid) return null;
     const realTable = resolveActualTableName(tableName);
     try {
+      console.log(`📡 [H-market] جاري استعلام جدول: ${realTable}`);
       const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${select}${query}`, {
         headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
       });
+      console.log(`📡 [H-market] رد سيرفر جدول ${realTable}: كود ${res.status}`);
       if (res.ok) {
         const rows = await res.json();
         if (Array.isArray(rows)) {
+          console.log(`📦 [H-market] تم استلام (${rows.length}) سطر من جدول ${realTable}`);
           return rows.map(toCamelCaseRow);
         }
         return rows;
+      } else {
+        const errText = await res.text();
+        console.warn(`⚠️ [H-market] فشل قراءة ${realTable}: ${res.status}`, errText);
       }
-    } catch (err) {}
+    } catch (err) {
+      console.error(`❌ [H-market] تعذر الاتصال بجدول ${realTable}:`, err);
+    }
     return null;
   };
 
@@ -2495,7 +2503,12 @@ export default function App() {
   }, []);
 
   // --- Debounced (0.7s) & Serialized Auto-Save on State Changes ---
+  const isFirstMountRef = React.useRef(true);
   useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
     if (isIncomingSyncRef.current) {
       isIncomingSyncRef.current = false;
       return;
@@ -2641,20 +2654,32 @@ export default function App() {
       return;
     }
 
-    // Protect recent local edits from being overwritten
-    if (Date.now() - lastLocalMutationAtRef.current < 4000) {
+    // Never skip initial mount pull! Only protect recent local mutations during background polling:
+    if (silent && hasCloudInitialPullCompletedRef.current && (Date.now() - lastLocalMutationAtRef.current < 4000)) {
       return;
     }
 
     try {
       setCloudSyncStatus('syncing');
+      console.log('🚀 [H-market] بدء سحب المنتجات والموديلات من Supabase...', sbUrl);
 
-      // 1. Directly fetch products & models from independent tables
-      const [partsRows, modelsRows, groupsRows] = await Promise.all([
+      // 1. Directly fetch products & models from independent tables (with fallback to alternative table names)
+      let [partsRows, modelsRows, groupsRows] = await Promise.all([
         sbFetchTable('spare_parts'),
         sbFetchTable('mobile_models'),
         sbFetchTable('pricing_groups')
       ]);
+
+      // If spare_parts was empty, check products
+      if (!Array.isArray(partsRows) || partsRows.length === 0) {
+        const altParts = await sbFetchTable('products');
+        if (Array.isArray(altParts) && altParts.length > 0) partsRows = altParts;
+      }
+      // If mobile_models was empty, check models
+      if (!Array.isArray(modelsRows) || modelsRows.length === 0) {
+        const altModels = await sbFetchTable('models');
+        if (Array.isArray(altModels) && altModels.length > 0) modelsRows = altModels;
+      }
 
       isIncomingSyncRef.current = true;
 
