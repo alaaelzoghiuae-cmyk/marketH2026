@@ -3968,11 +3968,6 @@ export default function App() {
     setGridLimit(18);
   }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy]);
 
-  // Reset admin quick stock page to 1 when search/category/sort changes
-  useEffect(() => {
-    setQuickStockPage(1);
-  }, [quickStockSearch, quickStockCat, quickStockSort]);
-
   // Toggle Targeted Ad Star/Check on a Product or Model (Req 7)
   const handleToggleTargetedAdPart = (partObj, e) => {
     if (e) e.stopPropagation();
@@ -10809,6 +10804,11 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
   const [quickStockSearch, setQuickStockSearch] = useState('');
   const [quickStockCat, setQuickStockCat] = useState('ALL');
   const [quickStockSort, setQuickStockSort] = useState('stock_asc');
+
+  // Reset admin quick stock page to 1 when search/category/sort changes
+  useEffect(() => {
+    setQuickStockPage(1);
+  }, [quickStockSearch, quickStockCat, quickStockSort]);
 
   const renderAdminQuickStock = () => {
     const QUICK_STOCK_MAX_PER_PAGE = 100;
