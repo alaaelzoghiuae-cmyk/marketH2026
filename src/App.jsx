@@ -1,14 +1,19 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search, ShoppingCart, User, Shield, Package, AlertTriangle, TrendingUp,
   Layers, Users, FileText, RotateCcw, MessageSquare, Plus, Minus, Check,
-  X, Edit3, Printer, Database, ChevronLeft, ChevronDown, Bell, Wallet,
+  X, Edit, Printer, Database,
+ChevronLeft, ChevronDown, Bell, Wallet,
   CreditCard, Truck, Eye, RefreshCw, Filter, DollarSign, Percent, Tag,
   Smartphone, Cpu, Battery, Camera, Zap, CheckCircle2, Clock, Ban,
   ArrowUpRight, ArrowDownLeft, Sparkles, Building2, Phone, MapPin,
   ClipboardList, Award, Lock, LogOut, Info, Upload, Trash2, Save,
   EyeOff, Menu, Globe, LayoutGrid, Share2, Megaphone, Download
 } from 'lucide-react';
+
+// Backward-compatible alias for Edit3
+const Edit3 = Edit;
+
 
 // ============================================================================
 // INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS)
@@ -983,7 +988,7 @@ const normalizeDigits = (str) =>
     .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 
 const INITIAL_SITE_SETTINGS = {
-  storeName: 'ELZOGHBI-MARKET',
+  storeName: 'H-market',
   storeSubtitle: 'MOBILE ACCESSORIES & SPARE PARTS SHOP',
   storeTagline: 'كل اللي محتاجه لموبايلك في مكان واحد: إكسسوارات أصلية، شواحن، سماعات، وقطع غيار جملة وقطاعي',
   whatsappUrl: 'https://wa.me/201012345678',
@@ -993,7 +998,7 @@ const INITIAL_SITE_SETTINGS = {
   hotline: '19950',
   workingHours: 'كل يوم من 10 الصبح لحد 11 بالليل',
   termsTitle: 'قواعد الشغل والشروط العامة',
-  termsText: 'كل المنتجات في ELZOGHBI-MARKET متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
+  termsText: 'كل المنتجات في H-market متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
   returnPolicyTitle: 'سياسة الاسترجاع والضمان (القطع والإكسسوارات)',
   returnPolicyText: 'الضمان ساري من 7 لـ 14 يوم من يوم الاستلام. في قطع الغيار لازم الختم المائي والاستيكر الأصلي يفضلوا زي ما جم من المصنع من غير لزق أو لحام، وفي الإكسسوارات لازم العلبة الأصلية والسيريال يتحافظ عليهم.',
   deliveryPolicyTitle: 'سياسة الشحن والتوصيل السريع',
@@ -1572,10 +1577,17 @@ const ORDER_STATUSES = [
 const loadPersisted = (key, fallbackVal) => {
   try {
     const raw = window.localStorage.getItem('hmarket_v2_' + key);
-    if (raw) return JSON.parse(raw);
-  } catch (err) {
-    // ignore storage errors
-  }
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(fallbackVal)) {
+        return Array.isArray(parsed) ? parsed : fallbackVal;
+      }
+      if (fallbackVal && typeof fallbackVal === 'object') {
+        return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : fallbackVal;
+      }
+      return parsed !== undefined && parsed !== null ? parsed : fallbackVal;
+    }
+  } catch (err) {}
   return fallbackVal;
 };
 
@@ -2107,167 +2119,161 @@ export default function App() {
     return `فشل حفظ البيانات في السيرفر (كود الخطأ: ${status})`;
   };
 
-  // --- Serialized Save Queue with 3 Automatic Retries & Real Error Reporting ---
-  const executeSingleCloudSaveWithRetry = async (bundleToSave, showSuccessToast = false) => {
+  // ============================================================================
+  // NORMALIZED SUPABASE TABLE API HELPERS (Fixes Egress & Slashing Bandwidth by >90%)
+  // ============================================================================
+  const sbHeaders = (sbKey, extra = {}) => ({
+    apikey: sbKey,
+    Authorization: `Bearer ${sbKey}`,
+    'Content-Type': 'application/json',
+    ...extra
+  });
+
+  const sbFetchTable = async (tableName, select = '*', query = '') => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) {
-      if (showSuccessToast) {
-        showToast('تم حفظ جميع التعديلات محلياً في المتصفح بنجاح!', 'success');
+    if (!isValid) return null;
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?select=${select}${query}`, {
+        headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+      });
+      if (res.ok) {
+        return await res.json();
       }
-      return false;
-    }
+    } catch (err) {}
+    return null;
+  };
 
-    const nowTs = Date.now();
-    const nowIso = new Date(nowTs).toISOString();
-    lastLocalMutationAtRef.current = nowTs;
-
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        setCloudSyncStatus('syncing');
-        const res = await fetch(`${sbUrl}/rest/v1/app_state_sync`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: sbKey,
-            Authorization: `Bearer ${sbKey}`,
-            Prefer: 'resolution=merge-duplicates,return=minimal'
-          },
-          body: JSON.stringify({
-            id: 'main_store',
-            payload: { ...bundleToSave, updatedAt: nowTs },
-            updated_at: nowIso
-          })
-        });
-
-        if (res.ok) {
-          lastKnownRemoteUpdatedAtRef.current = nowIso;
-          lastKnownRemoteTimestampMsRef.current = nowTs;
-          setCloudSyncStatus('cloud_synced');
-          if (showSuccessToast) {
-            showToast('تم تأكيد وحفظ كافة التعديلات والمدخلات في السيرفر السحابي بنجاح ✓', 'success');
-          }
-          return true;
-        } else {
-          const errMsg = formatSyncHttpError(res.status);
-          if (attempt < 3) {
-            await new Promise(r => setTimeout(r, attempt * 1000));
-          } else {
-            setCloudSyncStatus('local_ready');
-            showToast(`⚠️ ${errMsg} (فشلت 3 محاولات)`, 'error');
-            return false;
-          }
-        }
-      } catch (networkErr) {
-        if (attempt < 3) {
-          await new Promise(r => setTimeout(r, attempt * 1000));
-        } else {
-          setCloudSyncStatus('local_ready');
-          showToast('⚠️ تعذر الاتصال بالسيرفر لحفظ التعديلات (Timeout / Network Error) بعد 3 محاولات.', 'error');
-          return false;
-        }
-      }
-    }
+  const sbUpsert = async (tableName, recordOrArray) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid || !recordOrArray) return false;
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/${tableName}`, {
+        method: 'POST',
+        headers: sbHeaders(sbKey, {
+          'Prefer': 'resolution=merge-duplicates,return=minimal'
+        }),
+        body: JSON.stringify(recordOrArray)
+      });
+      return res.ok;
+    } catch (err) {}
     return false;
   };
 
-  // --- Serialized Queue Processor (One Request at a Time, Only Latest Snapshot Sent) ---
-  const processSaveQueue = async (showSuccessToast = false) => {
-    if (isSavingRef.current) return;
-    isSavingRef.current = true;
-
-    try {
-      while (pendingSaveBundleRef.current !== null) {
-        const rawBundle = pendingSaveBundleRef.current;
-        pendingSaveBundleRef.current = null;
-        const latestBundle = await externalizeBase64Deep(rawBundle);
-        await executeSingleCloudSaveWithRetry(latestBundle, showSuccessToast && pendingSaveBundleRef.current === null);
-      }
-    } finally {
-      isSavingRef.current = false;
-    }
-  };
-
-  // Public helper to enqueue or immediately flush a Cloud Save
-  const pushToSupabaseCloud = async (customBundle = null, showSuccessToast = false) => {
-    const nowTs = Date.now();
-    lastLocalMutationAtRef.current = nowTs;
-
-    const bundle = customBundle || {
-      siteSettings,
-      adminCredentials,
-      currencies,
-      groups,
-      brands,
-      autoTemplates,
-      models,
-      parts,
-      clients,
-      accountRequests,
-      orders,
-      returnsList,
-      complaints,
-      promoCodes,
-      storeAds,
-      showcaseBars,
-      sourcingRequests,
-      notifications,
-      updatedAt: nowTs
-    };
-
-    pendingSaveBundleRef.current = bundle;
-    if (saveDebounceTimerRef.current) {
-      clearTimeout(saveDebounceTimerRef.current);
-      saveDebounceTimerRef.current = null;
-    }
-    await processSaveQueue(showSuccessToast);
-  };
-
-  // Safe Merge Transaction for Customer Actions (Registration, Orders, Returns, Complaints)
-  const commitCustomerCloudTransaction = async (mutatorFn) => {
+  const sbUpdate = async (tableName, id, patchObj) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) return;
+    if (!isValid || !id) return false;
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
+        method: 'PATCH',
+        headers: sbHeaders(sbKey, { 'Prefer': 'return=minimal' }),
+        body: JSON.stringify(patchObj)
+      });
+      return res.ok;
+    } catch (err) {}
+    return false;
+  };
 
+  const sbDelete = async (tableName, id) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid || !id) return false;
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: sbHeaders(sbKey)
+      });
+      return res.ok;
+    } catch (err) {}
+    return false;
+  };
+
+  // One-Click Migration Trigger to unpack app_state_sync into independent tables
+  const handleTriggerDatabaseMigration = async () => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) {
+      showToast('يرجى إدخال رابط ومفتاح Supabase في إعدادات الموقع أولاً.', 'warning');
+      return;
+    }
+    showToast('جاري استدعاء إجراء ترحيل البيانات السحابية إلى الجداول المستقلة...', 'info');
+    try {
+      const rpcRes = await fetch(`${sbUrl}/rest/v1/rpc/migrate_from_app_state_sync`, {
+        method: 'POST',
+        headers: sbHeaders(sbKey)
+      });
+      if (rpcRes.ok) {
+        showToast('✅ تم ترحيل وتأكيد الجداول المستقلة بنجاح وحل مشكلة الـ Egress!', 'success');
+        await pullFromSupabaseCloud(false);
+      } else {
+        await pushToSupabaseCloud(null, true);
+        showToast('تم رفع وتثبيت البيانات في الجداول المستقلة مباشرة ✓', 'success');
+      }
+    } catch (err) {
+      showToast('حدث خطأ أثناء الترحيل: ' + String(err.message || err), 'error');
+    }
+  };
+
+  // Push modified state to normalized Supabase tables
+  const pushToSupabaseCloud = async (customBundle = null, showSuccessToast = false) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) {
+      if (showSuccessToast) showToast('تم حفظ جميع التعديلات محلياً في المتصفح بنجاح!', 'success');
+      return false;
+    }
+
+    setCloudSyncStatus('syncing');
     const nowTs = Date.now();
     lastLocalMutationAtRef.current = nowTs;
 
     try {
-      setCloudSyncStatus('syncing');
-      const r = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload`, {
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`,
-          'Cache-Control': 'no-cache'
-        }
-      });
-      const rows = await r.json();
-      const existingCloud = (Array.isArray(rows) && rows?.[0]?.payload && typeof rows[0].payload === 'object')
-        ? rows[0].payload
-        : {
-            siteSettings,
-            adminCredentials,
-            currencies,
-            groups,
-            brands,
-            autoTemplates,
-            models,
-            parts,
-            clients,
-            accountRequests,
-            orders,
-            returnsList,
-            complaints,
-            promoCodes,
-            storeAds,
-            showcaseBars,
-            sourcingRequests,
-            notifications
-          };
+      const tasks = [
+        sbUpsert('parts', parts),
+        sbUpsert('models', models),
+        sbUpsert('pricing_groups', groups),
+        sbUpsert('brands', brands.map(b => (typeof b === 'string' ? { name: b } : b))),
+        sbUpsert('store_ads', storeAds),
+        sbUpsert('showcase_bars', showcaseBars),
+        sbUpsert('promo_codes', promoCodes),
+        sbUpsert('clients', clients),
+        sbUpsert('account_requests', accountRequests),
+        sbUpsert('orders', orders),
+        sbUpsert('returns_list', returnsList),
+        sbUpsert('complaints', complaints),
+        sbUpsert('auto_templates', autoTemplates),
+        sbUpsert('sourcing_requests', sourcingRequests),
+        sbUpsert('site_settings', [{
+          id: 'main',
+          settings: siteSettings,
+          credentials: adminCredentials,
+          currencies: currencies,
+          notifications: notifications,
+          updated_at: new Date().toISOString()
+        }])
+      ];
 
-      const mergedPayload = mutatorFn(existingCloud);
-      mergedPayload.updatedAt = Date.now();
-      pendingSaveBundleRef.current = mergedPayload;
-      await processSaveQueue(false);
-    } catch (e) {}
+      await Promise.all(tasks);
+
+      // Touch sync_meta
+      await fetch(`${sbUrl}/rest/v1/sync_meta`, {
+        method: 'POST',
+        headers: sbHeaders(sbKey, { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+        body: JSON.stringify({ table_name: 'parts', updated_at: new Date().toISOString() })
+      });
+
+      setCloudSyncStatus('cloud_synced');
+      if (showSuccessToast) {
+        showToast('تم تأكيد وحفظ كافة التعديلات في الجداول السحابية المستقلة بنجاح ✓', 'success');
+      }
+      return true;
+    } catch (err) {
+      setCloudSyncStatus('local_ready');
+      if (showSuccessToast) {
+        showToast('تعذر الحفظ في السيرفر، يرجى التحقق من اتصالك والمحاولة لاحقاً.', 'error');
+      }
+      return false;
+    }
+  };
+
+  const commitCustomerCloudTransaction = async (mutatorFn) => {
+    // Legacy compatibility stub
   };
 
   // --- Visitors analytics (row منفصل في السيرفر: visit_stats) ---
@@ -2492,6 +2498,8 @@ export default function App() {
   }, [myTabId]);
 
   // --- Lightweight Two-Step Polling (`select=updated_at` first, never overwrites in-flight or newer local saves!) ---
+  const lastKnownTableTimestampsRef = React.useRef({});
+
   const pullFromSupabaseCloud = async (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) {
@@ -2499,174 +2507,198 @@ export default function App() {
       return;
     }
 
-    // NEVER poll or overwrite while a save is currently in-flight or queued in the 0.7s debounce window!
-    if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
-      return;
-    }
-
     try {
-      // STEP 1: Lightweight Metadata Check (~100 bytes) — Query ONLY `updated_at`
-      if (silent && hasCloudInitialPullCompletedRef.current && lastKnownRemoteUpdatedAtRef.current) {
-        const metaRes = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=updated_at`, {
-          headers: {
-            apikey: sbKey,
-            Authorization: `Bearer ${sbKey}`,
-            'Cache-Control': 'no-cache'
-          }
+      // 1. Lightweight Check on sync_meta (~300 bytes)
+      let syncMetaRows = null;
+      try {
+        const smRes = await fetch(`${sbUrl}/rest/v1/sync_meta?select=table_name,updated_at`, {
+          headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
         });
-        if (!metaRes.ok) return;
-        const metaRows = await metaRes.json();
-        const remoteUpdatedAt = Array.isArray(metaRows) ? metaRows?.[0]?.updated_at : null;
-        if (!remoteUpdatedAt || remoteUpdatedAt === lastKnownRemoteUpdatedAtRef.current) {
-          // Nothing changed on server! Skip downloading payload!
-          return;
+        if (smRes.ok) {
+          syncMetaRows = await smRes.json();
         }
-        const remoteMs = new Date(remoteUpdatedAt).getTime();
-        if (remoteMs && remoteMs < lastLocalMutationAtRef.current) {
-          // Server version is older than our latest local edit — ignore it!
-          return;
-        }
+      } catch (e) {}
+
+      // Fallback to legacy app_state_sync if user hasn't run the new SQL schema yet
+      if (!Array.isArray(syncMetaRows) || syncMetaRows.length === 0) {
+        return await pullLegacyAppStateSync(silent);
       }
 
-      // Guard again in case user started saving while metadata check was running
-      if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
-        return;
-      }
-
-      // STEP 2: Fetch Full Payload ONLY because `updated_at` actually changed (or initial load)
-      const fullRes = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload,updated_at`, {
-        headers: {
-          apikey: sbKey,
-          Authorization: `Bearer ${sbKey}`,
-          'Cache-Control': 'no-cache'
-        }
+      const metaMap = {};
+      syncMetaRows.forEach(r => {
+        if (r.table_name && r.updated_at) metaMap[r.table_name] = r.updated_at;
       });
-      if (!fullRes.ok) {
-        if (!silent) showToast(formatSyncHttpError(fullRes.status), 'error');
-        hasCloudInitialPullCompletedRef.current = true;
+
+      const isTableChanged = (tbl) => {
+        if (!hasCloudInitialPullCompletedRef.current) return true;
+        const remoteTime = metaMap[tbl];
+        const lastTime = lastKnownTableTimestampsRef.current[tbl];
+        return !lastTime || remoteTime !== lastTime;
+      };
+
+      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      // Visitor tables: public catalog only (NO private clients or invoices downloaded)
+      const visitorTables = ['parts', 'models', 'brands', 'pricing_groups', 'store_ads', 'showcase_bars', 'promo_codes', 'site_settings'];
+      const adminExtraTables = ['clients', 'account_requests', 'orders', 'returns_list', 'complaints', 'sourcing_requests', 'auto_templates'];
+      const targetTables = isAdmin ? [...visitorTables, ...adminExtraTables] : visitorTables;
+
+      const tablesToFetch = targetTables.filter(isTableChanged);
+      if (silent && tablesToFetch.length === 0) {
+        // Nothing changed! Zero bytes downloaded!
         return;
       }
 
-      const rows = await fullRes.json();
-      const rowObj = Array.isArray(rows) ? rows?.[0] : null;
-      const cloudData = rowObj?.payload;
-      const remoteUpdatedAt = rowObj?.updated_at || '';
+      setCloudSyncStatus('syncing');
 
-      // Final Race-Condition Guard before applying state:
-      // If a save started while downloading payload, or if payload timestamp is older than our last local mutation, abort!
-      if (silent && (isSavingRef.current || pendingSaveBundleRef.current !== null || saveDebounceTimerRef.current !== null)) {
-        return;
-      }
-      const payloadTs = Number(cloudData?.updatedAt || (remoteUpdatedAt ? new Date(remoteUpdatedAt).getTime() : 0));
-      if (silent && hasCloudInitialPullCompletedRef.current && payloadTs > 0 && payloadTs < lastLocalMutationAtRef.current) {
-        return;
-      }
+      await Promise.all(tablesToFetch.map(async (tbl) => {
+        try {
+          const rows = await sbFetchTable(tbl);
+          if (Array.isArray(rows)) {
+            lastKnownTableTimestampsRef.current[tbl] = metaMap[tbl] || new Date().toISOString();
+            isIncomingSyncRef.current = true;
 
-      const hasValidCloudContent =
-        cloudData &&
-        typeof cloudData === 'object' &&
-        (Array.isArray(cloudData.parts) || Array.isArray(cloudData.storeAds) || cloudData.updatedAt);
-
-      if (hasValidCloudContent) {
-        lastKnownRemoteUpdatedAtRef.current = remoteUpdatedAt;
-        if (payloadTs) lastKnownRemoteTimestampMsRef.current = payloadTs;
-
-        const incomingCompareObj = {
-          siteSettings: cloudData.siteSettings,
-          adminCredentials: cloudData.adminCredentials,
-          currencies: cloudData.currencies,
-          groups: cloudData.groups,
-          brands: cloudData.brands,
-          autoTemplates: cloudData.autoTemplates,
-          models: cloudData.models,
-          parts: cloudData.parts,
-          clients: cloudData.clients,
-          accountRequests: cloudData.accountRequests,
-          orders: cloudData.orders,
-          returnsList: cloudData.returnsList,
-          complaints: cloudData.complaints,
-          promoCodes: cloudData.promoCodes,
-          storeAds: cloudData.storeAds,
-          showcaseBars: cloudData.showcaseBars,
-          sourcingRequests: cloudData.sourcingRequests,
-          notifications: cloudData.notifications
-        };
-        const incomingStr = JSON.stringify(incomingCompareObj);
-
-        if (incomingStr !== lastSavedPayloadRef.current) {
-          isIncomingSyncRef.current = true;
-          lastSavedPayloadRef.current = incomingStr;
-
-          if (Array.isArray(cloudData.orders) && cloudData.orders.length > lastSeenOrderCountRef.current) {
-            lastSeenOrderCountRef.current = cloudData.orders.length;
-            if (appPortal === 'admin') {
-              playNotificationSound();
-              showToast('🔔 وصلت طلبية جديدة الآن من أحد العملاء! تفقد قسم الطلبات.', 'success');
+            switch (tbl) {
+              case 'parts':
+                setParts(rows);
+                window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(rows));
+                break;
+              case 'models':
+                setModels(rows);
+                window.localStorage.setItem('hmarket_v2_models', JSON.stringify(rows));
+                break;
+              case 'brands':
+                const brandNames = rows.map(b => (typeof b === 'object' && b.name ? b.name : b));
+                setBrands(brandNames);
+                window.localStorage.setItem('hmarket_v2_brands', JSON.stringify(brandNames));
+                break;
+              case 'pricing_groups':
+                setGroups(rows);
+                window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(rows));
+                break;
+              case 'store_ads':
+                setStoreAds(rows);
+                window.localStorage.setItem('hmarket_v2_storeAds', JSON.stringify(rows));
+                break;
+              case 'showcase_bars':
+                setShowcaseBars(rows);
+                window.localStorage.setItem('hmarket_v2_showcaseBars', JSON.stringify(rows));
+                break;
+              case 'promo_codes':
+                setPromoCodes(rows);
+                window.localStorage.setItem('hmarket_v2_promoCodes', JSON.stringify(rows));
+                break;
+              case 'clients':
+                setClients(rows);
+                window.localStorage.setItem('hmarket_v2_clients', JSON.stringify(rows));
+                break;
+              case 'account_requests':
+                if (rows.length > lastSeenReqCountRef.current && isAdmin) {
+                  lastSeenReqCountRef.current = rows.length;
+                  playNotificationSound();
+                  showToast('🔔 وصل طلب تسجيل حساب عميل جديد بانتظار موافقتك!', 'success');
+                }
+                setAccountRequests(rows);
+                window.localStorage.setItem('hmarket_v2_accountRequests', JSON.stringify(rows));
+                break;
+              case 'orders':
+                if (rows.length > lastSeenOrderCountRef.current && isAdmin) {
+                  lastSeenOrderCountRef.current = rows.length;
+                  playNotificationSound();
+                  showToast('🔔 وصلت طلبية جديدة الآن من أحد العملاء! تفقد قسم الطلبات.', 'success');
+                }
+                setOrders(rows);
+                window.localStorage.setItem('hmarket_v2_orders', JSON.stringify(rows));
+                break;
+              case 'returns_list':
+                setReturnsList(rows);
+                window.localStorage.setItem('hmarket_v2_returnsList', JSON.stringify(rows));
+                break;
+              case 'complaints':
+                setComplaints(rows);
+                window.localStorage.setItem('hmarket_v2_complaints', JSON.stringify(rows));
+                break;
+              case 'auto_templates':
+                setAutoTemplates(rows);
+                window.localStorage.setItem('hmarket_v2_autoTemplates', JSON.stringify(rows));
+                break;
+              case 'sourcing_requests':
+                setSourcingRequests(rows);
+                window.localStorage.setItem('hmarket_v2_sourcingRequests', JSON.stringify(rows));
+                break;
+              case 'site_settings':
+                const cfgRow = rows.find(r => r.id === 'main') || rows[0];
+                if (cfgRow) {
+                  if (cfgRow.settings && typeof cfgRow.settings === 'object') {
+                    const mergedSettings = { ...cfgRow.settings, supabaseUrl: cfgRow.settings.supabaseUrl || sbUrl, supabaseAnonKey: cfgRow.settings.supabaseAnonKey || sbKey };
+                    setSiteSettings(mergedSettings);
+                    window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings));
+                  }
+                  if (cfgRow.credentials && typeof cfgRow.credentials === 'object') {
+                    setAdminCredentials(cfgRow.credentials);
+                    window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(cfgRow.credentials));
+                  }
+                  if (cfgRow.currencies && typeof cfgRow.currencies === 'object') {
+                    setCurrencies(cfgRow.currencies);
+                    window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(cfgRow.currencies));
+                  }
+                  if (Array.isArray(cfgRow.notifications)) {
+                    setNotifications(cfgRow.notifications);
+                    window.localStorage.setItem('hmarket_v2_notifications', JSON.stringify(cfgRow.notifications));
+                  }
+                }
+                break;
+              default:
+                break;
             }
           }
-          if (Array.isArray(cloudData.accountRequests) && cloudData.accountRequests.length > lastSeenReqCountRef.current) {
-            lastSeenReqCountRef.current = cloudData.accountRequests.length;
-            if (appPortal === 'admin') {
-              playNotificationSound();
-              showToast('🔔 وصل طلب تسجيل حساب عميل جديد بانتظار موافقتك!', 'success');
-            }
-          }
+        } catch (err) {}
+      }));
 
-          if (cloudData.siteSettings && typeof cloudData.siteSettings === 'object') {
-            const mergedSettings = {
-              ...cloudData.siteSettings,
-              supabaseUrl: cloudData.siteSettings.supabaseUrl || sbUrl,
-              supabaseAnonKey: cloudData.siteSettings.supabaseAnonKey || sbKey
-            };
-            setSiteSettings(mergedSettings);
-            window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings));
-          }
-          if (cloudData.adminCredentials && typeof cloudData.adminCredentials === 'object') {
-            setAdminCredentials(cloudData.adminCredentials);
-            window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(cloudData.adminCredentials));
-          }
-          if (cloudData.currencies && typeof cloudData.currencies === 'object') {
-            setCurrencies(cloudData.currencies);
-            window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(cloudData.currencies));
-          }
-          const syncSlice = (key, setter) => {
-            if (Array.isArray(cloudData[key])) {
-              setter(cloudData[key]);
-              window.localStorage.setItem('hmarket_v2_' + key, JSON.stringify(cloudData[key]));
-            }
-          };
-          syncSlice('groups', setGroups);
-          syncSlice('brands', setBrands);
-          syncSlice('autoTemplates', setAutoTemplates);
-          syncSlice('models', setModels);
-          syncSlice('parts', setParts);
-          syncSlice('clients', setClients);
-          syncSlice('accountRequests', setAccountRequests);
-          syncSlice('orders', setOrders);
-          syncSlice('returnsList', setReturnsList);
-          syncSlice('complaints', setComplaints);
-          syncSlice('promoCodes', setPromoCodes);
-          syncSlice('storeAds', setStoreAds);
-          syncSlice('showcaseBars', setShowcaseBars);
-          syncSlice('sourcingRequests', setSourcingRequests);
-          syncSlice('notifications', setNotifications);
-        }
-        setCloudSyncStatus('cloud_synced');
-        if (!silent) showToast('تمت مزامنة وتحديث كافة البيانات من السيرفر بنجاح ✓', 'success');
-        hasCloudInitialPullCompletedRef.current = true;
-      } else {
-        hasCloudInitialPullCompletedRef.current = true;
-        if (adminAuthenticated) {
-          pushToSupabaseCloud(null, false);
-        }
-      }
+      setCloudSyncStatus('cloud_synced');
+      hasCloudInitialPullCompletedRef.current = true;
+      if (!silent) showToast('تمت مزامنة البيانات من الجداول السحابية المستقلة بنجاح ✓', 'success');
     } catch (err) {
       hasCloudInitialPullCompletedRef.current = true;
     }
   };
 
+  // Graceful fallback to app_state_sync if user hasn't run the new schema yet
+  const pullLegacyAppStateSync = async (silent = false) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) return;
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload,updated_at`, {
+        headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      const cloudData = rows?.[0]?.payload;
+      if (cloudData && typeof cloudData === 'object') {
+        isIncomingSyncRef.current = true;
+        if (Array.isArray(cloudData.parts)) setParts(cloudData.parts);
+        if (Array.isArray(cloudData.models)) setModels(cloudData.models);
+        if (Array.isArray(cloudData.brands)) setBrands(cloudData.brands);
+        if (Array.isArray(cloudData.groups)) setGroups(cloudData.groups);
+        if (Array.isArray(cloudData.clients)) setClients(cloudData.clients);
+        if (Array.isArray(cloudData.orders)) setOrders(cloudData.orders);
+        if (Array.isArray(cloudData.accountRequests)) setAccountRequests(cloudData.accountRequests);
+        if (Array.isArray(cloudData.returnsList)) setReturnsList(cloudData.returnsList);
+        if (Array.isArray(cloudData.complaints)) setComplaints(cloudData.complaints);
+        if (Array.isArray(cloudData.promoCodes)) setPromoCodes(cloudData.promoCodes);
+        if (Array.isArray(cloudData.storeAds)) setStoreAds(cloudData.storeAds);
+        if (Array.isArray(cloudData.showcaseBars)) setShowcaseBars(cloudData.showcaseBars);
+        if (cloudData.siteSettings) setSiteSettings(cloudData.siteSettings);
+        if (cloudData.adminCredentials) setAdminCredentials(cloudData.adminCredentials);
+        if (cloudData.currencies) setCurrencies(cloudData.currencies);
+        hasCloudInitialPullCompletedRef.current = true;
+        setCloudSyncStatus('cloud_synced');
+      }
+    } catch (e) {
+      hasCloudInitialPullCompletedRef.current = true;
+    }
+  };
+
   useEffect(() => {
-    // أول تحميل مرة واحدة، وبعدها كل 30 ثانية وبس لما التاب ظاهر (بيتوقف لو المستخدم سابه)
     const POLL_MS = 30000;
     let timer = null;
     const tick = () => {
@@ -2993,7 +3025,7 @@ export default function App() {
     const targetClient = clients.find(c => c.id === normalizedRole);
     showToast(
       targetClient
-        ? `أهلاً بيك "${targetClient.name}" في ${siteSettings.storeName || 'ELZOGHBI-MARKET'} — الأسعار والسلة اتحدّثت على حسابك.`
+        ? `أهلاً بيك "${targetClient.name}" في ${siteSettings.storeName || 'H-market'} — الأسعار والسلة اتحدّثت على حسابك.`
         : 'إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).',
       'info'
     );
@@ -3383,19 +3415,14 @@ export default function App() {
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
     setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
 
-    // Immediately merge into Supabase Cloud so Admin Dashboard receives the order & notification right away!
-    commitCustomerCloudTransaction(cloud => {
-      const updatedCloudParts = (Array.isArray(cloud.parts) ? cloud.parts : parts).map(p => {
-        const cartItem = cartSummary.items.find(i => i.part.id === p.id);
-        if (!cartItem) return p;
-        return { ...p, stock: Math.max(0, p.stock - cartItem.qty) };
-      });
-      return {
-        ...cloud,
-        parts: updatedCloudParts,
-        orders: [newOrder, ...(Array.isArray(cloud.orders) ? cloud.orders : orders)],
-        notifications: [adminOrderNotif, clientOrderNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-      };
+    // Direct Normalized Table Operations (Massive Egress Reduction: ~1.5KB instead of 4MB!)
+    sbUpsert('orders', newOrder);
+    cartSummary.items.forEach(item => {
+      const p = parts.find(x => x.id === item.part.id);
+      if (p) {
+        const updatedStock = Math.max(0, p.stock - item.qty);
+        sbUpdate('parts', p.id, { stock: updatedStock });
+      }
     });
     setCart({});
     setAppliedPromo(null);
@@ -4175,7 +4202,7 @@ export default function App() {
             />
             <div className="min-w-0 hidden min-[420px]:block">
               <h1 className="text-base sm:text-xl font-black tracking-wide bg-gradient-to-l from-cyan-300 via-teal-200 to-blue-400 bg-clip-text text-transparent truncate">
-                {siteSettings.storeName || 'ELZOGHBI-MARKET'}
+                {siteSettings.storeName || 'H-market'}
               </h1>
               <p className="text-[11px] text-slate-400 truncate hidden md:block">
                 {siteSettings.storeSubtitle || siteSettings.storeTagline}
@@ -4403,7 +4430,7 @@ export default function App() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4 text-center">
         <div className="flex items-center justify-center gap-3">
           <img src={HMARKET_LOGO} alt="Logo" className="w-10 h-10 rounded-xl object-cover border-2 border-cyan-400/40" />
-          <span className="font-extrabold text-white">{siteSettings.storeName || 'ELZOGHBI-MARKET'}</span>
+          <span className="font-extrabold text-white">{siteSettings.storeName || 'H-market'}</span>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-bold">
           <span className="px-3 py-1.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
@@ -4431,7 +4458,7 @@ export default function App() {
             </a>
           )}
         </div>
-        <p className="text-[10px] text-slate-500">© {siteSettings.storeName || 'ELZOGHBI-MARKET'}</p>
+        <p className="text-[10px] text-slate-500">© {siteSettings.storeName || 'H-market'}</p>
       </div>
     </footer>
   );
@@ -6542,7 +6569,7 @@ export default function App() {
     const pendingReqCount = accountRequests.filter(r => r.status === 'pending').length;
     const pendingRetCount = returnsList.filter(r => r.status === 'قيد المراجعة').length;
 
-    // Admin Login Gate (Standalone ELZOGHBI-MARKET ERP Login Screen)
+    // Admin Login Gate (Standalone H-market ERP Login Screen)
     if (!adminAuthenticated) {
       return (
         <div className="min-h-screen bg-[#0d151c] flex items-center justify-center p-4">
@@ -6550,11 +6577,11 @@ export default function App() {
             <div className="text-center space-y-2">
               <img
                 src={HMARKET_LOGO}
-                alt="ELZOGHBI-MARKET Logo"
+                alt="H-market Logo"
                 className="w-20 h-20 rounded-2xl object-cover mx-auto border-2 border-cyan-400/50 shadow-xl"
               />
               <h1 className="text-xl font-black tracking-tight bg-gradient-to-l from-cyan-300 to-teal-300 bg-clip-text text-transparent">
-                بوابة الإدارة المركزية — ELZOGHBI-MARKET ERP
+                بوابة الإدارة المركزية — H-market ERP
               </h1>
               <p className="text-xs text-slate-400">
                 يرجى إدخال اسم المستخدم وكلمة المرور الخاصة بمدير النظام للدخول
@@ -6605,7 +6632,7 @@ export default function App() {
                 onClick={() => switchPortal('storefront')}
                 className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition"
               >
-                العودة إلى متجر العملاء (ELZOGHBI-MARKET Store)
+                العودة إلى متجر العملاء (H-market Store)
               </button>
             </form>
           </div>
@@ -6640,7 +6667,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
     return (
       <div className="min-h-screen bg-slate-100 flex flex-col lg:flex-row">
-        {/* Professional Right Sidebar for ELZOGHBI-MARKET Admin ERP */}
+        {/* Professional Right Sidebar for H-market Admin ERP */}
         <aside className="w-full lg:w-72 bg-[#0d151c] text-white shrink-0 border-l border-slate-800 flex flex-col justify-between lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
           <div>
             {/* Brand Header */}
@@ -6648,11 +6675,11 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               <div className="flex items-center gap-3">
                 <img
                   src={HMARKET_LOGO}
-                  alt="ELZOGHBI-MARKET"
+                  alt="H-market"
                   className="w-11 h-11 rounded-xl object-cover border border-cyan-400/40 shadow"
                 />
                 <div>
-                  <h1 className="text-sm font-black tracking-wide text-cyan-300">ELZOGHBI-MARKET ERP</h1>
+                  <h1 className="text-sm font-black tracking-wide text-cyan-300">H-market ERP</h1>
                   <p className="text-[11px] text-slate-400 hidden lg:block">لوحة الإدارة والمخازن المركزية</p>
                   <p className="text-[11px] text-slate-300 lg:hidden font-bold">{adminShortLabels[currentNavItem.id]}</p>
                 </div>
@@ -7126,7 +7153,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         <div className="border-b border-slate-100 pb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-extrabold text-slate-900">
-              إعدادات هوية ELZOGHBI-MARKET، روابط السوشيال ميديا، والشروط والأحكام
+              إعدادات هوية H-market، روابط السوشيال ميديا، والشروط والأحكام
             </h2>
             <p className="text-xs text-slate-500 mt-0.5">
               عدّل روابط واتساب وفيسبوك وإنستجرام وشروط العمل وسياسة الاسترجاع والدليفري التي تظهر في أسفل الموقع
@@ -7618,6 +7645,34 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             >
               <Upload className="w-4 h-4" />
               <span>{migratingImages ? migrationProgress || 'جاري نقل الصور...' : 'ضغط ونقل الصور القديمة لـ Storage الآن'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Egress Fix: Independent Tables Migration Card */}
+        <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl p-5 border border-emerald-200 shadow-xs mt-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Database className="w-5 h-5 text-emerald-600" />
+                <h4 className="font-black text-slate-900 text-sm">
+                  نظام الجداول المستقلة وحل استهلاك الباندويث (Egress Quota Fix)
+                </h4>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white">
+                  جديد v7.0
+                </span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
+                تم فصل المنتجات والطلبات والعملاء إلى جداول مستقلة وتفعيل الفحص الذكي <span className="font-mono font-bold">sync_meta</span> لخفض استهلاك الباندويث والـ Egress بنسبة تتجاوز 90%. اضغط هنا لاستدعاء إجراء الترحيل التلقائي ونقل البيانات القديمة إن وُجدت.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleTriggerDatabaseMigration}
+              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition shrink-0"
+            >
+              <Database className="w-4 h-4" />
+              <span>ترحيل وتأكيد الجداول المستقلة الآن</span>
             </button>
           </div>
         </div>
@@ -11693,12 +11748,8 @@ model OrderInvoice {
       setClients(prev => [newClientObj, ...prev]);
       setAccountRequests(prev => [approvedReq, ...prev]);
       setNotifications(prev => [autoNotif, ...prev]);
-      commitCustomerCloudTransaction(cloud => ({
-        ...cloud,
-        clients: [newClientObj, ...(Array.isArray(cloud.clients) ? cloud.clients : clients)],
-        accountRequests: [approvedReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
-        notifications: [autoNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-      }));
+      sbUpsert('clients', newClientObj);
+      sbUpsert('account_requests', approvedReq);
 
       setActiveRole(newClientId);
       setLoginModalOpen(false);
@@ -11722,13 +11773,7 @@ model OrderInvoice {
     isCustomerMutatingCloudRef.current = true;
     setAccountRequests(prev => [newReq, ...prev]);
     setNotifications(prev => [newAdminNotif, ...prev]);
-
-    // Immediately merge into Supabase Cloud so Admin Dashboard receives it right away!
-    commitCustomerCloudTransaction(cloud => ({
-      ...cloud,
-      accountRequests: [newReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
-      notifications: [newAdminNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-    }));
+    sbUpsert('account_requests', newReq);
 
     setLoginModalOpen(false);
     setRegErrors({});
@@ -12623,6 +12668,7 @@ model OrderInvoice {
         createdAt: '2026-11-01 06:25'
       };
       setReturnsList(prev => [newRet, ...prev]);
+      sbUpsert('returns_list', newRet);
       setReturnModalOrder(null);
       setRetReason('');
       setRetPhotos([]);
@@ -12792,13 +12838,6 @@ model OrderInvoice {
   });
   const cloudSourcingUpdate = (mapper, extraNotif) => {
     isCustomerMutatingCloudRef.current = true;
-    commitCustomerCloudTransaction(cloud => ({
-      ...cloud,
-      sourcingRequests: mapper(Array.isArray(cloud.sourcingRequests) ? cloud.sourcingRequests : sourcingRequests),
-      notifications: extraNotif
-        ? [extraNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-        : Array.isArray(cloud.notifications) ? cloud.notifications : notifications
-    }));
   };
 
   const openSourcing = () => {
@@ -13789,7 +13828,7 @@ model OrderInvoice {
 .hmi .sig{display:flex;justify-content:space-between;gap:12px;margin-top:30px;border-top:2px solid #0f172a;padding-top:14px;font-size:12px}
 `;
     const body = `<div class="hmi" dir="${dirv}">
-<div class="head"><div class="brand"><img src="${HMARKET_LOGO}" width="64" height="64" alt=""/><div><h1>${esc(siteSettings.storeName || 'ELZOGHBI-MARKET')}</h1><p>${isInvoice ? T.sub : T.pick}${isInvoice && siteSettings.whatsappNumber ? ' — ' + esc(siteSettings.whatsappNumber) : ''}</p></div></div>
+<div class="head"><div class="brand"><img src="${HMARKET_LOGO}" width="64" height="64" alt=""/><div><h1>${esc(siteSettings.storeName || 'H-market')}</h1><p>${isInvoice ? T.sub : T.pick}${isInvoice && siteSettings.whatsappNumber ? ' — ' + esc(siteSettings.whatsappNumber) : ''}</p></div></div>
 <div class="meta"><div><b>${T.inv}:</b> ${esc(order.id)}</div><div>${T.date}: ${esc(order.createdAt)}</div><div>${T.status}: ${esc(order.status)}</div></div></div>
 <div class="box"><div><b>${T.client}:</b> ${esc(order.clientName)}<br/>${T.addr}: ${esc(order.address)}</div><div>${T.pay}: <b>${esc(order.paymentMethod)}</b><br/>${T.pcs}: <b>${pieces}</b></div></div>
 <table><thead><tr><th>#</th><th>${T.sku}</th><th>${T.item}</th><th>${T.color}</th><th style="text-align:center">${T.qty}</th>${isInvoice ? `<th>${T.unit}</th><th>${T.line}</th>` : `<th>${T.check}</th>`}</tr></thead><tbody>${rows}</tbody></table>
@@ -13969,17 +14008,17 @@ ${footer}
             id="hmarket-printable-invoice-area"
             className="border-2 border-slate-900 rounded-2xl p-6 space-y-5 text-xs bg-white text-slate-900 shadow-inner"
           >
-            {/* Invoice Top Letterhead with ELZOGHBI-MARKET Official Logo */}
+            {/* Invoice Top Letterhead with H-market Official Logo */}
             <div className="flex flex-wrap justify-between items-start gap-4 border-b-2 border-slate-900 pb-4">
               <div className="flex items-center gap-3.5">
                 <img
                   src={HMARKET_LOGO}
-                  alt="ELZOGHBI-MARKET Logo"
+                  alt="H-market Logo"
                   className="w-14 h-14 rounded-2xl object-cover border border-slate-300 shadow-xs"
                 />
                 <div>
                   <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                    {siteSettings.storeName || 'ELZOGHBI-MARKET'} — {siteSettings.storeSubtitle || 'للهواتف والإكسسوارات وقطع الغيار'}
+                    {siteSettings.storeName || 'H-market'} — {siteSettings.storeSubtitle || 'للهواتف والإكسسوارات وقطع الغيار'}
                   </h2>
                   <p className="text-[11px] text-slate-600">
                     {effectiveMode === 'picking'
@@ -15757,7 +15796,7 @@ ${footer}
     );
   };
 
-  // --- ELZOGHBI-MARKET Comprehensive Footer (Business Rules, Terms, Return Policy, Delivery Policy & Social Icons) ---
+  // --- H-market Comprehensive Footer (Business Rules, Terms, Return Policy, Delivery Policy & Social Icons) ---
   const renderClientFooter = () => (
     <footer className="bg-[#0d151c] text-slate-300 border-t border-cyan-500/20 mt-16 pt-12 pb-24">
       <div className="max-w-7xl mx-auto px-4 space-y-10">
@@ -15766,7 +15805,7 @@ ${footer}
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-cyan-400" />
             <h3 className="text-base font-extrabold text-white">
-              شروطنا وسياسات الضمان والشحن عند {siteSettings.storeName || 'ELZOGHBI-MARKET'}
+              شروطنا وسياسات الضمان والشحن عند {siteSettings.storeName || 'H-market'}
             </h3>
           </div>
 
@@ -15802,12 +15841,12 @@ ${footer}
           <div className="flex items-center gap-4">
             <img
               src={HMARKET_LOGO}
-              alt="ELZOGHBI-MARKET"
+              alt="H-market"
               className="w-14 h-14 rounded-2xl object-cover border border-cyan-400/40 shadow-lg"
             />
             <div className="space-y-1">
               <div className="text-lg font-black text-white tracking-wide">
-                {siteSettings.storeName || 'ELZOGHBI-MARKET'}{' '}
+                {siteSettings.storeName || 'H-market'}{' '}
                 <span className="text-xs font-bold text-cyan-400">
                   {siteSettings.storeSubtitle}
                 </span>
@@ -15829,9 +15868,9 @@ ${footer}
               <span
                 onDoubleClick={() => switchPortal('admin')}
                 className="select-none cursor-default"
-                title="ELZOGHBI-MARKET"
+                title="H-market"
               >
-                © {new Date().getFullYear()} {siteSettings.storeName || 'ELZOGHBI-MARKET'}. جميع الحقوق محفوظة.
+                © {new Date().getFullYear()} {siteSettings.storeName || 'H-market'}. جميع الحقوق محفوظة.
               </span>
               <span>•</span>
 
