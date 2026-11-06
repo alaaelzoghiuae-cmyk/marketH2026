@@ -1,250 +1,518 @@
 -- ============================================================================
--- H-market ERP & B2B/B2C Storefront — Complete Supabase PostgreSQL + Storage Schema (v6.0)
--- ============================================================================
--- طريقة الاستخدام:
--- 1. افتح مشروعك في Supabase (https://supabase.com)
--- 2. ادخل على قسم (SQL Editor) من القائمة الجانبية واضغط (New Query)
--- 3. انسخ هذا الكود بالكامل والصقه هناك ثم اضغط (Run)
--- ملاحظة: هذا السكريبت آمن للتشغيل عدة مرات (Idempotent) بدون أي أخطاء!
+-- H-Market Production Database Schema (v7.0.0 Normalized Tables)
+-- Fixes Supabase Egress Quota by transitioning from monolithic JSON to independent tables
 -- ============================================================================
 
--- 1. جدول العملات وأسعار الصرف
-CREATE TABLE IF NOT EXISTS public.currencies (
-  code TEXT PRIMARY KEY,
-  symbol TEXT NOT NULL,
-  name TEXT NOT NULL,
-  rate_from_base NUMERIC(12, 6) NOT NULL DEFAULT 1.0
-);
-
--- 2. جدول مجموعات التسعير ورسوم التوصيل لكل مجموعة
-CREATE TABLE IF NOT EXISTS public.pricing_groups (
+-- 1. SPACING PARTS / PRODUCTS (قطع الغيار والمنتجات)
+CREATE TABLE IF NOT EXISTS public.parts (
   id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  currency TEXT NOT NULL REFERENCES public.currencies(code) ON UPDATE CASCADE,
-  modifier_type TEXT NOT NULL DEFAULT 'none',
-  modifier_value NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  delivery_fee_base NUMERIC(12, 2) NOT NULL DEFAULT 50,
-  is_default BOOLEAN NOT NULL DEFAULT false,
-  description TEXT
-);
-
--- 3. جدول موديلات الهواتف
-CREATE TABLE IF NOT EXISTS public.mobile_models (
-  id TEXT PRIMARY KEY,
-  brand TEXT NOT NULL,
-  name TEXT NOT NULL,
-  aliases TEXT,
-  image TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 4. جدول قطع الغيار والمخزون
-CREATE TABLE IF NOT EXISTS public.spare_parts (
-  id TEXT PRIMARY KEY,
-  sku TEXT UNIQUE NOT NULL,
-  model_id TEXT REFERENCES public.mobile_models(id) ON DELETE CASCADE,
-  category TEXT NOT NULL,
-  name TEXT NOT NULL,
-  quality_grade TEXT NOT NULL,
-  colors JSONB NOT NULL DEFAULT '["قياسي"]'::jsonb,
-  compatible_models JSONB NOT NULL DEFAULT '[]'::jsonb,
-  search_aliases TEXT,
+  "createdAt" TEXT,
+  sku TEXT,
+  "modelId" TEXT,
+  category TEXT,
+  name TEXT,
+  "qualityGrade" TEXT,
+  colors JSONB DEFAULT '[]'::jsonb,
+  "compatibleModels" JSONB DEFAULT '[]'::jsonb,
+  "searchAliases" TEXT,
   description TEXT,
-  warranty_text TEXT,
+  "warrantyText" TEXT,
   image TEXT,
-  images JSONB NOT NULL DEFAULT '[]'::jsonb,
-  stock INTEGER NOT NULL DEFAULT 0,
-  low_stock_threshold INTEGER NOT NULL DEFAULT 5,
-  max_order_qty INTEGER NOT NULL DEFAULT 10,
-  cost_price NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  base_price NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  custom_group_prices JSONB NOT NULL DEFAULT '{}'::jsonb,
-  waitlist_count INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT
-);
-
--- 5. جدول حسابات التجار والعملاء وكشوف الحساب (تم تصحيح ON DELETE SET NULL)
-CREATE TABLE IF NOT EXISTS public.clients (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  owner TEXT NOT NULL,
-  phone TEXT UNIQUE NOT NULL,
-  email TEXT,
-  password TEXT NOT NULL,
-  address TEXT,
-  secondary_address TEXT,
-  group_id TEXT REFERENCES public.pricing_groups(id) ON DELETE SET NULL,
-  wallet_balance NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  credit_limit NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  avatar TEXT,
-  avatar_bg TEXT,
-  avatar_image TEXT,
-  status TEXT NOT NULL DEFAULT 'active',
-  created_at TEXT,
-  ledger JSONB NOT NULL DEFAULT '[]'::jsonb
-);
-
--- 6. جدول طلبات فتح الحسابات الجديدة
-CREATE TABLE IF NOT EXISTS public.account_requests (
-  id TEXT PRIMARY KEY,
-  shop_name TEXT NOT NULL,
-  owner_name TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  email TEXT,
-  requested_password TEXT NOT NULL,
-  address TEXT,
-  shop_type TEXT,
-  notes TEXT,
-  status TEXT NOT NULL DEFAULT 'pending',
-  created_at TEXT
-);
-
--- 7. جدول الطلبات والفواتير اللحظية (تم تصحيح ON DELETE SET NULL)
-CREATE TABLE IF NOT EXISTS public.orders (
-  id TEXT PRIMARY KEY,
-  client_id TEXT REFERENCES public.clients(id) ON DELETE SET NULL,
-  client_name TEXT NOT NULL,
-  group_id TEXT,
-  currency TEXT NOT NULL DEFAULT 'EGP',
-  exchange_rate_used NUMERIC(12, 6) NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'تم الاستلام',
-  payment_method TEXT NOT NULL,
-  address TEXT,
-  notes TEXT,
-  delivery_fee_base NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  discount_base NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  wallet_used_base NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  admin_edited BOOLEAN NOT NULL DEFAULT false,
-  admin_edit_note TEXT,
-  items JSONB NOT NULL DEFAULT '[]'::jsonb
-);
-
--- 8. جدول المرتجعات والضمان
-CREATE TABLE IF NOT EXISTS public.returns_list (
-  id TEXT PRIMARY KEY,
-  order_id TEXT,
-  client_id TEXT,
-  client_name TEXT,
-  part_id TEXT,
-  part_name TEXT,
-  qty INTEGER NOT NULL DEFAULT 1,
-  refund_amount_base NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  reason TEXT,
-  warranty_confirmed BOOLEAN NOT NULL DEFAULT true,
-  photos JSONB NOT NULL DEFAULT '[]'::jsonb,
-  status TEXT NOT NULL DEFAULT 'قيد المراجعة',
-  resolution_type TEXT,
-  admin_response TEXT,
-  replies JSONB NOT NULL DEFAULT '[]'::jsonb,
-  created_at TEXT
-);
-
--- 9. جدول الشكاوى والمقترحات
-CREATE TABLE IF NOT EXISTS public.complaints (
-  id TEXT PRIMARY KEY,
-  client_id TEXT,
-  client_name TEXT,
-  type TEXT,
-  subject TEXT,
-  message TEXT,
-  status TEXT NOT NULL DEFAULT 'مفتوح',
-  admin_reply TEXT,
-  replies JSONB NOT NULL DEFAULT '[]'::jsonb,
-  created_at TEXT
-);
-
--- 10. جدول أكواد الخصم والكوبونات
-CREATE TABLE IF NOT EXISTS public.promo_codes (
-  id TEXT PRIMARY KEY,
-  code TEXT UNIQUE NOT NULL,
-  type TEXT NOT NULL DEFAULT 'percentage',
-  value NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  max_discount_cap NUMERIC(12, 2) NOT NULL DEFAULT 500,
-  min_order_amount NUMERIC(12, 2) NOT NULL DEFAULT 0,
-  usage_limit INTEGER NOT NULL DEFAULT 100,
-  used_count INTEGER NOT NULL DEFAULT 0,
-  expiry_date TEXT,
-  active BOOLEAN NOT NULL DEFAULT true,
-  description TEXT
-);
-
--- 11. جدول مخزن الحالة المتزامنة اللحظية (Realtime App State Store)
-CREATE TABLE IF NOT EXISTS public.app_state_sync (
-  id TEXT PRIMARY KEY DEFAULT 'main_store',
-  payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+  images JSONB DEFAULT '[]'::jsonb,
+  stock INTEGER DEFAULT 0,
+  "lowStockThreshold" INTEGER DEFAULT 5,
+  "costPrice" NUMERIC DEFAULT 0,
+  "basePrice" NUMERIC DEFAULT 0,
+  "maxOrderQty" INTEGER,
+  "customGroupPrices" JSONB DEFAULT '{}'::jsonb,
+  "waitlistCount" INTEGER DEFAULT 0,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- فهرس لتسريع استعلام الـ Polling الخفيف على updated_at
-CREATE INDEX IF NOT EXISTS idx_app_state_sync_updated_at ON public.app_state_sync (id, updated_at);
+-- 2. MOBILE MODELS (الموديلات)
+CREATE TABLE IF NOT EXISTS public.models (
+  id TEXT PRIMARY KEY,
+  brand TEXT,
+  name TEXT,
+  aliases TEXT,
+  image TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- تفعيل القراءة والكتابة لجدول المزامنة
-ALTER TABLE public.app_state_sync ENABLE ROW LEVEL SECURITY;
+-- 3. BRANDS (الماركات)
+CREATE TABLE IF NOT EXISTS public.brands (
+  name TEXT PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
-DROP POLICY IF EXISTS "Allow public read/write for app_state_sync" ON public.app_state_sync;
-CREATE POLICY "Allow public read/write for app_state_sync"
-  ON public.app_state_sync
-  FOR ALL
-  USING (true)
-  WITH CHECK (true);
+-- 4. PRICING GROUPS (مجموعات التسعير)
+CREATE TABLE IF NOT EXISTS public.pricing_groups (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  currency TEXT DEFAULT 'EGP',
+  "modifierType" TEXT DEFAULT 'none',
+  "modifierValue" NUMERIC DEFAULT 0,
+  "deliveryFeeBase" NUMERIC DEFAULT 75,
+  "isDefault" BOOLEAN DEFAULT FALSE,
+  description TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- إنشاء سجل البداية الافتراضي
-INSERT INTO public.app_state_sync (id, payload)
-VALUES ('main_store', '{}'::jsonb)
-ON CONFLICT (id) DO NOTHING;
+-- 5. CLIENTS / SHOPS (العملاء والمحلات المسجلة)
+CREATE TABLE IF NOT EXISTS public.clients (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  owner TEXT,
+  phone TEXT,
+  email TEXT,
+  password TEXT,
+  address TEXT,
+  "secondaryAddress" TEXT,
+  "groupId" TEXT,
+  "creditLimit" NUMERIC DEFAULT 0,
+  "walletBalance" NUMERIC DEFAULT 0,
+  ledger JSONB DEFAULT '[]'::jsonb,
+  status TEXT DEFAULT 'active',
+  type TEXT DEFAULT 'shop',
+  avatar TEXT,
+  "avatarBg" TEXT,
+  "avatarImage" TEXT,
+  "createdAt" TEXT,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
 
--- 12. تفعيل خاصية التحديث اللحظي (Supabase Realtime) بشكل آمن لا يفشل عند التكرار
+-- 6. ACCOUNT REQUESTS (طلبات فتح الحسابات الجديدة)
+CREATE TABLE IF NOT EXISTS public.account_requests (
+  id TEXT PRIMARY KEY,
+  name TEXT,
+  owner TEXT,
+  phone TEXT,
+  email TEXT,
+  password TEXT,
+  address TEXT,
+  type TEXT DEFAULT 'shop',
+  status TEXT DEFAULT 'pending',
+  "assignedGroupId" TEXT,
+  "creditLimit" NUMERIC DEFAULT 0,
+  "createdAt" TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 7. ORDERS / INVOICES (الطلبات والفواتير)
+CREATE TABLE IF NOT EXISTS public.orders (
+  id TEXT PRIMARY KEY,
+  "clientId" TEXT,
+  "clientName" TEXT,
+  "groupId" TEXT,
+  currency TEXT DEFAULT 'EGP',
+  "exchangeRateUsed" NUMERIC DEFAULT 1,
+  status TEXT DEFAULT 'تم الاستلام',
+  "paymentMethod" TEXT,
+  address TEXT,
+  notes TEXT,
+  items JSONB DEFAULT '[]'::jsonb,
+  "deliveryFeeBase" NUMERIC DEFAULT 0,
+  "discountBase" NUMERIC DEFAULT 0,
+  "walletUsedBase" NUMERIC DEFAULT 0,
+  "adminEdited" BOOLEAN DEFAULT FALSE,
+  "adminEditNote" TEXT,
+  "createdAt" TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 8. RETURNS (المرتجعات والضمان)
+CREATE TABLE IF NOT EXISTS public.returns_list (
+  id TEXT PRIMARY KEY,
+  "orderId" TEXT,
+  "clientId" TEXT,
+  "clientName" TEXT,
+  "partId" TEXT,
+  "partName" TEXT,
+  qty INTEGER DEFAULT 1,
+  "refundAmountBase" NUMERIC DEFAULT 0,
+  reason TEXT,
+  status TEXT DEFAULT 'قيد المراجعة',
+  photos JSONB DEFAULT '[]'::jsonb,
+  "adminResponse" TEXT,
+  "resolutionType" TEXT,
+  "warrantyConfirmed" BOOLEAN DEFAULT TRUE,
+  "createdAt" TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 9. COMPLAINTS & TICKETS (الشكاوى والمقترحات)
+CREATE TABLE IF NOT EXISTS public.complaints (
+  id TEXT PRIMARY KEY,
+  "clientId" TEXT,
+  "clientName" TEXT,
+  type TEXT,
+  subject TEXT,
+  message TEXT,
+  status TEXT DEFAULT 'قيد المتابعة',
+  "adminReply" TEXT,
+  replies JSONB DEFAULT '[]'::jsonb,
+  "createdAt" TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 10. PROMO CODES (أكواد الخصم)
+CREATE TABLE IF NOT EXISTS public.promo_codes (
+  id TEXT PRIMARY KEY,
+  code TEXT UNIQUE,
+  type TEXT,
+  value NUMERIC,
+  "maxDiscountCap" NUMERIC,
+  "minOrderAmount" NUMERIC,
+  "usageLimit" INTEGER,
+  "usedCount" INTEGER DEFAULT 0,
+  "expiryDate" TEXT,
+  description TEXT,
+  active BOOLEAN DEFAULT TRUE
+);
+
+-- 11. STORE ADS / BANNERS (الإعلانات والبنرات)
+CREATE TABLE IF NOT EXISTS public.store_ads (
+  id TEXT PRIMARY KEY,
+  badge TEXT,
+  title TEXT,
+  subtitle TEXT,
+  gradient TEXT,
+  image TEXT,
+  "buttonText" TEXT,
+  "linkedPartId" TEXT,
+  active BOOLEAN DEFAULT TRUE,
+  sort_order INTEGER DEFAULT 0
+);
+
+-- 12. SHOWCASE BARS (بارات عرض المنتجات)
+CREATE TABLE IF NOT EXISTS public.showcase_bars (
+  id TEXT PRIMARY KEY,
+  title TEXT,
+  subtitle TEXT,
+  "badgeColor" TEXT,
+  "partIds" JSONB DEFAULT '[]'::jsonb,
+  active BOOLEAN DEFAULT TRUE,
+  sort_order INTEGER DEFAULT 0
+);
+
+-- 13. AUTO TEMPLATES (تمبلت قطع الغيار التلقائي)
+CREATE TABLE IF NOT EXISTS public.auto_templates (
+  id TEXT PRIMARY KEY,
+  "skuPrefix" TEXT,
+  category TEXT,
+  "namePattern" TEXT,
+  "qualityGrade" TEXT,
+  colors JSONB DEFAULT '[]'::jsonb,
+  "warrantyText" TEXT,
+  "imageKey" TEXT,
+  "costPrice" NUMERIC DEFAULT 0,
+  "basePrice" NUMERIC DEFAULT 0,
+  "defaultStock" INTEGER DEFAULT 0,
+  "lowStockThreshold" INTEGER DEFAULT 5,
+  "maxOrderQty" INTEGER,
+  enabled BOOLEAN DEFAULT TRUE
+);
+
+-- 14. SOURCING REQUESTS (طلبات توفير النواقص)
+CREATE TABLE IF NOT EXISTS public.sourcing_requests (
+  id TEXT PRIMARY KEY,
+  "clientId" TEXT,
+  "clientName" TEXT,
+  "clientPhone" TEXT,
+  "partId" TEXT,
+  "partName" TEXT,
+  notes TEXT,
+  "createdAt" TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 15. SITE SETTINGS & CREDENTIALS (إعدادات الموقع والحسابات)
+CREATE TABLE IF NOT EXISTS public.site_settings (
+  id TEXT PRIMARY KEY DEFAULT 'main',
+  settings JSONB DEFAULT '{}'::jsonb,
+  credentials JSONB DEFAULT '{}'::jsonb,
+  currencies JSONB DEFAULT '{}'::jsonb,
+  notifications JSONB DEFAULT '[]'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 16. SYNC METADATA (جدول التحديثات الذكي الفائق الخفة لمنع الـ Egress)
+CREATE TABLE IF NOT EXISTS public.sync_meta (
+  table_name TEXT PRIMARY KEY,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Initialize sync_meta with all tables
+INSERT INTO public.sync_meta (table_name, updated_at) VALUES
+  ('parts', NOW()),
+  ('models', NOW()),
+  ('brands', NOW()),
+  ('pricing_groups', NOW()),
+  ('clients', NOW()),
+  ('account_requests', NOW()),
+  ('orders', NOW()),
+  ('returns_list', NOW()),
+  ('complaints', NOW()),
+  ('promo_codes', NOW()),
+  ('store_ads', NOW()),
+  ('showcase_bars', NOW()),
+  ('auto_templates', NOW()),
+  ('sourcing_requests', NOW()),
+  ('site_settings', NOW())
+ON CONFLICT (table_name) DO NOTHING;
+
+-- Trigger Function to automatically touch sync_meta whenever any table changes
+CREATE OR REPLACE FUNCTION public.notify_sync_meta()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.sync_meta (table_name, updated_at)
+  VALUES (TG_TABLE_NAME, NOW())
+  ON CONFLICT (table_name) DO UPDATE SET updated_at = NOW();
+  RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+-- Attach triggers to all tables
+DROP TRIGGER IF EXISTS trg_parts_sync_meta ON public.parts;
+CREATE TRIGGER trg_parts_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.parts FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_models_sync_meta ON public.models;
+CREATE TRIGGER trg_models_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.models FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_groups_sync_meta ON public.pricing_groups;
+CREATE TRIGGER trg_groups_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.pricing_groups FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_clients_sync_meta ON public.clients;
+CREATE TRIGGER trg_clients_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.clients FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_orders_sync_meta ON public.orders;
+CREATE TRIGGER trg_orders_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.orders FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_account_requests_sync_meta ON public.account_requests;
+CREATE TRIGGER trg_account_requests_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.account_requests FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_returns_list_sync_meta ON public.returns_list;
+CREATE TRIGGER trg_returns_list_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.returns_list FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_complaints_sync_meta ON public.complaints;
+CREATE TRIGGER trg_complaints_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.complaints FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_store_ads_sync_meta ON public.store_ads;
+CREATE TRIGGER trg_store_ads_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.store_ads FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_showcase_bars_sync_meta ON public.showcase_bars;
+CREATE TRIGGER trg_showcase_bars_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.showcase_bars FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+DROP TRIGGER IF EXISTS trg_site_settings_sync_meta ON public.site_settings;
+CREATE TRIGGER trg_site_settings_sync_meta AFTER INSERT OR UPDATE OR DELETE ON public.site_settings FOR EACH STATEMENT EXECUTE FUNCTION public.notify_sync_meta();
+
+-- ============================================================================
+-- Row Level Security (RLS) Policies
+-- ============================================================================
+ALTER TABLE public.parts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.models ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.brands ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pricing_groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.account_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.returns_list ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.complaints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.promo_codes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.store_ads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.showcase_bars ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.auto_templates ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sourcing_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sync_meta ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read/write policies for seamless operation with anon key
+DO $$
+DECLARE
+  tbl text;
+BEGIN
+  FOR tbl IN
+    SELECT unnest(ARRAY[
+      'parts', 'models', 'brands', 'pricing_groups', 'clients', 'account_requests',
+      'orders', 'returns_list', 'complaints', 'promo_codes', 'store_ads',
+      'showcase_bars', 'auto_templates', 'sourcing_requests', 'site_settings', 'sync_meta'
+    ])
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS "Allow public full access %I" ON public.%I', tbl, tbl);
+    EXECUTE format('CREATE POLICY "Allow public full access %I" ON public.%I FOR ALL USING (true) WITH CHECK (true)', tbl, tbl);
+  END LOOP;
+END;
+$$;
+
+-- ============================================================================
+-- AUTOMATED DATA MIGRATION FROM app_state_sync (إنقاذ ونقل كافة البيانات السابقة)
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.migrate_from_app_state_sync()
+RETURNS TEXT AS $$
+DECLARE
+  v_payload JSONB;
+BEGIN
+  -- Check if app_state_sync table exists
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'app_state_sync'
+  ) THEN
+    RETURN 'جدول app_state_sync غير موجود، تم تخطي الترحيل.';
+  END IF;
+
+  SELECT payload INTO v_payload FROM public.app_state_sync WHERE id = 'main_store' LIMIT 1;
+  IF v_payload IS NULL THEN
+    RETURN 'لا توجد بيانات قديمة داخل app_state_sync لنقلها.';
+  END IF;
+
+  -- 1. Brands
+  IF v_payload ? 'brands' AND jsonb_typeof(v_payload->'brands') = 'array' THEN
+    INSERT INTO public.brands (name)
+    SELECT value FROM jsonb_array_elements_text(v_payload->'brands') AS value
+    ON CONFLICT (name) DO NOTHING;
+  END IF;
+
+  -- 2. Groups
+  IF v_payload ? 'groups' AND jsonb_typeof(v_payload->'groups') = 'array' THEN
+    INSERT INTO public.pricing_groups SELECT * FROM jsonb_populate_recordset(null::public.pricing_groups, v_payload->'groups')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 3. Models
+  IF v_payload ? 'models' AND jsonb_typeof(v_payload->'models') = 'array' THEN
+    INSERT INTO public.models SELECT * FROM jsonb_populate_recordset(null::public.models, v_payload->'models')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 4. Parts
+  IF v_payload ? 'parts' AND jsonb_typeof(v_payload->'parts') = 'array' THEN
+    INSERT INTO public.parts SELECT * FROM jsonb_populate_recordset(null::public.parts, v_payload->'parts')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 5. Clients
+  IF v_payload ? 'clients' AND jsonb_typeof(v_payload->'clients') = 'array' THEN
+    INSERT INTO public.clients SELECT * FROM jsonb_populate_recordset(null::public.clients, v_payload->'clients')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 6. Account Requests
+  IF v_payload ? 'accountRequests' AND jsonb_typeof(v_payload->'accountRequests') = 'array' THEN
+    INSERT INTO public.account_requests SELECT * FROM jsonb_populate_recordset(null::public.account_requests, v_payload->'accountRequests')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 7. Orders
+  IF v_payload ? 'orders' AND jsonb_typeof(v_payload->'orders') = 'array' THEN
+    INSERT INTO public.orders SELECT * FROM jsonb_populate_recordset(null::public.orders, v_payload->'orders')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 8. Returns
+  IF v_payload ? 'returnsList' AND jsonb_typeof(v_payload->'returnsList') = 'array' THEN
+    INSERT INTO public.returns_list SELECT * FROM jsonb_populate_recordset(null::public.returns_list, v_payload->'returnsList')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 9. Complaints
+  IF v_payload ? 'complaints' AND jsonb_typeof(v_payload->'complaints') = 'array' THEN
+    INSERT INTO public.complaints SELECT * FROM jsonb_populate_recordset(null::public.complaints, v_payload->'complaints')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 10. Promo Codes
+  IF v_payload ? 'promoCodes' AND jsonb_typeof(v_payload->'promoCodes') = 'array' THEN
+    INSERT INTO public.promo_codes SELECT * FROM jsonb_populate_recordset(null::public.promo_codes, v_payload->'promoCodes')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 11. Store Ads
+  IF v_payload ? 'storeAds' AND jsonb_typeof(v_payload->'storeAds') = 'array' THEN
+    INSERT INTO public.store_ads SELECT * FROM jsonb_populate_recordset(null::public.store_ads, v_payload->'storeAds')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 12. Showcase Bars
+  IF v_payload ? 'showcaseBars' AND jsonb_typeof(v_payload->'showcaseBars') = 'array' THEN
+    INSERT INTO public.showcase_bars SELECT * FROM jsonb_populate_recordset(null::public.showcase_bars, v_payload->'showcaseBars')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 13. Auto Templates
+  IF v_payload ? 'autoTemplates' AND jsonb_typeof(v_payload->'autoTemplates') = 'array' THEN
+    INSERT INTO public.auto_templates SELECT * FROM jsonb_populate_recordset(null::public.auto_templates, v_payload->'autoTemplates')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 14. Sourcing Requests
+  IF v_payload ? 'sourcingRequests' AND jsonb_typeof(v_payload->'sourcingRequests') = 'array' THEN
+    INSERT INTO public.sourcing_requests SELECT * FROM jsonb_populate_recordset(null::public.sourcing_requests, v_payload->'sourcingRequests')
+    ON CONFLICT (id) DO NOTHING;
+  END IF;
+
+  -- 15. Site Settings
+  INSERT INTO public.site_settings (id, settings, credentials, currencies, notifications)
+  VALUES (
+    'main',
+    COALESCE(v_payload->'siteSettings', '{}'::jsonb),
+    COALESCE(v_payload->'adminCredentials', '{}'::jsonb),
+    COALESCE(v_payload->'currencies', '{}'::jsonb),
+    COALESCE(v_payload->'notifications', '[]'::jsonb)
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    settings = EXCLUDED.settings,
+    credentials = EXCLUDED.credentials,
+    currencies = EXCLUDED.currencies,
+    notifications = EXCLUDED.notifications,
+    updated_at = NOW();
+
+  RETURN 'تم نقل وترحيل جميع البيانات من app_state_sync إلى الجداول المستقلة بنجاح!';
+END;
+$$ LANGUAGE plpgsql;
+
+-- Execute migration immediately if data exists
+SELECT public.migrate_from_app_state_sync();
+
+-- ============================================================================
+-- Supabase Storage Setup (Buckets & Policies for images)
+-- ============================================================================
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "Public Access product-images" ON storage.objects;
+CREATE POLICY "Public Access product-images" ON storage.objects FOR SELECT USING (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Public Insert product-images" ON storage.objects;
+CREATE POLICY "Public Insert product-images" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Public Update product-images" ON storage.objects;
+CREATE POLICY "Public Update product-images" ON storage.objects FOR UPDATE USING (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Public Delete product-images" ON storage.objects;
+CREATE POLICY "Public Delete product-images" ON storage.objects FOR DELETE USING (bucket_id = 'product-images');
+
+-- ============================================================================
+-- Realtime Publication for instant cross-device updates
+-- ============================================================================
 DO $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1
-    FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime'
-      AND schemaname = 'public'
-      AND tablename = 'app_state_sync'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.app_state_sync;
+  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    BEGIN
+      ALTER PUBLICATION supabase_realtime ADD TABLE
+        public.parts,
+        public.models,
+        public.pricing_groups,
+        public.orders,
+        public.clients,
+        public.account_requests,
+        public.store_ads,
+        public.showcase_bars,
+        public.site_settings,
+        public.sync_meta;
+    EXCEPTION WHEN duplicate_object THEN
+      NULL;
+    END;
   END IF;
-END $$;
-
--- ============================================================================
--- 13. إعداد Supabase Storage Bucket (product-images) لرفع الصور خارج قاعدة البيانات
--- ============================================================================
-INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-VALUES (
-  'product-images',
-  'product-images',
-  true,
-  5242880, -- 5MB limit per compressed image
-  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-)
-ON CONFLICT (id) DO UPDATE
-SET public = true,
-    file_size_limit = 5242880;
-
--- سياسات الأمان لـ Storage Bucket (قراءة عامة + رفع وتحديث وحذف)
-DROP POLICY IF EXISTS "Public Read Access for product-images" ON storage.objects;
-CREATE POLICY "Public Read Access for product-images"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'product-images');
-
-DROP POLICY IF EXISTS "Public Insert Access for product-images" ON storage.objects;
-CREATE POLICY "Public Insert Access for product-images"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'product-images');
-
-DROP POLICY IF EXISTS "Public Update Access for product-images" ON storage.objects;
-CREATE POLICY "Public Update Access for product-images"
-  ON storage.objects FOR UPDATE
-  USING (bucket_id = 'product-images');
-
-DROP POLICY IF EXISTS "Public Delete Access for product-images" ON storage.objects;
-CREATE POLICY "Public Delete Access for product-images"
-  ON storage.objects FOR DELETE
-  USING (bucket_id = 'product-images');
-
--- ============================================================================
--- استعلام فحص حجم صف البيانات الحالي (للتأكد من خفة الصف بعد نقل الصور):
--- SELECT id, pg_size_pretty(pg_column_size(payload)) AS payload_size, updated_at FROM public.app_state_sync;
--- ============================================================================
+END;
+$$;
