@@ -2665,13 +2665,23 @@ export default function App() {
             switch (tbl) {
               case 'spare_parts':
               case 'parts':
-                setParts(rows);
-                window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(rows));
+                setParts(prevParts => {
+                  const serverIds = new Set(rows.map(r => r.id));
+                  const localOnly = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !serverIds.has(p.id));
+                  const merged = [...localOnly, ...rows];
+                  window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(merged));
+                  return merged;
+                });
                 break;
               case 'mobile_models':
               case 'models':
-                setModels(rows);
-                window.localStorage.setItem('hmarket_v2_models', JSON.stringify(rows));
+                setModels(prevModels => {
+                  const serverIds = new Set(rows.map(r => r.id));
+                  const localOnly = (Array.isArray(prevModels) ? prevModels : []).filter(m => m && m.id && !serverIds.has(m.id));
+                  const merged = [...localOnly, ...rows];
+                  window.localStorage.setItem('hmarket_v2_models', JSON.stringify(merged));
+                  return merged;
+                });
                 break;
               case 'brands':
                 const brandNames = rows.map(b => (typeof b === 'object' && b.name ? b.name : b));
