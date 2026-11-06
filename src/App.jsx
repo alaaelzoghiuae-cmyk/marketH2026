@@ -2,8 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search, ShoppingCart, User, Shield, Package, AlertTriangle, TrendingUp,
   Layers, Users, FileText, RotateCcw, MessageSquare, Plus, Minus, Check,
-  X, Edit, Printer, Database,
-ChevronLeft, ChevronDown, Bell, Wallet,
+  X, Edit, Printer, Database, ChevronLeft, ChevronDown, Bell, Wallet,
   CreditCard, Truck, Eye, RefreshCw, Filter, DollarSign, Percent, Tag,
   Smartphone, Cpu, Battery, Camera, Zap, CheckCircle2, Clock, Ban,
   ArrowUpRight, ArrowDownLeft, Sparkles, Building2, Phone, MapPin,
@@ -2129,15 +2128,111 @@ export default function App() {
     ...extra
   });
 
+  const CAMEL_TO_SNAKE_MAP = {
+    modelId: 'model_id',
+    qualityGrade: 'quality_grade',
+    basePrice: 'base_price',
+    costPrice: 'cost_price',
+    lowStockThreshold: 'low_stock_threshold',
+    warrantyText: 'warranty_text',
+    searchAliases: 'search_aliases',
+    createdAt: 'created_at',
+    compatibleModels: 'compatible_models',
+    customGroupPrices: 'custom_group_prices',
+    maxOrderQty: 'max_order_qty',
+    waitlistCount: 'waitlist_count',
+    clientId: 'client_id',
+    clientName: 'client_name',
+    clientPhone: 'client_phone',
+    groupId: 'group_id',
+    creditLimit: 'credit_limit',
+    walletBalance: 'wallet_balance',
+    avatarImage: 'avatar_image',
+    avatarBg: 'avatar_bg',
+    secondaryAddress: 'secondary_address',
+    paymentMethod: 'payment_method',
+    deliveryFeeBase: 'delivery_fee_base',
+    discountBase: 'discount_base',
+    walletUsedBase: 'wallet_used_base',
+    adminEdited: 'admin_edited',
+    adminEditNote: 'admin_edit_note',
+    exchangeRateUsed: 'exchange_rate_used',
+    modifierType: 'modifier_type',
+    modifierValue: 'modifier_value',
+    isDefault: 'is_default',
+    adminReply: 'admin_reply',
+    orderId: 'order_id',
+    partId: 'part_id',
+    partName: 'part_name',
+    refundAmountBase: 'refund_amount_base',
+    adminResponse: 'admin_response',
+    resolutionType: 'resolution_type',
+    warrantyConfirmed: 'warranty_confirmed',
+    shopName: 'shop_name',
+    ownerName: 'owner_name',
+    assignedGroupId: 'assigned_group_id',
+  };
+
+  const SNAKE_TO_CAMEL_MAP = Object.fromEntries(
+    Object.entries(CAMEL_TO_SNAKE_MAP).map(([c, s]) => [s, c])
+  );
+
+  const toSnakeCaseRow = (row, tableName = '') => {
+    if (!row || typeof row !== 'object') return row;
+    const out = {};
+    for (const [k, v] of Object.entries(row)) {
+      const sk = CAMEL_TO_SNAKE_MAP[k] || k;
+      out[sk] = v;
+    }
+    if (tableName === 'account_requests') {
+      if (out.name && !out.shop_name) out.shop_name = out.name;
+      if (out.owner && !out.owner_name) out.owner_name = out.owner;
+      delete out.password;
+    }
+    if (tableName === 'clients') {
+      if (!out.owner) out.owner = out.name || 'عميل فردي';
+    }
+    if (tableName === 'promo_codes') {
+      if (out.is_active !== undefined && out.active === undefined) {
+        out.active = out.is_active;
+        delete out.is_active;
+      }
+    }
+    return out;
+  };
+
+  const toCamelCaseRow = (row) => {
+    if (!row || typeof row !== 'object') return row;
+    const out = {};
+    for (const [k, v] of Object.entries(row)) {
+      const ck = SNAKE_TO_CAMEL_MAP[k] || k;
+      out[ck] = v;
+    }
+    if (out.shop_name && !out.name) out.name = out.shop_name;
+    if (out.owner_name && !out.owner) out.owner = out.owner_name;
+    return out;
+  };
+
+  const resolveActualTableName = (name) => {
+    if (name === 'models' || name === 'mobile_models') return 'mobile_models';
+    if (name === 'parts' || name === 'spare_parts') return 'spare_parts';
+    return name;
+  };
+
   const sbFetchTable = async (tableName, select = '*', query = '') => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return null;
+    const realTable = resolveActualTableName(tableName);
     try {
-      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?select=${select}${query}`, {
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${select}${query}`, {
         headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
       });
       if (res.ok) {
-        return await res.json();
+        const rows = await res.json();
+        if (Array.isArray(rows)) {
+          return rows.map(toCamelCaseRow);
+        }
+        return rows;
       }
     } catch (err) {}
     return null;
@@ -2146,13 +2241,18 @@ export default function App() {
   const sbUpsert = async (tableName, recordOrArray) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid || !recordOrArray) return false;
+    const realTable = resolveActualTableName(tableName);
     try {
-      const res = await fetch(`${sbUrl}/rest/v1/${tableName}`, {
+      const payload = Array.isArray(recordOrArray)
+        ? recordOrArray.map(r => toSnakeCaseRow(r, realTable))
+        : toSnakeCaseRow(recordOrArray, realTable);
+
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}`, {
         method: 'POST',
         headers: sbHeaders(sbKey, {
           'Prefer': 'resolution=merge-duplicates,return=minimal'
         }),
-        body: JSON.stringify(recordOrArray)
+        body: JSON.stringify(payload)
       });
       return res.ok;
     } catch (err) {}
@@ -2162,11 +2262,13 @@ export default function App() {
   const sbUpdate = async (tableName, id, patchObj) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid || !id) return false;
+    const realTable = resolveActualTableName(tableName);
     try {
-      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
+      const payload = toSnakeCaseRow(patchObj, realTable);
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?id=eq.${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers: sbHeaders(sbKey, { 'Prefer': 'return=minimal' }),
-        body: JSON.stringify(patchObj)
+        body: JSON.stringify(payload)
       });
       return res.ok;
     } catch (err) {}
@@ -2176,8 +2278,9 @@ export default function App() {
   const sbDelete = async (tableName, id) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid || !id) return false;
+    const realTable = resolveActualTableName(tableName);
     try {
-      const res = await fetch(`${sbUrl}/rest/v1/${tableName}?id=eq.${encodeURIComponent(id)}`, {
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?id=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: sbHeaders(sbKey)
       });
@@ -2225,8 +2328,8 @@ export default function App() {
 
     try {
       const tasks = [
-        sbUpsert('parts', parts),
-        sbUpsert('models', models),
+        sbUpsert('spare_parts', parts),
+        sbUpsert('mobile_models', models),
         sbUpsert('pricing_groups', groups),
         sbUpsert('brands', brands.map(b => (typeof b === 'string' ? { name: b } : b))),
         sbUpsert('store_ads', storeAds),
@@ -2416,13 +2519,12 @@ export default function App() {
 
       // 3. Enqueue Debounced (700ms) & Serialized Save to Supabase if Admin
       if (isValid && hasCloudInitialPullCompletedRef.current && adminAuthenticated) {
-        pendingSaveBundleRef.current = { ...bundle, updatedAt: nowTs };
         if (saveDebounceTimerRef.current) {
           clearTimeout(saveDebounceTimerRef.current);
         }
         saveDebounceTimerRef.current = setTimeout(() => {
           saveDebounceTimerRef.current = null;
-          processSaveQueue(false);
+          pushToSupabaseCloud(null, false);
         }, 700);
       }
     } catch (err) {}
@@ -2507,6 +2609,11 @@ export default function App() {
       return;
     }
 
+    // Protect recent local modifications (e.g. within 3 seconds) from being overwritten
+    if (Date.now() - lastLocalMutationAtRef.current < 3000) {
+      return;
+    }
+
     try {
       // 1. Lightweight Check on sync_meta (~300 bytes)
       let syncMetaRows = null;
@@ -2537,14 +2644,12 @@ export default function App() {
       };
 
       const isAdmin = appPortal === 'admin' || adminAuthenticated;
-      // Visitor tables: public catalog only (NO private clients or invoices downloaded)
-      const visitorTables = ['parts', 'models', 'brands', 'pricing_groups', 'store_ads', 'showcase_bars', 'promo_codes', 'site_settings'];
+      const visitorTables = ['spare_parts', 'mobile_models', 'brands', 'pricing_groups', 'store_ads', 'showcase_bars', 'promo_codes', 'site_settings'];
       const adminExtraTables = ['clients', 'account_requests', 'orders', 'returns_list', 'complaints', 'sourcing_requests', 'auto_templates'];
       const targetTables = isAdmin ? [...visitorTables, ...adminExtraTables] : visitorTables;
 
       const tablesToFetch = targetTables.filter(isTableChanged);
       if (silent && tablesToFetch.length === 0) {
-        // Nothing changed! Zero bytes downloaded!
         return;
       }
 
@@ -2558,10 +2663,12 @@ export default function App() {
             isIncomingSyncRef.current = true;
 
             switch (tbl) {
+              case 'spare_parts':
               case 'parts':
                 setParts(rows);
                 window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(rows));
                 break;
+              case 'mobile_models':
               case 'models':
                 setModels(rows);
                 window.localStorage.setItem('hmarket_v2_models', JSON.stringify(rows));
@@ -2662,7 +2769,6 @@ export default function App() {
     }
   };
 
-  // Graceful fallback to app_state_sync if user hasn't run the new schema yet
   const pullLegacyAppStateSync = async (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return;
@@ -3415,13 +3521,13 @@ export default function App() {
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
     setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
 
-    // Direct Normalized Table Operations (Massive Egress Reduction: ~1.5KB instead of 4MB!)
+    // Direct Normalized Table Operations (Massive Egress Reduction)
     sbUpsert('orders', newOrder);
     cartSummary.items.forEach(item => {
       const p = parts.find(x => x.id === item.part.id);
       if (p) {
         const updatedStock = Math.max(0, p.stock - item.qty);
-        sbUpdate('parts', p.id, { stock: updatedStock });
+        sbUpdate('spare_parts', p.id, { stock: updatedStock });
       }
     });
     setCart({});
@@ -7648,34 +7754,6 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             </button>
           </div>
         </div>
-
-        {/* Egress Fix: Independent Tables Migration Card */}
-        <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl p-5 border border-emerald-200 shadow-xs mt-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Database className="w-5 h-5 text-emerald-600" />
-                <h4 className="font-black text-slate-900 text-sm">
-                  نظام الجداول المستقلة وحل استهلاك الباندويث (Egress Quota Fix)
-                </h4>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-600 text-white">
-                  جديد v7.0
-                </span>
-              </div>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-2xl">
-                تم فصل المنتجات والطلبات والعملاء إلى جداول مستقلة وتفعيل الفحص الذكي <span className="font-mono font-bold">sync_meta</span> لخفض استهلاك الباندويث والـ Egress بنسبة تتجاوز 90%. اضغط هنا لاستدعاء إجراء الترحيل التلقائي ونقل البيانات القديمة إن وُجدت.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleTriggerDatabaseMigration}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition shrink-0"
-            >
-              <Database className="w-4 h-4" />
-              <span>ترحيل وتأكيد الجداول المستقلة الآن</span>
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
@@ -8477,11 +8555,14 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       aliases: newModelAliases.trim() || newModelName.trim(),
       image: newModelImage || PART_IMAGES.screen
     };
+    lastLocalMutationAtRef.current = Date.now();
     setModels(prev => [newMdl, ...prev]);
+    sbUpsert('mobile_models', newMdl);
 
     if (autoGenerateParts) {
       const generated = generateTemplatePartsForModel(newMdl);
       setParts(prev => [...generated, ...prev]);
+      sbUpsert('spare_parts', generated);
       showToast(
         `تم إضافة موديل "${newMdl.name}" بصورته وتوليد ${generated.length} قطع غيار من التمبلت تلقائياً!`,
         'success'
@@ -8538,8 +8619,10 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       'حذف الموديل وجميع قطع غياره',
       `هل أنت متأكد من حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له (${childCount} قطعة) بشكل نهائي؟`,
       () => {
+        lastLocalMutationAtRef.current = Date.now();
         setModels(prev => prev.filter(m => m.id !== modelObj.id));
         setParts(prev => prev.filter(p => p.modelId !== modelObj.id));
+        sbDelete('mobile_models', modelObj.id);
         showToast(`تم حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له.`, 'info');
       }
     );
@@ -11748,8 +11831,12 @@ model OrderInvoice {
       setClients(prev => [newClientObj, ...prev]);
       setAccountRequests(prev => [approvedReq, ...prev]);
       setNotifications(prev => [autoNotif, ...prev]);
-      sbUpsert('clients', newClientObj);
-      sbUpsert('account_requests', approvedReq);
+      commitCustomerCloudTransaction(cloud => ({
+        ...cloud,
+        clients: [newClientObj, ...(Array.isArray(cloud.clients) ? cloud.clients : clients)],
+        accountRequests: [approvedReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
+        notifications: [autoNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+      }));
 
       setActiveRole(newClientId);
       setLoginModalOpen(false);
@@ -11773,7 +11860,13 @@ model OrderInvoice {
     isCustomerMutatingCloudRef.current = true;
     setAccountRequests(prev => [newReq, ...prev]);
     setNotifications(prev => [newAdminNotif, ...prev]);
-    sbUpsert('account_requests', newReq);
+
+    // Immediately merge into Supabase Cloud so Admin Dashboard receives it right away!
+    commitCustomerCloudTransaction(cloud => ({
+      ...cloud,
+      accountRequests: [newReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
+      notifications: [newAdminNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+    }));
 
     setLoginModalOpen(false);
     setRegErrors({});
@@ -12668,7 +12761,6 @@ model OrderInvoice {
         createdAt: '2026-11-01 06:25'
       };
       setReturnsList(prev => [newRet, ...prev]);
-      sbUpsert('returns_list', newRet);
       setReturnModalOrder(null);
       setRetReason('');
       setRetPhotos([]);
@@ -12838,6 +12930,13 @@ model OrderInvoice {
   });
   const cloudSourcingUpdate = (mapper, extraNotif) => {
     isCustomerMutatingCloudRef.current = true;
+    commitCustomerCloudTransaction(cloud => ({
+      ...cloud,
+      sourcingRequests: mapper(Array.isArray(cloud.sourcingRequests) ? cloud.sourcingRequests : sourcingRequests),
+      notifications: extraNotif
+        ? [extraNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
+        : Array.isArray(cloud.notifications) ? cloud.notifications : notifications
+    }));
   };
 
   const openSourcing = () => {
@@ -15218,7 +15317,9 @@ ${footer}
         waitlistCount: 0
       };
 
+      lastLocalMutationAtRef.current = Date.now();
       setParts(prev => [newPart, ...prev]);
+      sbUpsert('spare_parts', newPart);
       setAddingPartToModel(null);
       showToast(`تمت إضافة "${newPart.name}" بصورتها داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
     };
@@ -15715,9 +15816,11 @@ ${footer}
 
     const handleSaveModel = (e) => {
       e.preventDefault();
+      lastLocalMutationAtRef.current = Date.now();
       setModels(prev =>
         prev.map(m => (m.id === editingModelObj.id ? { ...editingModelObj } : m))
       );
+      sbUpdate('mobile_models', editingModelObj.id, editingModelObj);
       setEditingModelObj(null);
       showToast('تم تحديث بيانات وصورة الموديل بنجاح!', 'success');
     };
