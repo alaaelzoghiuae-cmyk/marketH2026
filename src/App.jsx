@@ -1808,14 +1808,38 @@ export default function App() {
 
   // Resolve Supabase URL and Key from Env OR SiteSettings OR LocalStorage Backup
   const getSupabaseConfig = () => {
+    let envUrl = '';
+    let envKey = '';
+    try {
+      if (typeof import.meta !== 'undefined' && import.meta.env) {
+        envUrl = import.meta.env.VITE_SUPABASE_URL || '';
+        envKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+      }
+    } catch (e) {}
+
     let savedUrl = '';
     let savedKey = '';
     try {
       savedUrl = window.localStorage.getItem('hmarket_sb_url') || '';
       savedKey = window.localStorage.getItem('hmarket_sb_key') || '';
     } catch (e) {}
-    const sbUrl = (window.__HMARKET_SUPABASE_URL__ || siteSettings?.supabaseUrl || savedUrl || '').trim().replace(/\/$/, '');
-    const sbKey = (window.__HMARKET_SUPABASE_KEY__ || siteSettings?.supabaseAnonKey || savedKey || '').trim();
+
+    const sbUrl = (
+      envUrl ||
+      window.__HMARKET_SUPABASE_URL__ ||
+      siteSettings?.supabaseUrl ||
+      savedUrl ||
+      ''
+    ).trim().replace(/\/$/, '');
+
+    const sbKey = (
+      envKey ||
+      window.__HMARKET_SUPABASE_KEY__ ||
+      siteSettings?.supabaseAnonKey ||
+      savedKey ||
+      ''
+    ).trim();
+
     const isValid = Boolean(sbUrl && sbKey && sbUrl.startsWith('http'));
     if (isValid) {
       try {
@@ -2609,207 +2633,85 @@ export default function App() {
       return;
     }
 
-    // Protect recent local modifications (e.g. within 3 seconds) from being overwritten
-    if (Date.now() - lastLocalMutationAtRef.current < 3000) {
+    // Protect recent local edits from being overwritten
+    if (Date.now() - lastLocalMutationAtRef.current < 4000) {
       return;
     }
 
     try {
-      // 1. Lightweight Check on sync_meta (~300 bytes)
-      let syncMetaRows = null;
-      try {
-        const smRes = await fetch(`${sbUrl}/rest/v1/sync_meta?select=table_name,updated_at`, {
-          headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
-        });
-        if (smRes.ok) {
-          syncMetaRows = await smRes.json();
-        }
-      } catch (e) {}
-
-      // Fallback to legacy app_state_sync if user hasn't run the new SQL schema yet
-      if (!Array.isArray(syncMetaRows) || syncMetaRows.length === 0) {
-        return await pullLegacyAppStateSync(silent);
-      }
-
-      const metaMap = {};
-      syncMetaRows.forEach(r => {
-        if (r.table_name && r.updated_at) metaMap[r.table_name] = r.updated_at;
-      });
-
-      const isTableChanged = (tbl) => {
-        if (!hasCloudInitialPullCompletedRef.current) return true;
-        const remoteTime = metaMap[tbl];
-        const lastTime = lastKnownTableTimestampsRef.current[tbl];
-        return !lastTime || remoteTime !== lastTime;
-      };
-
-      const isAdmin = appPortal === 'admin' || adminAuthenticated;
-      const visitorTables = ['spare_parts', 'mobile_models', 'brands', 'pricing_groups', 'store_ads', 'showcase_bars', 'promo_codes', 'site_settings'];
-      const adminExtraTables = ['clients', 'account_requests', 'orders', 'returns_list', 'complaints', 'sourcing_requests', 'auto_templates'];
-      const targetTables = isAdmin ? [...visitorTables, ...adminExtraTables] : visitorTables;
-
-      const tablesToFetch = targetTables.filter(isTableChanged);
-      if (silent && tablesToFetch.length === 0) {
-        return;
-      }
-
       setCloudSyncStatus('syncing');
 
-      await Promise.all(tablesToFetch.map(async (tbl) => {
-        try {
-          const rows = await sbFetchTable(tbl);
-          if (Array.isArray(rows)) {
-            lastKnownTableTimestampsRef.current[tbl] = metaMap[tbl] || new Date().toISOString();
-            isIncomingSyncRef.current = true;
+      // 1. Directly fetch products & models from independent tables
+      const [partsRows, modelsRows, groupsRows] = await Promise.all([
+        sbFetchTable('spare_parts'),
+        sbFetchTable('mobile_models'),
+        sbFetchTable('pricing_groups')
+      ]);
 
-            switch (tbl) {
-              case 'spare_parts':
-              case 'parts':
-                setParts(prevParts => {
-                  const serverIds = new Set(rows.map(r => r.id));
-                  const localOnly = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !serverIds.has(p.id));
-                  const merged = [...localOnly, ...rows];
-                  window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(merged));
-                  return merged;
-                });
-                break;
-              case 'mobile_models':
-              case 'models':
-                setModels(prevModels => {
-                  const serverIds = new Set(rows.map(r => r.id));
-                  const localOnly = (Array.isArray(prevModels) ? prevModels : []).filter(m => m && m.id && !serverIds.has(m.id));
-                  const merged = [...localOnly, ...rows];
-                  window.localStorage.setItem('hmarket_v2_models', JSON.stringify(merged));
-                  return merged;
-                });
-                break;
-              case 'brands':
-                const brandNames = rows.map(b => (typeof b === 'object' && b.name ? b.name : b));
-                setBrands(brandNames);
-                window.localStorage.setItem('hmarket_v2_brands', JSON.stringify(brandNames));
-                break;
-              case 'pricing_groups':
-                setGroups(rows);
-                window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(rows));
-                break;
-              case 'store_ads':
-                setStoreAds(rows);
-                window.localStorage.setItem('hmarket_v2_storeAds', JSON.stringify(rows));
-                break;
-              case 'showcase_bars':
-                setShowcaseBars(rows);
-                window.localStorage.setItem('hmarket_v2_showcaseBars', JSON.stringify(rows));
-                break;
-              case 'promo_codes':
-                setPromoCodes(rows);
-                window.localStorage.setItem('hmarket_v2_promoCodes', JSON.stringify(rows));
-                break;
-              case 'clients':
-                setClients(rows);
-                window.localStorage.setItem('hmarket_v2_clients', JSON.stringify(rows));
-                break;
-              case 'account_requests':
-                if (rows.length > lastSeenReqCountRef.current && isAdmin) {
-                  lastSeenReqCountRef.current = rows.length;
-                  playNotificationSound();
-                  showToast('🔔 وصل طلب تسجيل حساب عميل جديد بانتظار موافقتك!', 'success');
-                }
-                setAccountRequests(rows);
-                window.localStorage.setItem('hmarket_v2_accountRequests', JSON.stringify(rows));
-                break;
-              case 'orders':
-                if (rows.length > lastSeenOrderCountRef.current && isAdmin) {
-                  lastSeenOrderCountRef.current = rows.length;
-                  playNotificationSound();
-                  showToast('🔔 وصلت طلبية جديدة الآن من أحد العملاء! تفقد قسم الطلبات.', 'success');
-                }
-                setOrders(rows);
-                window.localStorage.setItem('hmarket_v2_orders', JSON.stringify(rows));
-                break;
-              case 'returns_list':
-                setReturnsList(rows);
-                window.localStorage.setItem('hmarket_v2_returnsList', JSON.stringify(rows));
-                break;
-              case 'complaints':
-                setComplaints(rows);
-                window.localStorage.setItem('hmarket_v2_complaints', JSON.stringify(rows));
-                break;
-              case 'auto_templates':
-                setAutoTemplates(rows);
-                window.localStorage.setItem('hmarket_v2_autoTemplates', JSON.stringify(rows));
-                break;
-              case 'sourcing_requests':
-                setSourcingRequests(rows);
-                window.localStorage.setItem('hmarket_v2_sourcingRequests', JSON.stringify(rows));
-                break;
-              case 'site_settings':
-                const cfgRow = rows.find(r => r.id === 'main') || rows[0];
-                if (cfgRow) {
-                  if (cfgRow.settings && typeof cfgRow.settings === 'object') {
-                    const mergedSettings = { ...cfgRow.settings, supabaseUrl: cfgRow.settings.supabaseUrl || sbUrl, supabaseAnonKey: cfgRow.settings.supabaseAnonKey || sbKey };
-                    setSiteSettings(mergedSettings);
-                    window.localStorage.setItem('hmarket_v2_siteSettings', JSON.stringify(mergedSettings));
-                  }
-                  if (cfgRow.credentials && typeof cfgRow.credentials === 'object') {
-                    setAdminCredentials(cfgRow.credentials);
-                    window.localStorage.setItem('hmarket_v2_adminCredentials', JSON.stringify(cfgRow.credentials));
-                  }
-                  if (cfgRow.currencies && typeof cfgRow.currencies === 'object') {
-                    setCurrencies(cfgRow.currencies);
-                    window.localStorage.setItem('hmarket_v2_currencies', JSON.stringify(cfgRow.currencies));
-                  }
-                  if (Array.isArray(cfgRow.notifications)) {
-                    setNotifications(cfgRow.notifications);
-                    window.localStorage.setItem('hmarket_v2_notifications', JSON.stringify(cfgRow.notifications));
-                  }
-                }
-                break;
-              default:
-                break;
-            }
-          }
-        } catch (err) {}
-      }));
+      isIncomingSyncRef.current = true;
+
+      if (Array.isArray(partsRows) && partsRows.length > 0) {
+        setParts(prevParts => {
+          const serverIds = new Set(partsRows.map(r => r.id));
+          const localOnly = (Array.isArray(prevParts) ? prevParts : []).filter(p => p && p.id && !serverIds.has(p.id));
+          const merged = [...localOnly, ...partsRows];
+          try { window.localStorage.setItem('hmarket_v2_parts', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      if (Array.isArray(modelsRows) && modelsRows.length > 0) {
+        setModels(prevModels => {
+          const serverIds = new Set(modelsRows.map(r => r.id));
+          const localOnly = (Array.isArray(prevModels) ? prevModels : []).filter(m => m && m.id && !serverIds.has(m.id));
+          const merged = [...localOnly, ...modelsRows];
+          try { window.localStorage.setItem('hmarket_v2_models', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      if (Array.isArray(groupsRows) && groupsRows.length > 0) {
+        setGroups(groupsRows);
+        try { window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(groupsRows)); } catch (e) {}
+      }
+
+      // 2. If Admin, also fetch clients, orders, complaints, returns
+      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      if (isAdmin) {
+        const [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows] = await Promise.all([
+          sbFetchTable('clients'),
+          sbFetchTable('orders'),
+          sbFetchTable('complaints'),
+          sbFetchTable('returns_list'),
+          sbFetchTable('account_requests')
+        ]);
+
+        if (Array.isArray(clientsRows) && clientsRows.length > 0) {
+          setClients(clientsRows);
+          try { window.localStorage.setItem('hmarket_v2_clients', JSON.stringify(clientsRows)); } catch (e) {}
+        }
+        if (Array.isArray(ordersRows) && ordersRows.length > 0) {
+          setOrders(ordersRows);
+          try { window.localStorage.setItem('hmarket_v2_orders', JSON.stringify(ordersRows)); } catch (e) {}
+        }
+        if (Array.isArray(complaintsRows) && complaintsRows.length > 0) {
+          setComplaints(complaintsRows);
+          try { window.localStorage.setItem('hmarket_v2_complaints', JSON.stringify(complaintsRows)); } catch (e) {}
+        }
+        if (Array.isArray(returnsRows) && returnsRows.length > 0) {
+          setReturnsList(returnsRows);
+          try { window.localStorage.setItem('hmarket_v2_returnsList', JSON.stringify(returnsRows)); } catch (e) {}
+        }
+        if (Array.isArray(reqsRows) && reqsRows.length > 0) {
+          setAccountRequests(reqsRows);
+          try { window.localStorage.setItem('hmarket_v2_accountRequests', JSON.stringify(reqsRows)); } catch (e) {}
+        }
+      }
 
       setCloudSyncStatus('cloud_synced');
       hasCloudInitialPullCompletedRef.current = true;
-      if (!silent) showToast('تمت مزامنة البيانات من الجداول السحابية المستقلة بنجاح ✓', 'success');
+      if (!silent) showToast('تمت مزامنة وقراءة البيانات من الجداول المستقلة بنجاح ✓', 'success');
     } catch (err) {
-      hasCloudInitialPullCompletedRef.current = true;
-    }
-  };
-
-  const pullLegacyAppStateSync = async (silent = false) => {
-    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) return;
-    try {
-      const res = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.main_store&select=payload,updated_at`, {
-        headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
-      });
-      if (!res.ok) return;
-      const rows = await res.json();
-      const cloudData = rows?.[0]?.payload;
-      if (cloudData && typeof cloudData === 'object') {
-        isIncomingSyncRef.current = true;
-        if (Array.isArray(cloudData.parts)) setParts(cloudData.parts);
-        if (Array.isArray(cloudData.models)) setModels(cloudData.models);
-        if (Array.isArray(cloudData.brands)) setBrands(cloudData.brands);
-        if (Array.isArray(cloudData.groups)) setGroups(cloudData.groups);
-        if (Array.isArray(cloudData.clients)) setClients(cloudData.clients);
-        if (Array.isArray(cloudData.orders)) setOrders(cloudData.orders);
-        if (Array.isArray(cloudData.accountRequests)) setAccountRequests(cloudData.accountRequests);
-        if (Array.isArray(cloudData.returnsList)) setReturnsList(cloudData.returnsList);
-        if (Array.isArray(cloudData.complaints)) setComplaints(cloudData.complaints);
-        if (Array.isArray(cloudData.promoCodes)) setPromoCodes(cloudData.promoCodes);
-        if (Array.isArray(cloudData.storeAds)) setStoreAds(cloudData.storeAds);
-        if (Array.isArray(cloudData.showcaseBars)) setShowcaseBars(cloudData.showcaseBars);
-        if (cloudData.siteSettings) setSiteSettings(cloudData.siteSettings);
-        if (cloudData.adminCredentials) setAdminCredentials(cloudData.adminCredentials);
-        if (cloudData.currencies) setCurrencies(cloudData.currencies);
-        hasCloudInitialPullCompletedRef.current = true;
-        setCloudSyncStatus('cloud_synced');
-      }
-    } catch (e) {
       hasCloudInitialPullCompletedRef.current = true;
     }
   };
