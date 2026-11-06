@@ -2445,6 +2445,9 @@ export default function App() {
       rawSnake.brand = rawSnake.brand || 'عام';
       rawSnake.name = rawSnake.name || 'موديل';
       rawSnake.aliases = rawSnake.aliases || rawSnake.name;
+      if (typeof rawSnake.image === 'string' && rawSnake.image.startsWith('data:')) {
+        rawSnake.image = '';
+      }
     } else if (realTable === 'pricing_groups') {
       rawSnake.currency = rawSnake.currency || 'EGP';
       rawSnake.modifier_type = rawSnake.modifier_type || 'none';
@@ -2712,7 +2715,7 @@ export default function App() {
   // Explicit lightweight column projections per table (strictly NO select=* and NO redundant `data` or heavy `images`/`messages` blobs in list queries!)
   const TABLE_LIGHT_COLUMNS = {
     spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at,data->>isPromotedAd',
-    mobile_models: 'id,brand,name,aliases,image,created_at,data->>isPromotedAd',
+    mobile_models: 'id,brand,name,data->>isPromotedAd',
     brands: 'name,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
     store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
@@ -2730,6 +2733,7 @@ export default function App() {
 
   const TABLE_DEFAULT_QUERY = {
     spare_parts: '&order=created_at.desc&limit=26',
+    mobile_models: '&order=name.asc&limit=100',
     orders: '&order=created_at.desc&limit=50',
     clients: '&limit=100',
     complaints: '&order=created_at.desc&limit=50',
@@ -3530,7 +3534,7 @@ export default function App() {
         templatesRows
       ] = await Promise.all([
         sbFetchTable('spare_parts', null, initialPartsQuery),
-        sbFetchTable('mobile_models', null, '&limit=200'),
+        sbFetchTable('mobile_models', null, '&order=name.asc&limit=100'),
         sbFetchTable('pricing_groups', null, '&limit=50'),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20'),
         sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20'),
