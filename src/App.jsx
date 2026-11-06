@@ -2663,11 +2663,12 @@ export default function App() {
       setCloudSyncStatus('syncing');
       console.log('🚀 [H-market] بدء سحب المنتجات والموديلات من Supabase...', sbUrl);
 
-      // 1. Directly fetch products & models from independent tables (with fallback to alternative table names)
-      let [partsRows, modelsRows, groupsRows] = await Promise.all([
+      // 1. Directly fetch products, models, pricing groups & ads from independent tables
+      let [partsRows, modelsRows, groupsRows, adsRows] = await Promise.all([
         sbFetchTable('spare_parts'),
         sbFetchTable('mobile_models'),
-        sbFetchTable('pricing_groups')
+        sbFetchTable('pricing_groups'),
+        sbFetchTable('store_ads')
       ]);
 
       // If spare_parts was empty, check products
@@ -2706,6 +2707,11 @@ export default function App() {
       if (Array.isArray(groupsRows) && groupsRows.length > 0) {
         setGroups(groupsRows);
         try { window.localStorage.setItem('hmarket_v2_groups', JSON.stringify(groupsRows)); } catch (e) {}
+      }
+
+      if (Array.isArray(adsRows) && adsRows.length > 0) {
+        setStoreAds(adsRows);
+        try { window.localStorage.setItem('hmarket_v2_storeAds', JSON.stringify(adsRows)); } catch (e) {}
       }
 
       // 2. If Admin, also fetch clients, orders, complaints, returns
