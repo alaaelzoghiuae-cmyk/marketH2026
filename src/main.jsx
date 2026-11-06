@@ -14,7 +14,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('H-market Error Caught:', error, errorInfo);
+    console.error('ELZOGHBI Error Caught:', error, errorInfo);
   }
 
   handleReset = () => {
@@ -22,9 +22,10 @@ class ErrorBoundary extends React.Component {
       const keysToClear = [];
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
-        if (k && k.startsWith('hmarket_')) keysToClear.push(k);
+        if (k && (k.startsWith('elzoghbi_') )) keysToClear.push(k);
       }
       keysToClear.forEach(k => localStorage.removeItem(k));
+      sessionStorage.clear();
     } catch (e) {}
     window.location.reload();
   };
@@ -55,7 +56,7 @@ class ErrorBoundary extends React.Component {
           }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚙️</div>
             <h2 style={{ fontSize: '20px', fontWeight: '800', marginBottom: '8px' }}>
-              مرحباً بك في H-market
+              مرحباً بك في ELZOGHBI
             </h2>
             <p style={{ fontSize: '13px', color: '#94a3b8', lineHeight: '1.6', marginBottom: '24px' }}>
               تم رصد خطأ أثناء تحميل الذاكرة المحلية أو الكاش القديم. اضغط على الزر أدناه لتنظيف الذاكرة المؤقتة وتشغيل الموقع فوراً.
@@ -88,7 +89,7 @@ class ErrorBoundary extends React.Component {
                 cursor: 'pointer'
               }}
             >
-              🔄 إعادة تهيئة الذاكرة وتشغيل الموقع الآن
+              🔄 إعادة تهيئة الذاكرة وتشغيل منصة ELZOGHBI الآن
             </button>
           </div>
         </div>
