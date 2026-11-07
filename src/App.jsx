@@ -840,9 +840,11 @@ function BlurFitImage({ src, alt, className = '', imgClassName = '', draggable }
   const containerRef = useRef(null);
   const [inView, setInView] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     setLoaded(false);
+    setFailed(false);
   }, [src]);
 
   useEffect(() => {
@@ -861,11 +863,13 @@ function BlurFitImage({ src, alt, className = '', imgClassName = '', draggable }
           }
         });
       },
-      { rootMargin: '160px 0px', threshold: 0.01 }
+      { rootMargin: '220px 0px', threshold: 0.01 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, [inView, src]);
+
+  const effectiveSrc = (!src || failed) ? PART_IMAGES.screen : src;
 
   return (
     <div
@@ -875,15 +879,18 @@ function BlurFitImage({ src, alt, className = '', imgClassName = '', draggable }
       {!loaded && (
         <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-800 via-slate-700/50 to-slate-800" />
       )}
-      {inView && src && (
+      {inView && (
         <img
-          src={src}
+          src={effectiveSrc}
           alt={alt || ''}
           loading="lazy"
           decoding="async"
           draggable={draggable}
           onLoad={() => setLoaded(true)}
-          onError={() => setLoaded(true)}
+          onError={() => {
+            if (!failed) setFailed(true);
+            setLoaded(true);
+          }}
           className={`relative w-full h-full object-contain transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
         />
       )}
@@ -1667,12 +1674,28 @@ export default function App() {
   const [detailImageIdx, setDetailImageIdx] = useState(0);
 
   const getPartImagesList = (part) => {
-    if (Array.isArray(part?.images) && part.images.length > 0) {
-      return part.images.filter(Boolean);
-    }
-    if (part?.image) return [part.image];
+    const primary = part?.image_url || part?.imageUrl || part?.image || '';
+    const rawArr = Array.isArray(part?.images) && part.images.length > 0
+      ? part.images.filter(Boolean)
+      : (Array.isArray(part?.imageUrls) && part.imageUrls.length > 0 ? part.imageUrls.filter(Boolean) : []);
+    const combined = Array.from(new Set([primary, ...rawArr].filter(Boolean))).slice(0, 4);
+    if (combined.length > 0) return combined;
     return [PART_IMAGES.screen];
   };
+
+  // --- UI Theme State ('modern_pro' vs 'classic') & Brand Images Map (1 image per brand) ---
+  const [uiTheme, setUiTheme] = useState(() => {
+    try { return window.localStorage.getItem('elzoghbi_ui_theme') || 'modern_pro'; } catch (e) { return 'modern_pro'; }
+  });
+  const toggleUiTheme = () => {
+    setUiTheme(prev => {
+      const next = prev === 'modern_pro' ? 'classic' : 'modern_pro';
+      try { window.localStorage.setItem('elzoghbi_ui_theme', next); } catch (e) {}
+      return next;
+    });
+  };
+  const [brandImages, setBrandImages] = useState(() => loadPersisted('brandImages', {}));
+  const [editingBrandImageFor, setEditingBrandImageFor] = useState(null); // { brandName, imageUrl }
 
   // --- Persistent Global State (Survives Page Refresh & Syncs Across Tabs + Supabase Cloud) ---
   const [siteSettings, setSiteSettings] = useState(() => loadPersisted('siteSettings', INITIAL_SITE_SETTINGS));
@@ -2334,12 +2357,12 @@ export default function App() {
     spare_parts: [
       'id', 'sku', 'model_id', 'category', 'name', 'quality_grade',
       'colors', 'compatible_models', 'search_aliases', 'description', 'warranty_text',
-      'image', 'images', 'stock', 'low_stock_threshold', 'max_order_qty',
+      'image_url', 'image', 'images', 'stock', 'low_stock_threshold', 'max_order_qty',
       'cost_price', 'base_price', 'custom_group_prices', 'waitlist_count',
-      'sold_out', 'created_at', 'data'
+      'sold_out', 'is_promoted_ad', 'created_at', 'data'
     ],
-    mobile_models: ['id', 'brand', 'name', 'aliases', 'image', 'data'],
-    brands: ['name', 'sort_order'],
+    mobile_models: ['id', 'brand', 'name', 'aliases', 'image', 'is_promoted_ad', 'data'],
+    brands: ['name', 'sort_order', 'image_url'],
     pricing_groups: [
       'id', 'name', 'currency', 'modifier_type', 'modifier_value',
       'delivery_fee_base', 'is_default', 'description', 'data'
@@ -2431,7 +2454,11 @@ export default function App() {
       rawSnake.quality_grade = rawSnake.quality_grade || 'قياسي';
       rawSnake.colors = Array.isArray(rawSnake.colors) ? rawSnake.colors : ['قياسي'];
       rawSnake.compatible_models = Array.isArray(rawSnake.compatible_models) ? rawSnake.compatible_models : [];
-      rawSnake.images = Array.isArray(rawSnake.images) ? rawSnake.images : (rawSnake.image ? [rawSnake.image] : []);
+      const primaryUrl = row.image_url || row.imageUrl || rawSnake.image_url || rawSnake.image || (Array.isArray(rawSnake.images) && rawSnake.images[0]) || '';
+      rawSnake.image_url = primaryUrl;
+      rawSnake.image = primaryUrl;
+      rawSnake.images = (Array.isArray(rawSnake.images) && rawSnake.images.length > 0 ? rawSnake.images : (primaryUrl ? [primaryUrl] : [])).slice(0, 4);
+      rawSnake.is_promoted_ad = Boolean(row.isPromotedAd || rawSnake.is_promoted_ad);
       rawSnake.custom_group_prices = (rawSnake.custom_group_prices && typeof rawSnake.custom_group_prices === 'object') ? rawSnake.custom_group_prices : {};
       rawSnake.stock = Number(rawSnake.stock) || 0;
       rawSnake.low_stock_threshold = Number(rawSnake.low_stock_threshold) || 5;
@@ -2564,11 +2591,22 @@ export default function App() {
     if (out.ownerName && !out.owner) out.owner = out.ownerName;
     if (out.owner && !out.ownerName) out.ownerName = out.owner;
     if (out.desc_text && !out.desc) out.desc = out.desc_text;
+    const resolvedImgUrl = row.image_url || out.image_url || out.imageUrl || out.image || (Array.isArray(out.images) && out.images[0]) || '';
+    if (resolvedImgUrl) {
+      out.image_url = resolvedImgUrl;
+      out.imageUrl = resolvedImgUrl;
+      if (!out.image) out.image = resolvedImgUrl;
+    }
     if (Array.isArray(out.images) && out.images.length === 0 && out.image) {
       out.images = [out.image];
     }
+    if (Array.isArray(out.images) && out.images.length > 4) {
+      out.images = out.images.slice(0, 4);
+    }
     if (!out.image && Array.isArray(out.images) && out.images[0]) {
       out.image = out.images[0];
+      out.image_url = out.images[0];
+      out.imageUrl = out.images[0];
     }
     if (out.isPromotedAd !== undefined && out.isPromotedAd !== null) {
       out.isPromotedAd = out.isPromotedAd === true || out.isPromotedAd === 'true';
@@ -2735,9 +2773,9 @@ export default function App() {
 
   // Explicit lightweight column projections per table (strictly NO select=*, NO `image`/`images` in bulk catalog index, and NO `data` blobs!)
   const TABLE_LIGHT_COLUMNS = {
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image_url,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at',
     mobile_models: 'id,brand,name,aliases,is_promoted_ad',
-    brands: 'name,sort_order',
+    brands: 'name,sort_order,image_url',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
     store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
     showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order',
@@ -2869,17 +2907,30 @@ export default function App() {
         if (res.ok) {
           let rows = await res.json();
           if (Array.isArray(rows)) {
-            // If table has > 1000 rows (PostgREST max per page) and we requested a full light index, fetch remaining pages automatically
+            // High-Scale Parallel Multi-Page Loader for 5,000 to 15,000+ products (fetches in parallel waves of 4,000 rows!)
             if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && !currentQuery.includes('offset=')) {
-              for (let pageOffset = 1000; pageOffset <= 4000; pageOffset += 1000) {
-                const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&limit=1000&offset=${pageOffset}`, {
-                  headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                });
-                if (!moreRes.ok) break;
-                const moreRows = await moreRes.json();
-                if (!Array.isArray(moreRows) || moreRows.length === 0) break;
-                rows = rows.concat(moreRows);
-                if (moreRows.length < 1000) break;
+              for (let waveStart = 1000; waveStart <= 13000; waveStart += 4000) {
+                const offsets = [waveStart, waveStart + 1000, waveStart + 2000, waveStart + 3000];
+                const waveResults = await Promise.all(
+                  offsets.map(off =>
+                    fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&limit=1000&offset=${off}`, {
+                      headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+                    })
+                      .then(r => (r.ok ? r.json() : []))
+                      .catch(() => [])
+                  )
+                );
+                let waveHadFullLastPage = false;
+                for (let idx = 0; idx < waveResults.length; idx++) {
+                  const batch = waveResults[idx];
+                  if (Array.isArray(batch) && batch.length > 0) {
+                    rows = rows.concat(batch);
+                    if (idx === waveResults.length - 1 && batch.length === 1000) {
+                      waveHadFullLastPage = true;
+                    }
+                  }
+                }
+                if (!waveHadFullLastPage) break;
               }
             }
             const mapped = rows.map(toCamelCaseRow);
@@ -3182,7 +3233,7 @@ export default function App() {
         delete pendingDiffUpsertsRef.current[sliceKey];
         if (items.length > 0) {
           const formatted = sliceKey === 'brands'
-            ? items.map((b, i) => (typeof b === 'string' ? { name: b, sort_order: i } : b))
+            ? items.map((b, i) => (typeof b === 'string' ? { name: b, sort_order: i, image_url: brandImages[b] || '' } : b))
             : items;
           tasks.push(sbUpsert(tbl, formatted));
         }
@@ -3242,7 +3293,7 @@ export default function App() {
       const tasks = [
         sbUpsert('mobile_models', b.models || models),
         sbUpsert('pricing_groups', b.groups || groups),
-        sbUpsert('brands', (b.brands || brands).map((br, idx) => (typeof br === 'string' ? { name: br, sort_order: idx } : br))),
+        sbUpsert('brands', (b.brands || brands).map((br, idx) => (typeof br === 'string' ? { name: br, sort_order: idx, image_url: brandImages[br] || '' } : { ...br, image_url: br.image_url || brandImages[br.name] || '' }))),
         sbUpsert('spare_parts', b.parts || parts),
         sbUpsert('store_ads', (b.storeAds || storeAds).map((ad, idx) => ({ ...ad, sortOrder: idx }))),
         sbUpsert('showcase_bars', (b.showcaseBars || showcaseBars).map((bar, idx) => ({ ...bar, sortOrder: idx }))),
@@ -3383,15 +3434,18 @@ export default function App() {
       sourcingRequests
     };
 
-    // 1. Always save slices to localStorage immediately so page refresh NEVER loses state
+    // 1. Non-blocking localStorage persistence (skips serializing >2,000 parts on every keystroke so 5,000+ products stay 60FPS!)
     try {
       Object.entries(currentSlices).forEach(([k, v]) => {
+        if (k === 'parts' && Array.isArray(v) && v.length > 2000) return;
+        if (prevSlicesRef.current && prevSlicesRef.current[k] === v) return;
         window.localStorage.setItem('elzoghbi_v2_' + k, JSON.stringify(v));
       });
       window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(siteSettings));
       window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
       window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(currencies));
       window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(notifications));
+      window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(brandImages));
     } catch (e) {}
 
     // Initialize baseline snapshot on first mount without triggering network writes
@@ -3461,7 +3515,9 @@ export default function App() {
         const itemWithOrder = (sliceKey === 'storeAds' || sliceKey === 'showcaseBars')
           ? { ...item, sortOrder: idx }
           : item;
-        if (!prevEntry || JSON.stringify(prevEntry.item) !== JSON.stringify(item) || ((sliceKey === 'storeAds' || sliceKey === 'showcaseBars') && prevEntry.idx !== idx)) {
+        const orderChanged = (sliceKey === 'storeAds' || sliceKey === 'showcaseBars') && prevEntry && prevEntry.idx !== idx;
+        if (prevEntry && prevEntry.item === item && !orderChanged) return;
+        if (!prevEntry || orderChanged || JSON.stringify(prevEntry.item) !== JSON.stringify(item)) {
           markLocalUpsert(sliceKey, itemWithOrder);
           hasAnyMutation = true;
         }
@@ -3849,6 +3905,21 @@ export default function App() {
         });
       }
 
+      if (Array.isArray(brandsRows) && brandsRows.length > 0) {
+        const fetchedBrandImgs = {};
+        brandsRows.forEach(b => {
+          if (b && typeof b === 'object' && b.name && (b.image_url || b.imageUrl || b.image)) {
+            fetchedBrandImgs[String(b.name).trim()] = b.image_url || b.imageUrl || b.image;
+          }
+        });
+        if (Object.keys(fetchedBrandImgs).length > 0) {
+          setBrandImages(prev => {
+            const next = { ...prev, ...fetchedBrandImgs };
+            try { window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(next)); } catch (e) {}
+            return next;
+          });
+        }
+      }
       const explicitBrands = (Array.isArray(brandsRows) && brandsRows.length > 0)
         ? brandsRows.map(b => String(typeof b === 'object' && b !== null ? (b.name || b.id || '') : b).trim()).filter(Boolean)
         : (Array.isArray(legacyPayload?.brands) ? legacyPayload.brands : []);
@@ -4673,17 +4744,51 @@ export default function App() {
   };
   const CATEGORY_GRADS = ['from-blue-500 to-cyan-500', 'from-emerald-500 to-teal-500', 'from-amber-500 to-orange-500', 'from-rose-500 to-pink-500', 'from-violet-500 to-purple-500', 'from-sky-500 to-indigo-500', 'from-lime-500 to-green-600', 'from-fuchsia-500 to-rose-500'];
 
+  // --- High-Speed O(1) Lookup Indexes & Deferred Search for 5,000 to 15,000+ Products ---
+  const deferredSearchQuery = React.useDeferredValue(searchQuery);
+
+  const modelByIdMap = useMemo(() => {
+    const map = new Map();
+    for (let i = 0; i < models.length; i++) {
+      const m = models[i];
+      if (m && m.id !== undefined) map.set(String(m.id), m);
+    }
+    return map;
+  }, [models]);
+
+  const { partCountByModelIdMap, partCountByBrandMap } = useMemo(() => {
+    const byModel = new Map();
+    const byBrand = new Map();
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      if (!p) continue;
+      const mid = String(p.modelId || '');
+      byModel.set(mid, (byModel.get(mid) || 0) + 1);
+      const mObj = modelByIdMap.get(mid);
+      const bName = mObj?.brand || p.brand;
+      if (bName) byBrand.set(bName, (byBrand.get(bName) || 0) + 1);
+    }
+    return { partCountByModelIdMap: byModel, partCountByBrandMap: byBrand };
+  }, [parts, modelByIdMap]);
+
+  const parsedSearchWords = useMemo(() => {
+    const q = deferredSearchQuery.trim().toLowerCase();
+    return q ? q.split(/\s+/).filter(Boolean) : [];
+  }, [deferredSearchQuery]);
+
+  const selectedTargetModelName = useMemo(() => {
+    if (selectedModelId === 'ALL') return '';
+    return modelByIdMap.get(String(selectedModelId))?.name || '';
+  }, [selectedModelId, modelByIdMap]);
+
   const partPassesStoreFilters = (part, ignoreCategory = false) => {
-    // 1. Zero Price Hiding
-    const priceInfo = calculatePartPrice(part, currentGroup);
-    if (priceInfo.baseEgpPrice <= 0) return false;
+    if (!part) return false;
     if (part.customGroupPrices && Number(part.customGroupPrices[currentGroup?.id]) === 0) return false;
 
-    const modelObj = models.find(m => String(m.id) === String(part.modelId));
+    const modelObj = modelByIdMap.get(String(part.modelId));
     if (selectedBrand !== 'ALL' && modelObj?.brand !== selectedBrand) return false;
     if (selectedModelId !== 'ALL' && String(part.modelId) !== String(selectedModelId)) {
-      const targetModelName = models.find(m => m.id === selectedModelId)?.name;
-      if (!targetModelName || !(part.compatibleModels || []).some(cm => cm.includes(targetModelName))) {
+      if (!selectedTargetModelName || !(part.compatibleModels || []).some(cm => cm && cm.includes(selectedTargetModelName))) {
         return false;
       }
     }
@@ -4693,23 +4798,28 @@ export default function App() {
     if (storeStockFilter === 'LOW_STOCK' && (part.stock <= 0 || part.stock > part.lowStockThreshold)) return false;
     if (storeStockFilter === 'OUT_OF_STOCK' && part.stock > 0) return false;
 
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.trim().toLowerCase();
-      const haystack = [
-        part.name,
-        part.sku,
-        part.category,
-        part.qualityGrade,
-        part.description,
-        part.searchAliases,
-        ...(part.compatibleModels || []),
-        modelObj?.name || '',
-        modelObj?.aliases || ''
-      ]
-        .join(' ')
-        .toLowerCase();
-      const words = q.split(/\s+/);
-      if (!words.every(w => haystack.includes(w))) return false;
+    if (parsedSearchWords.length > 0) {
+      let haystack = part._cachedHaystack;
+      if (!haystack || part._cachedNameRef !== part.name) {
+        haystack = [
+          part.name,
+          part.sku,
+          part.category,
+          part.qualityGrade,
+          part.searchAliases,
+          ...(part.compatibleModels || []),
+          modelObj?.name || '',
+          modelObj?.brand || '',
+          modelObj?.aliases || ''
+        ]
+          .join(' ')
+          .toLowerCase();
+        part._cachedHaystack = haystack;
+        part._cachedNameRef = part.name;
+      }
+      for (let i = 0; i < parsedSearchWords.length; i++) {
+        if (!haystack.includes(parsedSearchWords[i])) return false;
+      }
     }
     return true;
   };
@@ -4725,7 +4835,7 @@ export default function App() {
       if (storeSortBy === 'date_asc') return (a.createdAt || '').localeCompare(b.createdAt || '');
       return (b.createdAt || '').localeCompare(a.createdAt || '');
     });
-  }, [parts, models, selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
+  }, [parts, modelByIdMap, selectedBrand, selectedModelId, selectedTargetModelName, selectedCategory, parsedSearchWords, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
 
   // Automatically load thumbnails (`image`) on-demand ONLY for the products visible on the current page (18-26 items) & Showcase Bars
   useEffect(() => {
@@ -5934,6 +6044,22 @@ export default function App() {
             )}
 
             <button
+              type="button"
+              onClick={toggleUiTheme}
+              className={`px-2.5 h-12 rounded-xl transition flex flex-col items-center justify-center gap-0.5 border ${
+                uiTheme === 'modern_pro'
+                  ? 'bg-gradient-to-b from-indigo-500 via-violet-600 to-fuchsia-600 text-white border-indigo-300/40 shadow-md shadow-indigo-500/20'
+                  : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
+              }`}
+              title="التبديل بين الثيم الاحترافي الحديث والشكل الأصلي الكلاسيكي"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-[9px] font-extrabold whitespace-nowrap">
+                {uiTheme === 'modern_pro' ? 'ثيم Pro' : 'الأصلي'}
+              </span>
+            </button>
+
+            <button
               onClick={() => setCartDrawerOpen(true)}
               className="relative min-w-[58px] h-12 px-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition flex flex-col items-center justify-center gap-0.5"
             >
@@ -6269,7 +6395,7 @@ export default function App() {
                   شوف كل المنتجات ›
                 </button>
               </div>
-              <div className="grid grid-rows-2 grid-flow-col auto-cols-[8.6rem] gap-2 overflow-x-auto pb-1 lg:grid-rows-none lg:grid-flow-row lg:grid-cols-4 lg:auto-cols-auto lg:overflow-visible lg:gap-3" style={{ scrollbarWidth: 'none' }}>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1.5 sm:flex-wrap" style={{ scrollbarWidth: 'none' }}>
                 {tops.map((t, i) => (
                   <button
                     key={t.cat}
@@ -6279,17 +6405,14 @@ export default function App() {
                       setSelectedCategory(t.cat);
                       setClientTab('search');
                     }}
-                    className="relative overflow-hidden rounded-xl sm:rounded-2xl p-1.5 sm:p-3.5 bg-white border border-slate-200 hover:border-blue-400 transition flex items-center gap-2 sm:gap-3 text-right"
+                    className="hm-cat-pill shrink-0 px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/40 transition flex items-center gap-2.5 text-right shadow-2xs"
                   >
-                    <span className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${CATEGORY_GRADS[i % CATEGORY_GRADS.length]} flex items-center justify-center text-base sm:text-2xl shrink-0`}>
-                      {categoryEmoji(t.cat)}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block font-extrabold text-slate-900 text-[11px] sm:text-sm truncate">{t.cat}</span>
-                      <span className="block text-[9px] sm:text-[11px] text-emerald-700 font-bold">{t.count} منتج</span>
+                    <span className="font-extrabold text-slate-900 text-xs sm:text-sm whitespace-nowrap">{t.cat}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-extrabold whitespace-nowrap">
+                      {t.count} منتج
                     </span>
                     {i < 3 && t.sold > 0 && (
-                      <span className="hidden sm:block absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-extrabold">الأكتر طلباً</span>
+                      <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[9px] font-extrabold whitespace-nowrap">الأكتر طلباً</span>
                     )}
                   </button>
                 ))}
@@ -8458,11 +8581,27 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               </button>
             </div>
 
-            {/* Switch to Storefront Button */}
-            <div className="px-3 pt-3 hidden lg:block">
+            {/* Switch to Storefront & Theme Toggle Buttons */}
+            <div className="px-3 pt-3 space-y-2">
+              <button
+                type="button"
+                onClick={toggleUiTheme}
+                className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-between transition border ${
+                  uiTheme === 'modern_pro'
+                    ? 'bg-gradient-to-l from-indigo-600 via-violet-600 to-fuchsia-600 text-white border-indigo-400/40 shadow-md'
+                    : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  <span>{uiTheme === 'modern_pro' ? 'الثيم الاحترافي الحديث (Pro)' : 'الشكل الأصلي الكلاسيكي'}</span>
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-black/25 text-[10px]">تبديل</span>
+              </button>
+
               <button
                 onClick={() => switchPortal('storefront')}
-                className="w-full py-2.5 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-extrabold flex items-center justify-between transition"
+                className="hidden lg:flex w-full py-2.5 px-3 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-extrabold items-center justify-between transition"
               >
                 <span className="flex items-center gap-2">
                   <Eye className="w-4 h-4" />
@@ -10557,7 +10696,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               return true;
             });
             const brandModelIds = new Set(brandModels.map(m => String(m.id)));
-            const brandPartsCount = parts.filter(p => brandModelIds.has(String(p.modelId))).length;
+            const brandPartsCount = searchQ === "" ? (partCountByBrandMap.get(brandName) || 0) : brandModels.reduce((acc, m) => acc + (partCountByModelIdMap.get(String(m.id)) || 0), 0);
 
             return (
               <div key={brandName} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
@@ -10579,8 +10718,18 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                       {isBrandOpen ? '−' : '+'}
                     </button>
 
-                    <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0">
-                      <Smartphone className="w-5 h-5 text-cyan-300" />
+                    <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/20 overflow-hidden flex items-center justify-center shrink-0">
+                      {brandImages[brandName] ? (
+                        <img
+                          src={brandImages[brandName]}
+                          alt={brandName}
+                          loading="lazy"
+                          onError={e => { e.currentTarget.style.display = 'none'; }}
+                          className="w-full h-full object-contain bg-white p-0.5"
+                        />
+                      ) : (
+                        <Smartphone className="w-5 h-5 text-cyan-300" />
+                      )}
                     </div>
 
                     <div>
@@ -10599,8 +10748,24 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                     </div>
                   </div>
 
-                  {/* Button inside Brand Bar: + إضافة موديل */}
-                  <div className="flex items-center gap-2">
+                  {/* Buttons inside Brand Bar: Brand Image + Add Model + Delete Entire Brand */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingBrandImageFor({
+                          brandName,
+                          imageUrl: brandImages[brandName] || ''
+                        });
+                      }}
+                      className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-cyan-200 border border-white/15 text-xs font-extrabold flex items-center gap-1.5 transition"
+                      title="تحديد صورة البراند (رابط خارجي مباشر أو رفع صورة محلية)"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>صورة البراند</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={(e) => {
@@ -10617,6 +10782,33 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                       <Plus className="w-4 h-4" />
                       <span>إضافة موديل في {brandName}</span>
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        askConfirmDelete(
+                          `حذف براند "${brandName}" بالكامل`,
+                          `هل أنت متأكد من حذف براند "${brandName}" وجميع الموديلات (${brandModels.length} موديل) والمنتجات (${brandPartsCount} منتج) التابعة له نهائياً؟`,
+                          () => {
+                            const affectedModelIds = new Set(models.filter(m => m.brand === brandName).map(m => String(m.id)));
+                            const affectedPartIds = parts.filter(p => affectedModelIds.has(String(p.modelId))).map(p => p.id);
+                            setParts(prev => prev.filter(p => !affectedModelIds.has(String(p.modelId))));
+                            setModels(prev => prev.filter(m => m.brand !== brandName));
+                            setBrands(prev => prev.filter(b => b !== brandName));
+                            affectedPartIds.forEach(pid => sbDelete('spare_parts', pid));
+                            Array.from(affectedModelIds).forEach(mid => sbDelete('mobile_models', mid));
+                            sbDelete('brands', brandName);
+                            showToast(`🗑️ تم حذف براند "${brandName}" بجميع موديلاته ومنتجاته نهائياً.`, 'info');
+                          }
+                        );
+                      }}
+                      className="px-3 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+                      title={`حذف براند ${brandName} بالكامل`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>حذف البراند</span>
+                    </button>
                   </div>
                 </div>
 
@@ -10630,7 +10822,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                     ) : (
                       brandModels.map(model => {
                         const isModelOpen = !!expandedAdminModels[model.id];
-                        const modelPartsCount = parts.filter(p => String(p.modelId) === String(model.id)).length;
+                        const modelPartsCount = partCountByModelIdMap.get(String(model.id)) || 0;
 
                         // Compute and sort modelParts ONLY when this specific Model Bar is opened via +
                         const modelParts = isModelOpen
@@ -13868,26 +14060,44 @@ model OrderInvoice {
   const renderLoginModal = () => {
     if (!loginModalOpen) return null;
     return (
-      <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl max-h-[92vh] overflow-y-auto">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center">
-                <Lock className="w-5 h-5" />
+      <div
+        onClick={() => setLoginModalOpen(false)}
+        className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center p-2 sm:p-4"
+      >
+        <div
+          onClick={e => e.stopPropagation()}
+          className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full shadow-2xl max-h-[76vh] sm:max-h-[80vh] flex flex-col overflow-hidden border border-slate-200"
+        >
+          {/* Sticky Compact Header with Drag Handle & Prominent Close Button */}
+          <div className="sticky top-0 z-20 bg-white/95 backdrop-blur px-4 pt-2.5 pb-3 border-b border-slate-100 shrink-0">
+            <div className="w-12 h-1.5 rounded-full bg-slate-300 mx-auto mb-2.5 sm:hidden" />
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900">
+                    تسجيل الدخول أو فتح حساب جديد
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    اسحب للأعلى للتمرير السريع أو اضغط إغلاق باليسار
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900">
-                  حسابات التجار والمحلات
-                </h3>
-                <p className="text-xs text-slate-500">
-                  سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة
-                </p>
-              </div>
+              <button
+                type="button"
+                onClick={() => setLoginModalOpen(false)}
+                className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 font-extrabold text-xs flex items-center gap-1 transition shrink-0 shadow-2xs"
+                title="إغلاق النافذة"
+              >
+                <X className="w-4 h-4" />
+                <span>إغلاق</span>
+              </button>
             </div>
-            <button onClick={() => setLoginModalOpen(false)} className="p-1 text-slate-400">
-              <X className="w-5 h-5" />
-            </button>
           </div>
+
+          <div className="p-4 space-y-3.5 overflow-y-auto overscroll-contain touch-pan-y flex-1">
 
           {/* Tabs: Login vs Request New Account */}
           <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl text-xs font-extrabold">
@@ -14197,7 +14407,7 @@ model OrderInvoice {
                 <div className="font-extrabold text-slate-900">
                   {siteSettings.registrationTermsTitle || 'الشروط والأحكام'}
                 </div>
-                <div className="max-h-40 overflow-y-auto p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] leading-relaxed text-slate-600 whitespace-pre-line">
+                <div className="max-h-20 overflow-y-auto p-2 rounded-xl bg-white border border-slate-200 text-[10px] leading-relaxed text-slate-600 whitespace-pre-line">
                   {lang === 'en' && (!siteSettings.registrationTermsText || siteSettings.registrationTermsText === DEFAULT_REGISTRATION_TERMS)
                     ? DEFAULT_REGISTRATION_TERMS_EN
                     : siteSettings.registrationTermsText || DEFAULT_REGISTRATION_TERMS}
@@ -14234,6 +14444,7 @@ model OrderInvoice {
               </button>
             </form>
           )}
+          </div>
         </div>
       </div>
     );
@@ -17280,47 +17491,172 @@ ${footer}
     );
   };
 
-  // --- Add Spare Part to Existing Model Modal (With Direct Custom Image File Upload!) ---
+  // --- Brand Image Modal (1 Image per Brand: External URL or Local File Upload) ---
+  const renderBrandImageModal = () => {
+    if (!editingBrandImageFor) return null;
+    const { brandName, imageUrl } = editingBrandImageFor;
+
+    const handleUploadBrandLocalImg = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      showToast('جاري ضغط وتجهيز صورة البراند...', 'info');
+      const uploadedUrl = await processAndUploadImage(file, 'brands');
+      if (uploadedUrl) {
+        setEditingBrandImageFor(prev => (prev ? { ...prev, imageUrl: uploadedUrl } : prev));
+        showToast('تم تجهيز صورة البراند بنجاح ✓', 'success');
+      }
+    };
+
+    const handleSaveBrandImage = (e) => {
+      e.preventDefault();
+      const trimmedUrl = (imageUrl || '').trim();
+      setBrandImages(prev => {
+        const next = { ...prev };
+        if (trimmedUrl) next[brandName] = trimmedUrl;
+        else delete next[brandName];
+        try { window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(next)); } catch (err) {}
+        return next;
+      });
+      sbUpsert('brands', [{ name: brandName, sort_order: Math.max(0, brands.indexOf(brandName)), image_url: trimmedUrl }]);
+      setEditingBrandImageFor(null);
+      showToast(`تم حفظ صورة براند "${brandName}" بنجاح ✓`, 'success');
+    };
+
+    return (
+      <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <form onSubmit={handleSaveBrandImage} className="bg-white rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl text-xs">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 className="text-sm font-extrabold text-slate-900">
+              صورة البراند: <span className="text-indigo-600">{brandName}</span> (صورة واحدة للبراند)
+            </h3>
+            <button type="button" onClick={() => setEditingBrandImageFor(null)} className="p-1 text-slate-400 hover:text-slate-700">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div className="w-16 h-16 rounded-xl bg-white border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={brandName}
+                  loading="lazy"
+                  onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                  className="w-full h-full object-contain p-1"
+                />
+              ) : (
+                <Smartphone className="w-7 h-7 text-slate-400" />
+              )}
+            </div>
+            <div className="flex-1 space-y-1.5">
+              <div className="font-extrabold text-slate-900">مرونة كاملة (رابط خارجي أو رفع محلي):</div>
+              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5" />
+                <span>أو رفع صورة محلية للبراند</span>
+                <input type="file" accept="image/*" onChange={handleUploadBrandLocalImg} className="hidden" />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="font-extrabold text-slate-800 block mb-1">
+              الرابط الخارجي المباشر لصورة البراند (External Image URL):
+            </label>
+            <input
+              type="text"
+              dir="ltr"
+              value={imageUrl}
+              onChange={e => setEditingBrandImageFor(prev => (prev ? { ...prev, imageUrl: e.target.value } : prev))}
+              placeholder="https://example.com/brand-logo.webp"
+              className="w-full p-2.5 rounded-xl border border-slate-300 font-mono text-slate-900"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold">
+              حفظ صورة البراند ✓
+            </button>
+            {imageUrl && (
+              <button
+                type="button"
+                onClick={() => setEditingBrandImageFor(prev => (prev ? { ...prev, imageUrl: '' } : prev))}
+                className="px-3.5 py-2.5 rounded-xl bg-rose-50 text-rose-600 font-bold"
+              >
+                مسح
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    );
+  };
+
+  // --- Add Spare Part to Existing Model Modal (Supports 4 Images: External Image URLs `image_url` OR Local File Upload!) ---
   const renderAddPartToModelModal = () => {
     if (!addingPartToModel) return null;
 
-    const handleUploadNewPartCustomImage = async (e) => {
-      const files = Array.from(e.target.files || []).slice(0, 5);
+    const getFourSlots = (obj) => {
+      const list = Array.isArray(obj.imagesList) ? [...obj.imagesList] : [];
+      if (list.length === 0 && (obj.image_url || obj.customImage)) {
+        list.push(obj.image_url || obj.customImage);
+      }
+      while (list.length < 4) list.push('');
+      return list.slice(0, 4);
+    };
+
+    const fourSlots = getFourSlots(addingPartToModel);
+
+    const setSlotUrl = (slotIdx, urlVal) => {
+      setAddingPartToModel(prev => {
+        if (!prev) return prev;
+        const slots = getFourSlots(prev);
+        slots[slotIdx] = urlVal;
+        const nonEmpty = slots.map(s => s.trim()).filter(Boolean);
+        return {
+          ...prev,
+          image_url: slots[0]?.trim() || nonEmpty[0] || '',
+          customImage: slots[0]?.trim() || nonEmpty[0] || '',
+          imagesList: slots
+        };
+      });
+    };
+
+    const handleUploadSlotImage = async (slotIdx, e) => {
+      const files = Array.from(e.target.files || []).slice(0, 4 - slotIdx);
       if (files.length === 0) return;
-      showToast('جاري ضغط ورفع صور المنتج تلقائياً (أقصى 900px وجودة 72%)...', 'info');
-      for (const file of files) {
-        const uploadedUrl = await processAndUploadImage(file, 'parts');
+      showToast('جاري ضغط وتجهيز الصورة محلياً...', 'info');
+      for (let i = 0; i < files.length; i++) {
+        const uploadedUrl = await processAndUploadImage(files[i], 'parts');
         if (uploadedUrl) {
-          setAddingPartToModel(prev => {
-            if (!prev) return prev;
-            const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : [];
-            const nextList = [...currentList, uploadedUrl].slice(0, 5);
-            return {
-              ...prev,
-              customImage: nextList[0] || uploadedUrl,
-              imagesList: nextList
-            };
-          });
+          setSlotUrl(Math.min(3, slotIdx + i), uploadedUrl);
         }
       }
-      showToast('تم ضغط ورفع صور المنتج بنجاح ✓', 'success');
+      showToast('تم رفع وتجهيز الصورة بنجاح ✓', 'success');
     };
 
     const handleSaveNewPart = (e) => {
       e.preventDefault();
-      const colorsArr = addingPartToModel.colorsText
+      const colorsArr = (addingPartToModel.colorsText || '')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
-      const compatArr = addingPartToModel.compatibleText
+      const compatArr = (addingPartToModel.compatibleText || '')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
 
+      const cleanImages = fourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 4);
+      const primaryImgUrl =
+        cleanImages[0] ||
+        (addingPartToModel.image_url || '').trim() ||
+        addingPartToModel.customImage ||
+        PART_IMAGES[addingPartToModel.imageKey] ||
+        PART_IMAGES.screen;
+
       const newPart = {
         id: `prt_${Date.now()}`,
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        sku: addingPartToModel.sku.trim() || `PRT-${Date.now()}`,
+        sku: (addingPartToModel.sku || '').trim() || `PRT-${Date.now()}`,
         modelId: addingPartToModel.model.id,
         category: addingPartToModel.category,
         name: addingPartToModel.name.trim(),
@@ -17328,14 +17664,12 @@ ${footer}
         colors: colorsArr.length > 0 ? colorsArr : ['قياسي'],
         compatibleModels: compatArr.length > 0 ? compatArr : [addingPartToModel.model.name],
         searchAliases: `${addingPartToModel.name} ${addingPartToModel.model.name} ${addingPartToModel.category}`,
-        description: `${addingPartToModel.name} (${addingPartToModel.qualityGrade})`,
         warrantyText: addingPartToModel.warrantyText,
         description: addingPartToModel.description || `${addingPartToModel.name} (${addingPartToModel.qualityGrade})`,
-        images: (Array.isArray(addingPartToModel.imagesList) && addingPartToModel.imagesList.length > 0) ? addingPartToModel.imagesList : [previewImg],
-        image:
-          addingPartToModel.customImage ||
-          PART_IMAGES[addingPartToModel.imageKey] ||
-          PART_IMAGES.screen,
+        image_url: primaryImgUrl,
+        imageUrl: primaryImgUrl,
+        image: primaryImgUrl,
+        images: cleanImages.length > 0 ? cleanImages : [primaryImgUrl],
         stock: Number(addingPartToModel.stock) || 0,
         lowStockThreshold: Number(addingPartToModel.lowStockThreshold) || 5,
         maxOrderQty: Number(addingPartToModel.maxOrderQty) || 10,
@@ -17347,78 +17681,100 @@ ${footer}
 
       setParts(prev => [newPart, ...prev]);
       setAddingPartToModel(null);
-      showToast(`تمت إضافة "${newPart.name}" بصورتها داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
+      showToast(`تمت إضافة "${newPart.name}" داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
     };
 
     const previewImg =
-      addingPartToModel.customImage ||
+      fourSlots.map(s => s.trim()).find(Boolean) ||
       PART_IMAGES[addingPartToModel.imageKey] ||
       PART_IMAGES.screen;
 
     return (
-      <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
         <form
           onSubmit={handleSaveNewPart}
-          className="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto text-xs"
+          className="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto text-xs"
         >
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
             <h3 className="text-base font-extrabold text-slate-900">
-              إضافة قطعة غيار جديدة لموديل: <span className="text-blue-600">{addingPartToModel.model.name}</span>
+              إضافة قطعة غيار جديدة لموديل: <span className="text-indigo-600">{addingPartToModel.model.name}</span>
             </h3>
-            <button type="button" onClick={() => setAddingPartToModel(null)} className="p-1 text-slate-400">
+            <button type="button" onClick={() => setAddingPartToModel(null)} className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Part Multi-Image Upload & Gallery Preview (Up to 5 Photos) */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+          {/* 4-Slot Product Image Manager: External URL (image_url) OR Local Upload */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <img
                   src={previewImg}
                   alt="معاينة القطعة"
-                  className="w-14 h-14 rounded-xl object-cover border border-slate-300 bg-slate-900"
+                  loading="lazy"
+                  onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                  className="w-14 h-14 rounded-xl object-contain border border-slate-300 bg-white p-1"
                 />
                 <div>
-                  <div className="font-extrabold text-slate-900">صور المنتج (ارفع من 1 إلى 5 صور):</div>
-                  <div className="text-[11px] text-slate-500">يمكن للعميل تقليب الصور بأسهم من داخل كارت المنتج مباشرة</div>
+                  <div className="font-extrabold text-slate-900">
+                    صور المنتج (4 صور لكل منتج — رابط خارجي مباشر `image_url` أو رفع محلي):
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    الصق رابط الصورة الخارجي مباشرة (مثل علي بابا أو CDN بدون استهلاك تخزين) أو ارفع صورة من جهازك
+                  </div>
                 </div>
               </div>
-              <label className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer flex items-center gap-1.5 transition">
-                <Upload className="w-3.5 h-3.5" />
-                رفع صور المنتج (حتى 5 صور)
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleUploadNewPartCustomImage}
-                  className="hidden"
-                />
-              </label>
             </div>
 
-            {Array.isArray(addingPartToModel.imagesList) && addingPartToModel.imagesList.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-200">
-                {addingPartToModel.imagesList.map((imgSrc, idx) => (
-                  <div key={idx} className="relative group w-14 h-14 rounded-xl overflow-hidden border-2 border-blue-500">
-                    <img src={imgSrc} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setAddingPartToModel(prev => {
-                          const next = prev.imagesList.filter((_, i) => i !== idx);
-                          return { ...prev, imagesList: next, customImage: next[0] || '' };
-                        })
-                      }
-                      className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow"
-                      title="حذف الصورة"
-                    >
-                      ×
-                    </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              {[0, 1, 2, 3].map(slotIdx => (
+                <div key={slotIdx} className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-[11px] text-slate-800">
+                      {slotIdx === 0 ? '⭐ الصورة 1 الأساسية (image_url):' : `الصورة الإضافية ${slotIdx + 1}:`}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <label className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-700 text-white text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        <span>رفع محلي</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => handleUploadSlotImage(slotIdx, e)}
+                          className="hidden"
+                        />
+                      </label>
+                      {fourSlots[slotIdx] && (
+                        <button
+                          type="button"
+                          onClick={() => setSlotUrl(slotIdx, '')}
+                          className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 text-[10px] font-bold"
+                        >
+                          مسح
+                        </button>
+                      )}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={fourSlots[slotIdx] || PART_IMAGES.screen}
+                      alt=""
+                      loading="lazy"
+                      onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                      className="w-9 h-9 rounded-lg object-contain border border-slate-200 bg-slate-50 shrink-0"
+                    />
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={fourSlots[slotIdx]}
+                      onChange={e => setSlotUrl(slotIdx, e.target.value)}
+                      placeholder="https://... الصق الرابط الخارجي للصورة"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 font-mono text-[11px] text-slate-900"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -17441,6 +17797,16 @@ ${footer}
                 onChange={e => setAddingPartToModel(prev => ({ ...prev, category: e.target.value }))}
                 placeholder="شاشات كاملة، بطاريات، بورد شحن..."
                 className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">كود الصنف (SKU):</label>
+              <input
+                type="text"
+                value={addingPartToModel.sku}
+                onChange={e => setAddingPartToModel(prev => ({ ...prev, sku: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
               />
             </div>
 
@@ -17467,54 +17833,6 @@ ${footer}
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="font-bold text-slate-700 block mb-1">شروط وفترة الضمان (تظهر بوضوح للعميل):</label>
-              <input
-                type="text"
-                value={addingPartToModel.warrantyText || ''}
-                onChange={e => setAddingPartToModel(prev => ({ ...prev, warrantyText: e.target.value }))}
-                placeholder="مثال: ضمان 6 شهور استبدال فوري ضد الانتفاخ، أو ضمان تجربة 14 يوم قبل اللزق..."
-                className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="font-bold text-slate-700 block mb-1">المواصفات الفنية والتفاصيل:</label>
-              <textarea
-                rows={2}
-                value={addingPartToModel.description || ''}
-                onChange={e => setAddingPartToModel(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="اكتب أي مواصفات وتفاصيل فنية تهم العميل وفني الصيانة..."
-                className="w-full p-2.5 rounded-xl border border-slate-300"
-              />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">كود الصنف (SKU):</label>
-              <input
-                type="text"
-                value={addingPartToModel.sku}
-                onChange={e => setAddingPartToModel(prev => ({ ...prev, sku: e.target.value }))}
-                className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
-              />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 block mb-1">أو اختر صورة افتراضية:</label>
-              <select
-                value={addingPartToModel.imageKey}
-                onChange={e =>
-                  setAddingPartToModel(prev => ({ ...prev, imageKey: e.target.value, customImage: '' }))
-                }
-                className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
-              >
-                <option value="screen">صورة شاشة هاتف</option>
-                <option value="battery">صورة بطارية</option>
-                <option value="flex">صورة بوردة / فلاتة شحن</option>
-                <option value="camera">صورة وحدة كاميرا</option>
-              </select>
             </div>
 
             <div>
@@ -17558,6 +17876,28 @@ ${footer}
             </div>
 
             <div className="sm:col-span-2">
+              <label className="font-bold text-slate-700 block mb-1">شروط وفترة الضمان (تظهر بوضوح للعميل):</label>
+              <input
+                type="text"
+                value={addingPartToModel.warrantyText || ''}
+                onChange={e => setAddingPartToModel(prev => ({ ...prev, warrantyText: e.target.value }))}
+                placeholder="مثال: ضمان 6 شهور استبدال فوري ضد الانتفاخ، أو ضمان تجربة 14 يوم قبل اللزق..."
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="font-bold text-slate-700 block mb-1">المواصفات الفنية والتفاصيل:</label>
+              <textarea
+                rows={2}
+                value={addingPartToModel.description || ''}
+                onChange={e => setAddingPartToModel(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="اكتب أي مواصفات وتفاصيل فنية تهم العميل وفني الصيانة..."
+                className="w-full p-2.5 rounded-xl border border-slate-300"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
               <label className="font-bold text-slate-700 block mb-1">الموديلات المتوافقة معها (مفصولة بفاصلة):</label>
               <input
                 type="text"
@@ -17572,49 +17912,70 @@ ${footer}
             type="submit"
             className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold"
           >
-            حفظ وإدراج القطعة داخل الموديل
+            حفظ وإدراج القطعة داخل الموديل ✓
           </button>
         </form>
       </div>
     );
   };
 
-  // --- Edit Existing Part Modal (With Custom Image Upload & Preset Selector!) ---
+  // --- Edit Existing Part Modal (Supports 4 Images: External Image URLs `image_url` OR Local File Upload!) ---
   const renderEditPartModal = () => {
     if (!editingPartObj) return null;
 
-    const handleEditPartImageUpload = async (e) => {
-      const files = Array.from(e.target.files || []).slice(0, 5);
+    const getEditFourSlots = (obj) => {
+      const baseArr = Array.isArray(obj.imagesList) && obj.imagesList.length > 0
+        ? [...obj.imagesList]
+        : [obj.image_url || obj.imageUrl || obj.image || ''].filter(Boolean);
+      while (baseArr.length < 4) baseArr.push('');
+      return baseArr.slice(0, 4);
+    };
+
+    const editFourSlots = getEditFourSlots(editingPartObj);
+
+    const setEditSlotUrl = (slotIdx, urlVal) => {
+      setEditingPartObj(prev => {
+        if (!prev) return prev;
+        const slots = getEditFourSlots(prev);
+        slots[slotIdx] = urlVal;
+        const nonEmpty = slots.map(s => s.trim()).filter(Boolean);
+        const primary = slots[0]?.trim() || nonEmpty[0] || '';
+        return {
+          ...prev,
+          image_url: primary,
+          imageUrl: primary,
+          image: primary,
+          imagesList: slots
+        };
+      });
+    };
+
+    const handleEditSlotUpload = async (slotIdx, e) => {
+      const files = Array.from(e.target.files || []).slice(0, 4 - slotIdx);
       if (files.length === 0) return;
-      showToast('جاري ضغط ورفع صور المنتج تلقائياً (أقصى 900px وجودة 72%)...', 'info');
-      for (const file of files) {
-        const uploadedUrl = await processAndUploadImage(file, 'parts');
+      showToast('جاري ضغط وتجهيز الصورة محلياً...', 'info');
+      for (let i = 0; i < files.length; i++) {
+        const uploadedUrl = await processAndUploadImage(files[i], 'parts');
         if (uploadedUrl) {
-          setEditingPartObj(prev => {
-            if (!prev) return prev;
-            const currentList = Array.isArray(prev.imagesList) ? prev.imagesList : (prev.image ? [prev.image] : []);
-            const nextList = [...currentList, uploadedUrl].slice(0, 5);
-            return {
-              ...prev,
-              image: nextList[0] || uploadedUrl,
-              imagesList: nextList
-            };
-          });
+          setEditSlotUrl(Math.min(3, slotIdx + i), uploadedUrl);
         }
       }
-      showToast('تم ضغط ورفع صور المنتج بنجاح ✓', 'success');
+      showToast('تم رفع وتجهيز الصورة بنجاح ✓', 'success');
     };
 
     const handleSaveEditedPart = (e) => {
       e.preventDefault();
-      const colorsArr = editingPartObj.colorsText
+      const colorsArr = (editingPartObj.colorsText || '')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
-      const compatArr = editingPartObj.compatibleText
+      const compatArr = (editingPartObj.compatibleText || '')
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
+
+      const cleanImages = editFourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 4);
+      const primaryImgUrl = cleanImages[0] || editingPartObj.image_url || editingPartObj.image || PART_IMAGES.screen;
 
       setParts(prev =>
         prev.map(p =>
@@ -17623,14 +17984,15 @@ ${footer}
                 ...p,
                 name: editingPartObj.name,
                 sku: editingPartObj.sku,
+                modelId: editingPartObj.modelId || p.modelId,
                 category: editingPartObj.category,
                 qualityGrade: editingPartObj.qualityGrade,
                 warrantyText: editingPartObj.warrantyText !== undefined ? editingPartObj.warrantyText : p.warrantyText,
                 description: editingPartObj.description !== undefined ? editingPartObj.description : p.description,
-                images: (Array.isArray(editingPartObj.imagesList) && editingPartObj.imagesList.length > 0)
-                  ? editingPartObj.imagesList
-                  : (editingPartObj.image ? [editingPartObj.image] : p.images),
-                image: editingPartObj.image || (editingPartObj.imagesList && editingPartObj.imagesList[0]) || p.image,
+                image_url: primaryImgUrl,
+                imageUrl: primaryImgUrl,
+                image: primaryImgUrl,
+                images: cleanImages.length > 0 ? cleanImages : [primaryImgUrl],
                 stock: Number(editingPartObj.stock),
                 costPrice: Number(editingPartObj.costPrice),
                 basePrice: Number(editingPartObj.basePrice),
@@ -17641,92 +18003,93 @@ ${footer}
         )
       );
       setEditingPartObj(null);
-      showToast('تم حفظ تعديلات وصورة قطعة الغيار بنجاح!', 'success');
+      showToast('تم حفظ تعديلات وروابط صور قطعة الغيار بنجاح ✓', 'success');
     };
 
+    const currentPreview = editFourSlots.map(s => s.trim()).find(Boolean) || PART_IMAGES.screen;
+
     return (
-      <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4">
         <form
           onSubmit={handleSaveEditedPart}
-          className="bg-white rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl text-xs max-h-[90vh] overflow-y-auto"
+          className="bg-white rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-xs max-h-[90vh] overflow-y-auto"
         >
           <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-            <h3 className="text-base font-extrabold text-slate-900">تعديل بيانات وصورة قطعة الغيار</h3>
-            <button type="button" onClick={() => setEditingPartObj(null)} className="p-1 text-slate-400">
+            <h3 className="text-base font-extrabold text-slate-900">تعديل بيانات وصور قطعة الغيار (حتى 4 صور)</h3>
+            <button type="button" onClick={() => setEditingPartObj(null)} className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600">
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Part Multi-Image Editor (Up to 5 Photos) */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <img
-                  src={editingPartObj.image}
-                  alt={editingPartObj.name}
-                  className="w-14 h-14 rounded-xl object-cover border border-slate-300 bg-slate-900"
-                />
-                <div>
-                  <div className="font-extrabold text-slate-900">صور المنتج ({(editingPartObj.imagesList || [editingPartObj.image]).length} / 5 صور)</div>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    {Object.entries(PART_IMAGES).map(([k, imgUrl]) => (
-                      <button
-                        key={k}
-                        type="button"
-                        onClick={() =>
-                          setEditingPartObj(prev => ({
-                            ...prev,
-                            image: imgUrl,
-                            imagesList: [imgUrl, ...(prev.imagesList || []).slice(1)].slice(0, 5)
-                          }))
-                        }
-                        className="px-2 py-0.5 rounded bg-white border border-slate-300 text-[10px] font-bold"
-                      >
-                        {k}
-                      </button>
-                    ))}
-                  </div>
+          {/* 4-Slot Product Image Editor: External URL (image_url) OR Local Upload */}
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div className="flex items-center gap-3">
+              <img
+                src={currentPreview}
+                alt={editingPartObj.name}
+                loading="lazy"
+                onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                className="w-14 h-14 rounded-xl object-contain border border-slate-300 bg-white p-1"
+              />
+              <div>
+                <div className="font-extrabold text-slate-900">
+                  روابط وصور المنتج (4 صور — رابط خارجي مباشر `image_url` أو رفع محلي):
+                </div>
+                <div className="text-[11px] text-slate-500">
+                  الصق رابط الصورة الخارجي مباشرة (صفر استهلاك تخزين وEgress) أو ارفع صورة من جهازك
                 </div>
               </div>
-              <label className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold cursor-pointer flex items-center gap-1.5 transition">
-                <Upload className="w-3.5 h-3.5" />
-                + إضافة صور للمنتج (حتى 5)
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleEditPartImageUpload}
-                  className="hidden"
-                />
-              </label>
             </div>
 
-            {Array.isArray(editingPartObj.imagesList) && editingPartObj.imagesList.length > 0 && (
-              <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-slate-200">
-                {editingPartObj.imagesList.map((imgSrc, idx) => (
-                  <div key={idx} className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-blue-500">
-                    <img src={imgSrc} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setEditingPartObj(prev => {
-                          const next = prev.imagesList.filter((_, i) => i !== idx);
-                          return {
-                            ...prev,
-                            imagesList: next,
-                            image: next[0] || PART_IMAGES.screen
-                          };
-                        })
-                      }
-                      className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold shadow"
-                      title="حذف هذه الصورة"
-                    >
-                      ×
-                    </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {[0, 1, 2, 3].map(slotIdx => (
+                <div key={slotIdx} className="p-2.5 rounded-xl bg-white border border-slate-200 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-[11px] text-slate-800">
+                      {slotIdx === 0 ? '⭐ الصورة 1 الأساسية (image_url):' : `الصورة الإضافية ${slotIdx + 1}:`}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <label className="px-2 py-0.5 rounded-lg bg-slate-900 hover:bg-slate-700 text-white text-[10px] font-bold cursor-pointer flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        <span>رفع محلي</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={e => handleEditSlotUpload(slotIdx, e)}
+                          className="hidden"
+                        />
+                      </label>
+                      {editFourSlots[slotIdx] && (
+                        <button
+                          type="button"
+                          onClick={() => setEditSlotUrl(slotIdx, '')}
+                          className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-600 text-[10px] font-bold"
+                        >
+                          مسح
+                        </button>
+                      )}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={editFourSlots[slotIdx] || PART_IMAGES.screen}
+                      alt=""
+                      loading="lazy"
+                      onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                      className="w-9 h-9 rounded-lg object-contain border border-slate-200 bg-slate-50 shrink-0"
+                    />
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={editFourSlots[slotIdx]}
+                      onChange={e => setEditSlotUrl(slotIdx, e.target.value)}
+                      placeholder="https://... الصق الرابط الخارجي للصورة"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 font-mono text-[11px] text-slate-900"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -17741,6 +18104,19 @@ ${footer}
             </div>
 
             <div>
+              <label className="font-bold text-slate-700 block mb-1">الموديل المرتبط:</label>
+              <select
+                value={editingPartObj.modelId || ''}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, modelId: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-bold bg-white"
+              >
+                {models.map(m => (
+                  <option key={m.id} value={m.id}>{m.brand} — {m.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label className="font-bold text-slate-700 block mb-1">التصنيف:</label>
               <input
                 type="text"
@@ -17750,38 +18126,63 @@ ${footer}
               />
             </div>
 
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">سعر التكلفة (ج.م):</label>
+              <input
+                type="number"
+                value={editingPartObj.costPrice ?? 0}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, costPrice: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-mono text-rose-700 font-bold"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">سعر البيع الأساسي (ج.م):</label>
+              <input
+                type="number"
+                value={editingPartObj.basePrice ?? 0}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, basePrice: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-extrabold text-emerald-800"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">الكمية بالمخزن:</label>
+              <input
+                type="number"
+                value={editingPartObj.stock ?? 0}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, stock: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-extrabold"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">كود الصنف (SKU):</label>
+              <input
+                type="text"
+                value={editingPartObj.sku || ''}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, sku: e.target.value }))}
+                className="w-full p-2.5 rounded-xl border border-slate-300 font-mono"
+              />
+            </div>
+
             <div className="sm:col-span-2 space-y-1.5">
-              <label className="font-bold text-slate-700 block">درجة الجودة (اكتبها يدوياً أو اختر من المقترحات):</label>
+              <label className="font-bold text-slate-700 block">درجة الجودة:</label>
               <input
                 type="text"
                 required
                 value={editingPartObj.qualityGrade}
                 onChange={e => setEditingPartObj(prev => ({ ...prev, qualityGrade: e.target.value }))}
-                placeholder="اكتب درجة الجودة (مثال: أصلي توكيل، سعة أصلية، خلع، أوليد...)"
                 className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
               />
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] text-slate-400 font-bold">مقترحات:</span>
-                {QUALITY_GRADE_SUGGESTIONS.map(sug => (
-                  <button
-                    key={sug}
-                    type="button"
-                    onClick={() => setEditingPartObj(prev => ({ ...prev, qualityGrade: sug }))}
-                    className="px-2 py-0.5 rounded-lg bg-slate-100 hover:bg-blue-100 text-slate-700 hover:text-blue-700 text-[10px] font-bold transition"
-                  >
-                    + {sug}
-                  </button>
-                ))}
-              </div>
             </div>
 
             <div className="sm:col-span-2">
-              <label className="font-bold text-slate-700 block mb-1">شروط وفترة الضمان (تظهر بوضوح للعميل):</label>
+              <label className="font-bold text-slate-700 block mb-1">شروط وفترة الضمان:</label>
               <input
                 type="text"
                 value={editingPartObj.warrantyText || ''}
                 onChange={e => setEditingPartObj(prev => ({ ...prev, warrantyText: e.target.value }))}
-                placeholder="مثال: ضمان 6 شهور استبدال فوري ضد الانتفاخ أو التسريب..."
                 className="w-full p-2.5 rounded-xl border border-slate-300 font-bold"
               />
             </div>
@@ -17792,7 +18193,6 @@ ${footer}
                 rows={2}
                 value={editingPartObj.description || ''}
                 onChange={e => setEditingPartObj(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="اكتب أي مواصفات وتفاصيل فنية تهم العميل وفني الصيانة..."
                 className="w-full p-2.5 rounded-xl border border-slate-300"
               />
             </div>
@@ -17818,8 +18218,8 @@ ${footer}
             </div>
           </div>
 
-          <button type="submit" className="w-full py-3 rounded-xl bg-blue-600 text-white font-extrabold">
-            حفظ التعديلات والصورة
+          <button type="submit" className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold">
+            حفظ التعديلات وروابط الصور ✓
           </button>
         </form>
       </div>
@@ -18144,8 +18544,63 @@ ${footer}
   // ============================================================================
 
   return (
-    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className={`min-h-screen bg-slate-50 text-slate-900 font-sans ${uiTheme === 'modern_pro' ? 'theme-modern-pro' : 'theme-classic'}`}>
       <style>{`
+        /* ==========================================================================
+           NEO-LUXURY E-COMMERCE & ERP PRO THEME (Royal Indigo, Emerald & Obsidian)
+           ========================================================================== */
+        .theme-modern-pro {
+          background: radial-gradient(circle at 15% 0%, rgba(99, 102, 241, 0.06), transparent 38%),
+                      radial-gradient(circle at 85% 10%, rgba(16, 185, 129, 0.06), transparent 35%),
+                      #f4f6fb !important;
+          color: #0f172a;
+        }
+        .theme-modern-pro header,
+        .theme-modern-pro .bg-\[\#0d151c\] {
+          background: linear-gradient(135deg, #090d16 0%, #111827 55%, #1e1b4b 100%) !important;
+          border-color: rgba(99, 102, 241, 0.25) !important;
+        }
+        .theme-modern-pro .hm-card {
+          border-radius: 1.25rem !important;
+          border: 1px solid rgba(226, 232, 240, 0.95) !important;
+          background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%) !important;
+          box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
+          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease !important;
+        }
+        .theme-modern-pro .hm-card:hover {
+          transform: translateY(-4px) !important;
+          border-color: rgba(99, 102, 241, 0.45) !important;
+          box-shadow: 0 18px 34px -8px rgba(79, 70, 229, 0.14), 0 6px 14px -4px rgba(15, 23, 42, 0.06) !important;
+        }
+        .theme-modern-pro .hm-cat-pill {
+          background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%) !important;
+          border: 1px solid rgba(99, 102, 241, 0.22) !important;
+          box-shadow: 0 2px 8px rgba(79, 70, 229, 0.05) !important;
+        }
+        .theme-modern-pro .hm-cat-pill:hover {
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+          color: #ffffff !important;
+          border-color: transparent !important;
+          transform: translateY(-1px);
+        }
+        .theme-modern-pro .hm-cat-pill:hover span {
+          color: #ffffff !important;
+        }
+        .theme-modern-pro select,
+        .theme-modern-pro input[type="text"],
+        .theme-modern-pro input[type="number"],
+        .theme-modern-pro input[type="tel"],
+        .theme-modern-pro textarea {
+          border-radius: 0.875rem !important;
+          transition: all 0.18s ease !important;
+        }
+        .theme-modern-pro select:focus,
+        .theme-modern-pro input:focus,
+        .theme-modern-pro textarea:focus {
+          border-color: #6366f1 !important;
+          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16) !important;
+          outline: none !important;
+        }
         @media (max-width: 1024px) {
           input, select, textarea { font-size: 16px !important; }
         }
@@ -18210,6 +18665,7 @@ ${footer}
       {renderReturnRequestModal()}
       {renderPrintModal()}
       {renderBrandManagerModal()}
+      {renderBrandImageModal()}
       {renderTemplateManagerModal()}
       {renderAddPartToModelModal()}
       {renderEditPartModal()}
