@@ -69,7 +69,8 @@ const INITIAL_GROUPS = [
   }
 ];
 
-const INITIAL_BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Honor', 'Oppo', 'Realme', 'Vivo', 'Infinix', 'Huawei'];
+// ✅ الطريقة الصح (لتوليد البراندات ديناميكياً من الموديلات الموجودة في القاعدة)
+const availableBrands = ['All', ...new Set(models.map(m => m.brand))];
 
 const INITIAL_AUTO_TEMPLATES = [
   {
