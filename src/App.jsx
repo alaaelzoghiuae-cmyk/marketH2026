@@ -69,8 +69,9 @@ const INITIAL_GROUPS = [
   }
 ];
 
-// ✅ الطريقة الصح (لتوليد البراندات ديناميكياً من الموديلات الموجودة في القاعدة)
-const availableBrands = ['All', ...new Set(models.map(m => m.brand))];
+// حماية المتغير بحيث لو models لسه مش معرف أو فاضي، ميضربش أخطاء
+const safeModels = Array.isArray(models) ? models : [];
+const availableBrands = ['All', ...new Set(safeModels.map(m => m.brand))];
 
 const INITIAL_AUTO_TEMPLATES = [
   {
