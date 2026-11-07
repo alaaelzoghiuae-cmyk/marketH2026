@@ -837,63 +837,36 @@ const applyVisit = (cur, info) => {
 };
 
 function BlurFitImage({ src, alt, className = '', imgClassName = '', draggable }) {
-  const containerRef = useRef(null);
-  const [inView, setInView] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    setLoaded(false);
     setFailed(false);
   }, [src]);
-
-  useEffect(() => {
-    if (inView) return undefined;
-    const el = containerRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') {
-      setInView(true);
-      return undefined;
-    }
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setInView(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { rootMargin: '220px 0px', threshold: 0.01 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [inView, src]);
 
   const effectiveSrc = (!src || failed) ? PART_IMAGES.screen : src;
 
   return (
     <div
-      ref={containerRef}
       className={`relative w-full h-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 ${className}`}
     >
       {!loaded && (
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-800 via-slate-700/50 to-slate-800" />
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-slate-800 via-slate-700/40 to-slate-800 pointer-events-none" />
       )}
-      {inView && (
-        <img
-          src={effectiveSrc}
-          alt={alt || ''}
-          loading="lazy"
-          decoding="async"
-          draggable={draggable}
-          onLoad={() => setLoaded(true)}
-          onError={() => {
-            if (!failed) setFailed(true);
-            setLoaded(true);
-          }}
-          className={`relative w-full h-full object-contain transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'} ${imgClassName}`}
-        />
-      )}
+      <img
+        src={effectiveSrc}
+        alt={alt || ''}
+        loading="lazy"
+        decoding="async"
+        referrerPolicy="no-referrer"
+        draggable={draggable}
+        onLoad={() => setLoaded(true)}
+        onError={() => {
+          if (!failed) setFailed(true);
+          setLoaded(true);
+        }}
+        className={`relative w-full h-full object-contain transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-90'} ${imgClassName}`}
+      />
     </div>
   );
 }
@@ -2746,14 +2719,22 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v11_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v16_';
   try {
-    if (!window.localStorage.getItem('elzoghbi_cache_purged_v11')) {
-      window.localStorage.removeItem('elzoghbi_v2_models');
-      window.localStorage.removeItem('elzoghbi_v2_parts');
-      window.localStorage.removeItem('elzoghbi_v2_brands');
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v16_vision2030') {
+      const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
+      const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
+      const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
+      const keepAdmin = window.localStorage.getItem('elzoghbi_v2_adminAuth');
       window.sessionStorage.clear();
-      window.localStorage.setItem('elzoghbi_cache_purged_v11', '1');
+      window.localStorage.removeItem('elzoghbi_v2_parts');
+      window.localStorage.removeItem('elzoghbi_v2_models');
+      window.localStorage.removeItem('elzoghbi_v2_brands');
+      window.localStorage.setItem('elzoghbi_ui_theme_v2030', keepTheme);
+      if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
+      if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
+      if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
+      window.localStorage.setItem('elzoghbi_app_version', 'v16_vision2030');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 30 * 60 * 1000; // 30 minutes smart session cache
@@ -2792,11 +2773,11 @@ export default function App() {
     } catch (e) {}
   };
 
-  // Explicit lightweight column projections per table (strictly NO select=*, NO `image`/`images` in bulk catalog index, and NO `data` blobs!)
+  // Explicit lightweight column projections per table (guaranteed columns -> ZERO HTTP 400 retries, ZERO select=*, and strict server-side limit=20!)
   const TABLE_LIGHT_COLUMNS = {
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image_url,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at',
-    mobile_models: 'id,brand,name,aliases,is_promoted_ad',
-    brands: 'name,sort_order,image_url',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at',
+    mobile_models: 'id,brand,name,aliases',
+    brands: 'name,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
     store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
     showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order',
@@ -2812,15 +2793,21 @@ export default function App() {
   };
 
   const TABLE_DEFAULT_QUERY = {
-    spare_parts: '&limit=5000',
-    mobile_models: '&limit=2000',
-    orders: '&order=created_at.desc&limit=50',
+    spare_parts: '&order=created_at.desc&limit=20',
+    mobile_models: '&limit=400',
+    orders: '&order=created_at.desc&limit=40',
     clients: '&limit=100',
-    complaints: '&order=created_at.desc&limit=50',
-    returns_list: '&order=created_at.desc&limit=50',
-    account_requests: '&order=created_at.desc&limit=50',
-    sourcing_requests: '&order=created_at.desc&limit=30'
+    complaints: '&order=created_at.desc&limit=40',
+    returns_list: '&order=created_at.desc&limit=40',
+    account_requests: '&order=created_at.desc&limit=40',
+    sourcing_requests: '&order=created_at.desc&limit=25'
   };
+
+  const inFlightRequestsMapRef = useRef(new Map());
+  const hasInitialBootPullRanRef = useRef(false);
+  const hasAdminTablesPulledRef = useRef(false);
+  const isFirstFilterRenderRef = useRef(true);
+  const filterFetchDebounceRef = useRef(null);
 
   const fetchedModelPartsSetRef = useRef(new Set());
   const fetchedPartDetailsSetRef = useRef(new Set());
@@ -2907,131 +2894,119 @@ export default function App() {
     const qStr = (query === null || query === undefined || query === '') ? (TABLE_DEFAULT_QUERY[realTable] || '') : query;
     const cacheKey = `${realTable}_${colsList.join(',')}_${qStr}`;
 
-    if (!forceNetwork && STATIC_SESSION_TABLES.has(realTable) && realTable !== 'spare_parts' && realTable !== 'mobile_models' && realTable !== 'brands') {
+    // 1. Serve from SessionStorage cache if available (prevents repeated network requests!)
+    if (!forceNetwork && STATIC_SESSION_TABLES.has(realTable)) {
       const cached = readSessionTableCache(cacheKey);
       if (cached && cached.length > 0) {
         return cached;
       }
     }
 
-    try {
-      const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
-      let currentQuery = qStr;
+    // 2. Deduplicate identical concurrent or back-to-back requests within 5 seconds
+    const existingInFlight = inFlightRequestsMapRef.current.get(cacheKey);
+    if (existingInFlight && (Date.now() - existingInFlight.ts < 5000)) {
+      return existingInFlight.promise;
+    }
 
-      // Self-healing column & order retry loop (NEVER falls back to just `id,name`, only strips the exact missing column!)
-      for (let attempt = 0; attempt < 8; attempt++) {
-        const currentCols = colsList.join(',');
-        const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
-          headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-        });
+    const fetchPromise = (async () => {
+      try {
+        const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
+        let currentQuery = qStr;
 
-        if (res.ok) {
-          let rows = await res.json();
-          if (Array.isArray(rows)) {
-            // High-Scale Parallel Multi-Page Loader for 5,000 to 15,000+ products (fetches in parallel waves of 4,000 rows!)
-            if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && !currentQuery.includes('offset=')) {
-              for (let waveStart = 1000; waveStart <= 13000; waveStart += 4000) {
-                const offsets = [waveStart, waveStart + 1000, waveStart + 2000, waveStart + 3000];
-                const waveResults = await Promise.all(
-                  offsets.map(off =>
-                    fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&limit=1000&offset=${off}`, {
-                      headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                    })
-                      .then(r => (r.ok ? r.json() : []))
-                      .catch(() => [])
-                  )
-                );
-                let waveHadFullLastPage = false;
-                for (let idx = 0; idx < waveResults.length; idx++) {
-                  const batch = waveResults[idx];
-                  if (Array.isArray(batch) && batch.length > 0) {
-                    rows = rows.concat(batch);
-                    if (idx === waveResults.length - 1 && batch.length === 1000) {
-                      waveHadFullLastPage = true;
-                    }
-                  }
-                }
-                if (!waveHadFullLastPage) break;
+        for (let attempt = 0; attempt < 4; attempt++) {
+          const currentCols = colsList.join(',');
+          const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
+            headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+          });
+
+          if (res.ok) {
+            const rows = await res.json();
+            if (Array.isArray(rows)) {
+              const mapped = rows.map(toCamelCaseRow);
+              if (STATIC_SESSION_TABLES.has(realTable)) {
+                writeSessionTableCache(cacheKey, mapped);
+              }
+              return mapped;
+            }
+            return rows;
+          }
+
+          if (res.status === 400) {
+            const errText = await res.text();
+            const colMatch =
+              errText.match(/column [^."]*\.?([a-zA-Z0-9_]+) does not exist/i) ||
+              errText.match(/Could not find the '([^']+)' column/i);
+            if (colMatch && colMatch[1]) {
+              const missingCol = colMatch[1].trim();
+              if (colsList.includes(missingCol) && colsList.length > 1) {
+                colsList = colsList.filter(c => c !== missingCol);
+                continue;
+              }
+              if (currentQuery.includes(missingCol)) {
+                currentQuery = currentQuery.replace(new RegExp(`&?order=${missingCol}\\.(asc|desc)`, 'i'), '');
+                continue;
               }
             }
-            const mapped = rows.map(toCamelCaseRow);
-            if (STATIC_SESSION_TABLES.has(realTable)) {
-              writeSessionTableCache(cacheKey, mapped);
-            }
-            return mapped;
           }
-          return rows;
+          break;
         }
+      } catch (err) {}
+      return null;
+    })();
 
-        if (res.status === 400) {
-          const errText = await res.text();
-          const colMatch =
-            errText.match(/column [^."]*\.?([a-zA-Z0-9_]+) does not exist/i) ||
-            errText.match(/Could not find the '([^']+)' column/i);
-          if (colMatch && colMatch[1]) {
-            const missingCol = colMatch[1].trim();
-            if (colsList.includes(missingCol) && colsList.length > 1) {
-              colsList = colsList.filter(c => c !== missingCol);
-              continue;
-            }
-            if (currentQuery.includes(missingCol)) {
-              currentQuery = currentQuery.replace(new RegExp(`&?order=${missingCol}\.(asc|desc)`, 'i'), '');
-              continue;
-            }
-          }
-        }
-        break;
-      }
-    } catch (err) {}
-    return null;
+    inFlightRequestsMapRef.current.set(cacheKey, { ts: Date.now(), promise: fetchPromise });
+    return fetchPromise;
   };
 
-  // On-Demand Batch Thumbnail (`image`) Loader for currently visible products ONLY (prevents downloading all images at once!)
-  const fetchVisiblePartImagesOnDemand = async (partIds = []) => {
-    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid || !Array.isArray(partIds) || partIds.length === 0) return;
-    const neededIds = partIds
-      .map(id => String(id || '').trim())
-      .filter(id => id && !fetchedPartImagesSetRef.current.has(id))
-      .slice(0, 30);
-    if (neededIds.length === 0) return;
-    neededIds.forEach(id => fetchedPartImagesSetRef.current.add(id));
-
-    try {
-      const inList = neededIds.map(id => `"${id.replace(/"/g, '')}"`).join(',');
-      const res = await fetch(
-        `${sbUrl}/rest/v1/spare_parts?select=id,image&id=in.(${encodeURIComponent(inList)})`,
-        { headers: sbHeaders(sbKey) }
-      );
-      if (res.ok) {
-        const rows = await res.json();
-        if (Array.isArray(rows) && rows.length > 0) {
-          const imgMap = new Map();
-          rows.forEach(r => {
-            if (r && r.id && r.image) imgMap.set(String(r.id), r.image);
-          });
-          if (imgMap.size > 0) {
-            incomingSyncUntilRef.current = Date.now() + 800;
-            isIncomingSyncRef.current = true;
-            setParts(prev =>
-              prev.map(p => {
-                const fetchedImg = imgMap.get(String(p.id));
-                return fetchedImg && !p.image ? { ...p, image: fetchedImg, images: p.images?.length ? p.images : [fetchedImg] } : p;
-              })
-            );
-          }
-        }
-      }
-    } catch (e) {}
+  const fetchVisiblePartImagesOnDemand = async () => {
+    // No-op: `image` (external URL) is already included directly in the paginated `limit=20` query!
   };
 
-  // On-Demand Paginated / Filtered Image Fetch for spare_parts
-  const fetchSparePartsSliceOnDemand = async ({ modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 26 } = {}) => {
+  // Strict Server-Side Paginated / Filtered Fetch for spare_parts (fetches ONLY 18-20 items per page/filter = < 5-8 KB!)
+  const fetchSparePartsSliceOnDemand = async ({ brand = 'ALL', modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 20 } = {}) => {
+    const { isValid } = getSupabaseConfig();
+    if (!isValid) return;
+    const cols = TABLE_LIGHT_COLUMNS.spare_parts;
+    const filters = [];
+
     if (modelId && modelId !== 'ALL') {
-      const modelPartIds = parts.filter(p => String(p.modelId) === String(modelId) && !p.image).map(p => p.id);
-      if (modelPartIds.length > 0) {
-        fetchVisiblePartImagesOnDemand(modelPartIds.slice(0, limit));
+      filters.push(`model_id=eq.${encodeURIComponent(modelId)}`);
+    } else if (brand && brand !== 'ALL') {
+      const brandModelIds = models.filter(m => m && m.brand === brand).map(m => String(m.id)).slice(0, 60);
+      if (brandModelIds.length > 0) {
+        const inStr = brandModelIds.map(id => `"${id.replace(/"/g, '')}"`).join(',');
+        filters.push(`model_id=in.(${encodeURIComponent(inStr)})`);
       }
+    }
+
+    if (category && category !== 'ALL') {
+      filters.push(`category=eq.${encodeURIComponent(category)}`);
+    }
+    if (search && search.trim() !== '') {
+      const cleanQ = search.trim().replace(/[%*,()]/g, '');
+      if (cleanQ) {
+        filters.push(`or=(name.ilike.*${encodeURIComponent(cleanQ)}*,sku.ilike.*${encodeURIComponent(cleanQ)}*)`);
+      }
+    }
+
+    const offset = page <= 1 ? 0 : 20 + (page - 2) * 8;
+    const fetchLimit = page <= 1 ? limit : 8;
+    const filterQuery = (filters.length > 0 ? '&' + filters.join('&') : '') + `&order=created_at.desc&limit=${fetchLimit}&offset=${offset}`;
+
+    const rows = await sbFetchTable('spare_parts', cols, filterQuery, false);
+    if (Array.isArray(rows) && rows.length > 0) {
+      incomingSyncUntilRef.current = Date.now() + 1000;
+      isIncomingSyncRef.current = true;
+      setParts(prev => {
+        const map = new Map(prev.map(p => [String(p.id), p]));
+        rows.forEach(r => {
+          const existing = map.get(String(r.id));
+          map.set(String(r.id), existing ? { ...existing, ...r } : r);
+        });
+        const merged = Array.from(map.values());
+        if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
+        return merged;
+      });
     }
   };
 
@@ -3737,10 +3712,17 @@ export default function App() {
         } catch (e) {}
       }
 
+      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      if (silent && hasInitialBootPullRanRef.current && (!isAdmin || hasAdminTablesPulledRef.current)) {
+        return;
+      }
+      hasInitialBootPullRanRef.current = true;
+      if (isAdmin) hasAdminTablesPulledRef.current = true;
+
       setCloudSyncStatus('syncing');
 
-      // 1. Fetch public storefront tables in parallel using lightweight column projections & pagination (NO select=*!)
-      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      // 1. Fetch public storefront tables in parallel using strict pagination (`spare_parts` limit=20 = ~4-6 KB!)
+      const forceRefresh = !silent;
       const [
         partsRows,
         modelsRows,
@@ -3752,15 +3734,15 @@ export default function App() {
         settingsRows,
         templatesRows
       ] = await Promise.all([
-        sbFetchTable('spare_parts', null, '&limit=1000', true),
-        sbFetchTable('mobile_models', null, '&limit=1000', true),
-        sbFetchTable('pricing_groups', null, '&limit=50'),
-        sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20'),
-        sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20'),
-        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', true),
-        sbFetchTable('promo_codes', null, '&limit=50'),
-        sbFetchTable('site_settings', null, '&limit=5'),
-        isAdmin ? sbFetchTable('auto_templates', null, '&limit=50') : Promise.resolve(null)
+        sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=20', forceRefresh),
+        sbFetchTable('mobile_models', null, '&limit=400', forceRefresh),
+        sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
+        sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20', forceRefresh),
+        sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20', forceRefresh),
+        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
+        sbFetchTable('promo_codes', null, '&limit=50', forceRefresh),
+        sbFetchTable('site_settings', null, '&limit=5', forceRefresh),
+        isAdmin ? sbFetchTable('auto_templates', null, '&limit=50', forceRefresh) : Promise.resolve(null)
       ]);
 
       // 2. Only fetch Admin tables when Admin is actually viewing the Admin Portal (#/AlaaDB)
@@ -4340,15 +4322,26 @@ export default function App() {
     setGridLimit(18);
   }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy]);
 
-  // On-Demand Paginated / Filtered Fetch when customer changes page, model, brand, category, or search
+  // On-Demand Debounced Paginated / Filtered Fetch ONLY when customer changes page, model, brand, category, or search (skips initial mount!)
   useEffect(() => {
-    fetchSparePartsSliceOnDemand({
-      modelId: selectedModelId,
-      category: selectedCategory,
-      search: searchQuery,
-      page: storePage,
-      limit: storeExtraEightShown ? 26 : 18
-    });
+    if (isFirstFilterRenderRef.current) {
+      isFirstFilterRenderRef.current = false;
+      return undefined;
+    }
+    if (filterFetchDebounceRef.current) clearTimeout(filterFetchDebounceRef.current);
+    filterFetchDebounceRef.current = setTimeout(() => {
+      fetchSparePartsSliceOnDemand({
+        brand: selectedBrand,
+        modelId: selectedModelId,
+        category: selectedCategory,
+        search: searchQuery,
+        page: storePage,
+        limit: storeExtraEightShown ? 26 : 20
+      });
+    }, 320);
+    return () => {
+      if (filterFetchDebounceRef.current) clearTimeout(filterFetchDebounceRef.current);
+    };
   }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storePage, storeExtraEightShown]);
 
   // On-Demand Full Details & Secondary Images Fetch when customer opens a Product Detail Modal
@@ -4858,31 +4851,7 @@ export default function App() {
     });
   }, [parts, modelByIdMap, selectedBrand, selectedModelId, selectedTargetModelName, selectedCategory, parsedSearchWords, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
 
-  // Automatically load thumbnails (`image`) on-demand ONLY for the products visible on the current page (18-26 items) & Showcase Bars
-  useEffect(() => {
-    const FIRST_PAGE_INITIAL = 18;
-    const FIRST_PAGE_MAX = 26;
-    const NEXT_PAGE_SIZE = 8;
-    const p = Math.max(1, storePage);
-    let visibleSlice = [];
-    if (p === 1) {
-      visibleSlice = filteredParts.slice(0, storeExtraEightShown ? FIRST_PAGE_MAX : FIRST_PAGE_INITIAL);
-    } else {
-      const start = FIRST_PAGE_MAX + (p - 2) * NEXT_PAGE_SIZE;
-      visibleSlice = filteredParts.slice(start, start + NEXT_PAGE_SIZE);
-    }
-    const barPartIds = (showcaseBars || []).filter(b => b && b.active).flatMap(b => b.partIds || []);
-    const idsNeedingImage = [
-      ...visibleSlice.filter(pt => pt && !pt.image).map(pt => pt.id),
-      ...barPartIds.filter(id => {
-        const pt = parts.find(x => String(x.id) === String(id));
-        return pt && !pt.image;
-      })
-    ];
-    if (idsNeedingImage.length > 0) {
-      fetchVisiblePartImagesOnDemand(idsNeedingImage);
-    }
-  }, [filteredParts, storePage, storeExtraEightShown, clientTab, showcaseBars]);
+
 
   // --- Cart Totals Calculation ---
   const cartSummary = useMemo(() => {
@@ -18579,13 +18548,13 @@ ${footer}
       <style>{`
         /* ==========================================================================
            VISION 2030: SPATIAL AI & HOLOGRAPHIC CYBER-COMMERCE THEME (5 YEARS AHEAD)
-           Transforms both Storefront & Admin ERP into a Deep Cosmic Spatial Glass UI
+           High-Contrast Calibrated Colors — Every Text, Button, Badge & Icon 100% Clear!
            ========================================================================== */
         @media screen {
           .theme-vision-2030,
           .theme-vision-2030 .min-h-screen.bg-slate-100,
           .theme-vision-2030 .min-h-screen.bg-slate-50 {
-            background-color: #050814 !important;
+            background-color: #060913 !important;
             background-image:
               radial-gradient(circle at 12% 8%, rgba(6, 182, 212, 0.16) 0%, transparent 34%),
               radial-gradient(circle at 88% 12%, rgba(124, 58, 237, 0.18) 0%, transparent 38%),
@@ -18597,76 +18566,110 @@ ${footer}
             color: #f8fafc !important;
           }
 
-          /* Frosted Spatial Glass Panels & Containers */
+          /* 1. All Light Surface Containers -> Deep Spatial Frosted Glass */
           .theme-vision-2030 .bg-white,
+          .theme-vision-2030 .bg-white\/80,
+          .theme-vision-2030 .bg-white\/90,
           .theme-vision-2030 .bg-white\/95,
           .theme-vision-2030 .bg-slate-50,
-          .theme-vision-2030 .bg-slate-50\/70,
+          .theme-vision-2030 .bg-slate-50\/50,
           .theme-vision-2030 .bg-slate-50\/60,
+          .theme-vision-2030 .bg-slate-50\/70,
+          .theme-vision-2030 .bg-slate-50\/80,
           .theme-vision-2030 .bg-slate-100 {
-            background: linear-gradient(155deg, rgba(15, 23, 42, 0.86) 0%, rgba(8, 13, 27, 0.92) 100%) !important;
+            background: linear-gradient(155deg, rgba(15, 23, 42, 0.90) 0%, rgba(9, 14, 28, 0.95) 100%) !important;
             backdrop-filter: blur(20px) saturate(160%) !important;
             -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-            border-color: rgba(56, 189, 248, 0.22) !important;
+            border-color: rgba(56, 189, 248, 0.24) !important;
             color: #f8fafc !important;
             box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
           }
 
-          /* Headers & Sidebars in Vision 2030 */
+          /* 2. Secondary Buttons & Pills (.bg-slate-200, .bg-slate-300) -> Elevated Slate Glass with Bright White Text */
+          .theme-vision-2030 .bg-slate-200,
+          .theme-vision-2030 .bg-slate-300 {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
+            border: 1px solid rgba(56, 189, 248, 0.30) !important;
+            color: #f8fafc !important;
+          }
+          .theme-vision-2030 .bg-slate-200:hover,
+          .theme-vision-2030 .bg-slate-300:hover {
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.98) 0%, rgba(30, 41, 59, 1) 100%) !important;
+            border-color: rgba(34, 211, 238, 0.55) !important;
+            color: #ffffff !important;
+          }
+
+          /* 3. Headers & Sidebars */
           .theme-vision-2030 header,
           .theme-vision-2030 aside,
           .theme-vision-2030 .bg-\[\#0d151c\],
-          .theme-vision-2030 .bg-slate-900 {
-            background: linear-gradient(135deg, rgba(4, 7, 17, 0.94) 0%, rgba(15, 23, 42, 0.92) 55%, rgba(30, 27, 75, 0.90) 100%) !important;
-            backdrop-filter: blur(24px) !important;
+          .theme-vision-2030 .bg-slate-900,
+          .theme-vision-2030 .bg-slate-800 {
+            background: linear-gradient(135deg, rgba(6, 10, 22, 0.96) 0%, rgba(15, 23, 42, 0.94) 55%, rgba(30, 27, 75, 0.92) 100%) !important;
             border-color: rgba(56, 189, 248, 0.28) !important;
+            color: #f8fafc !important;
           }
 
-          /* 2030 Spatial Product Pods (.hm-card) */
+          /* 4. 2030 Spatial Product Pods (.hm-card) */
           .theme-vision-2030 .hm-card {
             border-radius: 1.5rem !important;
-            background: linear-gradient(165deg, rgba(17, 25, 46, 0.90) 0%, rgba(7, 11, 22, 0.96) 100%) !important;
-            border: 1px solid rgba(56, 189, 248, 0.24) !important;
+            background: linear-gradient(165deg, rgba(17, 25, 46, 0.92) 0%, rgba(8, 12, 24, 0.98) 100%) !important;
+            border: 1px solid rgba(56, 189, 248, 0.26) !important;
             box-shadow: 0 16px 38px -12px rgba(0, 0, 0, 0.78), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
-            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease !important;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
           }
           .theme-vision-2030 .hm-card:hover {
-            transform: translateY(-6px) scale(1.01) !important;
+            transform: translateY(-5px) !important;
             border-color: rgba(34, 211, 238, 0.65) !important;
-            box-shadow: 0 24px 48px -12px rgba(6, 182, 212, 0.32), 0 0 28px -4px rgba(139, 92, 246, 0.28) !important;
+            box-shadow: 0 22px 44px -12px rgba(6, 182, 212, 0.32), 0 0 24px -4px rgba(139, 92, 246, 0.26) !important;
           }
           .theme-vision-2030 .hm-card-img {
-            background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95) 0%, rgba(5, 8, 20, 0.98) 100%) !important;
-            border-bottom: 1px solid rgba(56, 189, 248, 0.16) !important;
+            background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95) 0%, rgba(6, 9, 19, 0.98) 100%) !important;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.18) !important;
           }
 
-          /* Category Pills in Vision 2030 */
+          /* 5. Category Pills */
           .theme-vision-2030 .hm-cat-pill {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 27, 75, 0.85) 100%) !important;
-            border: 1px solid rgba(56, 189, 248, 0.32) !important;
-            box-shadow: 0 8px 20px -6px rgba(6, 182, 212, 0.18) !important;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 27, 75, 0.90) 100%) !important;
+            border: 1px solid rgba(56, 189, 248, 0.35) !important;
+            color: #f8fafc !important;
           }
           .theme-vision-2030 .hm-cat-pill:hover {
-            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 55%, #a855f7 100%) !important;
-            border-color: rgba(255, 255, 255, 0.45) !important;
-            transform: translateY(-2px) scale(1.02) !important;
-            box-shadow: 0 12px 28px -6px rgba(6, 182, 212, 0.45) !important;
+            background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 60%, #9333ea 100%) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            color: #ffffff !important;
           }
 
-          /* High-Contrast Starlight Typography Overrides */
+          /* 6. Complete High-Contrast Typography Calibration (No Dark-on-Dark Text!) */
+          .theme-vision-2030 .text-slate-950,
           .theme-vision-2030 .text-slate-900,
           .theme-vision-2030 .text-slate-800,
           .theme-vision-2030 .text-slate-700,
           .theme-vision-2030 .text-blue-950,
+          .theme-vision-2030 .text-blue-900,
+          .theme-vision-2030 .text-blue-800,
           .theme-vision-2030 .text-indigo-950,
+          .theme-vision-2030 .text-indigo-900,
+          .theme-vision-2030 .text-indigo-800,
+          .theme-vision-2030 .text-violet-950,
+          .theme-vision-2030 .text-violet-900,
+          .theme-vision-2030 .text-violet-800,
           .theme-vision-2030 .text-emerald-950,
+          .theme-vision-2030 .text-emerald-900,
+          .theme-vision-2030 .text-cyan-900,
+          .theme-vision-2030 .text-cyan-800,
           .theme-vision-2030 .text-amber-950,
-          .theme-vision-2030 .text-rose-950 {
+          .theme-vision-2030 .text-amber-900,
+          .theme-vision-2030 .text-amber-800,
+          .theme-vision-2030 .text-rose-950,
+          .theme-vision-2030 .text-rose-900,
+          .theme-vision-2030 .text-rose-800 {
             color: #f8fafc !important;
           }
           .theme-vision-2030 .text-slate-600,
-          .theme-vision-2030 .text-slate-500 {
-            color: #94a3b8 !important;
+          .theme-vision-2030 .text-slate-500,
+          .theme-vision-2030 .text-slate-400 {
+            color: #cbd5e1 !important;
           }
           .theme-vision-2030 .text-blue-600,
           .theme-vision-2030 .text-blue-700,
@@ -18674,51 +18677,123 @@ ${footer}
           .theme-vision-2030 .text-indigo-700 {
             color: #38bdf8 !important;
           }
+          .theme-vision-2030 .text-emerald-600,
           .theme-vision-2030 .text-emerald-700,
-          .theme-vision-2030 .text-emerald-800,
-          .theme-vision-2030 .text-emerald-600 {
+          .theme-vision-2030 .text-emerald-800 {
             color: #34d399 !important;
           }
+          .theme-vision-2030 .text-amber-600,
+          .theme-vision-2030 .text-amber-700 {
+            color: #fbbf24 !important;
+          }
+          .theme-vision-2030 .text-rose-600,
+          .theme-vision-2030 .text-rose-700,
+          .theme-vision-2030 .text-pink-600,
+          .theme-vision-2030 .text-pink-700 {
+            color: #fb7185 !important;
+          }
 
-          /* Translucent Neon Soft Badges & Alert Boxes */
+          /* 7. Bright Neon Buttons & Badges (Gold, Cyan, Emerald) -> Deep Obsidian Text for Crisp Contrast! */
+          .theme-vision-2030 .bg-amber-400,
+          .theme-vision-2030 .bg-amber-500,
+          .theme-vision-2030 .bg-cyan-400,
+          .theme-vision-2030 .bg-emerald-400,
+          .theme-vision-2030 .from-cyan-400,
+          .theme-vision-2030 .from-cyan-500 {
+            color: #020617 !important;
+          }
+          .theme-vision-2030 .bg-amber-400 *,
+          .theme-vision-2030 .bg-amber-500 *,
+          .theme-vision-2030 .bg-cyan-400 *,
+          .theme-vision-2030 .from-cyan-400 *,
+          .theme-vision-2030 .from-cyan-500 * {
+            color: #020617 !important;
+          }
+
+          /* 8. Soft Tinted Badges & Alert Boxes (All 100/50 shades converted to Neon Glass!) */
           .theme-vision-2030 .bg-blue-50,
+          .theme-vision-2030 .bg-blue-50\/30,
+          .theme-vision-2030 .bg-blue-50\/40,
+          .theme-vision-2030 .bg-blue-50\/50,
+          .theme-vision-2030 .bg-blue-50\/60,
           .theme-vision-2030 .bg-blue-50\/70,
+          .theme-vision-2030 .bg-blue-100,
           .theme-vision-2030 .bg-indigo-50,
+          .theme-vision-2030 .bg-indigo-50\/40,
           .theme-vision-2030 .bg-indigo-50\/70,
-          .theme-vision-2030 .bg-cyan-50 {
-            background: rgba(6, 182, 212, 0.15) !important;
-            border-color: rgba(34, 211, 238, 0.35) !important;
+          .theme-vision-2030 .bg-indigo-50\/80,
+          .theme-vision-2030 .bg-indigo-100,
+          .theme-vision-2030 .bg-violet-50,
+          .theme-vision-2030 .bg-violet-100,
+          .theme-vision-2030 .bg-cyan-50,
+          .theme-vision-2030 .bg-cyan-100 {
+            background: rgba(6, 182, 212, 0.18) !important;
+            border-color: rgba(34, 211, 238, 0.40) !important;
             color: #e0f2fe !important;
           }
           .theme-vision-2030 .bg-emerald-50,
-          .theme-vision-2030 .bg-emerald-50\/70 {
-            background: rgba(16, 185, 129, 0.16) !important;
-            border-color: rgba(52, 211, 153, 0.35) !important;
+          .theme-vision-2030 .bg-emerald-50\/30,
+          .theme-vision-2030 .bg-emerald-50\/70,
+          .theme-vision-2030 .bg-emerald-100 {
+            background: rgba(16, 185, 129, 0.18) !important;
+            border-color: rgba(52, 211, 153, 0.40) !important;
             color: #d1fae5 !important;
           }
           .theme-vision-2030 .bg-amber-50,
-          .theme-vision-2030 .bg-amber-100 {
-            background: rgba(245, 158, 11, 0.16) !important;
-            border-color: rgba(251, 191, 36, 0.35) !important;
+          .theme-vision-2030 .bg-amber-50\/70,
+          .theme-vision-2030 .bg-amber-50\/90,
+          .theme-vision-2030 .bg-amber-100,
+          .theme-vision-2030 .bg-amber-200,
+          .theme-vision-2030 .bg-amber-300 {
+            background: rgba(245, 158, 11, 0.20) !important;
+            border-color: rgba(251, 191, 36, 0.45) !important;
             color: #fef3c7 !important;
           }
           .theme-vision-2030 .bg-rose-50,
-          .theme-vision-2030 .bg-rose-50\/40 {
-            background: rgba(244, 63, 94, 0.16) !important;
-            border-color: rgba(251, 113, 133, 0.38) !important;
+          .theme-vision-2030 .bg-rose-50\/30,
+          .theme-vision-2030 .bg-rose-50\/40,
+          .theme-vision-2030 .bg-rose-100,
+          .theme-vision-2030 .bg-rose-100\/80,
+          .theme-vision-2030 .bg-pink-50,
+          .theme-vision-2030 .bg-pink-50\/30 {
+            background: rgba(244, 63, 94, 0.20) !important;
+            border-color: rgba(251, 113, 133, 0.45) !important;
             color: #ffe4e6 !important;
           }
 
-          /* Borders & Dividers in Vision 2030 */
+          /* 9. All Lucide SVG Icons -> Luminous & Sharp! */
+          .theme-vision-2030 svg.lucide {
+            opacity: 1 !important;
+            filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.15));
+          }
+          .theme-vision-2030 svg.text-slate-400,
+          .theme-vision-2030 svg.text-slate-500,
+          .theme-vision-2030 svg.text-slate-600,
+          .theme-vision-2030 svg.text-slate-700 {
+            color: #38bdf8 !important;
+          }
+
+          /* 10. Tables, Borders & Dividers */
+          .theme-vision-2030 table thead tr {
+            background: rgba(15, 23, 42, 0.96) !important;
+            color: #38bdf8 !important;
+          }
+          .theme-vision-2030 table tbody tr {
+            background: rgba(9, 14, 28, 0.85) !important;
+            color: #f8fafc !important;
+          }
+          .theme-vision-2030 table tbody tr:hover {
+            background: rgba(30, 41, 59, 0.92) !important;
+          }
           .theme-vision-2030 .border-slate-200,
           .theme-vision-2030 .border-slate-300,
           .theme-vision-2030 .border-slate-100,
           .theme-vision-2030 .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
           .theme-vision-2030 .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-            border-color: rgba(56, 189, 248, 0.18) !important;
+            border-color: rgba(56, 189, 248, 0.22) !important;
           }
 
-          /* Bionic Spatial Inputs, Dropdowns (<select>), & Textareas */
+          /* 11. Bionic Spatial Inputs, Dropdowns (<select>), & Textareas */
           .theme-vision-2030 select,
           .theme-vision-2030 input[type="text"],
           .theme-vision-2030 input[type="number"],
@@ -18726,11 +18801,11 @@ ${footer}
           .theme-vision-2030 input[type="email"],
           .theme-vision-2030 input[type="password"],
           .theme-vision-2030 textarea {
-            background: rgba(6, 10, 22, 0.88) !important;
+            background: rgba(6, 10, 22, 0.92) !important;
             color: #f8fafc !important;
-            border: 1px solid rgba(56, 189, 248, 0.32) !important;
+            border: 1px solid rgba(56, 189, 248, 0.38) !important;
             border-radius: 0.95rem !important;
-            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
             transition: all 0.2s ease !important;
           }
           .theme-vision-2030 select option,
@@ -18740,21 +18815,21 @@ ${footer}
           }
           .theme-vision-2030 input::placeholder,
           .theme-vision-2030 textarea::placeholder {
-            color: #64748b !important;
+            color: #94a3b8 !important;
           }
           .theme-vision-2030 select:focus,
           .theme-vision-2030 input:focus,
           .theme-vision-2030 textarea:focus {
             border-color: #22d3ee !important;
-            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22), 0 0 20px rgba(6, 182, 212, 0.25) !important;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.25), 0 0 20px rgba(6, 182, 212, 0.30) !important;
             outline: none !important;
           }
 
-          /* Holographic Primary Buttons */
+          /* 12. Primary Action Buttons */
           .theme-vision-2030 .bg-blue-600,
           .theme-vision-2030 .bg-indigo-600 {
             background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 60%, #7c3aed 100%) !important;
-            border: 1px solid rgba(165, 243, 252, 0.3) !important;
+            border: 1px solid rgba(165, 243, 252, 0.35) !important;
             box-shadow: 0 8px 22px -4px rgba(6, 182, 212, 0.35) !important;
             color: #ffffff !important;
           }
