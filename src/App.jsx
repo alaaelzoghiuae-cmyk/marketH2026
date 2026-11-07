@@ -1683,22 +1683,43 @@ export default function App() {
     return [PART_IMAGES.screen];
   };
 
-  // --- UI Theme State ('modern_pro' vs 'classic') & Brand Images Map (1 image per brand) ---
+  // --- Vision 2030 Platform Theme State ('vision_2030' vs 'classic') — Controlled EXCLUSIVELY from Admin Dashboard (#/AlaaDB) & Active by Default! ---
   const [uiTheme, setUiTheme] = useState(() => {
-    try { return window.localStorage.getItem('elzoghbi_ui_theme') || 'modern_pro'; } catch (e) { return 'modern_pro'; }
+    try {
+      const saved = window.localStorage.getItem('elzoghbi_ui_theme_v2030');
+      if (saved === 'classic' || saved === 'vision_2030') return saved;
+    } catch (e) {}
+    return 'vision_2030';
   });
-  const toggleUiTheme = () => {
-    setUiTheme(prev => {
-      const next = prev === 'modern_pro' ? 'classic' : 'modern_pro';
-      try { window.localStorage.setItem('elzoghbi_ui_theme', next); } catch (e) {}
-      return next;
-    });
-  };
   const [brandImages, setBrandImages] = useState(() => loadPersisted('brandImages', {}));
   const [editingBrandImageFor, setEditingBrandImageFor] = useState(null); // { brandName, imageUrl }
 
   // --- Persistent Global State (Survives Page Refresh & Syncs Across Tabs + Supabase Cloud) ---
   const [siteSettings, setSiteSettings] = useState(() => loadPersisted('siteSettings', INITIAL_SITE_SETTINGS));
+
+  useEffect(() => {
+    if (siteSettings?.platformTheme === 'classic' || siteSettings?.platformTheme === 'vision_2030') {
+      if (siteSettings.platformTheme !== uiTheme) {
+        setUiTheme(siteSettings.platformTheme);
+        try { window.localStorage.setItem('elzoghbi_ui_theme_v2030', siteSettings.platformTheme); } catch (e) {}
+      }
+    }
+  }, [siteSettings?.platformTheme]);
+
+  const toggleUiTheme = () => {
+    const next = uiTheme === 'vision_2030' ? 'classic' : 'vision_2030';
+    setUiTheme(next);
+    try { window.localStorage.setItem('elzoghbi_ui_theme_v2030', next); } catch (e) {}
+    setSiteSettings(prev => ({ ...prev, platformTheme: next }));
+    if (homeElRef && homeElRef.current) homeElRef.current = null;
+    if (searchElRef && searchElRef.current) searchElRef.current = null;
+    showToast(
+      next === 'vision_2030'
+        ? '🚀 تم تفعيل ثيم رؤية المستقبل 2030 (Spatial Future Commerce) على كامل المنصة!'
+        : '🏛️ تم التبديل إلى المظهر الكلاسيكي الأصلي للمنصة.',
+      'success'
+    );
+  };
   const [currencies, setCurrencies] = useState(() => loadPersisted('currencies', INITIAL_CURRENCIES));
   const [groups, setGroups] = useState(() => loadPersisted('groups', INITIAL_GROUPS));
   const [brands, setBrands] = useState(() => loadPersisted('brands', INITIAL_BRANDS));
@@ -6044,22 +6065,6 @@ export default function App() {
             )}
 
             <button
-              type="button"
-              onClick={toggleUiTheme}
-              className={`px-2.5 h-12 rounded-xl transition flex flex-col items-center justify-center gap-0.5 border ${
-                uiTheme === 'modern_pro'
-                  ? 'bg-gradient-to-b from-indigo-500 via-violet-600 to-fuchsia-600 text-white border-indigo-300/40 shadow-md shadow-indigo-500/20'
-                  : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
-              }`}
-              title="التبديل بين الثيم الاحترافي الحديث والشكل الأصلي الكلاسيكي"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span className="text-[9px] font-extrabold whitespace-nowrap">
-                {uiTheme === 'modern_pro' ? 'ثيم Pro' : 'الأصلي'}
-              </span>
-            </button>
-
-            <button
               onClick={() => setCartDrawerOpen(true)}
               className="relative min-w-[58px] h-12 px-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition flex flex-col items-center justify-center gap-0.5"
             >
@@ -8581,22 +8586,25 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               </button>
             </div>
 
-            {/* Switch to Storefront & Theme Toggle Buttons */}
+            {/* Switch to Storefront & Vision 2030 Master Theme Toggle (Admin Only!) */}
             <div className="px-3 pt-3 space-y-2">
               <button
                 type="button"
                 onClick={toggleUiTheme}
-                className={`w-full py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-between transition border ${
-                  uiTheme === 'modern_pro'
-                    ? 'bg-gradient-to-l from-indigo-600 via-violet-600 to-fuchsia-600 text-white border-indigo-400/40 shadow-md'
-                    : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-700'
+                className={`w-full py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-between transition border ${
+                  uiTheme === 'vision_2030'
+                    ? 'bg-gradient-to-l from-cyan-500 via-indigo-600 to-fuchsia-600 text-white border-cyan-300/50 shadow-lg shadow-cyan-500/25'
+                    : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border-slate-600'
                 }`}
+                title="زر حصري في لوحة التحكم لتبديل مظهر المنصة بالكامل بين رؤية المستقبل 2030 والمظهر الكلاسيكي الأصلي"
               >
                 <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  <span>{uiTheme === 'modern_pro' ? 'الثيم الاحترافي الحديث (Pro)' : 'الشكل الأصلي الكلاسيكي'}</span>
+                  <Sparkles className="w-4 h-4 animate-pulse" />
+                  <span>{uiTheme === 'vision_2030' ? '🚀 ثيم رؤية 2030 (مفعّل)' : '🏛️ المظهر الأصلي الكلاسيكي'}</span>
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-black/25 text-[10px]">تبديل</span>
+                <span className="px-2 py-0.5 rounded-lg bg-black/30 text-[10px] border border-white/15">
+                  {uiTheme === 'vision_2030' ? 'إرجاع للأصلي' : 'تفعيل 2030'}
+                </span>
               </button>
 
               <button
@@ -8729,6 +8737,23 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-xs relative">
+                {/* Master Platform Theme Switcher (Admin Dashboard Exclusive) */}
+                <button
+                  type="button"
+                  onClick={toggleUiTheme}
+                  className={`px-3.5 py-2 rounded-xl font-black flex items-center gap-1.5 border transition shadow-md ${
+                    uiTheme === 'vision_2030'
+                      ? 'bg-gradient-to-l from-cyan-500 via-indigo-600 to-fuchsia-600 text-white border-cyan-300/50 shadow-cyan-500/20'
+                      : 'bg-slate-900 hover:bg-slate-800 text-amber-300 border-slate-700'
+                  }`}
+                  title="تبديل مظهر المنصة بالكامل (المتجر + الداشبورد) بين رؤية المستقبل 2030 والمظهر الكلاسيكي الأصلي"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>
+                    {uiTheme === 'vision_2030' ? '🚀 مظهر رؤية 2030: مفعّل (اضغط للعودة للأصلي)' : '🏛️ المظهر الأصلي (اضغط لتفعيل رؤية 2030)'}
+                  </span>
+                </button>
+
                 {/* Explicit Server Save Button */}
                 <button
                   type="button"
@@ -18532,6 +18557,12 @@ ${footer}
   // نخلي صفحتي الرئيسية والبحث متركّبين (مخفيين) عشان الرجوع يبقى فوري من غير إعادة بناء
   const homeElRef = React.useRef(null);
   const searchElRef = React.useRef(null);
+  const lastRenderedThemeRef = React.useRef(uiTheme);
+  if (lastRenderedThemeRef.current !== uiTheme) {
+    homeElRef.current = null;
+    searchElRef.current = null;
+    lastRenderedThemeRef.current = uiTheme;
+  }
   const homeActiveNow = clientTab === 'home' || clientTab === 'store';
   const searchActiveNow = clientTab === 'search';
   if (appPortal !== 'admin') {
@@ -18544,62 +18575,196 @@ ${footer}
   // ============================================================================
 
   return (
-    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className={`min-h-screen bg-slate-50 text-slate-900 font-sans ${uiTheme === 'modern_pro' ? 'theme-modern-pro' : 'theme-classic'}`}>
+    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className={`min-h-screen bg-slate-50 text-slate-900 font-sans ${uiTheme === 'vision_2030' ? 'theme-vision-2030' : 'theme-classic'}`}>
       <style>{`
         /* ==========================================================================
-           NEO-LUXURY E-COMMERCE & ERP PRO THEME (Royal Indigo, Emerald & Obsidian)
+           VISION 2030: SPATIAL AI & HOLOGRAPHIC CYBER-COMMERCE THEME (5 YEARS AHEAD)
+           Transforms both Storefront & Admin ERP into a Deep Cosmic Spatial Glass UI
            ========================================================================== */
-        .theme-modern-pro {
-          background: radial-gradient(circle at 15% 0%, rgba(99, 102, 241, 0.06), transparent 38%),
-                      radial-gradient(circle at 85% 10%, rgba(16, 185, 129, 0.06), transparent 35%),
-                      #f4f6fb !important;
-          color: #0f172a;
-        }
-        .theme-modern-pro header,
-        .theme-modern-pro .bg-\[\#0d151c\] {
-          background: linear-gradient(135deg, #090d16 0%, #111827 55%, #1e1b4b 100%) !important;
-          border-color: rgba(99, 102, 241, 0.25) !important;
-        }
-        .theme-modern-pro .hm-card {
-          border-radius: 1.25rem !important;
-          border: 1px solid rgba(226, 232, 240, 0.95) !important;
-          background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%) !important;
-          box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03) !important;
-          transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease !important;
-        }
-        .theme-modern-pro .hm-card:hover {
-          transform: translateY(-4px) !important;
-          border-color: rgba(99, 102, 241, 0.45) !important;
-          box-shadow: 0 18px 34px -8px rgba(79, 70, 229, 0.14), 0 6px 14px -4px rgba(15, 23, 42, 0.06) !important;
-        }
-        .theme-modern-pro .hm-cat-pill {
-          background: linear-gradient(135deg, #ffffff 0%, #f5f7ff 100%) !important;
-          border: 1px solid rgba(99, 102, 241, 0.22) !important;
-          box-shadow: 0 2px 8px rgba(79, 70, 229, 0.05) !important;
-        }
-        .theme-modern-pro .hm-cat-pill:hover {
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
-          color: #ffffff !important;
-          border-color: transparent !important;
-          transform: translateY(-1px);
-        }
-        .theme-modern-pro .hm-cat-pill:hover span {
-          color: #ffffff !important;
-        }
-        .theme-modern-pro select,
-        .theme-modern-pro input[type="text"],
-        .theme-modern-pro input[type="number"],
-        .theme-modern-pro input[type="tel"],
-        .theme-modern-pro textarea {
-          border-radius: 0.875rem !important;
-          transition: all 0.18s ease !important;
-        }
-        .theme-modern-pro select:focus,
-        .theme-modern-pro input:focus,
-        .theme-modern-pro textarea:focus {
-          border-color: #6366f1 !important;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16) !important;
-          outline: none !important;
+        @media screen {
+          .theme-vision-2030,
+          .theme-vision-2030 .min-h-screen.bg-slate-100,
+          .theme-vision-2030 .min-h-screen.bg-slate-50 {
+            background-color: #050814 !important;
+            background-image:
+              radial-gradient(circle at 12% 8%, rgba(6, 182, 212, 0.16) 0%, transparent 34%),
+              radial-gradient(circle at 88% 12%, rgba(124, 58, 237, 0.18) 0%, transparent 38%),
+              radial-gradient(circle at 50% 85%, rgba(16, 185, 129, 0.10) 0%, transparent 42%),
+              linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px) !important;
+            background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px !important;
+            background-attachment: fixed !important;
+            color: #f8fafc !important;
+          }
+
+          /* Frosted Spatial Glass Panels & Containers */
+          .theme-vision-2030 .bg-white,
+          .theme-vision-2030 .bg-white\/95,
+          .theme-vision-2030 .bg-slate-50,
+          .theme-vision-2030 .bg-slate-50\/70,
+          .theme-vision-2030 .bg-slate-50\/60,
+          .theme-vision-2030 .bg-slate-100 {
+            background: linear-gradient(155deg, rgba(15, 23, 42, 0.86) 0%, rgba(8, 13, 27, 0.92) 100%) !important;
+            backdrop-filter: blur(20px) saturate(160%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+            border-color: rgba(56, 189, 248, 0.22) !important;
+            color: #f8fafc !important;
+            box-shadow: 0 14px 34px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 0 rgba(255, 255, 255, 0.08) !important;
+          }
+
+          /* Headers & Sidebars in Vision 2030 */
+          .theme-vision-2030 header,
+          .theme-vision-2030 aside,
+          .theme-vision-2030 .bg-\[\#0d151c\],
+          .theme-vision-2030 .bg-slate-900 {
+            background: linear-gradient(135deg, rgba(4, 7, 17, 0.94) 0%, rgba(15, 23, 42, 0.92) 55%, rgba(30, 27, 75, 0.90) 100%) !important;
+            backdrop-filter: blur(24px) !important;
+            border-color: rgba(56, 189, 248, 0.28) !important;
+          }
+
+          /* 2030 Spatial Product Pods (.hm-card) */
+          .theme-vision-2030 .hm-card {
+            border-radius: 1.5rem !important;
+            background: linear-gradient(165deg, rgba(17, 25, 46, 0.90) 0%, rgba(7, 11, 22, 0.96) 100%) !important;
+            border: 1px solid rgba(56, 189, 248, 0.24) !important;
+            box-shadow: 0 16px 38px -12px rgba(0, 0, 0, 0.78), inset 0 1px 0 0 rgba(255, 255, 255, 0.12) !important;
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease, border-color 0.28s ease !important;
+          }
+          .theme-vision-2030 .hm-card:hover {
+            transform: translateY(-6px) scale(1.01) !important;
+            border-color: rgba(34, 211, 238, 0.65) !important;
+            box-shadow: 0 24px 48px -12px rgba(6, 182, 212, 0.32), 0 0 28px -4px rgba(139, 92, 246, 0.28) !important;
+          }
+          .theme-vision-2030 .hm-card-img {
+            background: radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.95) 0%, rgba(5, 8, 20, 0.98) 100%) !important;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.16) !important;
+          }
+
+          /* Category Pills in Vision 2030 */
+          .theme-vision-2030 .hm-cat-pill {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(30, 27, 75, 0.85) 100%) !important;
+            border: 1px solid rgba(56, 189, 248, 0.32) !important;
+            box-shadow: 0 8px 20px -6px rgba(6, 182, 212, 0.18) !important;
+          }
+          .theme-vision-2030 .hm-cat-pill:hover {
+            background: linear-gradient(135deg, #06b6d4 0%, #6366f1 55%, #a855f7 100%) !important;
+            border-color: rgba(255, 255, 255, 0.45) !important;
+            transform: translateY(-2px) scale(1.02) !important;
+            box-shadow: 0 12px 28px -6px rgba(6, 182, 212, 0.45) !important;
+          }
+
+          /* High-Contrast Starlight Typography Overrides */
+          .theme-vision-2030 .text-slate-900,
+          .theme-vision-2030 .text-slate-800,
+          .theme-vision-2030 .text-slate-700,
+          .theme-vision-2030 .text-blue-950,
+          .theme-vision-2030 .text-indigo-950,
+          .theme-vision-2030 .text-emerald-950,
+          .theme-vision-2030 .text-amber-950,
+          .theme-vision-2030 .text-rose-950 {
+            color: #f8fafc !important;
+          }
+          .theme-vision-2030 .text-slate-600,
+          .theme-vision-2030 .text-slate-500 {
+            color: #94a3b8 !important;
+          }
+          .theme-vision-2030 .text-blue-600,
+          .theme-vision-2030 .text-blue-700,
+          .theme-vision-2030 .text-indigo-600,
+          .theme-vision-2030 .text-indigo-700 {
+            color: #38bdf8 !important;
+          }
+          .theme-vision-2030 .text-emerald-700,
+          .theme-vision-2030 .text-emerald-800,
+          .theme-vision-2030 .text-emerald-600 {
+            color: #34d399 !important;
+          }
+
+          /* Translucent Neon Soft Badges & Alert Boxes */
+          .theme-vision-2030 .bg-blue-50,
+          .theme-vision-2030 .bg-blue-50\/70,
+          .theme-vision-2030 .bg-indigo-50,
+          .theme-vision-2030 .bg-indigo-50\/70,
+          .theme-vision-2030 .bg-cyan-50 {
+            background: rgba(6, 182, 212, 0.15) !important;
+            border-color: rgba(34, 211, 238, 0.35) !important;
+            color: #e0f2fe !important;
+          }
+          .theme-vision-2030 .bg-emerald-50,
+          .theme-vision-2030 .bg-emerald-50\/70 {
+            background: rgba(16, 185, 129, 0.16) !important;
+            border-color: rgba(52, 211, 153, 0.35) !important;
+            color: #d1fae5 !important;
+          }
+          .theme-vision-2030 .bg-amber-50,
+          .theme-vision-2030 .bg-amber-100 {
+            background: rgba(245, 158, 11, 0.16) !important;
+            border-color: rgba(251, 191, 36, 0.35) !important;
+            color: #fef3c7 !important;
+          }
+          .theme-vision-2030 .bg-rose-50,
+          .theme-vision-2030 .bg-rose-50\/40 {
+            background: rgba(244, 63, 94, 0.16) !important;
+            border-color: rgba(251, 113, 133, 0.38) !important;
+            color: #ffe4e6 !important;
+          }
+
+          /* Borders & Dividers in Vision 2030 */
+          .theme-vision-2030 .border-slate-200,
+          .theme-vision-2030 .border-slate-300,
+          .theme-vision-2030 .border-slate-100,
+          .theme-vision-2030 .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+          .theme-vision-2030 .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+            border-color: rgba(56, 189, 248, 0.18) !important;
+          }
+
+          /* Bionic Spatial Inputs, Dropdowns (<select>), & Textareas */
+          .theme-vision-2030 select,
+          .theme-vision-2030 input[type="text"],
+          .theme-vision-2030 input[type="number"],
+          .theme-vision-2030 input[type="tel"],
+          .theme-vision-2030 input[type="email"],
+          .theme-vision-2030 input[type="password"],
+          .theme-vision-2030 textarea {
+            background: rgba(6, 10, 22, 0.88) !important;
+            color: #f8fafc !important;
+            border: 1px solid rgba(56, 189, 248, 0.32) !important;
+            border-radius: 0.95rem !important;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+            transition: all 0.2s ease !important;
+          }
+          .theme-vision-2030 select option,
+          .theme-vision-2030 select optgroup {
+            background-color: #0b1120 !important;
+            color: #f8fafc !important;
+          }
+          .theme-vision-2030 input::placeholder,
+          .theme-vision-2030 textarea::placeholder {
+            color: #64748b !important;
+          }
+          .theme-vision-2030 select:focus,
+          .theme-vision-2030 input:focus,
+          .theme-vision-2030 textarea:focus {
+            border-color: #22d3ee !important;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22), 0 0 20px rgba(6, 182, 212, 0.25) !important;
+            outline: none !important;
+          }
+
+          /* Holographic Primary Buttons */
+          .theme-vision-2030 .bg-blue-600,
+          .theme-vision-2030 .bg-indigo-600 {
+            background: linear-gradient(135deg, #06b6d4 0%, #4f46e5 60%, #7c3aed 100%) !important;
+            border: 1px solid rgba(165, 243, 252, 0.3) !important;
+            box-shadow: 0 8px 22px -4px rgba(6, 182, 212, 0.35) !important;
+            color: #ffffff !important;
+          }
+          .theme-vision-2030 .bg-emerald-600,
+          .theme-vision-2030 .bg-emerald-500 {
+            background: linear-gradient(135deg, #10b981 0%, #059669 55%, #0d9488 100%) !important;
+            border: 1px solid rgba(167, 243, 208, 0.35) !important;
+            box-shadow: 0 8px 22px -4px rgba(16, 185, 129, 0.35) !important;
+            color: #ffffff !important;
+          }
         }
         @media (max-width: 1024px) {
           input, select, textarea { font-size: 16px !important; }
@@ -18650,6 +18815,32 @@ ${footer}
           <div>
             {renderAnnouncements()}
             {renderClientHeader()}
+            {uiTheme === 'vision_2030' && (
+              <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-3">
+                <div className="relative overflow-hidden rounded-2xl px-4 py-2.5 border border-cyan-400/30 bg-gradient-to-r from-slate-950/90 via-indigo-950/85 to-slate-950/90 backdrop-blur-xl shadow-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <span className="inline-flex h-2.5 w-2.5 rounded-full bg-cyan-400 animate-ping" />
+                    <span className="font-black tracking-wide bg-gradient-to-l from-cyan-300 via-indigo-300 to-fuchsia-300 bg-clip-text text-transparent">
+                      ELZOGHBI SPATIAL COMMERCE 2030
+                    </span>
+                    <span className="hidden md:inline text-slate-400 font-bold">
+                      • الجيل الجديد من التسوق الذكي الفوري لقطع الغيار والإكسسوارات
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[11px] font-extrabold">
+                    <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-400/30">
+                      ⚡ {brands.length} ماركة
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-400/30">
+                      📱 {models.length} جهاز
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-400/30">
+                      🧩 {parts.length} منتج مفهرس فورياً
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
             {homeElRef.current && <div className={homeActiveNow ? '' : 'hidden'}>{homeElRef.current}</div>}
             {searchElRef.current && <div className={searchActiveNow ? '' : 'hidden'}>{searchElRef.current}</div>}
             {clientTab === 'checkout' && renderCheckoutView()}
