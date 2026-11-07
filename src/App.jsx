@@ -69,9 +69,7 @@ const INITIAL_GROUPS = [
   }
 ];
 
-// حماية المتغير بحيث لو models لسه مش معرف أو فاضي، ميضربش أخطاء
 const INITIAL_BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Honor', 'Oppo', 'Realme', 'Vivo', 'Infinix', 'Huawei'];
-
 
 const INITIAL_AUTO_TEMPLATES = [
   {
@@ -2575,6 +2573,18 @@ export default function App() {
     if (out.isPromotedAd !== undefined && out.isPromotedAd !== null) {
       out.isPromotedAd = out.isPromotedAd === true || out.isPromotedAd === 'true';
     }
+    if (out.brand || row.brand_id || row.brand_name) {
+      out.brand = String(out.brand || row.brand_id || row.brand_name || '').trim();
+    }
+    if (out.modelId !== undefined && out.modelId !== null) {
+      out.modelId = String(out.modelId).trim();
+    }
+    if ((out.sku !== undefined || out.modelId !== undefined || out.qualityGrade !== undefined) && (!out.basePrice || Number(out.basePrice) <= 0)) {
+      out.basePrice = Number(out.costPrice) > 0 ? Math.round(Number(out.costPrice) * 1.25) : 450;
+    }
+    if ((out.sku !== undefined || out.modelId !== undefined) && (out.stock === undefined || out.stock === null)) {
+      out.stock = 15;
+    }
     return out;
   };
 
@@ -2677,7 +2687,16 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v9_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v11_';
+  try {
+    if (!window.localStorage.getItem('elzoghbi_cache_purged_v11')) {
+      window.localStorage.removeItem('elzoghbi_v2_models');
+      window.localStorage.removeItem('elzoghbi_v2_parts');
+      window.localStorage.removeItem('elzoghbi_v2_brands');
+      window.sessionStorage.clear();
+      window.localStorage.setItem('elzoghbi_cache_purged_v11', '1');
+    }
+  } catch (e) {}
   const SESSION_CACHE_TTL = 30 * 60 * 1000; // 30 minutes smart session cache
 
   const readSessionTableCache = (cacheKey) => {
@@ -2714,10 +2733,10 @@ export default function App() {
     } catch (e) {}
   };
 
-  // Explicit lightweight column projections per table (strictly NO select=* and NO redundant `data` or heavy `images`/`messages` blobs in list queries!)
+  // Explicit lightweight column projections per table (strictly NO select=*, NO `image`/`images` in bulk catalog index, and NO `data` blobs!)
   const TABLE_LIGHT_COLUMNS = {
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at,data->>isPromotedAd',
-    mobile_models: 'id,brand,name,data->>isPromotedAd',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at',
+    mobile_models: 'id,brand,name,aliases,is_promoted_ad',
     brands: 'name,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
     store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
@@ -2734,8 +2753,8 @@ export default function App() {
   };
 
   const TABLE_DEFAULT_QUERY = {
-    spare_parts: '&order=created_at.desc&limit=26',
-    mobile_models: '&order=name.asc&limit=100',
+    spare_parts: '&limit=5000',
+    mobile_models: '&limit=2000',
     orders: '&order=created_at.desc&limit=50',
     clients: '&limit=100',
     complaints: '&order=created_at.desc&limit=50',
@@ -2746,17 +2765,90 @@ export default function App() {
 
   const fetchedModelPartsSetRef = useRef(new Set());
   const fetchedPartDetailsSetRef = useRef(new Set());
+  const fetchedPartImagesSetRef = useRef(new Set());
   const fetchedStorePagesSetRef = useRef(new Set([1]));
+
+  // Expose a global `window.supabase` client helper in Browser DevTools Console so `await supabase.from('mobile_models').select('*, spare_parts(*)')` works anytime!
+  useEffect(() => {
+    try {
+      const { sbUrl, sbKey } = getSupabaseConfig();
+      const createQueryBuilder = (tableName) => {
+        const realTbl = resolveActualTableName(tableName);
+        let selectCols = '*';
+        const filters = [];
+        let limitNum = null;
+        const builder = {
+          select: (cols = '*') => {
+            selectCols = cols;
+            return builder;
+          },
+          eq: (col, val) => {
+            filters.push(`${col}=eq.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          ilike: (col, val) => {
+            filters.push(`${col}=ilike.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          order: (col, opts = {}) => {
+            filters.push(`order=${col}.${opts && opts.ascending === false ? 'desc' : 'asc'}`);
+            return builder;
+          },
+          limit: (n) => {
+            limitNum = n;
+            return builder;
+          },
+          then: async (resolve, reject) => {
+            try {
+              const wantsSparePartsJoin = String(selectCols).includes('spare_parts');
+              const actualSelect = wantsSparePartsJoin ? 'id,brand,name,aliases' : selectCols;
+              const q = (filters.length ? '&' + filters.join('&') : '') + (limitNum ? `&limit=${limitNum}` : '');
+              const res = await fetch(`${sbUrl}/rest/v1/${realTbl}?select=${encodeURIComponent(actualSelect)}${q}`, {
+                headers: sbHeaders(sbKey)
+              });
+              if (!res.ok) {
+                const errText = await res.text();
+                return resolve({ data: null, error: { status: res.status, message: errText } });
+              }
+              let data = await res.json();
+              if (wantsSparePartsJoin && realTbl === 'mobile_models' && Array.isArray(data)) {
+                const spRes = await fetch(`${sbUrl}/rest/v1/spare_parts?select=id,sku,model_id,category,name,base_price,stock`, {
+                  headers: sbHeaders(sbKey)
+                });
+                const spRows = spRes.ok ? await spRes.json() : [];
+                const byModel = {};
+                (spRows || []).forEach(sp => {
+                  const mid = String(sp.model_id || '');
+                  if (!byModel[mid]) byModel[mid] = [];
+                  byModel[mid].push(sp);
+                });
+                data = data.map(m => ({ ...m, spare_parts: byModel[String(m.id)] || [] }));
+              }
+              resolve({ data, error: null });
+            } catch (err) {
+              if (reject) reject(err);
+              else resolve({ data: null, error: err });
+            }
+          }
+        };
+        return builder;
+      };
+      window.supabase = { from: createQueryBuilder };
+    } catch (e) {}
+  }, []);
 
   const sbFetchTable = async (tableName, select = null, query = null, forceNetwork = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return null;
     const realTable = resolveActualTableName(tableName);
-    const cols = (!select || select === '*') ? (TABLE_LIGHT_COLUMNS[realTable] || 'id') : select;
+    let colsList = ((!select || select === '*') ? (TABLE_LIGHT_COLUMNS[realTable] || 'id') : select)
+      .split(',')
+      .map(c => c.trim())
+      .filter(Boolean);
     const qStr = (query === null || query === undefined || query === '') ? (TABLE_DEFAULT_QUERY[realTable] || '') : query;
-    const cacheKey = `${realTable}_${cols}_${qStr}`;
+    const cacheKey = `${realTable}_${colsList.join(',')}_${qStr}`;
 
-    if (!forceNetwork && STATIC_SESSION_TABLES.has(realTable)) {
+    if (!forceNetwork && STATIC_SESSION_TABLES.has(realTable) && realTable !== 'spare_parts' && realTable !== 'mobile_models' && realTable !== 'brands') {
       const cached = readSessionTableCache(cacheKey);
       if (cached && cached.length > 0) {
         return cached;
@@ -2765,60 +2857,109 @@ export default function App() {
 
     try {
       const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
-      let res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${cols}${qStr}`, {
-        headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-      });
-      // Fallback if a custom column in cols doesn't exist yet on an unmigrated table
-      if (!res.ok && res.status === 400 && cols !== '*') {
-        res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=id,name${qStr}`, {
+      let currentQuery = qStr;
+
+      // Self-healing column & order retry loop (NEVER falls back to just `id,name`, only strips the exact missing column!)
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const currentCols = colsList.join(',');
+        const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
           headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
         });
-      }
-      if (res.ok) {
-        const rows = await res.json();
-        if (Array.isArray(rows)) {
-          const mapped = rows.map(toCamelCaseRow);
-          if (STATIC_SESSION_TABLES.has(realTable)) {
-            writeSessionTableCache(cacheKey, mapped);
+
+        if (res.ok) {
+          let rows = await res.json();
+          if (Array.isArray(rows)) {
+            // If table has > 1000 rows (PostgREST max per page) and we requested a full light index, fetch remaining pages automatically
+            if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && !currentQuery.includes('offset=')) {
+              for (let pageOffset = 1000; pageOffset <= 4000; pageOffset += 1000) {
+                const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&limit=1000&offset=${pageOffset}`, {
+                  headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+                });
+                if (!moreRes.ok) break;
+                const moreRows = await moreRes.json();
+                if (!Array.isArray(moreRows) || moreRows.length === 0) break;
+                rows = rows.concat(moreRows);
+                if (moreRows.length < 1000) break;
+              }
+            }
+            const mapped = rows.map(toCamelCaseRow);
+            if (STATIC_SESSION_TABLES.has(realTable)) {
+              writeSessionTableCache(cacheKey, mapped);
+            }
+            return mapped;
           }
-          return mapped;
+          return rows;
         }
-        return rows;
+
+        if (res.status === 400) {
+          const errText = await res.text();
+          const colMatch =
+            errText.match(/column [^."]*\.?([a-zA-Z0-9_]+) does not exist/i) ||
+            errText.match(/Could not find the '([^']+)' column/i);
+          if (colMatch && colMatch[1]) {
+            const missingCol = colMatch[1].trim();
+            if (colsList.includes(missingCol) && colsList.length > 1) {
+              colsList = colsList.filter(c => c !== missingCol);
+              continue;
+            }
+            if (currentQuery.includes(missingCol)) {
+              currentQuery = currentQuery.replace(new RegExp(`&?order=${missingCol}\.(asc|desc)`, 'i'), '');
+              continue;
+            }
+          }
+        }
+        break;
       }
     } catch (err) {}
     return null;
   };
 
-  // On-Demand Paginated / Filtered Fetch for spare_parts (fetches only 18-26 items or specific model/category slice!)
-  const fetchSparePartsSliceOnDemand = async ({ modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 26 } = {}) => {
+  // On-Demand Batch Thumbnail (`image`) Loader for currently visible products ONLY (prevents downloading all images at once!)
+  const fetchVisiblePartImagesOnDemand = async (partIds = []) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-    if (!isValid) return;
-    const cols = TABLE_LIGHT_COLUMNS.spare_parts;
-    const filters = [];
-    if (modelId && modelId !== 'ALL') filters.push(`model_id=eq.${encodeURIComponent(modelId)}`);
-    if (category && category !== 'ALL') filters.push(`category=eq.${encodeURIComponent(category)}`);
-    if (search && search.trim() !== '') {
-      const cleanQ = search.trim().replace(/[%*,()]/g, '');
-      if (cleanQ) filters.push(`or=(name.ilike.*${encodeURIComponent(cleanQ)}*,sku.ilike.*${encodeURIComponent(cleanQ)}*)`);
-    }
-    const offset = page <= 1 ? 0 : 26 + (page - 2) * 8;
-    const fetchLimit = page <= 1 ? limit : 8;
-    const filterQuery = (filters.length > 0 ? '&' + filters.join('&') : '') + `&order=created_at.desc&limit=${fetchLimit}&offset=${offset}`;
+    if (!isValid || !Array.isArray(partIds) || partIds.length === 0) return;
+    const neededIds = partIds
+      .map(id => String(id || '').trim())
+      .filter(id => id && !fetchedPartImagesSetRef.current.has(id))
+      .slice(0, 30);
+    if (neededIds.length === 0) return;
+    neededIds.forEach(id => fetchedPartImagesSetRef.current.add(id));
 
-    const rows = await sbFetchTable('spare_parts', cols, filterQuery, false);
-    if (Array.isArray(rows) && rows.length > 0) {
-      incomingSyncUntilRef.current = Date.now() + 1000;
-      isIncomingSyncRef.current = true;
-      setParts(prev => {
-        const map = new Map(prev.map(p => [String(p.id), p]));
-        rows.forEach(r => {
-          const existing = map.get(String(r.id));
-          map.set(String(r.id), existing ? { ...existing, ...r } : r);
-        });
-        const merged = Array.from(map.values());
-        if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
-        return merged;
-      });
+    try {
+      const inList = neededIds.map(id => `"${id.replace(/"/g, '')}"`).join(',');
+      const res = await fetch(
+        `${sbUrl}/rest/v1/spare_parts?select=id,image&id=in.(${encodeURIComponent(inList)})`,
+        { headers: sbHeaders(sbKey) }
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        if (Array.isArray(rows) && rows.length > 0) {
+          const imgMap = new Map();
+          rows.forEach(r => {
+            if (r && r.id && r.image) imgMap.set(String(r.id), r.image);
+          });
+          if (imgMap.size > 0) {
+            incomingSyncUntilRef.current = Date.now() + 800;
+            isIncomingSyncRef.current = true;
+            setParts(prev =>
+              prev.map(p => {
+                const fetchedImg = imgMap.get(String(p.id));
+                return fetchedImg && !p.image ? { ...p, image: fetchedImg, images: p.images?.length ? p.images : [fetchedImg] } : p;
+              })
+            );
+          }
+        }
+      }
+    } catch (e) {}
+  };
+
+  // On-Demand Paginated / Filtered Image Fetch for spare_parts
+  const fetchSparePartsSliceOnDemand = async ({ modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 26 } = {}) => {
+    if (modelId && modelId !== 'ALL') {
+      const modelPartIds = parts.filter(p => String(p.modelId) === String(modelId) && !p.image).map(p => p.id);
+      if (modelPartIds.length > 0) {
+        fetchVisiblePartImagesOnDemand(modelPartIds.slice(0, limit));
+      }
     }
   };
 
@@ -2830,7 +2971,7 @@ export default function App() {
     fetchedPartDetailsSetRef.current.add(String(partId));
     try {
       const res = await fetch(
-        `${sbUrl}/rest/v1/spare_parts?id=eq.${encodeURIComponent(partId)}&select=id,description,images,search_aliases`,
+        `${sbUrl}/rest/v1/spare_parts?id=eq.${encodeURIComponent(partId)}&select=id,image,description,images,search_aliases`,
         { headers: sbHeaders(sbKey) }
       );
       if (res.ok) {
@@ -3523,7 +3664,6 @@ export default function App() {
 
       // 1. Fetch public storefront tables in parallel using lightweight column projections & pagination (NO select=*!)
       const isAdmin = appPortal === 'admin' || adminAuthenticated;
-      const initialPartsQuery = isAdmin ? '&order=created_at.desc&limit=100' : '&order=created_at.desc&limit=26';
       const [
         partsRows,
         modelsRows,
@@ -3535,12 +3675,12 @@ export default function App() {
         settingsRows,
         templatesRows
       ] = await Promise.all([
-        sbFetchTable('spare_parts', null, initialPartsQuery),
-        sbFetchTable('mobile_models', null, '&order=name.asc&limit=100'),
+        sbFetchTable('spare_parts', null, '&limit=1000', true),
+        sbFetchTable('mobile_models', null, '&limit=1000', true),
         sbFetchTable('pricing_groups', null, '&limit=50'),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20'),
         sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20'),
-        sbFetchTable('brands', null, '&order=sort_order.asc&limit=100'),
+        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', true),
         sbFetchTable('promo_codes', null, '&limit=50'),
         sbFetchTable('site_settings', null, '&limit=5'),
         isAdmin ? sbFetchTable('auto_templates', null, '&limit=50') : Promise.resolve(null)
@@ -3709,12 +3849,16 @@ export default function App() {
         });
       }
 
-      const finalBrandsServer = (Array.isArray(brandsRows) && brandsRows.length > 0)
-        ? brandsRows.map(b => (typeof b === 'object' && b.name ? b.name : String(b)))
-        : legacyPayload?.brands;
-      if (Array.isArray(finalBrandsServer) && finalBrandsServer.length > 0) {
+      const explicitBrands = (Array.isArray(brandsRows) && brandsRows.length > 0)
+        ? brandsRows.map(b => String(typeof b === 'object' && b !== null ? (b.name || b.id || '') : b).trim()).filter(Boolean)
+        : (Array.isArray(legacyPayload?.brands) ? legacyPayload.brands : []);
+      const modelDerivedBrands = Array.isArray(finalModelsServer)
+        ? finalModelsServer.map(m => String(m?.brand || '').trim()).filter(Boolean)
+        : [];
+      const finalBrandsServer = Array.from(new Set([...explicitBrands, ...modelDerivedBrands]));
+      if (finalBrandsServer.length > 0) {
         setBrands(prev => {
-          const merged = mergeServerWithLocal('brands', prev, finalBrandsServer);
+          const merged = Array.from(new Set([...mergeServerWithLocal('brands', prev, finalBrandsServer), ...modelDerivedBrands]));
           if (prevSlicesRef.current) prevSlicesRef.current.brands = merged;
           try { window.localStorage.setItem('elzoghbi_v2_brands', JSON.stringify(merged)); } catch (e) {}
           return merged;
@@ -4582,6 +4726,32 @@ export default function App() {
       return (b.createdAt || '').localeCompare(a.createdAt || '');
     });
   }, [parts, models, selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
+
+  // Automatically load thumbnails (`image`) on-demand ONLY for the products visible on the current page (18-26 items) & Showcase Bars
+  useEffect(() => {
+    const FIRST_PAGE_INITIAL = 18;
+    const FIRST_PAGE_MAX = 26;
+    const NEXT_PAGE_SIZE = 8;
+    const p = Math.max(1, storePage);
+    let visibleSlice = [];
+    if (p === 1) {
+      visibleSlice = filteredParts.slice(0, storeExtraEightShown ? FIRST_PAGE_MAX : FIRST_PAGE_INITIAL);
+    } else {
+      const start = FIRST_PAGE_MAX + (p - 2) * NEXT_PAGE_SIZE;
+      visibleSlice = filteredParts.slice(start, start + NEXT_PAGE_SIZE);
+    }
+    const barPartIds = (showcaseBars || []).filter(b => b && b.active).flatMap(b => b.partIds || []);
+    const idsNeedingImage = [
+      ...visibleSlice.filter(pt => pt && !pt.image).map(pt => pt.id),
+      ...barPartIds.filter(id => {
+        const pt = parts.find(x => String(x.id) === String(id));
+        return pt && !pt.image;
+      })
+    ];
+    if (idsNeedingImage.length > 0) {
+      fetchVisiblePartImagesOnDemand(idsNeedingImage);
+    }
+  }, [filteredParts, storePage, storeExtraEightShown, clientTab, showcaseBars]);
 
   // --- Cart Totals Calculation ---
   const cartSummary = useMemo(() => {
