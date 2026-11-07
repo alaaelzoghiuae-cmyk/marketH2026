@@ -70,8 +70,8 @@ const INITIAL_GROUPS = [
 ];
 
 // حماية المتغير بحيث لو models لسه مش معرف أو فاضي، ميضربش أخطاء
-const safeModels = typeof models !== 'undefined' && Array.isArray(models) ? models : [];
-const availableBrands = ['All', ...new Set(safeModels.map(m => m.brand))];
+const INITIAL_BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Honor', 'Oppo', 'Realme', 'Vivo', 'Infinix', 'Huawei'];
+
 
 const INITIAL_AUTO_TEMPLATES = [
   {
