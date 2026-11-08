@@ -2812,9 +2812,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v19_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v20_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v19_all_products_sync') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v20_full_catalog_fix') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -2827,7 +2827,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v19_all_products_sync');
+      window.localStorage.setItem('elzoghbi_app_version', 'v20_full_catalog_fix');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -2874,12 +2874,12 @@ export default function App() {
 
   // Explicit lightweight column projections per table (guaranteed columns -> ZERO HTTP 400 retries, ZERO select=*, and strict server-side limit=20!)
   const TABLE_LIGHT_COLUMNS = {
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,image_url,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at,data',
-    mobile_models: 'id,brand,name,aliases,image,is_promoted_ad,data',
-    brands: 'name,image_url,sort_order',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at',
+    mobile_models: 'id,brand,name,aliases',
+    brands: 'name,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
-    store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order,data',
-    showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order,data',
+    store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
+    showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order',
     promo_codes: 'id,code,type,value,max_discount_cap,min_order_amount,usage_limit,used_count,expiry_date,description,active',
     auto_templates: 'id,sku_prefix,category,name_pattern,quality_grade,colors,warranty_text,image_key,cost_price,base_price,default_stock,low_stock_threshold,max_order_qty,enabled',
     site_settings: 'id,settings,credentials,currencies,notifications,updated_at',
@@ -3012,7 +3012,7 @@ export default function App() {
         const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
         let currentQuery = qStr;
 
-        for (let attempt = 0; attempt < 4; attempt++) {
+        for (let attempt = 0; attempt < 8; attempt++) {
           const currentCols = colsList.join(',');
           const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
             headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
@@ -3021,11 +3021,12 @@ export default function App() {
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
-              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages deterministically (up to 35,000 rows) and cache!
+              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages with the EXACT SAME order clause so 0 rows are ever skipped!
               if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
-                const orderClause = currentQuery.includes('order=') ? '' : '&order=id.asc';
+                const baseOrderQuery = currentQuery.replace(/&?limit=1000/g, '');
+                const effectiveOrder = baseOrderQuery.includes('order=') ? baseOrderQuery : `${baseOrderQuery}&order=id.asc`;
                 for (let pageOffset = 1000; pageOffset <= 35000; pageOffset += 1000) {
-                  const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${orderClause}&limit=1000&offset=${pageOffset}`, {
+                  const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=1000&offset=${pageOffset}`, {
                     headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
                   });
                   if (!moreRes.ok) break;
@@ -3075,20 +3076,26 @@ export default function App() {
     // No-op: `image` (external URL) is already included directly in the paginated `limit=20` query!
   };
 
-  // Strict Server-Side Paginated / Filtered Fetch for spare_parts (fetches ONLY 18-20 items per page/filter = < 5-8 KB!)
-  const fetchSparePartsSliceOnDemand = async ({ brand = 'ALL', modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 20 } = {}) => {
+  // Strict Server-Side Filtered Fetch for spare_parts (supports both single modelId and full brand model list without encoding commas!)
+  const fetchSparePartsSliceOnDemand = async ({ brand = 'ALL', modelId = 'ALL', category = 'ALL', search = '', page = 1, limit = 250 } = {}) => {
     const { isValid } = getSupabaseConfig();
     if (!isValid) return;
     const cols = TABLE_LIGHT_COLUMNS.spare_parts;
     const filters = [];
 
     if (modelId && modelId !== 'ALL') {
-      filters.push(`model_id=eq.${encodeURIComponent(modelId)}`);
+      filters.push(`model_id=eq.${encodeURIComponent(String(modelId).trim())}`);
     } else if (brand && brand !== 'ALL') {
-      const brandModelIds = models.filter(m => m && m.brand === brand).map(m => String(m.id)).slice(0, 60);
+      const targetBrandClean = String(brand).trim().toLowerCase();
+      const brandModelIds = models
+        .filter(m => m && String(m.brand || '').trim().toLowerCase() === targetBrandClean)
+        .map(m => String(m.id).trim())
+        .filter(Boolean)
+        .slice(0, 80);
       if (brandModelIds.length > 0) {
-        const inStr = brandModelIds.map(id => `"${id.replace(/"/g, '')}"`).join(',');
-        filters.push(`model_id=in.(${encodeURIComponent(inStr)})`);
+        // PostgREST requires literal commas separating values inside in.(val1,val2)
+        const inStr = brandModelIds.map(id => encodeURIComponent(id)).join(',');
+        filters.push(`model_id=in.(${inStr})`);
       }
     }
 
@@ -3102,9 +3109,9 @@ export default function App() {
       }
     }
 
-    const offset = page <= 1 ? 0 : 20 + (page - 2) * 8;
-    const fetchLimit = page <= 1 ? limit : 8;
-    const filterQuery = (filters.length > 0 ? '&' + filters.join('&') : '') + `&order=created_at.desc&limit=${fetchLimit}&offset=${offset}`;
+    const offset = page <= 1 ? 0 : Math.max(0, (page - 1) * limit);
+    const fetchLimit = page <= 1 ? Math.max(limit, 250) : limit;
+    const filterQuery = (filters.length > 0 ? '&' + filters.join('&') : '') + `&order=id.asc&limit=${fetchLimit}&offset=${offset}`;
 
     const rows = await sbFetchTable('spare_parts', cols, filterQuery, false);
     if (Array.isArray(rows) && rows.length > 0) {
@@ -4528,11 +4535,18 @@ export default function App() {
   const [adminClientsGroupFilter, setAdminClientsGroupFilter] = useState('ALL');
   const [adminClientDossierTab, setAdminClientDossierTab] = useState('profile'); // 'profile' | 'wallet' | 'orders'
 
-  // Reset customer pagination to Page 1 (18 products) whenever any filter/search/sort changes
+  // Reset customer pagination to Page 1 AND ensure all parts for the selected Brand/Model are fetched whenever any filter changes
   useEffect(() => {
     setStorePage(1);
     setStoreExtraEightShown(false);
     setGridLimit(18);
+    if (selectedModelId && selectedModelId !== 'ALL') {
+      fetchSparePartsSliceOnDemand({ modelId: selectedModelId, limit: 300 });
+    } else if (selectedBrand && selectedBrand !== 'ALL') {
+      fetchSparePartsSliceOnDemand({ brand: selectedBrand, limit: 500 });
+    } else if (searchQuery && searchQuery.trim().length >= 2) {
+      fetchSparePartsSliceOnDemand({ search: searchQuery.trim(), limit: 200 });
+    }
   }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy]);
 
   // All catalog items & counts are already loaded in memory and cached in sessionStorage -> zero extra network calls needed on filter/page change!
@@ -5011,7 +5025,7 @@ export default function App() {
     const canonicalMid = modelObj ? String(modelObj.id) : String(part.modelId || '').trim();
     const partBrand = modelObj?.brand || part.brand || '';
 
-    if (selectedBrand !== 'ALL' && partBrand !== selectedBrand) return false;
+    if (selectedBrand !== 'ALL' && String(partBrand || '').trim().toLowerCase() !== String(selectedBrand || '').trim().toLowerCase()) return false;
     if (selectedModelId !== 'ALL' && canonicalMid !== String(selectedModelId)) {
       if (!selectedTargetModelName || !(part.compatibleModels || []).some(cm => cm && cm.toLowerCase().includes(selectedTargetModelName.toLowerCase()))) {
         return false;
@@ -10783,7 +10797,11 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
     });
 
     const toggleBrandBar = (brandName) => {
-      setExpandedAdminBrands(prev => ({ ...prev, [brandName]: !prev[brandName] }));
+      const willOpen = !expandedAdminBrands[brandName];
+      setExpandedAdminBrands(prev => ({ ...prev, [brandName]: willOpen }));
+      if (willOpen) {
+        fetchSparePartsSliceOnDemand({ brand: brandName, limit: 500 });
+      }
     };
 
     const toggleModelBar = (modelId) => {
