@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search, ShoppingCart, User, Shield, Package, AlertTriangle, TrendingUp,
-  Layers, Users, FileText, RotateCcw, MessageSquare, Plus, Minus, Check,
+  Layers, Users, FileText, RAotateCcw, MessageSquare, Plus, Minus, Check,
   X, Edit, Printer, Database, ChevronLeft, ChevronDown, Bell, Wallet,
   CreditCard, Truck, Eye, RefreshCw, Filter, DollarSign, Percent, Tag,
   Smartphone, Cpu, Battery, Camera, Zap, CheckCircle2, Clock, Ban,
@@ -2698,6 +2698,20 @@ export default function App() {
     if ((out.sku !== undefined || out.modelId !== undefined) && (out.stock === undefined || out.stock === null)) {
       out.stock = 15;
     }
+    if (out.sku !== undefined || out.modelId !== undefined || out.category !== undefined) {
+      const skuUpper = String(out.sku || '').trim().toUpperCase();
+      const rawCreated = String(out.createdAt || '').trim();
+      const imgStr = String(out.image || out.image_url || '').trim();
+      const isTemplateSku = /^(GLS-ORG|BAT-ORG|FLX-CHG|CAM-REAR|BCK-GLS)-/.test(skuUpper);
+      const isDefaultSvgImg = !imgStr || imgStr.startsWith('data:image/svg');
+      const isHardcodedTemplateDate = rawCreated === '2026-11-01 08:25' || rawCreated === '2020-01-01 08:25';
+      const isAutoTemplate = isTemplateSku && isHardcodedTemplateDate && isDefaultSvgImg;
+      out._isCustomUploaded = !isAutoTemplate;
+      // Fix the future '2026-11-01 08:25' template timestamp so template rows never bury real products uploaded in 2025/2026!
+      if (isAutoTemplate && rawCreated === '2026-11-01 08:25') {
+        out.createdAt = '2020-01-01 08:25';
+      }
+    }
     return out;
   };
 
@@ -2812,9 +2826,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v20_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v21_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v20_full_catalog_fix') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v21_old_products_priority') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -2827,7 +2841,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v20_full_catalog_fix');
+      window.localStorage.setItem('elzoghbi_app_version', 'v21_old_products_priority');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -3021,19 +3035,57 @@ export default function App() {
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
-              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages with the EXACT SAME order clause so 0 rows are ever skipped!
+              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages in parallel batches with automatic chunk fallback if any page has heavy rows!
               if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
                 const baseOrderQuery = currentQuery.replace(/&?limit=1000/g, '');
                 const effectiveOrder = baseOrderQuery.includes('order=') ? baseOrderQuery : `${baseOrderQuery}&order=id.asc`;
-                for (let pageOffset = 1000; pageOffset <= 35000; pageOffset += 1000) {
-                  const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=1000&offset=${pageOffset}`, {
-                    headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                  });
-                  if (!moreRes.ok) break;
-                  const moreRows = await moreRes.json();
-                  if (!Array.isArray(moreRows) || moreRows.length === 0) break;
-                  rows = rows.concat(moreRows);
-                  if (moreRows.length < 1000) break;
+                const fetchPageWithFallback = async (offsetVal) => {
+                  try {
+                    const pRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=1000&offset=${offsetVal}`, {
+                      headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+                    });
+                    if (pRes.ok) {
+                      const pData = await pRes.json();
+                      return Array.isArray(pData) ? pData : [];
+                    }
+                  } catch (e) {}
+                  // Fallback: if a 1000-row page timed out (e.g. due to old Base64 images), fetch it in 4 smaller 250-row chunks without failing!
+                  let chunkRows = [];
+                  for (let subOff = 0; subOff < 1000; subOff += 250) {
+                    try {
+                      const cRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=250&offset=${offsetVal + subOff}`, {
+                        headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+                      });
+                      if (cRes.ok) {
+                        const cData = await cRes.json();
+                        if (Array.isArray(cData) && cData.length > 0) {
+                          chunkRows = chunkRows.concat(cData);
+                          if (cData.length < 250) break;
+                        } else {
+                          break;
+                        }
+                      }
+                    } catch (e) {}
+                  }
+                  return chunkRows;
+                };
+
+                for (let batchStart = 1000; batchStart <= 30000; batchStart += 3000) {
+                  const batchResults = await Promise.all([
+                    fetchPageWithFallback(batchStart),
+                    fetchPageWithFallback(batchStart + 1000),
+                    fetchPageWithFallback(batchStart + 2000)
+                  ]);
+                  let reachedEnd = false;
+                  for (const bRows of batchResults) {
+                    if (Array.isArray(bRows) && bRows.length > 0) {
+                      rows = rows.concat(bRows);
+                      if (bRows.length < 1000) reachedEnd = true;
+                    } else {
+                      reachedEnd = true;
+                    }
+                  }
+                  if (reachedEnd) break;
                 }
               }
               const mapped = rows.map(toCamelCaseRow);
@@ -3844,7 +3896,10 @@ export default function App() {
       // 1. Fetch public storefront tables in parallel using strict pagination (`spare_parts` limit=20 = ~4-6 KB!)
       const forceRefresh = !silent;
       const [
-        partsRows,
+        partsRowsAsc,
+        partsRowsCustomDate,
+        partsRowsCustomSku,
+        partsRowsDesc,
         modelsRows,
         groupsRows,
         adsRows,
@@ -3855,6 +3910,9 @@ export default function App() {
         templatesRows
       ] = await Promise.all([
         sbFetchTable('spare_parts', null, '&order=id.asc&limit=1000', forceRefresh),
+        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&limit=1000', forceRefresh),
+        sbFetchTable('spare_parts', null, '&sku=ilike.PRT-*&limit=1000', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=id.desc&limit=1000', forceRefresh),
         sbFetchTable('mobile_models', null, '&order=id.asc&limit=1000', forceRefresh),
         sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20', forceRefresh),
@@ -3864,6 +3922,21 @@ export default function App() {
         sbFetchTable('site_settings', null, '&limit=5', forceRefresh),
         isAdmin ? sbFetchTable('auto_templates', null, '&limit=50', forceRefresh) : Promise.resolve(null)
       ]);
+
+      // Combine & deduplicate all spare_parts queries, putting custom/uploaded products first so 0 uploaded products are ever missed!
+      const combinedPartsMap = new Map();
+      [partsRowsCustomDate, partsRowsCustomSku, partsRowsDesc, partsRowsAsc].forEach(arr => {
+        if (Array.isArray(arr)) {
+          arr.forEach(r => {
+            if (r && r.id !== undefined) {
+              const key = String(r.id).trim();
+              if (!combinedPartsMap.has(key)) combinedPartsMap.set(key, r);
+              else combinedPartsMap.set(key, { ...combinedPartsMap.get(key), ...r });
+            }
+          });
+        }
+      });
+      const partsRows = combinedPartsMap.size > 0 ? Array.from(combinedPartsMap.values()) : partsRowsAsc;
 
       // 2. Only fetch Admin tables when Admin is actually viewing the Admin Portal (#/AlaaDB)
       let [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = [null, null, null, null, null, null];
@@ -3928,15 +4001,19 @@ export default function App() {
         if (fixedPart.stock === undefined || fixedPart.stock === null) {
           fixedPart.stock = 15;
         }
-        const currMdlId = String(fixedPart.modelId || '');
+        const currMdlId = String(fixedPart.modelId || '').trim();
         if (!currMdlId || !modelIdsSet.has(currMdlId)) {
           const pName = String(fixedPart.name || '').toLowerCase();
           const pCompat = Array.isArray(fixedPart.compatibleModels) ? fixedPart.compatibleModels.join(' ').toLowerCase() : '';
+          const pHaystack = `${currMdlId.toLowerCase()} ${pName} ${pCompat} ${String(fixedPart.sku || '').toLowerCase()}`;
           const matchedMdl = [...rawModelsServer]
             .sort((a, b) => String(b?.name || '').length - String(a?.name || '').length)
             .find(m => {
               const mn = String(m?.name || '').trim().toLowerCase();
-              return mn.length >= 2 && (pName.includes(mn) || pCompat.includes(mn));
+              if (mn.length >= 2 && (pHaystack.includes(mn) || currMdlId.toLowerCase() === mn)) return true;
+              // Also check slash-separated sub-models (e.g. "Samsung Galaxy A52 / A52S" -> "Samsung Galaxy A52")
+              const subNames = mn.split(/[\/|]/).map(s => s.trim()).filter(s => s.length >= 4);
+              return subNames.some(sub => pHaystack.includes(sub));
             });
           if (matchedMdl) {
             fixedPart.modelId = matchedMdl.id;
@@ -4981,6 +5058,10 @@ export default function App() {
           const cleanName = String(m.name).trim();
           if (!map.has(cleanName)) map.set(cleanName, m);
           if (!map.has(cleanName.toLowerCase())) map.set(cleanName.toLowerCase(), m);
+          const subParts = cleanName.split(/[\/|]/).map(s => s.trim()).filter(s => s.length >= 3);
+          subParts.forEach(sp => {
+            if (!map.has(sp.toLowerCase())) map.set(sp.toLowerCase(), m);
+          });
         }
       }
     }
@@ -5071,7 +5152,16 @@ export default function App() {
       if (storeSortBy === 'stock_asc') return a.stock - b.stock;
       if (storeSortBy === 'price_asc') return a.basePrice - b.basePrice;
       if (storeSortBy === 'price_desc') return b.basePrice - a.basePrice;
-      if (storeSortBy === 'date_asc') return (a.createdAt || '').localeCompare(b.createdAt || '');
+      if (storeSortBy === 'date_asc') {
+        const aCust = a._isCustomUploaded ? 1 : 0;
+        const bCust = b._isCustomUploaded ? 1 : 0;
+        if (aCust !== bCust) return bCust - aCust;
+        return (a.createdAt || '').localeCompare(b.createdAt || '');
+      }
+      // Default ('date_desc' / الأحدث أولاً): Always show real uploaded products (both old and new!) above generic auto-template placeholders!
+      const aCustom = a._isCustomUploaded ? 1 : 0;
+      const bCustom = b._isCustomUploaded ? 1 : 0;
+      if (aCustom !== bCustom) return bCustom - aCustom;
       return (b.createdAt || '').localeCompare(a.createdAt || '');
     });
   }, [parts, modelByIdMap, selectedBrand, selectedModelId, selectedTargetModelName, selectedCategory, parsedSearchWords, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
@@ -10658,7 +10748,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
   const generateTemplatePartsForModel = (modelObj) => {
     const cleanCode = modelObj.name.replace(/[^a-zA-Z0-9]/g, '').slice(0, 5).toUpperCase() || 'MDL';
     const enabledTemplates = autoTemplates.filter(t => t.enabled);
-    const nowStr = '2026-11-01 08:25';
+    const nowStr = '2020-01-01 08:25';
 
     return enabledTemplates.map((tpl, idx) => {
       const generatedName = tpl.namePattern.replace('{model}', modelObj.name);
@@ -11196,6 +11286,9 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                 if (adminCatalogSort === 'stock_asc') return a.stock - b.stock;
                                 if (adminCatalogSort === 'price_desc') return b.basePrice - a.basePrice;
                                 if (adminCatalogSort === 'price_asc') return a.basePrice - b.basePrice;
+                                const aCustom = a._isCustomUploaded ? 1 : 0;
+                                const bCustom = b._isCustomUploaded ? 1 : 0;
+                                if (aCustom !== bCustom) return bCustom - aCustom;
                                 return (b.createdAt || '').localeCompare(a.createdAt || '');
                               })
                           : [];
