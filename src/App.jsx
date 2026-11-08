@@ -898,7 +898,9 @@ function BlurFitImage({ src, alt, fit = 'contain', className = '', imgClassName 
   }, [src]);
 
   const effectiveSrc = (!src || failed) ? PART_IMAGES.screen : src;
-  const fitClass = fit === 'cover' ? 'object-cover' : 'object-contain';
+  const normalizedFit = String(fit || 'contain').trim().toLowerCase();
+  const isCover = normalizedFit === 'cover' || normalizedFit === 'fill';
+  const fitClass = isCover ? 'object-cover object-center' : 'object-contain object-center p-1';
 
   return (
     <div
@@ -2791,16 +2793,28 @@ export default function App() {
       }
     }
 
-    return [...newLocalItems, ...mergedServer];
+    // 3. For catalog slices (parts, models, brands), preserve any previously loaded rows that were not deleted so on-demand or older items never disappear on refresh!
+    const preservedCatalogItems = [];
+    if ((sliceKey === 'parts' || sliceKey === 'models' || sliceKey === 'brands') && Array.isArray(currentLocalArray)) {
+      for (const localItem of currentLocalArray) {
+        const id = String(typeof localItem === 'string' ? localItem : (localItem?.id || localItem?.code || localItem?.name || ''));
+        if (id && !seenIds.has(id) && !delMap[id]) {
+          preservedCatalogItems.push(localItem);
+          seenIds.add(id);
+        }
+      }
+    }
+
+    return [...newLocalItems, ...mergedServer, ...preservedCatalogItems];
   };
 
   const STATIC_SESSION_TABLES = new Set([
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v18_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v19_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v18_dark_mode') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v19_all_products_sync') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -2813,17 +2827,18 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v18_dark_mode');
+      window.localStorage.setItem('elzoghbi_app_version', 'v19_all_products_sync');
     }
   } catch (e) {}
-  const SESSION_CACHE_TTL = 30 * 60 * 1000; // 30 minutes smart session cache
+  const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
 
   const readSessionTableCache = (cacheKey) => {
     try {
       const raw = window.sessionStorage.getItem(SESSION_CACHE_PREFIX + cacheKey);
       if (!raw) return null;
       const parsed = JSON.parse(raw);
-      if (parsed && Array.isArray(parsed.rows) && (Date.now() - (parsed.ts || 0) < SESSION_CACHE_TTL)) {
+      const globalBustTs = Number(window.localStorage.getItem('elzoghbi_cache_bust_ts') || 0);
+      if (parsed && Array.isArray(parsed.rows) && (parsed.ts || 0) > globalBustTs && (Date.now() - (parsed.ts || 0) < SESSION_CACHE_TTL)) {
         return parsed.rows;
       }
     } catch (e) {}
@@ -2840,6 +2855,11 @@ export default function App() {
 
   const invalidateSessionTableCache = (tableName) => {
     try {
+      window.localStorage.setItem('elzoghbi_cache_bust_ts', String(Date.now()));
+      if (!tableName) {
+        window.sessionStorage.clear();
+        return;
+      }
       const realTable = resolveActualTableName(tableName);
       const keysToRemove = [];
       for (let i = 0; i < window.sessionStorage.length; i++) {
@@ -2854,16 +2874,16 @@ export default function App() {
 
   // Explicit lightweight column projections per table (guaranteed columns -> ZERO HTTP 400 retries, ZERO select=*, and strict server-side limit=20!)
   const TABLE_LIGHT_COLUMNS = {
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at',
-    mobile_models: 'id,brand,name,aliases',
-    brands: 'name,sort_order',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,image_url,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,is_promoted_ad,created_at,data',
+    mobile_models: 'id,brand,name,aliases,image,is_promoted_ad,data',
+    brands: 'name,image_url,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
-    store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order',
-    showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order',
+    store_ads: 'id,badge,title,subtitle,theme,gradient,image,button_text,linked_part_id,layout,align,image_fit,overlay,show_badge,show_button,start_date,end_date,active,sort_order,data',
+    showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order,data',
     promo_codes: 'id,code,type,value,max_discount_cap,min_order_amount,usage_limit,used_count,expiry_date,description,active',
     auto_templates: 'id,sku_prefix,category,name_pattern,quality_grade,colors,warranty_text,image_key,cost_price,base_price,default_stock,low_stock_threshold,max_order_qty,enabled',
     site_settings: 'id,settings,credentials,currencies,notifications,updated_at',
-    clients: 'id,name,owner,phone,email,password,address,secondary_address,group_id,credit_limit,wallet_balance,ledger,status,type,account_type,avatar,avatar_bg,avatar_image,created_at',
+    clients: 'id,name,owner,phone,email,password,address,secondary_address,group_id,credit_limit,wallet_balance,ledger,status,type,account_type,avatar,avatar_bg,avatar_image,created_at,data',
     orders: 'id,client_id,client_name,group_id,currency,exchange_rate_used,status,payment_method,address,notes,items,delivery_fee_base,discount_base,wallet_used_base,admin_edited,admin_edit_note,created_at',
     complaints: 'id,client_id,client_name,type,subject,message,status,admin_reply,replies,created_at',
     returns_list: 'id,order_id,client_id,client_name,part_id,part_name,qty,refund_amount_base,reason,status,admin_response,resolution_type,warranty_confirmed,replies,closed,created_at',
@@ -3001,10 +3021,11 @@ export default function App() {
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
-              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch remaining pages ONCE and cache in sessionStorage!
+              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages deterministically (up to 35,000 rows) and cache!
               if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
-                for (let pageOffset = 1000; pageOffset <= 6000; pageOffset += 1000) {
-                  const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&limit=1000&offset=${pageOffset}`, {
+                const orderClause = currentQuery.includes('order=') ? '' : '&order=id.asc';
+                for (let pageOffset = 1000; pageOffset <= 35000; pageOffset += 1000) {
+                  const moreRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${orderClause}&limit=1000&offset=${pageOffset}`, {
                     headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
                   });
                   if (!moreRes.ok) break;
@@ -3826,8 +3847,8 @@ export default function App() {
         settingsRows,
         templatesRows
       ] = await Promise.all([
-        sbFetchTable('spare_parts', null, '&limit=1000', forceRefresh),
-        sbFetchTable('mobile_models', null, '&limit=1000', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=id.asc&limit=1000', forceRefresh),
+        sbFetchTable('mobile_models', null, '&order=id.asc&limit=1000', forceRefresh),
         sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20', forceRefresh),
         sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20', forceRefresh),
@@ -4097,6 +4118,18 @@ export default function App() {
           setCurrencies(remoteCurr);
           try { window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(remoteCurr)); } catch (e) {}
         }
+        const remoteNotifs = cfgRow.notifications;
+        if (Array.isArray(remoteNotifs) && remoteNotifs.length > 0) {
+          setNotifications(prev => {
+            const byId = new Map();
+            remoteNotifs.forEach(n => { if (n && n.id) byId.set(String(n.id), n); });
+            prev.forEach(n => { if (n && n.id) byId.set(String(n.id), n); });
+            const mergedNotifs = Array.from(byId.values()).slice(0, 120);
+            if (prevSlicesRef.current) prevSlicesRef.current.notifications = mergedNotifs;
+            try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(mergedNotifs)); } catch (e) {}
+            return mergedNotifs;
+          });
+        }
       }
 
       if (isAdmin) {
@@ -4117,6 +4150,38 @@ export default function App() {
             if (prevSlicesRef.current) prevSlicesRef.current.orders = merged;
             try { window.localStorage.setItem('elzoghbi_v2_orders', JSON.stringify(merged)); } catch (e) {}
             return merged;
+          });
+          // Automatically ensure every new received order has an Admin Notification so no order is ever missed!
+          setNotifications(prevNotifs => {
+            let seenOrderIds = {};
+            try { seenOrderIds = JSON.parse(window.localStorage.getItem('elzoghbi_seen_admin_orders') || '{}'); } catch (e) {}
+            const existingOrderNotifIds = new Set(prevNotifs.map(n => String(n.orderId || '')));
+            const addedNotifs = [];
+            finalOrdersServer.forEach(ord => {
+              if (!ord || !ord.id) return;
+              const oid = String(ord.id);
+              if (ord.status === 'تم الاستلام' && !existingOrderNotifIds.has(oid) && !seenOrderIds[oid]) {
+                seenOrderIds[oid] = true;
+                addedNotifs.push({
+                  id: `ntf_ord_${oid}`,
+                  target: 'admin',
+                  type: 'new_order',
+                  title: `🔔 طلبية جديدة #${oid} (${ord.clientName || 'عميل'})`,
+                  msg: `أرسل "${ord.clientName || 'عميل'}" طلبية جديدة (${(ord.items || []).reduce((s, i) => s + (Number(i.qty) || 1), 0)} قطع)`,
+                  time: ord.createdAt || 'الآن',
+                  read: false,
+                  orderId: oid
+                });
+              }
+            });
+            if (addedNotifs.length > 0) {
+              try { window.localStorage.setItem('elzoghbi_seen_admin_orders', JSON.stringify(seenOrderIds)); } catch (e) {}
+              const nextNotifs = [...addedNotifs, ...prevNotifs].slice(0, 120);
+              if (prevSlicesRef.current) prevSlicesRef.current.notifications = nextNotifs;
+              try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(nextNotifs)); } catch (e) {}
+              return nextNotifs;
+            }
+            return prevNotifs;
           });
         }
 
@@ -4271,11 +4336,12 @@ export default function App() {
                 const notif = {
                   id: `ntf_rt_${Date.now()}`,
                   target: 'admin',
-                  type: 'order',
+                  type: 'new_order',
                   title: `⚡ أوردر جديد فوري (${camelRow.id})`,
                   msg: `العميل ${camelRow.clientName || 'زائر'} أرسل طلباً جديداً الآن عبر Realtime`,
                   time: 'الآن',
-                  read: false
+                  read: false,
+                  orderId: camelRow.id
                 };
                 setNotifications(prev => [notif, ...prev]);
                 if (appPortal === 'admin' || adminAuthenticated) {
@@ -4346,6 +4412,61 @@ export default function App() {
       }
     };
   }, [siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey, adminAuthenticated, appPortal]);
+
+  // Lightweight 25s Admin Poll for new customer orders & password reset requests (guarantees instant Admin notifications even if WebSocket is blocked!)
+  useEffect(() => {
+    if (appPortal !== 'admin' && !adminAuthenticated) return undefined;
+    const pollAdminAlerts = async () => {
+      try {
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (!isValid) return;
+        const [ordRes, cliRes] = await Promise.all([
+          fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=15`, {
+            headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+          }),
+          fetch(`${sbUrl}/rest/v1/clients?select=${TABLE_LIGHT_COLUMNS.clients}&limit=150`, {
+            headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
+          })
+        ]);
+        if (ordRes.ok) {
+          const rawOrders = await ordRes.json();
+          if (Array.isArray(rawOrders) && rawOrders.length > 0) {
+            const freshOrders = rawOrders.map(toCamelCaseRow);
+            setOrders(prev => {
+              const prevIds = new Set(prev.map(o => String(o.id)));
+              const brandNew = freshOrders.filter(o => o && o.id && !prevIds.has(String(o.id)));
+              if (brandNew.length > 0) {
+                brandNew.forEach(bo => {
+                  const notif = {
+                    id: `ntf_poll_${bo.id}_${Date.now()}`,
+                    target: 'admin',
+                    type: 'new_order',
+                    title: `🔔 طلبية جديدة #${bo.id} (${bo.clientName || 'عميل'})`,
+                    msg: `وصل الآن طلب جديد من "${bo.clientName || 'عميل'}" بقيمة ${(bo.items || []).reduce((s, i) => s + (Number(i.unitPriceBase) || 0) * (Number(i.qty) || 1), 0)} ج.م`,
+                    time: 'الآن',
+                    read: false,
+                    orderId: bo.id
+                  };
+                  setNotifications(nPrev => [notif, ...nPrev.filter(x => x.orderId !== bo.id)]);
+                  showToast(`🔔 وصل أوردر جديد الآن: #${bo.id} (${bo.clientName || ''})`, 'success');
+                });
+              }
+              return mergeServerWithLocal('orders', prev, freshOrders);
+            });
+          }
+        }
+        if (cliRes.ok) {
+          const rawClients = await cliRes.json();
+          if (Array.isArray(rawClients) && rawClients.length > 0) {
+            const freshClients = rawClients.map(toCamelCaseRow);
+            setClients(prev => mergeServerWithLocal('clients', prev, freshClients));
+          }
+        }
+      } catch (e) {}
+    };
+    const timer = setInterval(pollAdminAlerts, 25000);
+    return () => clearInterval(timer);
+  }, [appPortal, adminAuthenticated, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
 
@@ -4683,11 +4804,12 @@ export default function App() {
   // --- Pricing Calculation Helper ---
   // Returns both the price in Base Currency (EGP) and the converted display price in the Group's Currency
   const calculatePartPrice = (part, groupObj = currentGroup) => {
-    let baseEgpPrice = part.basePrice;
-    const hasCustomOverride = part.customGroupPrices && part.customGroupPrices[groupObj.id] !== undefined;
+    let baseEgpPrice = Number(part.basePrice) || 0;
+    const rawCustomPrice = part.customGroupPrices && groupObj ? part.customGroupPrices[groupObj.id] : undefined;
+    const hasCustomOverride = rawCustomPrice !== undefined && rawCustomPrice !== null && rawCustomPrice !== '' && Number(rawCustomPrice) > 0;
 
     if (hasCustomOverride) {
-      baseEgpPrice = Number(part.customGroupPrices[groupObj.id]);
+      baseEgpPrice = Number(rawCustomPrice);
     } else if (!groupObj.isDefault && groupObj.modifierType !== 'none') {
       if (groupObj.modifierType === 'percentage') {
         baseEgpPrice = Math.round(part.basePrice * (1 + Number(groupObj.modifierValue) / 100));
@@ -4811,7 +4933,7 @@ export default function App() {
       if (!pt.category || pt.stock <= 0 || pt.soldOut) return;
       const pr = calculatePartPrice(pt, currentGroup);
       if (pr.baseEgpPrice <= 0) return;
-      if (pt.customGroupPrices && Number(pt.customGroupPrices[currentGroup?.id]) === 0) return;
+      
       const st = stats[pt.category] || (stats[pt.category] = { cat: pt.category, count: 0, sold: 0 });
       st.count += 1;
       st.sold += sold[pt.sku] || 0;
@@ -4837,10 +4959,25 @@ export default function App() {
     const map = new Map();
     for (let i = 0; i < models.length; i++) {
       const m = models[i];
-      if (m && m.id !== undefined) map.set(String(m.id), m);
+      if (m && m.id !== undefined) {
+        const cleanId = String(m.id).trim();
+        map.set(cleanId, m);
+        map.set(cleanId.toLowerCase(), m);
+        if (m.name) {
+          const cleanName = String(m.name).trim();
+          if (!map.has(cleanName)) map.set(cleanName, m);
+          if (!map.has(cleanName.toLowerCase())) map.set(cleanName.toLowerCase(), m);
+        }
+      }
     }
     return map;
   }, [models]);
+
+  const resolvePartModelObj = (part) => {
+    if (!part) return undefined;
+    const rawMid = String(part.modelId || '').trim();
+    return modelByIdMap.get(rawMid) || modelByIdMap.get(rawMid.toLowerCase());
+  };
 
   const { partCountByModelIdMap, partCountByBrandMap } = useMemo(() => {
     const byModel = new Map();
@@ -4848,9 +4985,9 @@ export default function App() {
     for (let i = 0; i < parts.length; i++) {
       const p = parts[i];
       if (!p) continue;
-      const mid = String(p.modelId || '');
-      byModel.set(mid, (byModel.get(mid) || 0) + 1);
-      const mObj = modelByIdMap.get(mid);
+      const mObj = resolvePartModelObj(p);
+      const canonicalMid = mObj ? String(mObj.id) : String(p.modelId || '').trim();
+      byModel.set(canonicalMid, (byModel.get(canonicalMid) || 0) + 1);
       const bName = mObj?.brand || p.brand;
       if (bName) byBrand.set(bName, (byBrand.get(bName) || 0) + 1);
     }
@@ -4869,12 +5006,14 @@ export default function App() {
 
   const partPassesStoreFilters = (part, ignoreCategory = false) => {
     if (!part) return false;
-    if (part.customGroupPrices && Number(part.customGroupPrices[currentGroup?.id]) === 0) return false;
 
-    const modelObj = modelByIdMap.get(String(part.modelId));
-    if (selectedBrand !== 'ALL' && modelObj?.brand !== selectedBrand) return false;
-    if (selectedModelId !== 'ALL' && String(part.modelId) !== String(selectedModelId)) {
-      if (!selectedTargetModelName || !(part.compatibleModels || []).some(cm => cm && cm.includes(selectedTargetModelName))) {
+    const modelObj = resolvePartModelObj(part);
+    const canonicalMid = modelObj ? String(modelObj.id) : String(part.modelId || '').trim();
+    const partBrand = modelObj?.brand || part.brand || '';
+
+    if (selectedBrand !== 'ALL' && partBrand !== selectedBrand) return false;
+    if (selectedModelId !== 'ALL' && canonicalMid !== String(selectedModelId)) {
+      if (!selectedTargetModelName || !(part.compatibleModels || []).some(cm => cm && cm.toLowerCase().includes(selectedTargetModelName.toLowerCase()))) {
         return false;
       }
     }
@@ -5044,7 +5183,7 @@ export default function App() {
       return;
     }
 
-    const newOrderId = `INV-${1049 + orders.length}`;
+    const newOrderId = `INV-${String(Date.now()).slice(-6)}`;
     const chosenAddr =
       checkoutAddressChoice === 'primary'
         ? currentClient.address
@@ -5165,8 +5304,26 @@ export default function App() {
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
     setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
 
-    // Direct Normalized Table Operations
+    // Direct Normalized Table Operations + Instant Admin Notification Sync in site_settings
     sbUpsert('orders', newOrder);
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const nextNotifs = [adminOrderNotif, clientOrderNotif, ...notifications].slice(0, 100);
+        fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+          body: JSON.stringify([{
+            id: 'main',
+            settings: siteSettings,
+            credentials: adminCredentials,
+            currencies,
+            notifications: nextNotifs,
+            updated_at: new Date().toISOString()
+          }])
+        }).catch(() => {});
+      }
+    } catch (e) {}
     cartSummary.items.forEach(item => {
       const p = parts.find(x => x.id === item.part.id);
       if (p) {
@@ -5660,9 +5817,10 @@ export default function App() {
             className="hm-card-img relative h-48 bg-surface2 border-b border-line overflow-hidden cursor-pointer select-none"
           >
             <BlurFitImage
+              key={`${part.id}_${siteSettings.productImageFit || part.imageFit || 'contain'}`}
               src={currentDisplayImg}
               alt={part.name}
-              fit={part.imageFit || siteSettings.productImageFit || 'contain'}
+              fit={siteSettings.productImageFit || part.imageFit || 'contain'}
               imgClassName="group-hover:scale-105 transition duration-500"
             />
 
@@ -6855,8 +7013,13 @@ export default function App() {
                 <select
                   value={selectedBrand}
                   onChange={e => {
-                    setSelectedBrand(e.target.value);
+                    const nextBr = e.target.value;
+                    setSelectedBrand(nextBr);
                     setSelectedModelId('ALL');
+                    setSelectedCategory('ALL');
+                    if (nextBr !== 'ALL') {
+                      fetchSparePartsSliceOnDemand({ brand: nextBr, limit: 250 });
+                    }
                   }}
                   className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-accent"
                 >
@@ -6877,7 +7040,14 @@ export default function App() {
               <div className="relative">
                 <select
                   value={selectedModelId}
-                  onChange={e => setSelectedModelId(e.target.value)}
+                  onChange={e => {
+                    const nextMid = e.target.value;
+                    setSelectedModelId(nextMid);
+                    setSelectedCategory('ALL');
+                    if (nextMid !== 'ALL') {
+                      fetchSparePartsSliceOnDemand({ modelId: nextMid, limit: 200 });
+                    }
+                  }}
                   className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-accent"
                 >
                   <option value="ALL">
@@ -8410,39 +8580,39 @@ export default function App() {
 
     return (
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Top Clean Profile Summary Banner (No Group/Tier Name Exposed!) */}
-        <div className="bg-gradient-to-l from-nav via-nav2 to-indigo-950 text-white rounded-2xl p-6 shadow-md flex flex-wrap items-center justify-between gap-4">
+        {/* Top Clean Profile Summary Banner (High-Contrast in Light & Dark Mode!) */}
+        <div className="bg-surface text-fg border-2 border-accent rounded-2xl p-5 sm:p-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            {renderClientAvatar(currentClient, 'w-16 h-16 text-xl')}
+            {renderClientAvatar(currentClient, 'w-16 h-16 text-xl shadow-sm')}
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-extrabold">{currentClient.name}</h2>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] font-bold">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-xl font-black text-fg">{currentClient.name}</h2>
+                <span className="px-2.5 py-0.5 rounded-full bg-go/15 text-go border border-go/30 text-[11px] font-extrabold">
                   حساب معتمد نشط ✓
                 </span>
               </div>
-              <p className="text-xs text-muted mt-1">
-                المسؤول: {currentClient.owner} • الجوال: <span className="font-mono">{currentClient.phone}</span> • {currentClient.address}
+              <p className="text-xs text-muted font-bold mt-1.5">
+                المسؤول: <span className="text-fg font-extrabold">{currentClient.owner}</span> • الجوال: <span className="font-mono text-fg font-extrabold">{currentClient.phone}</span> • <span className="text-fg">{currentClient.address}</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 bg-surface backdrop-blur-xs px-4 py-3 rounded-xl border border-white/15">
+          <div className="flex items-center gap-3 bg-surface2 px-4 py-3 rounded-xl border border-line">
             <div>
-              <div className="text-[11px] text-muted">صافي رصيد المحفظة</div>
+              <div className="text-[11px] font-bold text-muted">صافي رصيد المحفظة</div>
               <div
-                className={`text-base font-extrabold ${
-                  currentClient.walletBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                className={`text-base font-black ${
+                  currentClient.walletBalance >= 0 ? 'text-go' : 'text-rose-600 dark:text-rose-400'
                 }`}
               >
                 {currentClient.walletBalance >= 0 ? 'رصيد ليك: ' : 'مديونية: '}
                 {formatMoney(Math.abs(currentClient.walletBalance))}
               </div>
             </div>
-            <div className="h-8 w-px bg-surface mx-1" />
+            <div className="h-8 w-px bg-line mx-1" />
             <button
               onClick={() => setClientTab('store')}
-              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-surface0 text-white text-xs font-extrabold transition"
+              className="px-4 py-2.5 rounded-xl bg-go hover:brightness-110 text-go-ink text-xs font-extrabold transition shadow-xs"
             >
               + اطلب منتجات جديدة
             </button>
@@ -10862,8 +11032,8 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
             return (
               <div key={brandName} className="bg-surface rounded-2xl border border-line overflow-hidden shadow-xs">
-                {/* Level 1: Collapsible Brand Bar Header (Closed by default!) */}
-                <div className="p-3.5 sm:p-4 bg-gradient-to-l from-nav via-nav2 to-nav text-white flex flex-wrap items-center justify-between gap-3">
+                {/* Level 1: Collapsible Brand Bar Header (High Contrast in Light & Dark Mode!) */}
+                <div className="p-3.5 sm:p-4 bg-surface2 text-fg border-b border-line flex flex-wrap items-center justify-between gap-3">
                   <div
                     onClick={() => toggleBrandBar(brandName)}
                     className="flex items-center gap-3 cursor-pointer select-none flex-1 min-w-[200px]"
@@ -10872,15 +11042,15 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                       type="button"
                       className={`w-9 h-9 rounded-xl font-mono font-black text-lg flex items-center justify-center transition ${
                         isBrandOpen
-                          ? 'bg-cyan-400 text-fg shadow-sm'
-                          : 'bg-amber-500 hover:bg-amber-400 text-fg shadow-sm'
+                          ? 'bg-accent text-accent-ink shadow-sm'
+                          : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm'
                       }`}
                       title={isBrandOpen ? 'إغلاق شريط البراند (−)' : 'فتح شريط البراند وعرض الموديلات (+)'}
                     >
                       {isBrandOpen ? '−' : '+'}
                     </button>
 
-                    <div className="w-10 h-10 rounded-xl bg-surface border border-white/20 overflow-hidden flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-surface border border-line overflow-hidden flex items-center justify-center shrink-0">
                       {brandImages[brandName] ? (
                         <img
                           src={brandImages[brandName]}
@@ -10890,21 +11060,21 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                           className="w-full h-full object-contain bg-surface p-0.5"
                         />
                       ) : (
-                        <Smartphone className="w-5 h-5 text-cyan-300" />
+                        <Smartphone className="w-5 h-5 text-accent-text" />
                       )}
                     </div>
 
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-black text-base sm:text-lg tracking-wide">{brandName}</span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-surface text-cyan-300 text-[11px] font-extrabold border border-white/10">
+                        <span className="font-black text-base sm:text-lg tracking-wide text-fg">{brandName}</span>
+                        <span className="px-2.5 py-0.5 rounded-full bg-accent/15 text-accent-text text-[11px] font-extrabold border border-accent/30">
                           {brandModels.length} موديل
                         </span>
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-extrabold border border-emerald-400/20">
+                        <span className="px-2.5 py-0.5 rounded-full bg-go/15 text-go text-[11px] font-extrabold border border-go/30">
                           {brandPartsCount} منتج
                         </span>
                       </div>
-                      <div className="text-[11px] text-muted mt-0.5">
+                      <div className="text-[11px] text-muted font-bold mt-0.5">
                         {isBrandOpen ? 'اضغط (−) لإغلاق شريط البراند' : 'اضغط (+) لإظهار شرائط الموديلات التابعة لهذا البراند'}
                       </div>
                     </div>
@@ -10921,10 +11091,10 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                           imageUrl: brandImages[brandName] || ''
                         });
                       }}
-                      className="px-3 py-2 rounded-xl bg-surface hover:bg-surface text-cyan-200 border border-white/15 text-xs font-extrabold flex items-center gap-1.5 transition"
+                      className="px-3 py-2 rounded-xl bg-surface hover:bg-bg text-fg border border-line text-xs font-extrabold flex items-center gap-1.5 transition shadow-2xs"
                       title="تحديد صورة البراند (رابط خارجي مباشر أو رفع صورة محلية)"
                     >
-                      <Upload className="w-3.5 h-3.5" />
+                      <Upload className="w-3.5 h-3.5 text-accent-text" />
                       <span>صورة البراند</span>
                     </button>
 
@@ -10990,7 +11160,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                         const modelParts = isModelOpen
                           ? parts
                               .filter(p => {
-                                if (String(p.modelId) !== String(model.id)) return false;
+                                const pMdl = resolvePartModelObj(p); if ((pMdl ? String(pMdl.id) : String(p.modelId || '').trim()) !== String(model.id)) return false;
                                 if (adminStockFilter === 'IN_STOCK' && p.stock <= 0) return false;
                                 if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > p.lowStockThreshold)) return false;
                                 if (adminStockFilter === 'OUT_OF_STOCK' && p.stock > 0) return false;
@@ -11014,8 +11184,8 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
                         return (
                           <div key={model.id} className="bg-surface rounded-xl border border-line overflow-hidden shadow-xs">
-                            {/* Collapsible Model Bar Header (Closed by default!) */}
-                            <div className="p-3 bg-nav2 text-white flex flex-wrap items-center justify-between gap-2.5">
+                            {/* Collapsible Model Bar Header (High Contrast in Light & Dark Mode!) */}
+                            <div className="p-3 bg-surface text-fg border-b border-line flex flex-wrap items-center justify-between gap-2.5">
                               <div
                                 onClick={() => toggleModelBar(model.id)}
                                 className="flex items-center gap-2.5 cursor-pointer select-none flex-1 min-w-[180px]"
@@ -11024,26 +11194,26 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                   type="button"
                                   className={`w-8 h-8 rounded-lg font-mono font-extrabold text-base flex items-center justify-center transition ${
                                     isModelOpen
-                                      ? 'bg-cyan-400 text-fg'
-                                      : 'bg-amber-500 hover:bg-amber-400 text-fg'
+                                      ? 'bg-accent text-accent-ink'
+                                      : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
                                   }`}
                                   title={isModelOpen ? 'إغلاق شريط الموديل (−)' : 'فتح شريط الموديل وعرض المنتجات (+)'}
                                 >
                                   {isModelOpen ? '−' : '+'}
                                 </button>
 
-                                <div className="w-9 h-9 rounded-lg overflow-hidden border border-white/20 bg-nav shrink-0">
+                                <div className="w-9 h-9 rounded-lg overflow-hidden border border-line bg-surface2 shrink-0">
                                   <BlurFitImage src={model.image || PART_IMAGES.screen} alt={model.name} />
                                 </div>
 
                                 <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="font-extrabold text-sm">{model.name}</span>
-                                    <span className="px-2 py-0.5 rounded bg-surface text-cyan-300 font-bold text-[10px]">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-black text-sm text-fg">{model.name}</span>
+                                    <span className="px-2 py-0.5 rounded bg-accent/15 text-accent-text border border-accent/30 font-extrabold text-[10px]">
                                       {modelPartsCount} منتج
                                     </span>
                                   </div>
-                                  <div className="text-[10px] text-muted">
+                                  <div className="text-[10px] text-muted font-bold">
                                     {isModelOpen ? 'اضغط (−) لإخفاء المنتجات' : 'اضغط (+) لإظهار وتعديل منتجات الموديل'}
                                   </div>
                                 </div>
@@ -12362,7 +12532,31 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               <button
                 key={val}
                 type="button"
-                onClick={() => setSiteSettings(prev => ({ ...prev, productImageFit: val }))}
+                onClick={() => {
+                  const nextSettings = { ...siteSettings, productImageFit: val };
+                  setSiteSettings(nextSettings);
+                  setParts(prev => prev.map(p => ({ ...p, imageFit: val })));
+                  invalidateSessionTableCache();
+                  try {
+                    window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(nextSettings));
+                    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+                    if (isValid) {
+                      fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
+                        method: 'POST',
+                        headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+                        body: JSON.stringify([{
+                          id: 'main',
+                          settings: nextSettings,
+                          credentials: adminCredentials,
+                          currencies,
+                          notifications,
+                          updated_at: new Date().toISOString()
+                        }])
+                      }).catch(() => {});
+                    }
+                  } catch (e) {}
+                  showToast(`تم تفعيل وضع "${label}" لكل كروت المنتجات وحفظه في السيرفر فوراً ✓`, 'success');
+                }}
                 className={`px-3 py-1.5 rounded-xl border font-extrabold transition ${
                   activeFit ? 'bg-accent text-accent-ink border-accent' : 'bg-surface2 text-fg border-line'
                 }`}
@@ -12777,6 +12971,44 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
 
   const renderAdminClients = () => {
     const pendingRequests = accountRequests.filter(r => r.status === 'pending');
+    const passwordResetClients = clients.filter(c => c && c.passwordResetRequest);
+
+    const handleApprovePasswordReset = async (clientObj) => {
+      const nextPass = String(clientObj.requestedNewPassword || clientObj.password || '123').trim();
+      const updated = {
+        ...clientObj,
+        password: nextPass,
+        passwordResetRequest: false,
+        requestedNewPassword: '',
+        resetOtp: '',
+        resetOtpExpires: 0
+      };
+      setClients(prev => prev.map(c => (c.id === clientObj.id ? updated : c)));
+      if (selectedAdminClientId === clientObj.id) {
+        setAdminEditClientForm(prev => (prev ? { ...prev, password: nextPass } : prev));
+      }
+      await sbUpsert('clients', updated);
+      invalidateSessionTableCache('clients');
+      showToast(`✓ تم اعتماد وتفعيل كلمة السر الجديدة للعميل "${clientObj.name}" فوراً!`, 'success');
+    };
+
+    const handleGenerateAndSendOtp = async (clientObj) => {
+      const otpCode = String(Math.floor(100000 + Math.random() * 900000));
+      const expiresAt = Date.now() + 30 * 60 * 1000; // 30 minutes validity
+      const updated = {
+        ...clientObj,
+        resetOtp: otpCode,
+        resetOtpExpires: expiresAt
+      };
+      setClients(prev => prev.map(c => (c.id === clientObj.id ? updated : c)));
+      await sbUpsert('clients', updated);
+      invalidateSessionTableCache('clients');
+      const cleanPhone = String(clientObj.phone || '').replace(/[^0-9]/g, '');
+      const waPhone = cleanPhone.startsWith('0') ? `2${cleanPhone}` : cleanPhone;
+      const waMsg = `مرحباً ${clientObj.name}، كود التحقق السري (OTP) لاستعادة كلمة المرور في ${siteSettings.storeName || 'ELZOGHBI'} هو: *${otpCode}* (صالح لمدة 30 دقيقة).`;
+      window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(waMsg)}`, '_blank');
+      showToast(`🔑 تم توليد كود الاستعادة (${otpCode}) للعميل "${clientObj.name}" وفتح واتساب!`, 'success');
+    };
     const selectedClient = selectedAdminClient;
     const clientOrders = orders.filter(o => o.clientId === selectedClient?.id);
 
@@ -12882,6 +13114,79 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
             <div className="text-[10px] text-blue-100 font-bold">تحديد الفئة وسقف الآجل فوراً</div>
           </div>
         </div>
+
+        {/* 1B. Password Reset Requests Banner (Shown when a client requests password recovery) */}
+        {passwordResetClients.length > 0 && (
+          <div className="bg-surface2 border-2 border-accent rounded-2xl p-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-sm font-extrabold text-fg flex items-center gap-2">
+                <Lock className="w-4 h-4 text-accent-text" />
+                <span>طلبات استعادة وتغيير كلمة المرور ({passwordResetClients.length})</span>
+              </h3>
+              <span className="text-[11px] font-bold text-accent-text">
+                اعتمد كلمة السر الجديدة بضغطة واحدة أو أرسل كود OTP للعميل عبر واتساب
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {passwordResetClients.map(rc => (
+                <div key={rc.id} className="bg-surface rounded-xl p-3.5 border border-line shadow-xs flex flex-col justify-between gap-3 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-extrabold text-fg">{rc.name}</span>
+                      <span className="px-2 py-0.5 rounded bg-accent/15 text-accent-text font-mono font-bold text-[10px]">
+                        {rc.passwordResetRequestedAt || 'الآن'}
+                      </span>
+                    </div>
+                    <div className="text-muted font-bold">
+                      {rc.owner} • <span className="font-mono text-fg font-extrabold">{rc.phone}</span>
+                    </div>
+                    {rc.requestedNewPassword && (
+                      <div className="text-[11px] bg-surface2 px-2.5 py-1.5 rounded-lg border border-line">
+                        كلمة السر الجديدة المطلوبة: <span className="font-mono font-black text-accent-text">{rc.requestedNewPassword}</span>
+                      </div>
+                    )}
+                    {rc.resetOtp && (
+                      <div className="text-[11px] text-go font-extrabold">
+                        كود OTP الفعال حالياً: <span className="font-mono">{rc.resetOtp}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-line">
+                    {rc.requestedNewPassword && (
+                      <button
+                        type="button"
+                        onClick={() => handleApprovePasswordReset(rc)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-go hover:brightness-110 text-go-ink font-extrabold flex items-center justify-center gap-1"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                        <span>اعتماد كلمة السر الجديدة فوراً</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handleGenerateAndSendOtp(rc)}
+                      className="flex-1 py-2 px-3 rounded-xl bg-accent hover:brightness-110 text-accent-ink font-extrabold flex items-center justify-center gap-1"
+                    >
+                      <span>🔑 توليد وإرسال كود OTP واتساب</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const cleared = { ...rc, passwordResetRequest: false, requestedNewPassword: '' };
+                        setClients(prev => prev.map(c => (c.id === rc.id ? cleared : c)));
+                        await sbUpsert('clients', cleared);
+                      }}
+                      className="py-2 px-2.5 rounded-xl bg-rose-500/15 text-rose-500 font-bold"
+                      title="إخفاء الطلب"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 2. Pending Account Join Requests Banner (Shown cleanly if any exist) */}
         {pendingRequests.length > 0 && (
@@ -13161,7 +13466,17 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                     </div>
 
                     <div>
-                      <label className="font-bold text-rose-500 dark:text-rose-400 block mb-1">كلمة المرور (Password):</label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="font-bold text-rose-500 dark:text-rose-400">كلمة المرور (Password):</label>
+                        <button
+                          type="button"
+                          onClick={() => handleGenerateAndSendOtp(selectedClient)}
+                          className="text-[10px] font-extrabold text-accent-text hover:underline"
+                          title="توليد كود استعادة من 6 أرقام وإرساله للعميل عبر واتساب"
+                        >
+                          🔑 إرسال كود OTP واتساب
+                        </button>
+                      </div>
                       <PasswordInput
                         type="text"
                         required
@@ -14018,9 +14333,163 @@ model OrderInvoice {
   };
 
   // --- Real Client Login & Account Registration Request Modal (No Account Picker List!) ---
-  const [authModalTab, setAuthModalTab] = useState('login'); // 'login' | 'register'
+  const [authModalTab, setAuthModalTab] = useState('login'); // 'login' | 'register' | 'forgot'
   const [clientLoginIdentifier, setClientLoginIdentifier] = useState('');
   const [clientLoginPassword, setClientLoginPassword] = useState('');
+  const [forgotPhone, setForgotPhone] = useState('');
+  const [forgotIdentityVerify, setForgotIdentityVerify] = useState('');
+  const [forgotOtpCode, setForgotOtpCode] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [forgotStepStatus, setForgotStepStatus] = useState(null); // null | { type: 'requested', phone, clientName }
+
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    const phoneClean = normalizeDigits(forgotPhone).trim();
+    const verifyClean = String(forgotIdentityVerify || '').trim().toLowerCase();
+    const otpClean = normalizeDigits(forgotOtpCode).trim();
+    const newPassClean = String(forgotNewPassword || '').trim();
+    const confirmClean = String(forgotConfirmPassword || '').trim();
+
+    if (!phoneClean || phoneClean.length < 10) {
+      showToast('اكتب رقم الموبايل المسجّل بالحساب بشكل صحيح.', 'error');
+      return;
+    }
+    if (newPassClean.length < 4) {
+      showToast('كلمة المرور الجديدة لازم تكون 4 حروف أو أرقام على الأقل.', 'error');
+      return;
+    }
+    if (newPassClean !== confirmClean) {
+      showToast('كلمة المرور الجديدة وتأكيدها مش متطابقين!', 'error');
+      return;
+    }
+
+    // Fetch latest clients from Supabase to verify account and OTP
+    let currentClientsList = clients;
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const res = await fetch(
+          `${sbUrl}/rest/v1/clients?select=${TABLE_LIGHT_COLUMNS.clients}&limit=200`,
+          { headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }) }
+        );
+        if (res.ok) {
+          const freshRows = await res.json();
+          if (Array.isArray(freshRows) && freshRows.length > 0) {
+            currentClientsList = freshRows.map(toCamelCaseRow);
+            setClients(currentClientsList);
+          }
+        }
+      }
+    } catch (err) {}
+
+    const matchedClient = currentClientsList.find(
+      c => normalizeDigits(String(c.phone || '')).trim() === phoneClean
+    );
+
+    if (!matchedClient) {
+      showToast('مفيش حساب مسجّل برقم الموبايل ده! اتأكد من الرقم أو اطلب فتح حساب جديد.', 'error');
+      return;
+    }
+
+    // Path 1: Instant Reset via 6-digit OTP code from Admin
+    if (otpClean.length >= 4) {
+      const savedOtp = normalizeDigits(String(matchedClient.resetOtp || '')).trim();
+      const otpExpires = Number(matchedClient.resetOtpExpires || 0);
+      if (!savedOtp || savedOtp !== otpClean) {
+        showToast('كود التحقق (OTP) غير صحيح! تأكد من الكود المرسل لك من الإدارة.', 'error');
+        return;
+      }
+      if (otpExpires > 0 && Date.now() > otpExpires) {
+        showToast('انتهت صلاحية كود التحقق! اطلب كود جديد من الإدارة.', 'error');
+        return;
+      }
+
+      const updatedClient = {
+        ...matchedClient,
+        password: newPassClean,
+        resetOtp: '',
+        resetOtpExpires: 0,
+        passwordResetRequest: false,
+        requestedNewPassword: ''
+      };
+      setClients(prev => prev.map(c => (c.id === matchedClient.id ? updatedClient : c)));
+      await sbUpsert('clients', updatedClient);
+      invalidateSessionTableCache('clients');
+      handleSwitchRole(matchedClient.id);
+      setLoginModalOpen(false);
+      setForgotOtpCode('');
+      setForgotNewPassword('');
+      setForgotConfirmPassword('');
+      setForgotStepStatus(null);
+      showToast(`تم التحقق من الكود وتغيير كلمة المرور بنجاح! أهلاً بك يا "${matchedClient.name}".`, 'success');
+      return;
+    }
+
+    // Path 2: Identity Verification (Shop Name / Owner Name / Email) + Request Approval / OTP
+    if (!verifyClean || verifyClean.length < 3) {
+      showToast('اكتب اسم المحل أو اسم المسؤول المسجل في الحساب (أو كود التحقق OTP) لتأكيد هويتك بأمان.', 'warning');
+      return;
+    }
+
+    const clientIdentityHaystack = `${matchedClient.name || ''} ${matchedClient.owner || ''} ${matchedClient.email || ''}`.toLowerCase();
+    const verifyWords = verifyClean.split(/\s+/).filter(w => w.length >= 2);
+    const identityMatches =
+      clientIdentityHaystack.includes(verifyClean) ||
+      (verifyWords.length > 0 && verifyWords.some(w => clientIdentityHaystack.includes(w)));
+
+    if (!identityMatches) {
+      showToast('الاسم المدخل غير مطابق لبيانات صاحب هذا الرقم! يرجى كتابة اسم المحل أو اسم المسؤول الصحيح أو التواصل مع الإدارة لاستلام كود OTP.', 'error');
+      return;
+    }
+
+    const updatedClientReq = {
+      ...matchedClient,
+      passwordResetRequest: true,
+      requestedNewPassword: newPassClean,
+      passwordResetRequestedAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+    };
+    setClients(prev => prev.map(c => (c.id === matchedClient.id ? updatedClientReq : c)));
+    await sbUpsert('clients', updatedClientReq);
+    invalidateSessionTableCache('clients');
+
+    const resetNotif = {
+      id: `ntf_pw_${matchedClient.id}_${Date.now()}`,
+      target: 'admin',
+      type: 'password_reset',
+      title: `🔑 طلب استعادة كلمة المرور (${matchedClient.name})`,
+      msg: `طلب العميل "${matchedClient.name}" (${matchedClient.phone}) تعيين كلمة مرور جديدة لحسابه.`,
+      time: 'الآن',
+      read: false,
+      clientId: matchedClient.id
+    };
+    setNotifications(prev => [resetNotif, ...prev]);
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+          body: JSON.stringify([{
+            id: 'main',
+            settings: siteSettings,
+            credentials: adminCredentials,
+            currencies,
+            notifications: [resetNotif, ...notifications].slice(0, 100),
+            updated_at: new Date().toISOString()
+          }])
+        }).catch(() => {});
+      }
+    } catch (err) {}
+
+    setForgotStepStatus({
+      type: 'requested',
+      phone: matchedClient.phone,
+      clientName: matchedClient.name,
+      clientId: matchedClient.id
+    });
+    showToast('تم إرسال طلب استعادة كلمة المرور للإدارة بنجاح! يمكنك تفعيله فوراً أو إدخال كود التحقق OTP.', 'success');
+  };
 
   const [regForm, setRegForm] = useState({ ...EMPTY_REG_FORM });
   const [regErrors, setRegErrors] = useState({});
@@ -14306,29 +14775,43 @@ model OrderInvoice {
 
           <div className="p-4 space-y-3.5 overflow-y-auto overscroll-contain touch-pan-y flex-1">
 
-          {/* Tabs: Login vs Request New Account */}
-          <div className="grid grid-cols-2 gap-2 p-1 bg-surface2 rounded-2xl text-xs font-extrabold">
+          {/* Tabs: Login vs Request New Account vs Forgot Password */}
+          <div className="grid grid-cols-3 gap-1.5 p-1 bg-surface2 rounded-2xl text-[11px] sm:text-xs font-extrabold">
             <button
               type="button"
               onClick={() => setAuthModalTab('login')}
-              className={`py-2.5 rounded-xl transition ${
+              className={`py-2.5 px-2 rounded-xl transition ${
                 authModalTab === 'login'
                   ? 'bg-surface text-fg shadow-xs'
                   : 'text-muted hover:text-fg'
               }`}
             >
-              تسجيل الدخول لحسابي
+              تسجيل الدخول
             </button>
             <button
               type="button"
               onClick={() => setAuthModalTab('register')}
-              className={`py-2.5 rounded-xl transition ${
+              className={`py-2.5 px-2 rounded-xl transition ${
                 authModalTab === 'register'
                   ? 'bg-blue-600 text-white shadow-xs'
                   : 'text-muted hover:text-fg'
               }`}
             >
-              طلب فتح حساب جديد
+              طلب فتح حساب
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthModalTab('forgot');
+                if (clientLoginIdentifier && !forgotPhone) setForgotPhone(clientLoginIdentifier);
+              }}
+              className={`py-2.5 px-2 rounded-xl transition ${
+                authModalTab === 'forgot'
+                  ? 'bg-amber-500 text-slate-950 shadow-xs'
+                  : 'text-muted hover:text-fg'
+              }`}
+            >
+              نسيت كلمة السر؟
             </button>
           </div>
 
@@ -14349,9 +14832,21 @@ model OrderInvoice {
               </div>
 
               <div>
-                <label className="font-bold text-muted block mb-1.5">
-                  كلمة المرور (Password):
-                </label>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="font-bold text-muted">
+                    كلمة المرور (Password):
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthModalTab('forgot');
+                      if (clientLoginIdentifier && !forgotPhone) setForgotPhone(clientLoginIdentifier);
+                    }}
+                    className="text-[11px] font-extrabold text-accent-text hover:underline"
+                  >
+                    هل نسيت كلمة السر؟
+                  </button>
+                </div>
                 <PasswordInput
                   type="password"
                   required
@@ -14364,19 +14859,163 @@ model OrderInvoice {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-nav2 hover:bg-nav2 text-white font-extrabold text-sm shadow-md transition"
+                className="w-full py-3.5 rounded-xl bg-go hover:brightness-110 text-go-ink font-extrabold text-sm shadow-md transition"
               >
                 ادخل وحدّث الأسعار
               </button>
 
-              <div className="pt-2 border-t border-line text-center">
-                <span className="text-muted">لسه معندكش حساب؟ </span>
+              <div className="pt-2 border-t border-line flex flex-wrap items-center justify-between gap-2 text-center">
+                <div>
+                  <span className="text-muted">لسه معندكش حساب؟ </span>
+                  <button
+                    type="button"
+                    onClick={() => setAuthModalTab('register')}
+                    className="font-extrabold text-accent-text hover:underline"
+                  >
+                    اطلب فتح حساب
+                  </button>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setAuthModalTab('register')}
-                  className="font-extrabold text-blue-600 hover:underline"
+                  onClick={() => {
+                    setAuthModalTab('forgot');
+                    if (clientLoginIdentifier && !forgotPhone) setForgotPhone(clientLoginIdentifier);
+                  }}
+                  className="font-extrabold text-amber-600 dark:text-amber-400 hover:underline"
                 >
-                  دوس هنا واطلب فتح حساب
+                  🔑 استعادة كلمة المرور
+                </button>
+              </div>
+            </form>
+          ) : authModalTab === 'forgot' ? (
+            <form onSubmit={handleForgotPasswordSubmit} className="space-y-3.5 text-xs">
+              <div className="p-3 rounded-2xl bg-surface2 border border-line space-y-1">
+                <div className="font-extrabold text-fg flex items-center gap-1.5">
+                  <Lock className="w-4 h-4 text-accent-text" />
+                  <span>استعادة وتغيير كلمة المرور بأمان</span>
+                </div>
+                <p className="text-[11px] text-muted leading-relaxed">
+                  أدخل رقم موبايلك المسجل مع اسم المحل/المسؤول (أو كود التحقق السري OTP المرسل من الإدارة) لتعيين كلمة مرور جديدة لحسابك.
+                </p>
+              </div>
+
+              {forgotStepStatus?.type === 'requested' && (
+                <div className="p-3.5 rounded-2xl bg-go/15 border border-go/30 text-fg space-y-2.5">
+                  <div className="font-extrabold text-go flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>تم تسجيل طلب استعادة كلمة السر لحساب "{forgotStepStatus.clientName}"!</span>
+                  </div>
+                  <p className="text-[11px] text-muted leading-relaxed">
+                    وصل إشعار فوري للإدارة لاعتماد كلمة المرور الجديدة، أو يمكنك استلام كود التفعيل الفوري (OTP) عبر واتساب وإدخاله بالأسفل:
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <a
+                      href={`https://wa.me/${String(siteSettings.whatsappNumber || '201000000000').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`مرحباً إدارة ${siteSettings.storeName || 'ELZOGHBI'}، قمت بطلب استعادة كلمة المرور لحساب: ${forgotStepStatus.clientName} (${forgotStepStatus.phone})، يرجى التفعيل أو إرسال كود OTP.`)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 py-2 px-3 rounded-xl bg-go text-go-ink font-extrabold text-center shadow-xs"
+                    >
+                      💬 تواصل واتساب للتفعيل الفوري
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalTab('login')}
+                      className="py-2 px-3 rounded-xl bg-surface border border-line text-fg font-extrabold"
+                    >
+                      العودة للدخول
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label className="font-bold text-muted block mb-1">
+                  1. رقم الموبايل المسجّل بالحساب *:
+                </label>
+                <input
+                  type="tel"
+                  required
+                  dir="ltr"
+                  value={forgotPhone}
+                  onChange={e => setForgotPhone(e.target.value)}
+                  placeholder="01012345678"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-line font-mono font-bold text-fg"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="font-bold text-muted block mb-1">
+                    2. اسم المحل أو المسؤول المسجّل:
+                  </label>
+                  <input
+                    type="text"
+                    value={forgotIdentityVerify}
+                    onChange={e => setForgotIdentityVerify(e.target.value)}
+                    placeholder="لتأكيد ملكية الحساب..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-line font-bold text-fg"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-accent-text block mb-1">
+                    أو كود التحقق السري (OTP):
+                  </label>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    value={forgotOtpCode}
+                    onChange={e => setForgotOtpCode(e.target.value)}
+                    placeholder="كود 6 أرقام للتفعيل الفوري"
+                    className="w-full px-3 py-2.5 rounded-xl border border-accent font-mono font-extrabold text-fg"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="font-bold text-muted block mb-1">
+                    3. كلمة المرور الجديدة *:
+                  </label>
+                  <PasswordInput
+                    type="password"
+                    required
+                    value={forgotNewPassword}
+                    onChange={e => setForgotNewPassword(e.target.value)}
+                    placeholder="كلمة السر الجديدة..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-line font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">
+                    تأكيد كلمة المرور الجديدة *:
+                  </label>
+                  <PasswordInput
+                    type="password"
+                    required
+                    value={forgotConfirmPassword}
+                    onChange={e => setForgotConfirmPassword(e.target.value)}
+                    placeholder="أعد كتابة كلمة السر..."
+                    className="w-full px-3 py-2.5 rounded-xl border border-line font-mono"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 rounded-xl bg-accent hover:brightness-110 text-accent-ink font-black text-xs sm:text-sm shadow-md transition"
+              >
+                {forgotOtpCode.trim().length >= 4
+                  ? '✓ تأكيد الكود (OTP) وتغيير كلمة السر فوراً'
+                  : '🔑 إرسال طلب استعادة وتغيير كلمة المرور'}
+              </button>
+
+              <div className="pt-2 border-t border-line text-center">
+                <button
+                  type="button"
+                  onClick={() => setAuthModalTab('login')}
+                  className="font-extrabold text-accent-text hover:underline"
+                >
+                  ← الرجوع لتسجيل الدخول
                 </button>
               </div>
             </form>
@@ -18769,14 +19408,15 @@ ${footer}
     };
   }, [i18nActive]);
 
-  // نخلي صفحتي الرئيسية والبحث متركّبين (مخفيين) عشان الرجوع يبقى فوري من غير إعادة بناء
+  // نخلي صفحتي الرئيسية والبحث متركّبين (مخفيين) مع تحديثهم فوراً عند أي تعديل في الإعدادات أو المنتجات أو الثيم
   const homeElRef = React.useRef(null);
   const searchElRef = React.useRef(null);
-  const lastRenderedThemeRef = React.useRef(uiTheme);
-  if (lastRenderedThemeRef.current !== uiTheme) {
+  const lastRenderSigRef = React.useRef('');
+  const currentRenderSig = `${uiTheme}_${siteSettings.productImageFit || 'contain'}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${activeRole}`;
+  if (lastRenderSigRef.current !== currentRenderSig) {
     homeElRef.current = null;
     searchElRef.current = null;
-    lastRenderedThemeRef.current = uiTheme;
+    lastRenderSigRef.current = currentRenderSig;
   }
   const homeActiveNow = clientTab === 'home' || clientTab === 'store';
   const searchActiveNow = clientTab === 'search';
@@ -18838,7 +19478,27 @@ ${footer}
         .border-go { border-color: rgb(var(--go)); }
         .bg-nav { background-color: #0b1620; }
         .bg-nav2 { background-color: #142431; }
+        .from-nav { --tw-gradient-from: #0b1620 var(--tw-gradient-from-position); --tw-gradient-to: rgb(11 22 32 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+        .via-nav2 { --tw-gradient-to: rgb(20 36 49 / 0)  var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #142431 var(--tw-gradient-via-position), var(--tw-gradient-to); }
+        .to-nav { --tw-gradient-to: #0b1620 var(--tw-gradient-to-position); }
         .border-navline { border-color: #223647; }
+        input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+        select,
+        textarea {
+          background-color: rgb(var(--bg)) !important;
+          color: rgb(var(--fg)) !important;
+          border-color: rgb(var(--line)) !important;
+          caret-color: rgb(var(--accent)) !important;
+        }
+        input::placeholder,
+        textarea::placeholder {
+          color: rgb(var(--muted)) !important;
+          opacity: 0.85 !important;
+        }
+        select option {
+          background-color: rgb(var(--surface)) !important;
+          color: rgb(var(--fg)) !important;
+        }
         .text-nav-fg { color: #e7f0f5; }
         .bg-nav-cyan { background-color: #22d3ee; }
         .text-nav-cyan { color: #22d3ee; }
