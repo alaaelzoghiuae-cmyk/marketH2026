@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   Search, ShoppingCart, User, Shield, Package, AlertTriangle, TrendingUp,
-  Layers, Users, FileText, RAotateCcw, MessageSquare, Plus, Minus, Check,
+  Layers, Users, FileText, RotateCcw, MessageSquare, Plus, Minus, Check,
   X, Edit, Printer, Database, ChevronLeft, ChevronDown, Bell, Wallet,
   CreditCard, Truck, Eye, RefreshCw, Filter, DollarSign, Percent, Tag,
   Smartphone, Cpu, Battery, Camera, Zap, CheckCircle2, Clock, Ban,
