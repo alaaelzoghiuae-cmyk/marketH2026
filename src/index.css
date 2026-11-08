@@ -2,6 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: 243 246 249;
+  --surface: 255 255 255;
+  --surface2: 233 239 244;
+  --fg: 15 27 38;
+  --muted: 86 104 121;
+  --line: 214 223 231;
+  --accent: 6 182 212;
+  --accent-ink: 4 34 42;
+  --accent-text: 14 116 144;
+  --go: 4 120 87;
+  --go-ink: 255 255 255;
+}
+
+.dark {
+  --bg: 7 12 17;
+  --surface: 15 24 32;
+  --surface2: 21 33 43;
+  --fg: 231 238 244;
+  --muted: 147 163 179;
+  --line: 34 49 64;
+  --accent: 34 211 238;
+  --accent-ink: 3 26 32;
+  --accent-text: 34 211 238;
+  --go: 16 185 129;
+  --go-ink: 3 21 15;
+}
+
+html, body {
+  min-height: 100svh;
+  margin: 0;
+  padding: 0;
+}
+
 body {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
   font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+main {
+  flex: 1;
+}
+
+/* Unified Inputs, Textareas & Select Dropdowns across Storefront & Admin Dashboard in Light & Dark Mode */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+textarea,
+select {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  border-color: rgb(var(--line));
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgb(var(--muted));
+  opacity: 0.85;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: rgb(var(--bg)) !important;
+  color: rgb(var(--fg)) !important;
+  border: 1px solid rgb(var(--line)) !important;
+  border-radius: 0.75rem !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23566879' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 0.75rem center;
+  background-size: 1rem 1rem;
+  padding-left: 2.25rem !important;
+}
+
+[dir="ltr"] select {
+  background-position: right 0.75rem center;
+  padding-left: 0.75rem !important;
+  padding-right: 2.25rem !important;
+}
+
+.dark select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+select option,
+select optgroup {
+  background-color: rgb(var(--surface));
+  color: rgb(var(--fg));
+}
+
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: rgb(var(--accent)) !important;
+  box-shadow: 0 0 0 2px rgb(var(--accent) / 0.2);
+}
+
+/* Any bar or element explicitly given a white background must always use black text */
+.bg-white,
+.bg-white input,
+.bg-white textarea,
+.bg-white select {
+  color: #0f1b26 !important;
 }
