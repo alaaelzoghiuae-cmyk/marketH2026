@@ -56,7 +56,6 @@ main {
   flex: 1;
 }
 
-/* Unified Inputs, Textareas & Select Dropdowns across Storefront & Admin Dashboard in Light & Dark Mode */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
 textarea,
 select {
@@ -110,7 +109,6 @@ select:focus {
   box-shadow: 0 0 0 2px rgb(var(--accent) / 0.2);
 }
 
-/* Any bar or element explicitly given a white background must always use black text */
 .bg-white,
 .bg-white input,
 .bg-white textarea,
