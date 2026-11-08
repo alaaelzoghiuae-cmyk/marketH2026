@@ -1612,5 +1612,29 @@ UPDATE public.clients
 SET data = data - 'ledger' - 'avatarImage'
 WHERE data IS NOT NULL AND (data ? 'ledger' OR data ? 'avatarImage');
 
+-- =================================================================================
+-- 10. دعم الروابط الخارجية المباشرة للصور (image_url) للمنتجات (4 صور) والبراندات (صورة واحدة)
+-- =================================================================================
+ALTER TABLE public.spare_parts
+  ADD COLUMN IF NOT EXISTS image_url TEXT,
+  ADD COLUMN IF NOT EXISTS image_urls JSONB DEFAULT '[]'::jsonb;
+
+ALTER TABLE public.brands
+  ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+-- نسخ أي رابط خارجي موجود حالياً في عمود image إلى عمود image_url تلقائياً
+UPDATE public.spare_parts
+SET image_url = image
+WHERE (image_url IS NULL OR image_url = '')
+  AND image IS NOT NULL
+  AND image LIKE 'http%';
+
+-- فهرس تسريع البحث والفلترة لـ 5,000 إلى 50,000+ منتج
+CREATE INDEX IF NOT EXISTS idx_spare_parts_model_category ON public.spare_parts (model_id, category);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_name_trgm ON public.spare_parts (name);
+CREATE INDEX IF NOT EXISTS idx_spare_parts_sku ON public.spare_parts (sku);
+CREATE INDEX IF NOT EXISTS idx_mobile_models_brand_name ON public.mobile_models (brand, name);
+
 -- تنبيه PostgREST لتحديث الكاش فوراً
 NOTIFY pgrst, 'reload schema';
+
