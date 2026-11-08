@@ -15,7 +15,7 @@ const Edit3 = Edit;
 
 
 // ============================================================================
-// INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS)
+// INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS) 
 // ============================================================================
 
 const INITIAL_CURRENCIES = {
