@@ -3,7 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f6f9" />
     <title>ELZOGHBI | متجر ومنصة الموبايلات وقطع الغيار والإكسسوارات</title>
+    <meta name="description" content="منصة ومتجر ELZOGHBI لقطع غيار الموبايلات الأصلية والشاشات والبطاريات والإكسسوارات بأسعار الجملة والقطاعي للمحلات ومراكز الصيانة مع شحن سريع وضمان معتمد في مصر." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://elzoghbi.market-h.com/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ELZOGHBI" />
+    <meta property="og:locale" content="ar_EG" />
+    <meta property="og:url" content="https://elzoghbi.market-h.com/" />
+    <meta property="og:title" content="ELZOGHBI | متجر ومنصة الموبايلات وقطع الغيار والإكسسوارات" />
+    <meta property="og:description" content="منصة ومتجر ELZOGHBI لقطع غيار الموبايلات الأصلية والشاشات والبطاريات والإكسسوارات بأسعار الجملة والقطاعي للمحلات ومراكز الصيانة مع شحن سريع وضمان معتمد." />
+    <meta property="og:image" content="https://elzoghbi.market-h.com/favicon.svg" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ELZOGHBI | متجر ومنصة الموبايلات وقطع الغيار والإكسسوارات" />
+    <meta name="twitter:description" content="منصة ومتجر ELZOGHBI لقطع غيار الموبايلات الأصلية والشاشات والبطاريات والإكسسوارات بأسعار الجملة والقطاعي مع شحن سريع وضمان معتمد." />
+    <meta name="twitter:image" content="https://elzoghbi.market-h.com/favicon.svg" />
+
+    <!-- Structured Data (JSON-LD Rich Snippets for Store & WebSite) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Store",
+            "@id": "https://elzoghbi.market-h.com/#store",
+            "name": "ELZOGHBI لقطع غيار الموبايلات والإكسسوارات",
+            "url": "https://elzoghbi.market-h.com/",
+            "image": "https://elzoghbi.market-h.com/favicon.svg",
+            "description": "منصة ومتجر ELZOGHBI لقطع غيار الموبايلات الأصلية والشاشات والبطاريات والإكسسوارات بأسعار الجملة والقطاعي مع شحن سريع وضمان معتمد.",
+            "priceRange": "$$",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "EG"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://elzoghbi.market-h.com/#website",
+            "url": "https://elzoghbi.market-h.com/",
+            "name": "ELZOGHBI",
+            "inLanguage": "ar",
+            "publisher": {
+              "@id": "https://elzoghbi.market-h.com/#store"
+            }
+          }
+        ]
+      }
+    </script>
+
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var isDark = saved
+            ? saved === 'dark'
+            : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (isDark) document.documentElement.classList.add('dark');
+          else document.documentElement.classList.remove('dark');
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', isDark ? '#070c11' : '#f3f6f9');
+        } catch (e) {}
+      })();
+    </script>
     <!-- Cairo Google Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,8 +79,16 @@
     <!-- html2pdf for printing invoices -->
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   </head>
-  <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-cyan-500 selection:text-white min-h-screen">
-    <div id="root"></div>
+  <body class="bg-bg text-fg font-sans antialiased selection:bg-accent selection:text-accent-ink min-h-[100svh] flex flex-col">
+    <div id="root">
+      <h1 class="sr-only">ELZOGHBI | متجر ومنصة الموبايلات وقطع الغيار والإكسسوارات الأصلية بأسعار الجملة والقطاعي</h1>
+    </div>
+    <noscript>
+      <div style="padding:2rem;text-align:center;font-family:sans-serif;">
+        <h1>ELZOGHBI | متجر ومنصة الموبايلات وقطع الغيار والإكسسوارات</h1>
+        <p>منصة متكاملة لبيع وتوزيع شاشات الموبايلات الأصلية، البطاريات، فلاتات الشحن، والإكسسوارات بأسعار الجملة والقطاعي مع ضمان معتمد وشحن سريع لجميع المحافظات.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
