@@ -15,7 +15,7 @@ const Edit3 = Edit;
 
 
 // ============================================================================
-// INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS) 
+// INITIAL MOCK DATA (REALISTIC ARABIC B2B/B2C MOBILE SPARE PARTS)
 // ============================================================================
 
 const INITIAL_CURRENCIES = {
@@ -1721,12 +1721,22 @@ export default function App() {
   };
 
   const getPartImagesList = (part) => {
+    if (!part) return [PART_IMAGES.screen];
     const catFallback = getCategoryFallbackImg(part);
-    const primary = part?.image_url || part?.imageUrl || part?.image || '';
+    const rawPrimary = String(part?.image_url || part?.imageUrl || part?.image || '').trim();
+    const primarySplit = rawPrimary.startsWith('data:')
+      ? [rawPrimary]
+      : rawPrimary.split(/[\n|]+/).map(s => s.trim()).filter(Boolean);
+    const cgpImages = Array.isArray(part?.customGroupPrices?._images) ? part.customGroupPrices._images.filter(Boolean) : [];
+    const metaImages = Array.isArray(siteSettings?.partExtraMeta?.[part.id]?.images) ? siteSettings.partExtraMeta[part.id].images.filter(Boolean) : [];
     const rawArr = Array.isArray(part?.images) && part.images.length > 0
       ? part.images.filter(Boolean)
       : (Array.isArray(part?.imageUrls) && part.imageUrls.length > 0 ? part.imageUrls.filter(Boolean) : []);
-    const combined = Array.from(new Set([primary, ...rawArr].filter(Boolean))).slice(0, 4);
+    const combined = Array.from(new Set([...primarySplit, ...rawArr, ...cgpImages, ...metaImages].map(s => String(s || '').trim()).filter(Boolean))).slice(0, 4);
+    if (combined.length > 1) {
+      const withoutDefaultSvg = combined.filter(u => u !== PART_IMAGES.screen);
+      if (withoutDefaultSvg.length > 0) return withoutDefaultSvg;
+    }
     if (combined.length === 1 && combined[0] === PART_IMAGES.screen && catFallback !== PART_IMAGES.screen) {
       return [catFallback];
     }
@@ -2532,9 +2542,29 @@ export default function App() {
       const primaryUrl = row.image_url || row.imageUrl || rawSnake.image_url || rawSnake.image || (Array.isArray(rawSnake.images) && rawSnake.images[0]) || '';
       rawSnake.image_url = primaryUrl;
       rawSnake.image = primaryUrl;
-      rawSnake.images = (Array.isArray(rawSnake.images) && rawSnake.images.length > 0 ? rawSnake.images : (primaryUrl ? [primaryUrl] : [])).slice(0, 4);
+      const cleanImgsArr = Array.from(new Set(
+        (Array.isArray(row.images) && row.images.length > 0 ? row.images : (Array.isArray(rawSnake.images) && rawSnake.images.length > 0 ? rawSnake.images : (primaryUrl ? [primaryUrl] : [])))
+          .map(u => String(u || '').trim())
+          .filter(Boolean)
+      )).slice(0, 4);
+      rawSnake.images = cleanImgsArr;
       rawSnake.is_promoted_ad = Boolean(row.isPromotedAd || rawSnake.is_promoted_ad);
-      rawSnake.custom_group_prices = (rawSnake.custom_group_prices && typeof rawSnake.custom_group_prices === 'object') ? rawSnake.custom_group_prices : {};
+      const baseCgp = (rawSnake.custom_group_prices && typeof rawSnake.custom_group_prices === 'object' && !Array.isArray(rawSnake.custom_group_prices))
+        ? { ...rawSnake.custom_group_prices }
+        : {};
+      if (cleanImgsArr.length > 0) {
+        baseCgp._images = cleanImgsArr;
+      }
+      if (row.oldPrice !== undefined) {
+        baseCgp._oldPrice = Number(row.oldPrice) || 0;
+      }
+      if (row.hidden !== undefined) {
+        baseCgp._hidden = Boolean(row.hidden);
+      }
+      if (row.isPromotedAd !== undefined) {
+        baseCgp._isPromotedAd = Boolean(row.isPromotedAd);
+      }
+      rawSnake.custom_group_prices = baseCgp;
       rawSnake.stock = Number(rawSnake.stock) || 0;
       rawSnake.low_stock_threshold = Number(rawSnake.low_stock_threshold) || 5;
       rawSnake.max_order_qty = Number(rawSnake.max_order_qty) || 10;
@@ -2666,14 +2696,30 @@ export default function App() {
     if (out.ownerName && !out.owner) out.owner = out.ownerName;
     if (out.owner && !out.ownerName) out.ownerName = out.owner;
     if (out.desc_text && !out.desc) out.desc = out.desc_text;
+    const cgpObj = (out.customGroupPrices && typeof out.customGroupPrices === 'object') ? out.customGroupPrices : {};
+    if (Array.isArray(cgpObj._images) && cgpObj._images.length > 0 && (!Array.isArray(out.images) || out.images.length <= 1)) {
+      out.images = cgpObj._images.filter(Boolean).slice(0, 4);
+    }
+    if (cgpObj._oldPrice !== undefined && out.oldPrice === undefined) {
+      out.oldPrice = Number(cgpObj._oldPrice) || 0;
+    }
+    if (cgpObj._hidden !== undefined && out.hidden === undefined) {
+      out.hidden = Boolean(cgpObj._hidden);
+    }
+    if (cgpObj._isPromotedAd !== undefined && out.isPromotedAd === undefined) {
+      out.isPromotedAd = Boolean(cgpObj._isPromotedAd);
+    }
     const resolvedImgUrl = row.image_url || out.image_url || out.imageUrl || out.image || (Array.isArray(out.images) && out.images[0]) || '';
     if (resolvedImgUrl) {
       out.image_url = resolvedImgUrl;
       out.imageUrl = resolvedImgUrl;
       if (!out.image) out.image = resolvedImgUrl;
     }
-    if (Array.isArray(out.images) && out.images.length === 0 && out.image) {
+    if ((!Array.isArray(out.images) || out.images.length === 0) && out.image) {
       out.images = [out.image];
+    }
+    if (Array.isArray(out.images) && out.images.length > 0 && out.image && !out.images.includes(out.image)) {
+      out.images = [out.image, ...out.images].slice(0, 4);
     }
     if (Array.isArray(out.images) && out.images.length > 4) {
       out.images = out.images.slice(0, 4);
@@ -2826,9 +2872,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v21_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v22_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v21_old_products_priority') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v22_storefront_master_controls') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -2841,7 +2887,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v21_old_products_priority');
+      window.localStorage.setItem('elzoghbi_app_version', 'v22_storefront_master_controls');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -3199,10 +3245,19 @@ export default function App() {
           const detail = toCamelCaseRow(rows[0]);
           incomingSyncUntilRef.current = Date.now() + 800;
           isIncomingSyncRef.current = true;
-          setParts(prev => prev.map(p => (String(p.id) === String(partId) ? { ...p, ...detail } : p)));
+          setParts(prev => prev.map(p => {
+            if (String(p.id) !== String(partId)) return p;
+            const bestImages = (Array.isArray(detail.images) && detail.images.length > 1)
+              ? detail.images
+              : (Array.isArray(p.images) && p.images.length > 1 ? p.images : (detail.images || p.images));
+            return { ...p, ...detail, images: bestImages };
+          }));
           setSelectedDetailItem(prev => {
             if (prev && prev.part && String(prev.part.id) === String(partId)) {
-              return { ...prev, part: { ...prev.part, ...detail } };
+              const bestImages = (Array.isArray(detail.images) && detail.images.length > 1)
+                ? detail.images
+                : (Array.isArray(prev.part.images) && prev.part.images.length > 1 ? prev.part.images : (detail.images || prev.part.images));
+              return { ...prev, part: { ...prev.part, ...detail, images: bestImages } };
             }
             return prev;
           });
@@ -4914,9 +4969,30 @@ export default function App() {
     const curr = currencies[groupObj.currency] || currencies.EGP;
     const displayPrice = Number((baseEgpPrice * curr.rateFromBase).toFixed(curr.code === 'EGP' ? 0 : 2));
 
+    // Old Price (سعر قبل الخصم) calculation — only shown when > basePrice and > 0
+    const rawOldBase = Number(
+      part?.oldPrice ||
+      part?.customGroupPrices?._oldPrice ||
+      siteSettings?.partExtraMeta?.[part?.id]?.oldPrice ||
+      0
+    );
+    const hasValidOldPrice = rawOldBase > 0 && rawOldBase > (Number(part?.basePrice) || 0) && rawOldBase > baseEgpPrice;
+    const priceRatio = (Number(part?.basePrice) || 0) > 0 ? (baseEgpPrice / Number(part.basePrice)) : 1;
+    const effectiveOldEgp = hasValidOldPrice ? Math.round(rawOldBase * Math.max(1, priceRatio)) : 0;
+    const displayOldPrice = hasValidOldPrice
+      ? Number((effectiveOldEgp * curr.rateFromBase).toFixed(curr.code === 'EGP' ? 0 : 2))
+      : 0;
+    const discountPercent = (hasValidOldPrice && displayOldPrice > displayPrice)
+      ? Math.max(1, Math.min(95, Math.round(((displayOldPrice - displayPrice) / displayOldPrice) * 100)))
+      : 0;
+
     return {
       baseEgpPrice,
       displayPrice,
+      oldBaseEgpPrice: rawOldBase,
+      displayOldPrice,
+      discountPercent,
+      hasDiscount: discountPercent > 0 && displayOldPrice > displayPrice,
       currencySymbol: curr.symbol,
       currencyCode: curr.code,
       isBelowCost,
@@ -5014,22 +5090,177 @@ export default function App() {
     showToast('سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.', 'success');
   };
 
-  // --- Filtered Parts for Storefront (Bilingual + Aliases + Cross-Compatibility) ---
-  // أكتر الأقسام طلباً: من التصنيفات اللي فيها بضاعة متاحة فعلاً
-  const getTopCategories = (limit = 8) => {
-    const sold = {};
-    orders.forEach(o => (o.items || []).forEach(it => { sold[it.sku] = (sold[it.sku] || 0) + (it.qty || 0); }));
-    const stats = {};
-    parts.forEach(pt => {
-      if (!pt.category || pt.stock <= 0 || pt.soldOut) return;
-      const pr = calculatePartPrice(pt, currentGroup);
-      if (pr.baseEgpPrice <= 0) return;
-      
-      const st = stats[pt.category] || (stats[pt.category] = { cat: pt.category, count: 0, sold: 0 });
-      st.count += 1;
-      st.sold += sold[pt.sku] || 0;
+  // --- Instant Cloud Settings Persistence Helper for Visibility, Layout & Storefront Controls ---
+  const saveSiteSettingsImmediate = (updater) => {
+    setSiteSettings(prev => {
+      const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      try {
+        window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(next));
+        window.localStorage.setItem('elzoghbi_cache_bust_ts', String(Date.now()));
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (isValid) {
+          fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
+            method: 'POST',
+            headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+            body: JSON.stringify([{
+              id: 'main',
+              settings: next,
+              credentials: adminCredentials,
+              currencies,
+              notifications,
+              updated_at: new Date().toISOString()
+            }])
+          }).catch(() => {});
+        }
+      } catch (e) {}
+      return next;
     });
-    return Object.values(stats).sort((x, y) => y.sold - x.sold || y.count - x.count).slice(0, limit);
+  };
+
+  // --- Visibility Helpers: Hide/Show Brand, Model, Product, or Category from ALL Customer Storefront Surfaces ---
+  const hiddenBrandsSet = useMemo(
+    () => new Set((Array.isArray(siteSettings.hiddenBrands) ? siteSettings.hiddenBrands : []).map(b => String(b || '').trim().toLowerCase()).filter(Boolean)),
+    [siteSettings.hiddenBrands]
+  );
+  const hiddenModelIdsSet = useMemo(
+    () => new Set((Array.isArray(siteSettings.hiddenModelIds) ? siteSettings.hiddenModelIds : []).map(id => String(id || '').trim()).filter(Boolean)),
+    [siteSettings.hiddenModelIds]
+  );
+  const hiddenPartIdsSet = useMemo(
+    () => new Set((Array.isArray(siteSettings.hiddenPartIds) ? siteSettings.hiddenPartIds : []).map(id => String(id || '').trim()).filter(Boolean)),
+    [siteSettings.hiddenPartIds]
+  );
+  const hiddenCategoriesSet = useMemo(
+    () => new Set((Array.isArray(siteSettings.hiddenCategories) ? siteSettings.hiddenCategories : []).map(c => String(c || '').trim().toLowerCase()).filter(Boolean)),
+    [siteSettings.hiddenCategories]
+  );
+
+  const isBrandHidden = (brandName) => {
+    if (!brandName) return false;
+    return hiddenBrandsSet.has(String(brandName).trim().toLowerCase());
+  };
+
+  const isModelHidden = (modelObjOrId) => {
+    if (!modelObjOrId) return false;
+    if (typeof modelObjOrId === 'object') {
+      if (modelObjOrId.hidden) return true;
+      if (hiddenModelIdsSet.has(String(modelObjOrId.id || '').trim())) return true;
+      if (modelObjOrId.brand && isBrandHidden(modelObjOrId.brand)) return true;
+      return false;
+    }
+    const mid = String(modelObjOrId).trim();
+    if (hiddenModelIdsSet.has(mid)) return true;
+    const mObj = models.find(m => String(m.id).trim() === mid);
+    if (mObj && (mObj.hidden || isBrandHidden(mObj.brand))) return true;
+    return false;
+  };
+
+  const isCategoryHidden = (catName) => {
+    if (!catName) return false;
+    return hiddenCategoriesSet.has(String(catName).trim().toLowerCase());
+  };
+
+  const toggleHideBrand = (brandName, e) => {
+    if (e) e.stopPropagation();
+    const cleanB = String(brandName || '').trim();
+    if (!cleanB) return;
+    const currentlyHidden = isBrandHidden(cleanB);
+    saveSiteSettingsImmediate(prev => {
+      const list = Array.isArray(prev.hiddenBrands) ? [...prev.hiddenBrands] : [];
+      const nextList = currentlyHidden
+        ? list.filter(x => String(x || '').trim().toLowerCase() !== cleanB.toLowerCase())
+        : Array.from(new Set([...list, cleanB]));
+      return { ...prev, hiddenBrands: nextList };
+    });
+    if (!currentlyHidden && selectedBrand === cleanB) {
+      setSelectedBrand('ALL');
+      setSelectedModelId('ALL');
+    }
+    showToast(
+      currentlyHidden
+        ? `👁️ تم إظهار براند "${cleanB}" وجميع موديلاته ومنتجاته في واجهة العميل ✓`
+        : `🚫 تم إخفاء براند "${cleanB}" وجميع موديلاته ومنتجاته بالكامل من واجهة العميل والـ Popup ✓`,
+      'info'
+    );
+  };
+
+  const toggleHideModel = (modelObj, e) => {
+    if (e) e.stopPropagation();
+    if (!modelObj || !modelObj.id) return;
+    const mid = String(modelObj.id).trim();
+    const currentlyHidden = hiddenModelIdsSet.has(mid) || !!modelObj.hidden;
+    setModels(prev => prev.map(m => (String(m.id) === mid ? { ...m, hidden: !currentlyHidden } : m)));
+    saveSiteSettingsImmediate(prev => {
+      const list = Array.isArray(prev.hiddenModelIds) ? [...prev.hiddenModelIds] : [];
+      const nextList = currentlyHidden
+        ? list.filter(x => String(x || '').trim() !== mid)
+        : Array.from(new Set([...list, mid]));
+      return { ...prev, hiddenModelIds: nextList };
+    });
+    if (!currentlyHidden && String(selectedModelId) === mid) {
+      setSelectedModelId('ALL');
+    }
+    showToast(
+      currentlyHidden
+        ? `👁️ تم إظهار موديل "${modelObj.name}" ومنتجاته في واجهة العميل ✓`
+        : `🚫 تم إخفاء موديل "${modelObj.name}" ومنتجاته بالكامل من واجهة العميل والـ Popup ✓`,
+      'info'
+    );
+  };
+
+  const toggleHidePart = (partObj, e) => {
+    if (e) e.stopPropagation();
+    if (!partObj || !partObj.id) return;
+    const pid = String(partObj.id).trim();
+    const currentlyHidden = hiddenPartIdsSet.has(pid) || !!partObj.hidden || !!partObj.customGroupPrices?._hidden;
+    const nextHidden = !currentlyHidden;
+    setParts(prev =>
+      prev.map(p =>
+        String(p.id) === pid
+          ? {
+              ...p,
+              hidden: nextHidden,
+              customGroupPrices: { ...(p.customGroupPrices || {}), _hidden: nextHidden }
+            }
+          : p
+      )
+    );
+    saveSiteSettingsImmediate(prev => {
+      const list = Array.isArray(prev.hiddenPartIds) ? [...prev.hiddenPartIds] : [];
+      const nextList = currentlyHidden
+        ? list.filter(x => String(x || '').trim() !== pid)
+        : Array.from(new Set([...list, pid]));
+      return { ...prev, hiddenPartIds: nextList };
+    });
+    showToast(
+      currentlyHidden
+        ? `👁️ تم إظهار المنتج "${partObj.name}" في واجهة العميل ✓`
+        : `🚫 تم إخفاء المنتج "${partObj.name}" من واجهة العميل ✓`,
+      'info'
+    );
+  };
+
+  const toggleHideCategory = (catName, e) => {
+    if (e) e.stopPropagation();
+    const cleanCat = String(catName || '').trim();
+    if (!cleanCat) return;
+    const currentlyHidden = isCategoryHidden(cleanCat);
+    saveSiteSettingsImmediate(prev => {
+      const list = Array.isArray(prev.hiddenCategories) ? [...prev.hiddenCategories] : [];
+      const nextList = currentlyHidden
+        ? list.filter(x => String(x || '').trim().toLowerCase() !== cleanCat.toLowerCase())
+        : Array.from(new Set([...list, cleanCat]));
+      return { ...prev, hiddenCategories: nextList };
+    });
+    if (!currentlyHidden && selectedCategory === cleanCat) {
+      setSelectedCategory('ALL');
+    }
+    showToast(
+      currentlyHidden
+        ? `👁️ تم إظهار تصنيف "${cleanCat}" في واجهة العميل والبحث ✓`
+        : `🚫 تم إخفاء تصنيف "${cleanCat}" من واجهة العميل والبحث ✓`,
+      'info'
+    );
   };
   const categoryEmoji = cat => {
     if (/شاش/.test(cat)) return '📱';
@@ -5074,9 +5305,44 @@ export default function App() {
     return modelByIdMap.get(rawMid) || modelByIdMap.get(rawMid.toLowerCase());
   };
 
-  const { partCountByModelIdMap, partCountByBrandMap } = useMemo(() => {
+  const isPartHidden = (part) => {
+    if (!part) return true;
+    if (part.hidden || part.customGroupPrices?._hidden) return true;
+    if (hiddenPartIdsSet.has(String(part.id || '').trim())) return true;
+    if (part.category && isCategoryHidden(part.category)) return true;
+    if (siteSettings.hideOutOfStockInStore && (Number(part.stock) <= 0 || part.soldOut)) return true;
+    const mObj = resolvePartModelObj(part);
+    if (mObj) {
+      if (mObj.hidden || hiddenModelIdsSet.has(String(mObj.id || '').trim())) return true;
+      if (mObj.brand && isBrandHidden(mObj.brand)) return true;
+    } else if (part.modelId && hiddenModelIdsSet.has(String(part.modelId).trim())) {
+      return true;
+    }
+    if (part.brand && isBrandHidden(part.brand)) return true;
+    return false;
+  };
+
+  // Public (Customer-Visible) Brands, Models & Parts (Excludes any hidden Brand, Model, Product, or Category!)
+  const publicBrands = useMemo(
+    () => brands.filter(b => !isBrandHidden(b)),
+    [brands, hiddenBrandsSet]
+  );
+
+  const publicModels = useMemo(
+    () => models.filter(m => !isModelHidden(m)),
+    [models, hiddenBrandsSet, hiddenModelIdsSet]
+  );
+
+  const publicParts = useMemo(
+    () => parts.filter(p => !isPartHidden(p)),
+    [parts, models, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore]
+  );
+
+  const { partCountByModelIdMap, partCountByBrandMap, publicPartCountByModelIdMap, publicPartCountByBrandMap } = useMemo(() => {
     const byModel = new Map();
     const byBrand = new Map();
+    const pubByModel = new Map();
+    const pubByBrand = new Map();
     for (let i = 0; i < parts.length; i++) {
       const p = parts[i];
       if (!p) continue;
@@ -5085,9 +5351,47 @@ export default function App() {
       byModel.set(canonicalMid, (byModel.get(canonicalMid) || 0) + 1);
       const bName = mObj?.brand || p.brand;
       if (bName) byBrand.set(bName, (byBrand.get(bName) || 0) + 1);
+      if (!isPartHidden(p)) {
+        pubByModel.set(canonicalMid, (pubByModel.get(canonicalMid) || 0) + 1);
+        if (bName) pubByBrand.set(bName, (pubByBrand.get(bName) || 0) + 1);
+      }
     }
-    return { partCountByModelIdMap: byModel, partCountByBrandMap: byBrand };
-  }, [parts, modelByIdMap]);
+    return {
+      partCountByModelIdMap: byModel,
+      partCountByBrandMap: byBrand,
+      publicPartCountByModelIdMap: pubByModel,
+      publicPartCountByBrandMap: pubByBrand
+    };
+  }, [parts, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore]);
+
+  // أكتر الأقسام طلباً: يدعم التثبيت اليدوي من الداشبورد + الحساب التلقائي من المنتجات الظاهرة للعميل فقط
+  const getTopCategories = (limit = 10) => {
+    const sold = {};
+    orders.forEach(o => (o.items || []).forEach(it => { sold[it.sku] = (sold[it.sku] || 0) + (it.qty || 0); }));
+    const stats = {};
+    const customCatList = Array.isArray(siteSettings.customCategories) ? siteSettings.customCategories : [];
+    customCatList.forEach(cc => {
+      const cleanC = String(cc || '').trim();
+      if (cleanC && !isCategoryHidden(cleanC)) {
+        stats[cleanC] = { cat: cleanC, count: 0, sold: 0, pinned: true };
+      }
+    });
+    const pinnedSet = new Set((Array.isArray(siteSettings.pinnedCategories) ? siteSettings.pinnedCategories : []).map(c => String(c || '').trim()));
+    publicParts.forEach(pt => {
+      if (!pt.category) return;
+      if (isCategoryHidden(pt.category)) return;
+      const pr = calculatePartPrice(pt, currentGroup);
+      if (pr.baseEgpPrice <= 0) return;
+      const st = stats[pt.category] || (stats[pt.category] = { cat: pt.category, count: 0, sold: 0, pinned: pinnedSet.has(pt.category) });
+      if (pinnedSet.has(pt.category)) st.pinned = true;
+      st.count += 1;
+      st.sold += sold[pt.sku] || 0;
+    });
+    return Object.values(stats)
+      .filter(st => st.count > 0 || st.pinned)
+      .sort((x, y) => (y.pinned ? 1 : 0) - (x.pinned ? 1 : 0) || y.sold - x.sold || y.count - x.count)
+      .slice(0, limit);
+  };
 
   const parsedSearchWords = useMemo(() => {
     const q = deferredSearchQuery.trim().toLowerCase();
@@ -5101,6 +5405,7 @@ export default function App() {
 
   const partPassesStoreFilters = (part, ignoreCategory = false) => {
     if (!part) return false;
+    if (isPartHidden(part)) return false;
 
     const modelObj = resolvePartModelObj(part);
     const canonicalMid = modelObj ? String(modelObj.id) : String(part.modelId || '').trim();
@@ -5164,7 +5469,7 @@ export default function App() {
       if (aCustom !== bCustom) return bCustom - aCustom;
       return (b.createdAt || '').localeCompare(a.createdAt || '');
     });
-  }, [parts, modelByIdMap, selectedBrand, selectedModelId, selectedTargetModelName, selectedCategory, parsedSearchWords, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup]);
+  }, [parts, modelByIdMap, selectedBrand, selectedModelId, selectedTargetModelName, selectedCategory, parsedSearchWords, storeStockFilter, storeQualityFilter, storeSortBy, currentGroup, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore]);
 
 
 
@@ -5915,20 +6220,30 @@ export default function App() {
         }`}
       >
         <div>
-          {/* Clickable Image & Top Badges (Stock Badge bottom-right, Share moved to category row!) */}
+          {/* Clickable Image & Top Badges (Supports Multi-Image Swipe, Arrows, Dots & Discount Badge!) */}
           <div
-            onClick={() => setSelectedDetailItem({ type: 'part', part })}
+            {...(imagesList.length > 1
+              ? swipeProps(
+                  () => setCardImageIdx(prev => ({ ...prev, [part.id]: ((prev[part.id] || 0) + 1) % imagesList.length })),
+                  () => setCardImageIdx(prev => ({ ...prev, [part.id]: ((prev[part.id] || 0) - 1 + imagesList.length) % imagesList.length }))
+                )
+              : {})}
+            onClick={() => {
+              if (swipeSuppressRef.current) return;
+              setDetailImageIdx(currentImgIdx);
+              setSelectedDetailItem({ type: 'part', part });
+            }}
             className="hm-card-img relative h-48 bg-surface2 border-b border-line overflow-hidden cursor-pointer select-none"
           >
             <BlurFitImage
-              key={`${part.id}_${siteSettings.productImageFit || part.imageFit || 'contain'}`}
+              key={`${part.id}_${currentImgIdx}_${siteSettings.productImageFit || part.imageFit || 'contain'}`}
               src={currentDisplayImg}
               alt={part.name}
               fit={siteSettings.productImageFit || part.imageFit || 'contain'}
               imgClassName="group-hover:scale-105 transition duration-500"
             />
 
-            {/* Left & Right Arrows if part has more than 1 image */}
+            {/* Left & Right Arrows + Dots if part has more than 1 image */}
             {imagesList.length > 1 && (
               <>
                 <button
@@ -5940,7 +6255,7 @@ export default function App() {
                       [part.id]: ((prev[part.id] || 0) - 1 + imagesList.length) % imagesList.length
                     }));
                   }}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-nav/80 hover:bg-accent text-nav-fg hover:text-accent-ink flex items-center justify-center text-sm font-extrabold z-10 transition border border-navline"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-nav/85 hover:bg-accent text-nav-fg hover:text-accent-ink flex items-center justify-center text-sm font-extrabold z-10 transition border border-navline shadow"
                   title="الصورة السابقة"
                 >
                   ‹
@@ -5954,18 +6269,23 @@ export default function App() {
                       [part.id]: ((prev[part.id] || 0) + 1) % imagesList.length
                     }));
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-nav/80 hover:bg-accent text-nav-fg hover:text-accent-ink flex items-center justify-center text-sm font-extrabold z-10 transition border border-navline"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-nav/85 hover:bg-accent text-nav-fg hover:text-accent-ink flex items-center justify-center text-sm font-extrabold z-10 transition border border-navline shadow"
                   title="الصورة التالية"
                 >
                   ›
                 </button>
-                <div className="absolute bottom-2.5 left-2.5 bg-nav/85 px-2.5 py-0.5 rounded-full text-[10px] text-nav-fg font-mono font-bold z-10 border border-navline">
-                  {currentImgIdx + 1} / {imagesList.length}
+                <div className="absolute bottom-2.5 left-2.5 bg-nav/90 px-2 py-0.5 rounded-full text-[10px] text-nav-fg font-mono font-bold z-10 border border-navline flex items-center gap-1">
+                  <span>{currentImgIdx + 1}/{imagesList.length}</span>
                 </div>
               </>
             )}
 
             <div className="absolute top-2.5 right-2.5 flex flex-wrap gap-1.5 z-10">
+              {priceInfo.hasDiscount && (
+                <span className="px-2.5 py-1 rounded-xl bg-rose-600 text-white text-[11px] font-black shadow-sm flex items-center gap-1">
+                  <span>🔥 خصم {priceInfo.discountPercent}%</span>
+                </span>
+              )}
               <span className="px-2.5 py-1 rounded-xl bg-nav/90 text-nav-fg text-[11px] font-bold border border-navline">
                 <Bidi text={part.qualityGrade} />
               </span>
@@ -6102,12 +6422,26 @@ export default function App() {
         {/* Price & Direct Quantity Controller Footer (surface2 + border-top line) */}
         <div className="hm-card-foot p-4 pt-3 border-t border-line bg-surface2 flex items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] text-muted font-bold">سعر الوحدة</div>
-            <div className="text-lg font-extrabold text-fg">
-              {priceInfo.displayPrice.toLocaleString()}{' '}
-              <span className="text-xs font-extrabold text-accent-text">
-                {priceInfo.currencySymbol}
-              </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-muted font-bold">سعر الوحدة</span>
+              {priceInfo.hasDiscount && (
+                <span className="px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-600 dark:text-rose-400 text-[9px] font-black">
+                  -{priceInfo.discountPercent}%
+                </span>
+              )}
+            </div>
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <div className="text-lg font-extrabold text-fg">
+                {priceInfo.displayPrice.toLocaleString()}{' '}
+                <span className="text-xs font-extrabold text-accent-text">
+                  {priceInfo.currencySymbol}
+                </span>
+              </div>
+              {priceInfo.hasDiscount && (
+                <span className="text-xs font-bold font-mono text-muted line-through decoration-rose-500 decoration-2">
+                  {priceInfo.displayOldPrice.toLocaleString()} {priceInfo.currencySymbol}
+                </span>
+              )}
             </div>
           </div>
 
@@ -6210,34 +6544,34 @@ export default function App() {
         style={headerFullH ? { height: headerFullH } : undefined}
       >
       <div ref={headerInnerRef} className="pointer-events-auto bg-nav text-nav-fg border-b border-navline shadow-lg">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2">
-          {/* Brand */}
-          <div onClick={() => setClientTab('home')} className="flex items-center gap-2.5 cursor-pointer min-w-0">
+        <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-1.5 sm:gap-2">
+          {/* Brand — Always shows full ELZOGHBI name clearly on mobile & desktop without clipping! */}
+          <div onClick={() => setClientTab('home')} className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer shrink-0">
             <img
               src={ELZOGHBI_LOGO}
               alt="Logo"
-              className="w-11 h-11 rounded-xl object-cover border border-navline shadow shrink-0"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover border border-navline shadow shrink-0"
             />
-            <div className="min-w-0 hidden min-[420px]:block">
-              <h1 className="text-base sm:text-xl font-black tracking-wide text-nav-cyan truncate">
+            <div className="shrink-0">
+              <h1 className="text-[13px] min-[375px]:text-sm sm:text-xl font-black tracking-wider text-nav-cyan whitespace-nowrap leading-tight">
                 {siteSettings.storeName || 'ELZOGHBI'}
               </h1>
-              <p className="text-[11px] text-nav-fg/75 truncate hidden md:block">
+              <p className="text-[9px] sm:text-[11px] text-nav-fg/75 truncate hidden md:block">
                 {siteSettings.storeSubtitle || siteSettings.storeTagline}
               </p>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Actions — Compact on mobile so ELZOGHBI never gets squeezed */}
           <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
             {headerCompact && (
               <button
                 type="button"
                 onClick={() => setClientTab('search')}
-                className="w-[54px] h-12 rounded-xl bg-nav-cyan text-nav-cyan-ink flex flex-col items-center justify-center gap-0.5 font-extrabold"
+                className="w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl bg-nav-cyan text-nav-cyan-ink flex flex-col items-center justify-center gap-0.5 font-extrabold"
               >
-                <Search className="w-5 h-5" />
-                <span className="text-[10px]">تصفّح</span>
+                <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-[9px] sm:text-[10px]">تصفّح</span>
               </button>
             )}
             <div className="hidden xl:flex items-center pl-2 ml-1 border-l border-navline">
@@ -6248,21 +6582,21 @@ export default function App() {
             <button
               type="button"
               onClick={toggleUiTheme}
-              className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
+              className="w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
               title={uiTheme === 'dark' ? 'التبديل للوضع الفاتح' : 'التبديل للوضع الدارك'}
             >
-              <span className="text-base leading-none">{uiTheme === 'dark' ? '☀️' : '🌙'}</span>
-              <span className="text-[10px] font-bold text-nav-fg">{uiTheme === 'dark' ? 'فاتح' : 'دارك'}</span>
+              <span className="text-sm sm:text-base leading-none">{uiTheme === 'dark' ? '☀️' : '🌙'}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-nav-fg">{uiTheme === 'dark' ? 'فاتح' : 'دارك'}</span>
             </button>
 
             <button
               type="button"
               onClick={() => changeLang(lang === 'en' ? 'ar' : 'en')}
-              className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
+              className="w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
               title="Language / اللغة"
             >
-              <Globe className="w-5 h-5" />
-              <span className="text-[10px] font-bold text-nav-fg">{lang === 'en' ? 'عربي' : 'English'}</span>
+              <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-[9px] sm:text-[10px] font-bold text-nav-fg">{lang === 'en' ? 'عربي' : 'English'}</span>
             </button>
 
             {currentClient ? (
@@ -6275,7 +6609,7 @@ export default function App() {
                         prev.map(n => (n.target === currentClient.id ? { ...n, read: true } : n))
                       );
                     }}
-                    className="relative w-[54px] h-12 rounded-xl bg-nav2 hover:bg-navline text-nav-cyan border border-navline transition flex flex-col items-center justify-center gap-0.5"
+                    className="relative w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl bg-nav2 hover:bg-navline text-nav-cyan border border-navline transition flex flex-col items-center justify-center gap-0.5"
                     title="إشعارات الطلبات"
                   >
                     <Bell className="w-5 h-5" />
@@ -6339,7 +6673,7 @@ export default function App() {
                     setClientTab('account');
                     setAccountSubTab('profile');
                   }}
-                  className={`w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition border ${
+                  className={`w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition border ${
                     clientTab === 'account' && accountSubTab === 'profile'
                       ? 'border-nav-cyan bg-nav-cyan text-nav-cyan-ink'
                       : 'border-navline bg-nav2 hover:bg-navline text-nav-fg'
@@ -6370,7 +6704,7 @@ export default function App() {
                     setAuthModalTab('login');
                     setLoginModalOpen(true);
                   }}
-                  className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
+                  className="w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav2 hover:bg-navline text-nav-cyan border border-navline"
                 >
                   <Lock className="w-5 h-5" />
                   <span className="text-[10px] font-bold text-nav-fg">دخول</span>
@@ -6380,7 +6714,7 @@ export default function App() {
                     setAuthModalTab('register');
                     setLoginModalOpen(true);
                   }}
-                  className="w-[54px] h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav-cyan hover:opacity-95 text-nav-cyan-ink font-extrabold"
+                  className="w-11 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition bg-nav-cyan hover:opacity-95 text-nav-cyan-ink font-extrabold"
                 >
                   <User className="w-5 h-5" />
                   <span className="text-[10px] font-extrabold">حساب جديد</span>
@@ -6390,7 +6724,7 @@ export default function App() {
 
             <button
               onClick={() => setCartDrawerOpen(true)}
-              className="relative min-w-[58px] h-12 px-2 rounded-xl bg-nav-cart hover:opacity-95 text-nav-cart-ink transition flex flex-col items-center justify-center gap-0.5 font-extrabold"
+              className="relative min-w-[44px] sm:min-w-[58px] h-10 sm:h-12 px-1.5 sm:px-2 rounded-xl bg-nav-cart hover:opacity-95 text-nav-cart-ink transition flex flex-col items-center justify-center gap-0.5 font-extrabold"
             >
               <ShoppingCart className="w-5 h-5" />
               <span className="text-[10px] font-extrabold">
@@ -6431,7 +6765,7 @@ export default function App() {
               }`}
             >
               <Search className="w-4 h-4" />
-              <span>تصفّح المنتجات ({parts.length})</span>
+              <span>تصفّح المنتجات ({publicParts.length})</span>
             </button>
 
             {currentClient && (
@@ -6527,8 +6861,21 @@ export default function App() {
           </div>
         )}
         {tickerOn && (
-          <div style={{ backgroundColor: '#be123c', color: '#ffffff' }} className="px-4 py-2 text-xs sm:text-sm font-extrabold text-center">
-            <Bidi text={tickerItems} />
+          <div
+            style={{ backgroundColor: siteSettings.tickerBgColor || '#be123c', color: '#ffffff' }}
+            className="hm-ticker-wrap relative overflow-hidden py-2 text-xs sm:text-sm font-extrabold select-none border-b border-white/10"
+          >
+            <div
+              className="hm-ticker-track flex items-center whitespace-nowrap w-max"
+              style={{ animationDuration: `${Number(siteSettings.tickerSpeedSeconds) || 26}s` }}
+            >
+              {[0, 1, 2, 3].map(repIdx => (
+                <span key={repIdx} className="inline-flex items-center px-6 gap-4">
+                  <span>📢 <Bidi text={tickerItems} /></span>
+                  <span className="opacity-60">✦</span>
+                </span>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -6704,9 +7051,10 @@ export default function App() {
           );
         })()}
 
-        {renderSourcingBanner()}
+        {siteSettings.showHomeSourcing !== false && renderSourcingBanner()}
 
-        {/* Search Block (Step 3.6: surface background, accent border, accent search button in both modes) */}
+        {/* Search Block (Controllable from Admin Storefront CMS) */}
+        {siteSettings.showHomeSearchBox !== false && (
         <div className="bg-surface rounded-2xl p-5 sm:p-6 text-fg border-2 border-accent shadow-sm dark:shadow-none space-y-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1.5">
@@ -6716,10 +7064,10 @@ export default function App() {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
               </div>
               <h2 className="text-lg sm:text-2xl font-black text-fg tracking-wide">
-                دوّر على أي منتج أو إكسسوار أو موديل موبايل
+                {siteSettings.homeSearchTitle || 'دوّر على أي منتج أو إكسسوار أو موديل موبايل'}
               </h2>
               <p className="text-xs text-muted">
-                أكثر من <span className="font-bold text-accent-text font-mono">{parts.length}</span> صنف وموديل متوفر في المخزن وجاهز يتشحن على طول
+                أكثر من <span className="font-bold text-accent-text font-mono">{publicParts.length}</span> صنف وموديل متوفر في المخزن وجاهز يتشحن على طول
               </p>
             </div>
 
@@ -6731,7 +7079,7 @@ export default function App() {
                 <Search className="w-5 h-5 stroke-[2.5]" />
               </div>
               <span className="text-xs sm:text-sm text-muted font-bold px-3 flex-1 select-none">
-                دوس هنا للبحث والفلترة...
+                {siteSettings.homeSearchPlaceholder || 'دوس هنا للبحث والفلترة...'}
               </span>
               <button
                 type="button"
@@ -6742,16 +7090,17 @@ export default function App() {
             </div>
           </div>
         </div>
+        )}
 
-        {/* Top Categories (Step 3.7: horizontal scroll, flex-none items, no orphan wrapping) */}
-        {(() => {
-          const tops = getTopCategories();
+        {/* Top Categories (Controllable from Admin Storefront CMS) */}
+        {siteSettings.showHomeTopCategories !== false && (() => {
+          const tops = getTopCategories(Number(siteSettings.homeTopCategoriesLimit) || 10);
           if (tops.length === 0) return null;
           return (
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-base sm:text-lg font-extrabold text-fg flex items-center gap-2">
-                  <span>🔥</span> الأقسام الأكتر طلباً
+                  <span>🔥</span> {siteSettings.homeTopCategoriesTitle || 'الأقسام الأكتر طلباً'}
                 </h3>
                 <button
                   type="button"
@@ -6780,7 +7129,7 @@ export default function App() {
                     <span className="px-2.5 py-0.5 rounded-full bg-accent/15 text-accent-text border border-accent/30 text-[10px] font-extrabold whitespace-nowrap">
                       {t.count} منتج
                     </span>
-                    {i < 3 && t.sold > 0 && (
+                    {(t.pinned || (i < 3 && t.sold > 0)) && (
                       <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold whitespace-nowrap" style={{ backgroundColor: '#fbbf24', color: '#2b1d00' }}>الأكتر طلباً</span>
                     )}
                   </button>
@@ -6790,8 +7139,8 @@ export default function App() {
           );
         })()}
 
-        {/* Active Promos Strip (Step 3.8: w-fit, dashed border, chips in accent-soft) */}
-        {activePromos.length > 0 && (
+        {/* Active Promos Strip (Controllable from Admin Storefront CMS) */}
+        {siteSettings.showHomePromos !== false && activePromos.length > 0 && (
           <div className="w-fit max-w-full bg-surface rounded-2xl px-4 py-2.5 border-2 border-dashed border-accent flex items-center gap-2 flex-wrap">
             <span className="text-xs font-extrabold text-fg flex items-center gap-1.5">
               <Tag className="w-3.5 h-3.5 text-accent-text" />
@@ -6813,14 +7162,14 @@ export default function App() {
           </div>
         )}
 
-        {/* Horizontal Strip View: Brands & Models (Step 3.7: flex-none overflow-x-auto) */}
+        {/* Horizontal Strip View: Brands & Models (Excludes any hidden Brand or Model!) */}
         {siteSettings.showHomeModels !== false && (
         <div className="bg-surface rounded-2xl p-4 sm:p-5 border border-line shadow-sm dark:shadow-none space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h3 className="text-sm sm:text-base font-extrabold text-fg flex items-center gap-2">
                 <Smartphone className="w-5 h-5 text-accent-text" />
-                <span>تصفّح سريع هرمي: اختر البراند ← اختر الجهاز (الموديل) ← اعرض القطع</span>
+                <span>{siteSettings.homeModelsTitle || 'تصفّح سريع هرمي: اختر البراند ← اختر الجهاز (الموديل) ← اعرض القطع'}</span>
               </h3>
               <p className="text-xs text-muted">
                 اضغط على الماركة لإظهار شريط الموديلات المصغر الخاص بها، ثم اختر الموديل لعرض منتجاته فوراً
@@ -6853,10 +7202,10 @@ export default function App() {
                   : 'bg-surface2 text-fg border-line hover:border-accent'
               }`}
             >
-              <span>كل البراندات ({brands.length})</span>
+              <span>كل البراندات ({publicBrands.length})</span>
             </button>
-            {brands.map(br => {
-              const brModelsCount = models.filter(m => m.brand === br).length;
+            {publicBrands.map(br => {
+              const brModelsCount = publicModels.filter(m => m.brand === br).length;
               const isSelected = selectedBrand === br;
               return (
                 <button
@@ -6884,10 +7233,10 @@ export default function App() {
 
           {/* 2. شريط الأجهزة / الموديلات المصغر */}
           <div className="flex items-center gap-2.5 overflow-x-auto py-1" style={{ scrollbarWidth: 'none' }}>
-            {models
+            {publicModels
               .filter(mdl => selectedBrand === 'ALL' || mdl.brand === selectedBrand)
               .map(mdl => {
-                const count = partCountByModelIdMap.get(String(mdl.id)) || 0;
+                const count = publicPartCountByModelIdMap.get(String(mdl.id)) || 0;
                 const isMdlActive = String(selectedModelId) === String(mdl.id);
                 return (
                   <div
@@ -6921,35 +7270,50 @@ export default function App() {
         </div>
         )}
 
-        {/* Admin-Curated Product Showcase Bars (بارات عرض المنتجات والعروض — مثل أحدث الأجهزة وأجهزة كسر زيرو) */}
-        {activeBars.map((bar, barIdx) => {
+        {/* Admin-Curated Product Showcase Bars (Supports Manual Products, Category, Brand, Model, or Discounted Items!) */}
+        {siteSettings.showHomeShowcaseBars !== false && activeBars.map((bar, barIdx) => {
+          const maxBarItems = Number(bar.maxItems) || 8;
           const rawIds = Array.isArray(bar.partIds) ? bar.partIds : [];
-          let barParts = rawIds
-            .map(pid => parts.find(p => String(p.id) === String(pid)))
-            .filter(p => {
-              if (!p) return false;
-              if (p.customGroupPrices && Number(p.customGroupPrices[currentGroup?.id]) === 0) return false;
-              return true;
-            });
+          let barParts = [];
 
-          // If bar's old product IDs were replaced after SQL import or not yet linked, auto-populate matching/starred/latest products so the bar ALWAYS appears!
-          if (barParts.length === 0 && parts.length > 0) {
+          if (bar.sourceType === 'category' && bar.sourceValue) {
+            barParts = publicParts.filter(p => p.category === bar.sourceValue).slice(0, maxBarItems);
+          } else if (bar.sourceType === 'brand' && bar.sourceValue) {
+            barParts = publicParts.filter(p => {
+              const mObj = resolvePartModelObj(p);
+              return (mObj?.brand || p.brand) === bar.sourceValue;
+            }).slice(0, maxBarItems);
+          } else if (bar.sourceType === 'model' && bar.sourceValue) {
+            barParts = publicParts.filter(p => {
+              const mObj = resolvePartModelObj(p);
+              return String(mObj ? mObj.id : p.modelId) === String(bar.sourceValue);
+            }).slice(0, maxBarItems);
+          } else if (bar.sourceType === 'discounts') {
+            barParts = publicParts.filter(p => calculatePartPrice(p, currentGroup).hasDiscount).slice(0, maxBarItems);
+          } else {
+            barParts = rawIds
+              .map(pid => publicParts.find(p => String(p.id) === String(pid)))
+              .filter(Boolean)
+              .slice(0, maxBarItems);
+          }
+
+          if (barParts.length === 0 && publicParts.length > 0) {
             const titleWords = String(bar.title || '').trim().toLowerCase().split(/\s+/).filter(w => w.length > 2);
             const titleMatched = titleWords.length > 0
-              ? parts.filter(p => {
+              ? publicParts.filter(p => {
                   const hay = `${p.name} ${p.category} ${p.qualityGrade}`.toLowerCase();
                   return titleWords.some(w => hay.includes(w));
                 })
               : [];
-            const promotedPool = parts.filter(p => p.isPromotedAd);
+            const promotedPool = publicParts.filter(p => p.isPromotedAd);
             if (titleMatched.length > 0) {
-              barParts = titleMatched.slice(0, 8);
+              barParts = titleMatched.slice(0, maxBarItems);
             } else if (promotedPool.length > 0) {
-              barParts = promotedPool.slice(0, 8);
+              barParts = promotedPool.slice(0, maxBarItems);
             } else {
-              const startSlice = (barIdx * 4) % Math.max(1, parts.length);
-              barParts = parts.slice(startSlice, startSlice + 4);
-              if (barParts.length === 0) barParts = parts.slice(0, 4);
+              const startSlice = (barIdx * 4) % Math.max(1, publicParts.length);
+              barParts = publicParts.slice(startSlice, startSlice + 4);
+              if (barParts.length === 0) barParts = publicParts.slice(0, 4);
             }
           }
           if (barParts.length === 0) return null;
@@ -7014,14 +7378,24 @@ export default function App() {
   // --- 2. DEDICATED INSTANT SEARCH & FULL CATALOG PAGE ---
   const renderStorefront = () => {
     const catCounts = {};
-    parts.filter(p => partPassesStoreFilters(p, true)).forEach(p => {
-      catCounts[p.category] = (catCounts[p.category] || 0) + 1;
+    publicParts.filter(p => partPassesStoreFilters(p, true)).forEach(p => {
+      if (p.category && !isCategoryHidden(p.category)) {
+        catCounts[p.category] = (catCounts[p.category] || 0) + 1;
+      }
+    });
+    (Array.isArray(siteSettings.customCategories) ? siteSettings.customCategories : []).forEach(cc => {
+      const cleanC = String(cc || '').trim();
+      if (cleanC && !isCategoryHidden(cleanC) && catCounts[cleanC] === undefined) {
+        catCounts[cleanC] = 0;
+      }
     });
     const facetTotal = Object.values(catCounts).reduce((a, b) => a + b, 0);
     const dynamicCategories = ['ALL', ...Object.keys(catCounts)];
-    if (selectedCategory !== 'ALL' && !dynamicCategories.includes(selectedCategory)) dynamicCategories.push(selectedCategory);
+    if (selectedCategory !== 'ALL' && !dynamicCategories.includes(selectedCategory) && !isCategoryHidden(selectedCategory)) {
+      dynamicCategories.push(selectedCategory);
+    }
 
-    const modelsForSelectedBrand = models.filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand);
+    const modelsForSelectedBrand = publicModels.filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand);
     const hasActiveFilters =
       selectedBrand !== 'ALL' || selectedModelId !== 'ALL' || selectedCategory !== 'ALL' || searchQuery.trim() !== '' || storeStockFilter !== 'ALL';
     const clearAllStoreFilters = () => {
@@ -7032,8 +7406,8 @@ export default function App() {
       setStoreStockFilter('ALL');
     };
 
-    // Pagination: 18 initial on Page 1 -> "إظهار المزيد" (+8 = 26) -> 8-by-8 subsequent pages
-    const FIRST_PAGE_INITIAL = 18;
+    // Pagination: configurable initial items on Page 1 -> "إظهار المزيد" (+8) -> subsequent pages
+    const FIRST_PAGE_INITIAL = Number(siteSettings.storeFirstPageLimit) || 18;
     const LOAD_MORE_STEP = 8;
     const FIRST_PAGE_MAX = FIRST_PAGE_INITIAL + LOAD_MORE_STEP; // 26
     const NEXT_PAGE_SIZE = 8;
@@ -7064,7 +7438,7 @@ export default function App() {
 
     return (
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
-        {renderSourcingBanner()}
+        {siteSettings.showSearchSourcing !== false && renderSourcingBanner()}
 
         {/* Search Banner at top of Products Page (surface bg, accent border, NO 'الرئيسية والعروض' chip, bg input, accent search button!) */}
         <div className="bg-surface rounded-2xl p-4 sm:p-5 text-fg border-2 border-accent shadow-sm dark:shadow-none space-y-3">
@@ -7127,10 +7501,10 @@ export default function App() {
                   }}
                   className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-accent"
                 >
-                  <option value="ALL">كل البراندات ({brands.length})</option>
-                  {brands.map(br => (
+                  <option value="ALL">كل البراندات ({publicBrands.length})</option>
+                  {publicBrands.map(br => (
                     <option key={br} value={br}>
-                      {br} ({models.filter(m => m.brand === br).length} موديل)
+                      {br} ({publicModels.filter(m => m.brand === br).length} موديل)
                     </option>
                   ))}
                 </select>
@@ -7160,7 +7534,7 @@ export default function App() {
                       : `اختر الموديل المناسب — أجهزة ${selectedBrand} (${modelsForSelectedBrand.length})`}
                   </option>
                   {modelsForSelectedBrand.map(mdl => {
-                    const cnt = partCountByModelIdMap.get(String(mdl.id)) || 0;
+                    const cnt = publicPartCountByModelIdMap.get(String(mdl.id)) || 0;
                     return (
                       <option key={mdl.id} value={mdl.id}>
                         {mdl.name} ({cnt} منتج)
@@ -11188,8 +11562,21 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                     </div>
                   </div>
 
-                  {/* Buttons inside Brand Bar: Brand Image + Add Model + Delete Entire Brand */}
+                  {/* Buttons inside Brand Bar: Hide/Show Brand + Brand Image + Add Model + Delete Entire Brand */}
                   <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => toggleHideBrand(brandName, e)}
+                      className={`px-3 py-2 rounded-xl border text-xs font-extrabold flex items-center gap-1.5 transition ${
+                        isBrandHidden(brandName)
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                          : 'bg-surface hover:bg-bg text-go border-line'
+                      }`}
+                      title={isBrandHidden(brandName) ? 'البراند مخفي عن واجهة العميل (اضغط لإظهاره)' : 'البراند ظاهر للعميل (اضغط لإخفائه بالكامل من واجهة العميل)'}
+                    >
+                      <span>{isBrandHidden(brandName) ? '🚫 مخفي عن العميل' : '👁️ ظاهر للعميل'}</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={(e) => {
@@ -11330,8 +11717,21 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                 </div>
                               </div>
 
-                              {/* Model Bar Action Buttons (Star, + إضافة منتج, التمبلت, تعديل, حذف) */}
+                              {/* Model Bar Action Buttons (Hide/Show, Star, + إضافة منتج, التمبلت, تعديل, حذف) */}
                               <div className="flex flex-wrap items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={(e) => toggleHideModel(model, e)}
+                                  className={`px-2.5 py-1.5 rounded-lg text-xs font-extrabold flex items-center gap-1 border transition ${
+                                    isModelHidden(model)
+                                      ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                                      : 'bg-surface2 hover:border-go text-go border-line'
+                                  }`}
+                                  title={isModelHidden(model) ? 'الموديل مخفي عن العميل (اضغط لإظهاره)' : 'الموديل ظاهر للعميل (اضغط لإخفائه من واجهة العميل والـ Popup)'}
+                                >
+                                  <span>{isModelHidden(model) ? '🚫 مخفي' : '👁️ ظاهر'}</span>
+                                </button>
+
                                 <button
                                   type="button"
                                   onClick={(e) => handleToggleTargetedAdModel(model, e)}
@@ -11564,10 +11964,22 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                             </button>
                                           </td>
                                           <td className="py-2.5 text-left">
-                                            <div className="flex items-center justify-end gap-1.5">
-                                              <button
-                                                type="button"
-                                                onClick={(e) => handleToggleTargetedAdPart(part, e)}
+                                              <div className="flex items-center justify-end gap-1.5">
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => toggleHidePart(part, e)}
+                                                  className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
+                                                    isPartHidden(part)
+                                                      ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                                                      : 'bg-surface2 hover:border-go text-go border-line'
+                                                  }`}
+                                                  title={isPartHidden(part) ? 'المنتج مخفي عن العميل (اضغط لإظهاره)' : 'المنتج ظاهر للعميل (اضغط لإخفائه)'}
+                                                >
+                                                  {isPartHidden(part) ? '🚫 مخفي' : '👁️ ظاهر'}
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => handleToggleTargetedAdPart(part, e)}
                                                 className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
                                                   part.isPromotedAd
                                                     ? 'bg-amber-400 text-fg border-amber-500 shadow-xs'
@@ -11578,14 +11990,16 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                                 {part.isPromotedAd ? '⭐ مميز ✓' : '⭐ للإعلان'}
                                               </button>
                                               <button
-                                                onClick={() =>
-                                                  setEditingPartObj({
-                                                    ...part,
-                                                    colorsText: (part.colors || []).join(', '),
-                                                    compatibleText: (part.compatibleModels || []).join(', '),
-                                                    imagesList: Array.isArray(part.images) && part.images.length > 0 ? [...part.images] : (part.image ? [part.image] : [])
-                                                  })
-                                                }
+                                                  onClick={() =>
+                                                    setEditingPartObj({
+                                                      ...part,
+                                                      oldPrice: part.oldPrice || part.customGroupPrices?._oldPrice || siteSettings?.partExtraMeta?.[part.id]?.oldPrice || '',
+                                                      hidden: isPartHidden(part),
+                                                      colorsText: (part.colors || []).join(', '),
+                                                      compatibleText: (part.compatibleModels || []).join(', '),
+                                                      imagesList: getPartImagesList(part)
+                                                    })
+                                                  }
                                                 className="p-1.5 rounded-lg bg-surface2 hover:bg-surface text-muted hover:text-accent-text transition"
                                                 title="تعديل بيانات وصورة القطعة"
                                               >
@@ -12885,37 +13299,274 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         </div>
       </div>
 
-      {/* 2. Manage Curated Product Showcase Bars */}
+      {/* 2. Master Control Panel: Home Sections, Categories, Brands/Models Visibility & Search Settings */}
+      <div className="bg-surface rounded-2xl p-5 border border-line shadow-xs space-y-5 text-xs">
+        <div className="border-b border-line pb-3 flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-extrabold text-fg flex items-center gap-2">
+              <LayoutGrid className="w-4 h-4 text-accent-text" />
+              <span>2. التحكم الكامل في أقسام الواجهة الرئيسية وصفحة البحث والتصنيفات</span>
+            </h3>
+            <p className="text-[11px] text-muted mt-0.5">
+              إظهار/إخفاء أي قسم أو براند أو تصنيف، وتخصيص شريط الأقسام الأكثر طلباً وإعدادات البحث والترتيب
+            </p>
+          </div>
+        </div>
+
+        {/* 2A. Toggle Visibility of Home & Search Page Sections */}
+        <div className="space-y-2">
+          <div className="font-extrabold text-fg">أ) إظهار وإخفاء أقسام الصفحة الرئيسية والبحث:</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+            {[
+              ['showHomeAds', 'البنرات الإعلانية العلوية (Hero Ads)'],
+              ['showHomeSourcing', 'بانر "اطلب منتجك من الخارج" بالرئيسية'],
+              ['showSearchSourcing', 'بانر "اطلب منتجك من الخارج" بصفحة البحث'],
+              ['showHomeSearchBox', 'صندوق البحث الكبير في أول الرئيسية'],
+              ['showHomeTopCategories', 'شريط "الأقسام الأكثر طلباً" بالرئيسية'],
+              ['showHomePromos', 'شريط أكواد الخصم الفعالة بالرئيسية'],
+              ['showHomeModels', 'شريط التصفح السريع للبراندات والموديلات'],
+              ['showHomeShowcaseBars', 'بارات عرض المنتجات المميزة (Showcase Bars)'],
+              ['hideOutOfStockInStore', 'إخفاء المنتجات المنتهية (كمية 0) تلقائياً']
+            ].map(([settingKey, labelTxt]) => {
+              const isBoolReverse = settingKey === 'hideOutOfStockInStore';
+              const isEnabled = isBoolReverse ? !!siteSettings[settingKey] : siteSettings[settingKey] !== false;
+              return (
+                <button
+                  key={settingKey}
+                  type="button"
+                  onClick={() => {
+                    const nextVal = isBoolReverse ? !siteSettings[settingKey] : !(siteSettings[settingKey] !== false);
+                    saveSiteSettingsImmediate(prev => ({ ...prev, [settingKey]: nextVal }));
+                    showToast('تم تحديث إعدادات عرض الواجهة وحفظها فوراً ✓', 'success');
+                  }}
+                  className={`p-3 rounded-xl border text-right flex items-center justify-between gap-2 font-extrabold transition ${
+                    isEnabled
+                      ? 'bg-accent/15 border-accent text-fg'
+                      : 'bg-surface2 border-line text-muted'
+                  }`}
+                >
+                  <span>{labelTxt}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${isEnabled ? 'bg-go text-go-ink' : 'bg-surface text-muted'}`}>
+                    {isEnabled ? 'مفعّل ✓' : 'مغلق'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2B. Customizing Titles, Speed & Page Size */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3.5 rounded-2xl bg-surface2 border border-line">
+          <div>
+            <label className="font-bold text-muted block mb-1">عنوان صندوق البحث بالرئيسية:</label>
+            <input
+              type="text"
+              value={siteSettings.homeSearchTitle || ''}
+              onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, homeSearchTitle: e.target.value }))}
+              placeholder="دوّر على أي منتج أو إكسسوار..."
+              className="w-full p-2 rounded-xl border border-line font-bold"
+            />
+          </div>
+          <div>
+            <label className="font-bold text-muted block mb-1">عنوان شريط التصنيفات بالرئيسية:</label>
+            <input
+              type="text"
+              value={siteSettings.homeTopCategoriesTitle || ''}
+              onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, homeTopCategoriesTitle: e.target.value }))}
+              placeholder="الأقسام الأكتر طلباً"
+              className="w-full p-2 rounded-xl border border-line font-bold"
+            />
+          </div>
+          <div>
+            <label className="font-bold text-muted block mb-1">عدد المنتجات في الصفحة الأولى بالبحث:</label>
+            <select
+              value={siteSettings.storeFirstPageLimit || 18}
+              onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, storeFirstPageLimit: Number(e.target.value) }))}
+              className="w-full p-2 rounded-xl border border-line font-extrabold"
+            >
+              <option value={12}>12 منتج في الصفحة</option>
+              <option value={18}>18 منتج في الصفحة (افتراضي)</option>
+              <option value={24}>24 منتج في الصفحة</option>
+              <option value={36}>36 منتج في الصفحة</option>
+              <option value={48}>48 منتج في الصفحة</option>
+            </select>
+          </div>
+          <div>
+            <label className="font-bold text-muted block mb-1">سرعة الشريط المتحرك العلوي:</label>
+            <select
+              value={siteSettings.tickerSpeedSeconds || 26}
+              onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, tickerSpeedSeconds: Number(e.target.value) }))}
+              className="w-full p-2 rounded-xl border border-line font-extrabold"
+            >
+              <option value={15}>سريع جداً (15 ثانية)</option>
+              <option value={26}>متوسط ومريح للعين (26 ثانية)</option>
+              <option value={40}>هادئ وبطيء (40 ثانية)</option>
+            </select>
+          </div>
+        </div>
+
+        {/* 2C. Full Category Control: Add Custom Category, Pin to Top Strip, or Hide Category from Customer */}
+        <div className="p-4 rounded-2xl bg-surface2 border border-line space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div className="font-extrabold text-fg">ب) إدارة التصنيفات (تثبيت في الرئيسية ⭐ أو إخفاء عن العميل 🚫 أو إضافة تصنيف جديد):</div>
+              <div className="text-[11px] text-muted">
+                اضغط على (⭐ تثبيت) لوضع التصنيف في مقدمة شريط الأقسام بالرئيسية، أو (🚫 إخفاء) لإخفاء التصنيف ومنتجاته من واجهة العميل والبحث والـ Popup
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <input
+                type="text"
+                id="elzoghbi-new-custom-cat-input"
+                placeholder="اسم تصنيف جديد (مثلاً: سماعات أصلية)..."
+                className="px-3 py-1.5 rounded-xl border border-line font-bold w-48 sm:w-60"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('elzoghbi-new-custom-cat-input');
+                  const val = String(el?.value || '').trim();
+                  if (!val) return;
+                  saveSiteSettingsImmediate(prev => ({
+                    ...prev,
+                    customCategories: Array.from(new Set([...(prev.customCategories || []), val])),
+                    pinnedCategories: Array.from(new Set([...(prev.pinnedCategories || []), val]))
+                  }));
+                  if (el) el.value = '';
+                  showToast(`تمت إضافة وتثبيت التصنيف "${val}" في الواجهة والبحث ✓`, 'success');
+                }}
+                className="px-3 py-1.5 rounded-xl bg-accent text-accent-ink font-extrabold shrink-0"
+              >
+                + إضافة تصنيف
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 max-h-52 overflow-y-auto p-2 bg-surface rounded-xl border border-line">
+            {Array.from(new Set([
+              ...(Array.isArray(siteSettings.customCategories) ? siteSettings.customCategories : []),
+              ...parts.map(p => p.category).filter(Boolean)
+            ])).map(catName => {
+              const hiddenCat = isCategoryHidden(catName);
+              const pinnedCat = (Array.isArray(siteSettings.pinnedCategories) ? siteSettings.pinnedCategories : []).includes(catName);
+              const catPartsCount = parts.filter(p => p.category === catName).length;
+              return (
+                <div
+                  key={catName}
+                  className={`px-3 py-1.5 rounded-xl border flex items-center gap-2 ${
+                    hiddenCat
+                      ? 'bg-rose-500/10 border-rose-500/40 opacity-75'
+                      : pinnedCat
+                      ? 'bg-accent/15 border-accent'
+                      : 'bg-surface2 border-line'
+                  }`}
+                >
+                  <span className="font-extrabold text-fg">{catName}</span>
+                  <span className="text-[10px] text-muted font-mono">({catPartsCount})</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      saveSiteSettingsImmediate(prev => {
+                        const list = Array.isArray(prev.pinnedCategories) ? prev.pinnedCategories : [];
+                        return {
+                          ...prev,
+                          pinnedCategories: pinnedCat ? list.filter(x => x !== catName) : [...list, catName]
+                        };
+                      });
+                    }}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                      pinnedCat ? 'bg-amber-400 text-slate-950' : 'bg-surface text-muted border border-line'
+                    }`}
+                    title="تثبيت في مقدمة شريط الأقسام الأكثر طلباً بالرئيسية"
+                  >
+                    {pinnedCat ? '⭐ مثبت' : '☆ تثبيت'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => toggleHideCategory(catName, e)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-extrabold ${
+                      hiddenCat ? 'bg-rose-600 text-white' : 'bg-go/15 text-go'
+                    }`}
+                    title={hiddenCat ? 'التصنيف مخفي عن العميل (اضغط لإظهاره)' : 'التصنيف ظاهر للعميل (اضغط لإخفائه)'}
+                  >
+                    {hiddenCat ? '🚫 مخفي' : '👁️ ظاهر'}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2D. Quick Brand Visibility Strip right inside Storefront CMS */}
+        <div className="p-4 rounded-2xl bg-surface2 border border-line space-y-2.5">
+          <div className="font-extrabold text-fg">ج) التحكم السريع في إظهار/إخفاء البراندات من واجهة العميل والـ Popup:</div>
+          <div className="flex flex-wrap gap-2">
+            {brands.map(br => {
+              const hiddenBr = isBrandHidden(br);
+              return (
+                <button
+                  key={br}
+                  type="button"
+                  onClick={(e) => toggleHideBrand(br, e)}
+                  className={`px-3 py-1.5 rounded-xl border font-extrabold flex items-center gap-1.5 transition ${
+                    hiddenBr
+                      ? 'bg-rose-600 text-white border-rose-600'
+                      : 'bg-surface text-fg border-line hover:border-accent'
+                  }`}
+                >
+                  <span>{br}</span>
+                  <span className="text-[10px]">{hiddenBr ? '🚫 مخفي' : '👁️ ظاهر'}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Manage Curated Product Showcase Bars */}
       <div className="bg-surface rounded-2xl p-5 border border-line shadow-xs space-y-4">
         <h3 className="text-sm font-extrabold text-fg">
-          2. بارات وأقسام عرض المنتجات في الواجهة الرئيسية (Showcase Bars)
+          3. بارات وأقسام عرض المنتجات في الواجهة الرئيسية (Showcase Bars — ربط بتصنيف أو براند أو موديل أو عروض أو منتجات)
         </h3>
 
         <form
           onSubmit={e => {
             e.preventDefault();
-            if (!newBarForm.title.trim() || newBarForm.selectedPartIds.length === 0) return;
+            if (!newBarForm.title.trim()) return;
+            const srcType = newBarForm.sourceType || 'manual';
+            if (srcType === 'manual' && newBarForm.selectedPartIds.length === 0) {
+              showToast('اختر منتجاً واحداً على الأقل أو اختر مصدر تلقائي للبار (تصنيف / براند / موديل / خصومات).', 'warning');
+              return;
+            }
             const createdBar = {
-              id: `bar_${Date.now()}`,
+              id: newBarForm.editingId || `bar_${Date.now()}`,
               title: newBarForm.title.trim(),
               subtitle: newBarForm.subtitle.trim() || 'منتجات مختارة بعناية من الإدارة',
-              badgeColor: 'bg-indigo-600 text-white',
+              badgeColor: newBarForm.badgeColor || 'bg-indigo-600 text-white',
+              sourceType: srcType,
+              sourceValue: newBarForm.sourceValue || '',
+              maxItems: Number(newBarForm.maxItems) || 8,
               partIds: newBarForm.selectedPartIds,
               active: true
             };
-            setShowcaseBars(prev => [...prev, createdBar]);
-            setNewBarForm({ title: '', subtitle: '', selectedPartIds: ['prt_1', 'prt_2'] });
-            showToast('تم إنشاء بار عرض المنتجات الجديد وإضافته للواجهة الرئيسية!', 'success');
+            if (newBarForm.editingId) {
+              setShowcaseBars(prev => prev.map(b => (b.id === newBarForm.editingId ? createdBar : b)));
+              showToast('تم حفظ تعديلات بار العرض بنجاح ✓', 'success');
+            } else {
+              setShowcaseBars(prev => [...prev, createdBar]);
+              showToast('تم إنشاء بار عرض المنتجات الجديد وإضافته للواجهة الرئيسية!', 'success');
+            }
+            setNewBarForm({ title: '', subtitle: '', sourceType: 'manual', sourceValue: '', maxItems: 8, selectedPartIds: [] });
           }}
           className="bg-surface2 p-4 rounded-xl border border-line space-y-3 text-xs"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <input
               type="text"
               required
               value={newBarForm.title}
               onChange={e => setNewBarForm(prev => ({ ...prev, title: e.target.value }))}
-              placeholder="عنوان البار الجديد (مثال: ⭐ عروض شاشات السامسونج الأصلية)..."
+              placeholder="عنوان البار (مثال: 🔥 أقوى عروض الشاشات والإكسسوارات)..."
               className="p-2.5 rounded-xl border border-line bg-surface font-bold"
             />
             <input
@@ -12925,20 +13576,92 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               placeholder="وصف مختصر تحت عنوان البار..."
               className="p-2.5 rounded-xl border border-line bg-surface"
             />
+            <select
+              value={newBarForm.maxItems || 8}
+              onChange={e => setNewBarForm(prev => ({ ...prev, maxItems: Number(e.target.value) }))}
+              className="p-2.5 rounded-xl border border-line bg-surface font-bold"
+            >
+              <option value={4}>عرض 4 منتجات في البار</option>
+              <option value={8}>عرض 8 منتجات في البار</option>
+              <option value={12}>عرض 12 منتج في البار</option>
+              <option value={16}>عرض 16 منتج في البار</option>
+            </select>
           </div>
 
-          <div>
-            <label className="font-bold text-muted block mb-1.5">
-              اختر المنتجات التي تظهر داخل هذا البار (تظهر هنا المنتجات المعلمة بنجمة ⭐ فقط):
-            </label>
-            <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-2.5 bg-surface rounded-xl border border-line">
-              {parts.filter(p => p.isPromotedAd).length === 0 ? (
-                <div className="w-full py-3 text-center text-muted font-bold">
-                  لم تقم بتعليم أي منتج بنجمة (⭐) بعد — اضغط على زر (⭐) بجانب أي منتج في قسم الموديلات أو المخزن ليظهر هنا مباشرة.
-                </div>
-              ) : (
-                parts
-                  .filter(p => p.isPromotedAd)
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="font-bold text-muted block mb-1">مصدر المنتجات المعروضة في هذا البار:</label>
+              <select
+                value={newBarForm.sourceType || 'manual'}
+                onChange={e => setNewBarForm(prev => ({ ...prev, sourceType: e.target.value, sourceValue: '' }))}
+                className="w-full p-2.5 rounded-xl border border-line font-extrabold"
+              >
+                <option value="manual">اختيار منتجات محددة يدوياً (أو المعلمة بنجمة ⭐)</option>
+                <option value="discounts">🔥 عرض كل المنتجات التي عليها خصم (سعر قبل الخصم) تلقائياً</option>
+                <option value="category">📂 عرض منتجات تصنيف معين تلقائياً</option>
+                <option value="brand">📱 عرض منتجات براند معين تلقائياً</option>
+                <option value="model">📲 عرض منتجات جهاز (موديل) معين تلقائياً</option>
+              </select>
+            </div>
+
+            {newBarForm.sourceType === 'category' && (
+              <div>
+                <label className="font-bold text-muted block mb-1">اختر التصنيف:</label>
+                <select
+                  value={newBarForm.sourceValue || ''}
+                  onChange={e => setNewBarForm(prev => ({ ...prev, sourceValue: e.target.value }))}
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                >
+                  <option value="">-- اختر التصنيف --</option>
+                  {Array.from(new Set(parts.map(p => p.category).filter(Boolean))).map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {newBarForm.sourceType === 'brand' && (
+              <div>
+                <label className="font-bold text-muted block mb-1">اختر البراند:</label>
+                <select
+                  value={newBarForm.sourceValue || ''}
+                  onChange={e => setNewBarForm(prev => ({ ...prev, sourceValue: e.target.value }))}
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                >
+                  <option value="">-- اختر البراند --</option>
+                  {brands.map(b => (
+                    <option key={b} value={b}>{b}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {newBarForm.sourceType === 'model' && (
+              <div>
+                <label className="font-bold text-muted block mb-1">اختر الجهاز (الموديل):</label>
+                <select
+                  value={newBarForm.sourceValue || ''}
+                  onChange={e => setNewBarForm(prev => ({ ...prev, sourceValue: e.target.value }))}
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                >
+                  <option value="">-- اختر الموديل --</option>
+                  {models.map(m => (
+                    <option key={m.id} value={m.id}>{m.brand} — {m.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {(!newBarForm.sourceType || newBarForm.sourceType === 'manual') && (
+            <div>
+              <label className="font-bold text-muted block mb-1.5">
+                اختر المنتجات التي تظهر داخل هذا البار (المنتجات المعلمة بنجمة ⭐ والمنتجات المرفوعة):
+              </label>
+              <div className="flex flex-wrap gap-2 max-h-44 overflow-y-auto p-2.5 bg-surface rounded-xl border border-line">
+                {parts
+                  .filter(p => p.isPromotedAd || p._isCustomUploaded || newBarForm.selectedPartIds.includes(p.id))
+                  .slice(0, 80)
                   .map(p => {
                     const checked = newBarForm.selectedPartIds.includes(p.id);
                     return (
@@ -12964,44 +13687,126 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                           }}
                           className="accent-blue-600"
                         />
-                        <span>⭐ {p.name}</span>
+                        <span>{p.isPromotedAd ? '⭐ ' : ''}{p.name}</span>
                       </label>
                     );
-                  })
-              )}
+                  })}
+              </div>
             </div>
-          </div>
+          )}
 
-          <button
-            type="submit"
-            className="px-5 py-2.5 rounded-xl bg-nav2 hover:bg-nav2 text-white font-extrabold"
-          >
-            + إضافة بار العرض للصفحة الرئيسية
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              className="px-5 py-2.5 rounded-xl bg-go hover:brightness-110 text-go-ink font-extrabold"
+            >
+              {newBarForm.editingId ? '✓ حفظ تعديلات البار' : '+ إضافة بار العرض للصفحة الرئيسية'}
+            </button>
+            {newBarForm.editingId && (
+              <button
+                type="button"
+                onClick={() => setNewBarForm({ title: '', subtitle: '', sourceType: 'manual', sourceValue: '', maxItems: 8, selectedPartIds: [] })}
+                className="px-4 py-2.5 rounded-xl bg-surface border border-line text-muted font-bold"
+              >
+                إلغاء التعديل
+              </button>
+            )}
+          </div>
         </form>
 
-        <div className="space-y-3">
-          {showcaseBars.map(bar => (
+        <div className="space-y-2.5">
+          {showcaseBars.map((bar, bIdx) => (
             <div
               key={bar.id}
-              className="p-4 rounded-xl border border-line flex flex-wrap items-center justify-between gap-3 text-xs"
+              className={`p-4 rounded-xl border border-line flex flex-wrap items-center justify-between gap-3 text-xs ${bar.active === false ? 'opacity-60 bg-surface2' : 'bg-surface'}`}
             >
               <div>
-                <div className="font-extrabold text-sm text-fg">{bar.title}</div>
-                <div className="text-muted">{bar.subtitle} • يضم ({bar.partIds.length} منتجات)</div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-extrabold text-sm text-fg">{bar.title}</span>
+                  <span className="px-2 py-0.5 rounded bg-accent/15 text-accent-text text-[10px] font-bold">
+                    {bar.sourceType === 'category'
+                      ? `تصنيف: ${bar.sourceValue}`
+                      : bar.sourceType === 'brand'
+                      ? `براند: ${bar.sourceValue}`
+                      : bar.sourceType === 'model'
+                      ? `موديل محدد`
+                      : bar.sourceType === 'discounts'
+                      ? '🔥 عروض وخصومات تلقائية'
+                      : `${(bar.partIds || []).length} منتجات مختارة`}
+                  </span>
+                </div>
+                <div className="text-muted mt-0.5">{bar.subtitle}</div>
               </div>
-              <button
-                onClick={() =>
-                  askConfirmDelete(
-                    'حذف بار العروض',
-                    `هل أنت متأكد من حذف بار المنتجات "${bar.title}" من الواجهة نهائياً؟`,
-                    () => setShowcaseBars(prev => prev.filter(b => b.id !== bar.id))
-                  )
-                }
-                className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-500 hover:text-white font-bold transition"
-              >
-                حذف البار
-              </button>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setShowcaseBars(prev => prev.map(b => (b.id === bar.id ? { ...b, active: b.active === false ? true : false } : b)))}
+                  className={`px-2.5 py-1.5 rounded-lg font-extrabold text-[11px] border ${
+                    bar.active === false ? 'bg-rose-600 text-white border-rose-600' : 'bg-go/15 text-go border-go/30'
+                  }`}
+                >
+                  {bar.active === false ? '🚫 مخفي' : '👁️ ظاهر'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setNewBarForm({
+                      editingId: bar.id,
+                      title: bar.title || '',
+                      subtitle: bar.subtitle || '',
+                      sourceType: bar.sourceType || 'manual',
+                      sourceValue: bar.sourceValue || '',
+                      maxItems: bar.maxItems || 8,
+                      badgeColor: bar.badgeColor || 'bg-indigo-600 text-white',
+                      selectedPartIds: Array.isArray(bar.partIds) ? [...bar.partIds] : []
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-lg bg-blue-600 text-white font-bold"
+                >
+                  تعديل
+                </button>
+                <button
+                  type="button"
+                  disabled={bIdx === 0}
+                  onClick={() =>
+                    setShowcaseBars(prev => {
+                      const arr = [...prev];
+                      if (bIdx > 0) [arr[bIdx - 1], arr[bIdx]] = [arr[bIdx], arr[bIdx - 1]];
+                      return arr;
+                    })
+                  }
+                  className="px-2.5 py-1.5 rounded-lg bg-surface2 text-fg disabled:opacity-30 font-bold"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  disabled={bIdx === showcaseBars.length - 1}
+                  onClick={() =>
+                    setShowcaseBars(prev => {
+                      const arr = [...prev];
+                      if (bIdx < arr.length - 1) [arr[bIdx + 1], arr[bIdx]] = [arr[bIdx], arr[bIdx + 1]];
+                      return arr;
+                    })
+                  }
+                  className="px-2.5 py-1.5 rounded-lg bg-surface2 text-fg disabled:opacity-30 font-bold"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    askConfirmDelete(
+                      'حذف بار العروض',
+                      `هل أنت متأكد من حذف بار المنتجات "${bar.title}" من الواجهة نهائياً؟`,
+                      () => setShowcaseBars(prev => prev.filter(b => b.id !== bar.id))
+                    )
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-500 hover:text-white font-bold transition"
+                >
+                  حذف
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -16913,13 +17718,17 @@ model OrderInvoice {
     let pick = () => {};
     if (filterSheet === 'brand') {
       title = 'اختار الماركة';
-      rows = [{ id: 'ALL', label: 'كل الماركات' }, ...brands.map(b => ({ id: b, label: b }))];
+      rows = [{ id: 'ALL', label: `كل الماركات (${publicBrands.length})` }, ...publicBrands.map(b => ({ id: b, label: b, count: publicModels.filter(m => m.brand === b).length }))];
       current = selectedBrand;
-      pick = id => { setSelectedBrand(id); setSelectedModelId('ALL'); };
+      pick = id => { setSelectedBrand(id); setSelectedModelId('ALL'); setSelectedCategory('ALL'); };
     } else if (filterSheet === 'category') {
       title = 'اختار التصنيف';
       const counts = {};
-      parts.filter(pt => partPassesStoreFilters(pt, true)).forEach(pt => { counts[pt.category] = (counts[pt.category] || 0) + 1; });
+      publicParts.filter(pt => partPassesStoreFilters(pt, true)).forEach(pt => {
+        if (pt.category && !isCategoryHidden(pt.category)) {
+          counts[pt.category] = (counts[pt.category] || 0) + 1;
+        }
+      });
       const total = Object.values(counts).reduce((a, b) => a + b, 0);
       rows = [{ id: 'ALL', label: 'كل التصنيفات', count: total }, ...Object.keys(counts).map(c => ({ id: c, label: c, count: counts[c] }))];
       current = selectedCategory;
@@ -16928,12 +17737,12 @@ model OrderInvoice {
       title = 'اختار الموديل';
       rows = [
         { id: 'ALL', label: 'كل الموديلات' },
-        ...models
+        ...publicModels
           .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
-          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: parts.filter(pt => pt.modelId === m.id).length }))
+          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: publicPartCountByModelIdMap.get(String(m.id)) || 0 }))
       ];
       current = selectedModelId;
-      pick = id => setSelectedModelId(id);
+      pick = id => { setSelectedModelId(id); setSelectedCategory('ALL'); };
     }
     const shown = rows.filter(r => !q || r.label.toLowerCase().includes(q) || (r.sub || '').toLowerCase().includes(q));
     return (
@@ -17613,6 +18422,11 @@ ${footer}
                   </>
                 )}
                 <div className="absolute top-3 right-3 flex flex-wrap gap-1.5">
+                  {priceInfo.hasDiscount && (
+                    <span className="px-3 py-1 rounded-xl bg-rose-600 text-white text-xs font-black shadow">
+                      🔥 خصم {priceInfo.discountPercent}%
+                    </span>
+                  )}
                   <span className="px-3 py-1 rounded-xl bg-nav/90 text-white text-xs font-extrabold">
                     {targetPart.qualityGrade}
                   </span>
@@ -17621,6 +18435,26 @@ ${footer}
                   </span>
                 </div>
               </div>
+
+              {/* Clickable Multi-Image Thumbnail Strip so customer can flip between all product images effortlessly! */}
+              {imagesList.length > 1 && (
+                <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                  {imagesList.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setDetailImageIdx(idx)}
+                      className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition ${
+                        idx === safeIdx
+                          ? 'border-accent ring-2 ring-accent/30 scale-105'
+                          : 'border-line opacity-70 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="w-full h-full object-contain bg-surface2 p-1" />
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {modelObj && (
                 <div className="p-3 rounded-xl bg-surface2 border border-line flex items-center gap-3 text-xs">
@@ -17640,12 +18474,26 @@ ${footer}
 
             {/* Product Specs */}
             <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-surface2 border border-line flex items-center justify-between">
+              <div className="p-4 rounded-2xl bg-surface2 border border-line flex items-center justify-between gap-2 flex-wrap">
                 <div>
-                  <div className="text-muted">سعر الوحدة:</div>
-                  <div className="text-2xl font-extrabold text-fg mt-0.5">
-                    {priceInfo.displayPrice.toLocaleString()}{' '}
-                    <span className="text-sm text-accent-text">{priceInfo.currencySymbol}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted font-bold">سعر الوحدة:</span>
+                    {priceInfo.hasDiscount && (
+                      <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black">
+                        🔥 خصم {priceInfo.discountPercent}% (وفّر {(priceInfo.displayOldPrice - priceInfo.displayPrice).toLocaleString()} {priceInfo.currencySymbol})
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-baseline gap-2.5 mt-0.5 flex-wrap">
+                    <div className="text-2xl font-extrabold text-fg">
+                      {priceInfo.displayPrice.toLocaleString()}{' '}
+                      <span className="text-sm text-accent-text">{priceInfo.currencySymbol}</span>
+                    </div>
+                    {priceInfo.hasDiscount && (
+                      <span className="text-sm font-bold font-mono text-muted line-through decoration-rose-500 decoration-2">
+                        {priceInfo.displayOldPrice.toLocaleString()} {priceInfo.currencySymbol}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -18140,6 +18988,17 @@ ${footer}
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
+                          type="button"
+                          onClick={(e) => toggleHideBrand(b, e)}
+                          className={`px-2.5 py-1 rounded-lg font-extrabold border text-[11px] transition ${
+                            isBrandHidden(b)
+                              ? 'bg-rose-600 text-white border-rose-600'
+                              : 'bg-surface2 text-go border-line'
+                          }`}
+                        >
+                          {isBrandHidden(b) ? '🚫 مخفي عن العميل' : '👁️ ظاهر للعميل'}
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingBrandIdx(idx);
                             setEditingBrandText(b);
@@ -18607,8 +19466,13 @@ ${footer}
         PART_IMAGES[addingPartToModel.imageKey] ||
         PART_IMAGES.screen;
 
+      const finalImgsList = cleanImages.length > 0 ? cleanImages : [primaryImgUrl];
+      const parsedOldPrice = Number(addingPartToModel.oldPrice) > 0 ? Number(addingPartToModel.oldPrice) : 0;
+      const isHiddenFlag = Boolean(addingPartToModel.hidden);
+      const newPartId = `prt_${Date.now()}`;
+
       const newPart = {
-        id: `prt_${Date.now()}`,
+        id: newPartId,
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
         sku: (addingPartToModel.sku || '').trim() || `PRT-${Date.now()}`,
         modelId: addingPartToModel.model.id,
@@ -18624,17 +19488,34 @@ ${footer}
         imageUrl: primaryImgUrl,
         image: primaryImgUrl,
         imageFit: addingPartToModel.imageFit || siteSettings.productImageFit || 'contain',
-        images: cleanImages.length > 0 ? cleanImages : [primaryImgUrl],
+        images: finalImgsList,
         stock: Number(addingPartToModel.stock) || 0,
         lowStockThreshold: Number(addingPartToModel.lowStockThreshold) || 5,
         maxOrderQty: Number(addingPartToModel.maxOrderQty) || 10,
         costPrice: Number(addingPartToModel.costPrice) || 0,
         basePrice: Number(addingPartToModel.basePrice) || 0,
-        customGroupPrices: {},
+        oldPrice: parsedOldPrice,
+        hidden: isHiddenFlag,
+        _isCustomUploaded: true,
+        customGroupPrices: {
+          _images: finalImgsList,
+          _oldPrice: parsedOldPrice,
+          _hidden: isHiddenFlag
+        },
         waitlistCount: 0
       };
 
       setParts(prev => [newPart, ...prev]);
+      saveSiteSettingsImmediate(prev => ({
+        ...prev,
+        hiddenPartIds: isHiddenFlag
+          ? Array.from(new Set([...(prev.hiddenPartIds || []), newPartId]))
+          : (prev.hiddenPartIds || []),
+        partExtraMeta: {
+          ...(prev.partExtraMeta || {}),
+          [newPartId]: { images: finalImgsList, oldPrice: parsedOldPrice }
+        }
+      }));
       setAddingPartToModel(null);
       showToast(`تمت إضافة "${newPart.name}" داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
     };
@@ -18828,6 +19709,32 @@ ${footer}
             </div>
 
             <div>
+              <label className="font-bold text-rose-500 dark:text-rose-400 block mb-1">
+                🔥 السعر قبل الخصم (اختياري — للخصم المشطوب):
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={addingPartToModel.oldPrice || ''}
+                onChange={e => setAddingPartToModel(prev => ({ ...prev, oldPrice: e.target.value }))}
+                placeholder="اتركه فارغاً إذا لم يوجد خصم..."
+                className="w-full p-2.5 rounded-xl border border-rose-500/40 font-mono font-extrabold"
+              />
+            </div>
+
+            <div className="flex items-center pt-5">
+              <label className="flex items-center gap-2 font-extrabold text-fg cursor-pointer select-none p-2.5 rounded-xl bg-surface2 border border-line w-full">
+                <input
+                  type="checkbox"
+                  checked={!!addingPartToModel.hidden}
+                  onChange={e => setAddingPartToModel(prev => ({ ...prev, hidden: e.target.checked }))}
+                  className="w-4 h-4 accent-rose-600"
+                />
+                <span>🚫 إخفاء هذا المنتج عن واجهة العميل مؤقتاً</span>
+              </label>
+            </div>
+
+            <div>
               <label className="font-bold text-muted block mb-1">الكمية المتاحة بالمخزن:</label>
               <input
                 type="number"
@@ -18948,6 +19855,10 @@ ${footer}
 
       const cleanImages = editFourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 4);
       const primaryImgUrl = cleanImages[0] || editingPartObj.image_url || editingPartObj.image || PART_IMAGES.screen;
+      const finalImgsList = cleanImages.length > 0 ? cleanImages : [primaryImgUrl];
+      const parsedOldPrice = Number(editingPartObj.oldPrice) > 0 ? Number(editingPartObj.oldPrice) : 0;
+      const isHiddenFlag = Boolean(editingPartObj.hidden);
+      const targetPid = String(editingPartObj.id);
 
       setParts(prev =>
         prev.map(p =>
@@ -18965,16 +19876,39 @@ ${footer}
                 imageUrl: primaryImgUrl,
                 image: primaryImgUrl,
                 imageFit: editingPartObj.imageFit || p.imageFit || siteSettings.productImageFit || 'contain',
-                images: cleanImages.length > 0 ? cleanImages : [primaryImgUrl],
+                images: finalImgsList,
                 stock: Number(editingPartObj.stock),
                 costPrice: Number(editingPartObj.costPrice),
                 basePrice: Number(editingPartObj.basePrice),
+                oldPrice: parsedOldPrice,
+                hidden: isHiddenFlag,
+                _isCustomUploaded: true,
+                customGroupPrices: {
+                  ...(p.customGroupPrices || {}),
+                  _images: finalImgsList,
+                  _oldPrice: parsedOldPrice,
+                  _hidden: isHiddenFlag
+                },
                 colors: colorsArr.length > 0 ? colorsArr : ['قياسي'],
                 compatibleModels: compatArr.length > 0 ? compatArr : p.compatibleModels
               }
             : p
         )
       );
+      saveSiteSettingsImmediate(prev => {
+        const curHidden = Array.isArray(prev.hiddenPartIds) ? prev.hiddenPartIds : [];
+        const nextHidden = isHiddenFlag
+          ? Array.from(new Set([...curHidden, targetPid]))
+          : curHidden.filter(id => String(id) !== targetPid);
+        return {
+          ...prev,
+          hiddenPartIds: nextHidden,
+          partExtraMeta: {
+            ...(prev.partExtraMeta || {}),
+            [targetPid]: { images: finalImgsList, oldPrice: parsedOldPrice }
+          }
+        };
+      });
       setEditingPartObj(null);
       showToast('تم حفظ تعديلات وروابط صور قطعة الغيار بنجاح ✓', 'success');
     };
@@ -19134,6 +20068,32 @@ ${footer}
                 onChange={e => setEditingPartObj(prev => ({ ...prev, basePrice: e.target.value }))}
                 className="w-full p-2.5 rounded-xl border border-line font-extrabold text-fg bg-bg"
               />
+            </div>
+
+            <div>
+              <label className="font-bold text-rose-500 dark:text-rose-400 block mb-1">
+                🔥 السعر قبل الخصم (اختياري — للخصم المشطوب):
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={editingPartObj.oldPrice ?? ''}
+                onChange={e => setEditingPartObj(prev => ({ ...prev, oldPrice: e.target.value }))}
+                placeholder="اتركه فارغاً إذا لم يوجد خصم..."
+                className="w-full p-2.5 rounded-xl border border-rose-500/40 font-mono font-extrabold text-fg bg-bg"
+              />
+            </div>
+
+            <div className="flex items-center pt-5">
+              <label className="flex items-center gap-2 font-extrabold text-fg cursor-pointer select-none p-2.5 rounded-xl bg-surface2 border border-line w-full">
+                <input
+                  type="checkbox"
+                  checked={!!editingPartObj.hidden}
+                  onChange={e => setEditingPartObj(prev => ({ ...prev, hidden: e.target.checked }))}
+                  className="w-4 h-4 accent-rose-600"
+                />
+                <span>🚫 إخفاء هذا المنتج عن واجهة العميل</span>
+              </label>
             </div>
 
             <div>
@@ -19523,7 +20483,7 @@ ${footer}
   const homeElRef = React.useRef(null);
   const searchElRef = React.useRef(null);
   const lastRenderSigRef = React.useRef('');
-  const currentRenderSig = `${uiTheme}_${siteSettings.productImageFit || 'contain'}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${activeRole}`;
+  const currentRenderSig = `${uiTheme}_${JSON.stringify(siteSettings)}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${showcaseBars.length}_${activeRole}`;
   if (lastRenderSigRef.current !== currentRenderSig) {
     homeElRef.current = null;
     searchElRef.current = null;
@@ -19627,6 +20587,24 @@ ${footer}
         }
         html { -webkit-text-size-adjust: 100%; }
         [dir='ltr'] .text-right { text-align: left; }
+        @keyframes hm-ticker-scroll-rtl {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(50%, 0, 0); }
+        }
+        @keyframes hm-ticker-scroll-ltr {
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .hm-ticker-track {
+          animation: hm-ticker-scroll-rtl 26s linear infinite;
+          will-change: transform;
+        }
+        [dir='ltr'] .hm-ticker-track {
+          animation-name: hm-ticker-scroll-ltr;
+        }
+        .hm-ticker-wrap:hover .hm-ticker-track {
+          animation-play-state: paused;
+        }
         .hm-card { content-visibility: auto; contain-intrinsic-size: auto 330px; }
         @media (max-width: 639px) {
           .hm-grid2 .hm-card { contain-intrinsic-size: auto 240px; }
@@ -19700,4 +20678,3 @@ ${footer}
     </div>
   );
 }
- 
