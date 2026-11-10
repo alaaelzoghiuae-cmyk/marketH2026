@@ -3327,11 +3327,11 @@ export default function App() {
 
   const STATIC_SESSION_TABLES = new Set([
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
-    'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
+    'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v23_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v25_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v23_cro_all_12_fixes') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v25_instant_flag_sync_and_gm_reports') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -3344,7 +3344,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v23_cro_all_12_fixes');
+      window.localStorage.setItem('elzoghbi_app_version', 'v25_instant_flag_sync_and_gm_reports');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -4410,8 +4410,62 @@ export default function App() {
         }
       } catch (err) {}
     };
+    const handleDirectSettingsStorage = (e) => {
+      if (!e.key || !e.newValue) return;
+      if (e.key === 'elzoghbi_v2_siteSettings' || e.key === 'elzoghbi_live_flags_ping') {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          const nextSettingsObj = e.key === 'elzoghbi_live_flags_ping' ? parsed.settings : parsed;
+          if (nextSettingsObj && typeof nextSettingsObj === 'object') {
+            incomingSyncUntilRef.current = Date.now() + 1000;
+            isIncomingSyncRef.current = true;
+            try { sessionStorage.removeItem('hm_local_settings_v8'); } catch (err) {}
+            if (homeElRef && homeElRef.current) homeElRef.current = null;
+            if (searchElRef && searchElRef.current) searchElRef.current = null;
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = nextSettingsObj;
+            setSiteSettings(nextSettingsObj);
+            if (nextSettingsObj.enableQualityTiers === false) {
+              setSelectedQualityTiers({});
+            }
+          }
+        } catch (err) {}
+      }
+    };
+
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bc = new BroadcastChannel('elzoghbi_live_flags_channel');
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (msg && msg.type === 'SITE_SETTINGS_UPDATED' && msg.settings && msg.senderTabId !== myTabId) {
+            incomingSyncUntilRef.current = Date.now() + 1000;
+            isIncomingSyncRef.current = true;
+            try {
+              sessionStorage.removeItem('hm_local_settings_v8');
+              window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(msg.settings));
+            } catch (err) {}
+            if (homeElRef && homeElRef.current) homeElRef.current = null;
+            if (searchElRef && searchElRef.current) searchElRef.current = null;
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = msg.settings;
+            setSiteSettings(msg.settings);
+            if (msg.settings.enableQualityTiers === false) {
+              setSelectedQualityTiers({});
+            }
+          }
+        };
+      }
+    } catch (err) {}
+
     window.addEventListener('storage', handleStorageEvent);
-    return () => window.removeEventListener('storage', handleStorageEvent);
+    window.addEventListener('storage', handleDirectSettingsStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorageEvent);
+      window.removeEventListener('storage', handleDirectSettingsStorage);
+      if (bc) {
+        try { bc.close(); } catch (err) {}
+      }
+    };
   }, [myTabId]);
 
   // --- Smart Normalized Table Pull with Automatic Legacy Enrichment & Local Edit Protection ---
@@ -4729,14 +4783,11 @@ export default function App() {
         });
       }
 
-      // Restore siteSettings, adminCredentials, currencies
-      const localSavedSettings = (() => {
+      // Restore siteSettings, adminCredentials, currencies — ALWAYS pick the newest _updatedAt between localStorage and server (never stale sessionStorage!)
+      const latestLocalSettings = (() => {
         try {
-          const raw = sessionStorage.getItem('hm_local_settings_v8');
-          if (raw) {
-            const p = JSON.parse(raw);
-            if (p && (Date.now() - (p.ts || 0) < 15 * 60 * 1000)) return p;
-          }
+          const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');
+          if (raw) return JSON.parse(raw);
         } catch (e) {}
         return null;
       })();
@@ -4751,25 +4802,31 @@ export default function App() {
           } : null);
 
       if (cfgRow) {
-        const remoteSettings = localSavedSettings?.settings || cfgRow.settings;
-        if (remoteSettings && typeof remoteSettings === 'object' && Object.keys(remoteSettings).length > 0) {
+        const srvSettings = cfgRow.settings || {};
+        const localTs = Number(latestLocalSettings?._updatedAt || 0);
+        const srvTs = Number(srvSettings?._updatedAt || (cfgRow.updated_at ? Date.parse(cfgRow.updated_at) : 0) || 0);
+        const winningSettings = (latestLocalSettings && localTs >= srvTs)
+          ? { ...srvSettings, ...latestLocalSettings }
+          : { ...(latestLocalSettings || {}), ...srvSettings };
+
+        if (winningSettings && typeof winningSettings === 'object' && Object.keys(winningSettings).length > 0) {
           const mergedSettings = {
             ...siteSettings,
-            ...remoteSettings,
-            supabaseUrl: remoteSettings.supabaseUrl || sbUrl,
-            supabaseAnonKey: remoteSettings.supabaseAnonKey || sbKey
+            ...winningSettings,
+            supabaseUrl: winningSettings.supabaseUrl || sbUrl,
+            supabaseAnonKey: winningSettings.supabaseAnonKey || sbKey
           };
           if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = mergedSettings;
           setSiteSettings(mergedSettings);
           try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(mergedSettings)); } catch (e) {}
         }
-        const remoteCreds = localSavedSettings?.credentials || cfgRow.credentials;
+        const remoteCreds = cfgRow.credentials;
         if (remoteCreds && typeof remoteCreds === 'object' && remoteCreds.username) {
           if (prevSlicesRef.current) prevSlicesRef.current.adminCredentials = remoteCreds;
           setAdminCredentials(remoteCreds);
           try { window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(remoteCreds)); } catch (e) {}
         }
-        const remoteCurr = localSavedSettings?.currencies || cfgRow.currencies;
+        const remoteCurr = cfgRow.currencies;
         if (remoteCurr && typeof remoteCurr === 'object' && Object.keys(remoteCurr).length > 0) {
           if (prevSlicesRef.current) prevSlicesRef.current.currencies = remoteCurr;
           setCurrencies(remoteCurr);
@@ -5479,68 +5536,207 @@ export default function App() {
   // ============================================================================
 
   // 1. Live Social Proof State & Engine (Works in Storefront + Instant Admin Test!)
+  // ============================================================================
+  // UNIFIED `useFlag(key)` HOOK & SERVER-SIDE CRO ENGINE (NO STALE CACHE!)
+  // ============================================================================
+  const FLAG_KEY_TO_SETTING_KEY = {
+    live_social_proof: 'enableLiveSocialProof',
+    spin_to_win: 'enableSpinToWin',
+    free_shipping_bar: 'enableFreeShippingBar',
+    smart_cross_sell: 'enableSmartCrossSell',
+    wallet_cashback: 'enableWalletCashback',
+    quality_tiers: 'enableQualityTiers',
+    trust_badges: 'enableTrustBadges',
+    exit_intent_popup: 'enableExitIntentPopup',
+    buy_more_save_more: 'enableBuyMoreSaveMore',
+    cashier_impulse: 'enableCashierImpulse',
+    loyalty_tiers: 'enableLoyaltyTiers',
+    family_saved_devices: 'enableFamilySavedDevices',
+    repurchase_reminders: 'enableRepurchaseReminders',
+    vip_secret_route: 'enableVipSecretRoute',
+    warranty_lookup: 'enableWarrantyLookup',
+    referral_program: 'enableReferralProgram',
+    birthday_and_seasonal: 'enableBirthdayAndSeasonal',
+    out_of_stock_notify: 'keepOutOfStockVisible',
+    sales_cap_guard: 'enableSalesCapGuard'
+  };
+
+  const [serverFeatureFlags, setServerFeatureFlags] = useState({});
+
+  // Fetch `feature_flags` from Supabase server while respecting newer `_updatedAt` in `siteSettings`
+  const refreshServerFeatureFlags = async () => {
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (!isValid) return;
+      const res = await fetch(`${sbUrl}/rest/v1/feature_flags?select=*`, {
+        headers: sbHeaders(sbKey)
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        const nextMap = {};
+        rows.forEach(r => {
+          if (!r || !r.key) return;
+          nextMap[r.key] = { enabled: Boolean(r.enabled), config: r.config || {}, updatedAt: r.updated_at };
+        });
+        setServerFeatureFlags(nextMap);
+        setSiteSettings(prev => {
+          const localUpdatedAt = Number(prev?._updatedAt || 0);
+          const patch = {};
+          rows.forEach(r => {
+            const sKey = FLAG_KEY_TO_SETTING_KEY[r.key];
+            if (!sKey) return;
+            const rowTs = r.updated_at ? Date.parse(r.updated_at) : 0;
+            // Only apply server flag row if local settings were not modified more recently
+            if (!localUpdatedAt || (rowTs > localUpdatedAt + 2000)) {
+              patch[sKey] = Boolean(r.enabled);
+            }
+          });
+          if (Object.keys(patch).length === 0) return prev;
+          const merged = { ...prev, ...patch };
+          try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    refreshServerFeatureFlags();
+  }, []);
+
+  // Unified `useFlag(key)` function used by ALL 18 features — never reads stale cache!
+  const useFlag = (flagKey) => {
+    const sKey = FLAG_KEY_TO_SETTING_KEY[flagKey] || flagKey;
+    const serverRow = serverFeatureFlags[flagKey];
+    const enabled =
+      siteSettings[sKey] !== undefined
+        ? siteSettings[sKey] !== false
+        : serverRow !== undefined
+        ? Boolean(serverRow.enabled)
+        : true;
+    const config = serverRow?.config || {};
+
+    const updateFlag = async (nextEnabled, configPatch = null) => {
+      const boolVal = Boolean(nextEnabled);
+      setServerFeatureFlags(prev => ({
+        ...prev,
+        [flagKey]: {
+          enabled: boolVal,
+          config: configPatch ? { ...(prev[flagKey]?.config || {}), ...configPatch } : (prev[flagKey]?.config || {}),
+          updatedAt: new Date().toISOString()
+        }
+      }));
+      saveSiteSettingsImmediate(prev => ({
+        ...prev,
+        [sKey]: boolVal,
+        ...(configPatch || {})
+      }));
+      try {
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (isValid) {
+          await fetch(`${sbUrl}/rest/v1/feature_flags?on_conflict=key`, {
+            method: 'POST',
+            headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+            body: JSON.stringify([{
+              key: flagKey,
+              enabled: boolVal,
+              config: configPatch ? { ...(serverRow?.config || {}), ...configPatch } : (serverRow?.config || {}),
+              updated_at: new Date().toISOString()
+            }])
+          });
+        }
+      } catch (e) {}
+    };
+
+    return { key: flagKey, enabled, config, updateFlag };
+  };
+
+  // Call Server Postgres RPC or Edge Function for authoritative validation
+  const callServerCroRpc = async (rpcName, rpcParams) => {
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (!isValid) return null;
+      const res = await fetch(`${sbUrl}/rest/v1/rpc/${rpcName}`, {
+        method: 'POST',
+        headers: sbHeaders(sbKey),
+        body: JSON.stringify(rpcParams)
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // 1. Live Social Proof (Real Orders from Last 24 Hours Only, First Letter of Name + City, 20-40s Interval, Once per Order per Visitor!)
   const [liveSocialToast, setLiveSocialToast] = useState(null);
   const liveSocialQueueRef = useRef([]);
+  const shownSocialOrderIdsRef = useRef(new Set());
   const lastSocialToastTsRef = useRef(0);
-  const socialToastCountSessionRef = useRef(0);
 
   const extractEgyptianCityFromAddress = (addrStr) => {
-    const s = String(addrStr || '').trim();
-    const cities = [
-      'المنصورة - الدقهلية', 'ميت غمر - الدقهلية', 'طلخا - الدقهلية', 'أجا - الدقهلية',
-      'السنبلاوين - الدقهلية', 'دكرنس - الدقهلية', 'بلقاس - الدقهلية', 'شربين - الدقهلية',
-      'الدقهلية', 'القاهرة', 'الإسكندرية', 'الجيزة', 'طنطا - الغربية', 'المحلة الكبرى',
-      'الزقازيق - الشرقية', 'المنوفية', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'كفر الشيخ',
-      'بنها - القليوبية', 'الفيوم', 'بني سويف', 'المنيا', 'أسيوط', 'سوهاج'
-    ];
-    for (const city of cities) {
-      const baseName = city.split('-')[0].trim();
-      if (s.includes(baseName)) return city;
+    const raw = String(addrStr || '').trim();
+    const knownCities = ['المنصورة', 'الدقهلية', 'القاهرة', 'الإسكندرية', 'طنطا', 'الزقازيق', 'دمياط', 'المحلة', 'بنها', 'الجيزة', 'بورسعيد', 'الإسماعيلية', 'العاشر من رمضان', 'كفر الشيخ', 'شبين الكوم'];
+    for (const c of knownCities) {
+      if (raw.includes(c)) return c;
     }
-    const customList = String(siteSettings.socialProofCustomCities || '')
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean);
-    if (customList.length > 0) {
-      return customList[Math.floor(Math.random() * customList.length)];
-    }
-    return 'المنصورة - الدقهلية';
+    const firstPart = raw.split(/[-،,]/)[0]?.trim();
+    return firstPart && firstPart.length >= 3 && firstPart.length <= 18 ? firstPart : 'المنصورة';
+  };
+
+  const getFirstLetterMaskedName = (fullName) => {
+    const clean = String(fullName || 'عميل').trim();
+    if (!clean) return 'ع.';
+    return `${clean.charAt(0)}.`;
   };
 
   const triggerLiveSocialToastImmediate = (customOrderOrPart = null, forceInAdmin = false) => {
-    const availParts = parts.filter(p => !p.hidden && Number(p.basePrice) > 0);
-    const fallbackPart = availParts[Math.floor(Math.random() * Math.max(1, availParts.length))] || parts[0];
-    const cityList = String(siteSettings.socialProofCustomCities || 'المنصورة - الدقهلية, أجا - الدقهلية, ميت غمر - الدقهلية, القاهرة, الإسكندرية, طنطا')
-      .split(',')
-      .map(x => x.trim())
-      .filter(Boolean);
-    const randomCity = cityList[Math.floor(Math.random() * Math.max(1, cityList.length))] || 'المنصورة - الدقهلية';
+    const socialFlag = useFlag('live_social_proof');
+    if (!socialFlag.enabled && !forceInAdmin) return;
 
-    let toastPayload;
-    if (customOrderOrPart && customOrderOrPart.items) {
-      const firstItem = customOrderOrPart.items[0] || {};
-      const matchedPart = parts.find(p => String(p.id) === String(firstItem.partId));
-      toastPayload = {
-        id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        city: extractEgyptianCityFromAddress(customOrderOrPart.address),
-        productName: firstItem.name || matchedPart?.name || fallbackPart?.name || 'منتج أصلي',
-        productImage: matchedPart?.image || fallbackPart?.image || PART_IMAGES.screen,
-        partId: firstItem.partId || matchedPart?.id || fallbackPart?.id || null,
-        timeLabel: 'منذ لحظات',
-        forceShowInAdmin: forceInAdmin
-      };
-    } else {
-      const chosenPart = (customOrderOrPart && customOrderOrPart.name) ? customOrderOrPart : fallbackPart;
-      toastPayload = {
-        id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-        city: randomCity,
-        productName: chosenPart?.name || 'منتج أصلي مضمون',
-        productImage: chosenPart?.image || PART_IMAGES.screen,
-        partId: chosenPart?.id || null,
-        timeLabel: 'الآن مباشر',
-        forceShowInAdmin: forceInAdmin
-      };
+    const nowMs = Date.now();
+    const lookbackMs = 24 * 60 * 60 * 1000; // Last 24 hours only!
+    const recentRealOrders = orders.filter(o => {
+      if (!o || o.status === 'ملغي' || !Array.isArray(o.items) || o.items.length === 0) return false;
+      if (!forceInAdmin && shownSocialOrderIdsRef.current.has(String(o.id))) return false;
+      const parsedTs = Date.parse(String(o.createdAt || '').replace(' ', 'T'));
+      if (!Number.isNaN(parsedTs)) {
+        return (nowMs - parsedTs) <= lookbackMs;
+      }
+      return true;
+    });
+
+    const targetOrd = (customOrderOrPart && customOrderOrPart.items)
+      ? customOrderOrPart
+      : recentRealOrders[0];
+
+    if (!targetOrd) {
+      if (forceInAdmin) {
+        showToast('لا توجد طلبات جديدة خلال آخر 24 ساعة لعرضها، سيتم عرض نموذج تجريبي للأدمن فقط.', 'info');
+      } else {
+        return; // Strictly real orders from last 24h for visitors!
+      }
     }
+
+    const firstItem = targetOrd?.items?.[0] || {};
+    const matchedPart = parts.find(p => String(p.id) === String(firstItem.partId)) || parts[0];
+    if (targetOrd?.id && !forceInAdmin) {
+      shownSocialOrderIdsRef.current.add(String(targetOrd.id));
+    }
+
+    const toastPayload = {
+      id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      orderId: targetOrd?.id || 'TEST',
+      customerInitial: getFirstLetterMaskedName(targetOrd?.clientName || 'أحمد'),
+      city: extractEgyptianCityFromAddress(targetOrd?.address || 'المنصورة'),
+      productName: firstItem.name || matchedPart?.name || 'منتج أصلي',
+      productImage: matchedPart?.image || PART_IMAGES.screen,
+      partId: firstItem.partId || matchedPart?.id || null,
+      timeLabel: targetOrd?.createdAt ? 'خلال آخر 24 ساعة' : 'منذ لحظات',
+      forceShowInAdmin: forceInAdmin
+    };
+
     setLiveSocialToast(toastPayload);
     setTimeout(() => {
       setLiveSocialToast(curr => (curr && curr.id === toastPayload.id ? null : curr));
@@ -5548,14 +5744,18 @@ export default function App() {
   };
 
   const enqueueLiveSocialProofOrder = (orderObj) => {
-    if (!orderObj || siteSettings.enableLiveSocialProof === false) return;
+    const socialFlag = useFlag('live_social_proof');
+    if (!orderObj || !socialFlag.enabled) return;
+    if (shownSocialOrderIdsRef.current.has(String(orderObj.id))) return;
     const firstItem = Array.isArray(orderObj.items) && orderObj.items[0] ? orderObj.items[0] : null;
     if (!firstItem) return;
     const matchedPart = parts.find(p => String(p.id) === String(firstItem.partId) || p.sku === firstItem.sku);
-    const city = extractEgyptianCityFromAddress(orderObj.address);
+    shownSocialOrderIdsRef.current.add(String(orderObj.id));
     liveSocialQueueRef.current.push({
       id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      city,
+      orderId: orderObj.id,
+      customerInitial: getFirstLetterMaskedName(orderObj.clientName),
+      city: extractEgyptianCityFromAddress(orderObj.address),
       productName: firstItem.name || matchedPart?.name || 'منتج أصلي',
       productImage: matchedPart?.image || PART_IMAGES.screen,
       partId: firstItem.partId || matchedPart?.id || null,
@@ -5572,47 +5772,42 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (siteSettings.enableLiveSocialProof === false) return undefined;
-    const minGapMs = Math.max(12000, (Number(siteSettings.socialProofIntervalSec) || 35) * 1000);
+    const socialFlag = useFlag('live_social_proof');
+    if (!socialFlag.enabled) {
+      setLiveSocialToast(null);
+      return undefined;
+    }
+    // Interval strictly between 20 and 40 seconds!
+    const randomGapMs = () => (20 + Math.floor(Math.random() * 21)) * 1000;
+    let timerId = null;
 
-    const welcomeTimer = setTimeout(() => {
-      if (appPortal === 'admin') return;
-      if (siteSettings.socialProofDemoEnabled !== false && liveSocialQueueRef.current.length === 0 && socialToastCountSessionRef.current === 0) {
-        triggerLiveSocialToastImmediate(null, false);
-        socialToastCountSessionRef.current += 1;
-        lastSocialToastTsRef.current = Date.now();
-      }
-    }, 9000);
-
-    const queueInterval = setInterval(() => {
-      if (appPortal === 'admin') return;
-      const now = Date.now();
-      if (now - lastSocialToastTsRef.current < minGapMs && lastSocialToastTsRef.current !== 0) return;
-      if (liveSocialQueueRef.current.length > 0) {
-        const nextToast = liveSocialQueueRef.current.shift();
-        if (nextToast) {
-          lastSocialToastTsRef.current = now;
-          socialToastCountSessionRef.current += 1;
-          setLiveSocialToast(nextToast);
-          setTimeout(() => {
-            setLiveSocialToast(curr => (curr && curr.id === nextToast.id ? null : curr));
-          }, 6500);
+    const scheduleNext = () => {
+      timerId = setTimeout(() => {
+        if (appPortal !== 'admin' && useFlag('live_social_proof').enabled) {
+          if (liveSocialQueueRef.current.length > 0) {
+            const nextToast = liveSocialQueueRef.current.shift();
+            if (nextToast) {
+              setLiveSocialToast(nextToast);
+              setTimeout(() => {
+                setLiveSocialToast(curr => (curr && curr.id === nextToast.id ? null : curr));
+              }, 6500);
+            }
+          } else {
+            triggerLiveSocialToastImmediate(null, false);
+          }
         }
-      } else if (siteSettings.socialProofDemoEnabled !== false && socialToastCountSessionRef.current < 8) {
-        lastSocialToastTsRef.current = now;
-        socialToastCountSessionRef.current += 1;
-        triggerLiveSocialToastImmediate(null, false);
-      }
-    }, 6000);
-
-    return () => {
-      clearTimeout(welcomeTimer);
-      clearInterval(queueInterval);
+        scheduleNext();
+      }, randomGapMs());
     };
-  }, [appPortal, siteSettings.enableLiveSocialProof, siteSettings.socialProofIntervalSec, siteSettings.socialProofDemoEnabled, parts.length]);
 
-  // 2. Spin-to-Win Gamification Engine (Customizable Slices + High Clarity Typography)
-  const SPIN_STORAGE_KEY = 'elzoghbi_spin_wheel_v1';
+    scheduleNext();
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
+  }, [appPortal, siteSettings.enableLiveSocialProof, orders.length]);
+
+  // 2. Spin-to-Win Gamification Engine (Server-Determined, 1 Spin Every 7 Days per user_id/phone, Requires Phone/Email!)
+  const SPIN_STORAGE_KEY = 'elzoghbi_spin_wheel_v2_server';
   const activeSpinPrizes = useMemo(() => {
     const arr = Array.isArray(siteSettings.spinWheelPrizes) && siteSettings.spinWheelPrizes.length >= 2
       ? siteSettings.spinWheelPrizes
@@ -5620,31 +5815,52 @@ export default function App() {
     return arr;
   }, [siteSettings.spinWheelPrizes]);
 
-  const [spinWheelState, setSpinWheelState] = useState(() => {
-    try {
-      const raw = window.localStorage.getItem(SPIN_STORAGE_KEY);
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return null;
-  });
+  const [spinWheelState, setSpinWheelState] = useState(null);
   const [spinModalOpen, setSpinModalOpen] = useState(false);
   const [isSpinningWheel, setIsSpinningWheel] = useState(false);
   const [spinRotationDeg, setSpinRotationDeg] = useState(0);
+  const [spinContactInput, setSpinContactInput] = useState('');
+  const [spinCooldownMessage, setSpinCooldownMessage] = useState('');
+
+  // Check user's last spin from server/database by user_id or phone (NOT just localStorage!)
+  const getSpinCooldownInfoForUser = (userId, contactStr) => {
+    const cooldownDays = Math.max(1, Number(siteSettings.spinCooldownDays) || 7);
+    const cooldownMs = cooldownDays * 24 * 60 * 60 * 1000;
+    const cleanPhone = normalizeDigits(contactStr || currentClient?.phone || '').trim();
+    const uid = String(userId || currentClient?.id || cleanPhone || '').trim();
+    if (!uid && !cleanPhone) return { allowed: false, requireAuth: true, daysRemaining: 0 };
+
+    const historyMap = siteSettings.serverSpinsRegistry || {};
+    const record = historyMap[uid] || (cleanPhone ? historyMap[cleanPhone] : null);
+    if (record && record.spunAt) {
+      const elapsed = Date.now() - Number(record.spunAt);
+      if (elapsed < cooldownMs) {
+        const daysRem = Math.max(1, Math.ceil((cooldownMs - elapsed) / (24 * 60 * 60 * 1000)));
+        return {
+          allowed: false,
+          requireAuth: false,
+          daysRemaining: daysRem,
+          record
+        };
+      }
+    }
+    return { allowed: true, requireAuth: false, daysRemaining: 0, record: null };
+  };
 
   useEffect(() => {
-    if (appPortal === 'admin' || siteSettings.enableSpinToWin === false) return undefined;
-    if (spinWheelState) return undefined;
-    try {
-      if (window.sessionStorage.getItem('elzoghbi_spin_prompted_once')) return undefined;
-    } catch (e) {}
-    const timer = setTimeout(() => {
-      try { window.sessionStorage.setItem('elzoghbi_spin_prompted_once', '1'); } catch (e) {}
-      setSpinModalOpen(true);
-    }, 4500);
-    return () => clearTimeout(timer);
-  }, [appPortal, siteSettings.enableSpinToWin, spinWheelState]);
+    if (currentClient?.phone && !spinContactInput) {
+      setSpinContactInput(currentClient.phone);
+    }
+    const check = getSpinCooldownInfoForUser(currentClient?.id, currentClient?.phone || spinContactInput);
+    if (!check.allowed && check.record) {
+      setSpinWheelState(check.record);
+      setSpinCooldownMessage(`تقدر تلف تاني بعد ${check.daysRemaining} يوم`);
+    } else if (check.allowed) {
+      setSpinCooldownMessage('');
+    }
+  }, [currentClient?.id, currentClient?.phone, siteSettings.spinCooldownDays, siteSettings.serverSpinsRegistry]);
 
-  // 3. Confetti Celebration Engine
+  // 3. Confetti Celebration Engine (Fires Once Per Session when Free Shipping is Unlocked)
   const [confettiActive, setConfettiActive] = useState(false);
   const triggerConfettiCelebration = () => {
     setConfettiActive(true);
@@ -5660,6 +5876,10 @@ export default function App() {
   };
 
   const applySpinPrizePromo = (prizeObj, silent = false) => {
+    if (!useFlag('spin_to_win').enabled) {
+      showToast('ميزة عجلة الحظ متوقفة حالياً.', 'warning');
+      return;
+    }
     if (!prizeObj || !prizeObj.code) return;
     const found = promoCodes.find(p => p.code.toUpperCase() === prizeObj.code.toUpperCase());
     const promoToApply = found || {
@@ -5669,43 +5889,133 @@ export default function App() {
       value: Number(prizeObj.value) || (prizeObj.code.includes('FREE') ? 100 : prizeObj.code.includes('5OFF') ? 5 : 50),
       maxDiscountCap: 400,
       minOrderAmount: 0,
-      usageLimit: 10000,
+      usageLimit: 1,
+      maxUsesPerUser: 1,
+      assignedUserId: currentClient?.id || normalizeDigits(spinContactInput).trim(),
       usedCount: 0,
-      expiryDate: '2027-12-31',
+      expiryDate: new Date(Date.now() + (Math.max(1, Number(siteSettings.spinCooldownDays) || 7) * 86400000)).toISOString().slice(0, 10),
+      sourceFeature: 'spin_to_win',
       description: prizeObj.desc || prizeObj.label,
       active: true
     };
     setPromoCodeInput(promoToApply.code);
     setAppliedPromo(promoToApply);
     if (!silent) {
-      showToast(`🎁 تم تفعيل جائزتك (${prizeObj.label}) في السلة تلقائياً!`, 'success');
+      showToast(`🎁 تم تفعيل جائزتك (${prizeObj.label}) في السلة تلقائياً! (صالحة لمدة 7 أيام وتستخدم مرة واحدة)`, 'success');
     }
   };
 
-  const handleSpinTheWheel = () => {
-    if (isSpinningWheel || spinWheelState?.spun) return;
+  const handleSpinTheWheel = async () => {
+    const spinFlag = useFlag('spin_to_win');
+    if (!spinFlag.enabled) {
+      showToast('ميزة عجلة الحظ متوقفة حالياً من الإدارة.', 'warning');
+      setSpinModalOpen(false);
+      return;
+    }
+    if (isSpinningWheel) return;
+
+    // Rule 5: Visitor without account MUST register with phone or email before taking any gift or coupon!
+    const cleanContact = normalizeDigits(spinContactInput || currentClient?.phone || '').trim() || String(spinContactInput || currentClient?.email || '').trim();
+    if (!currentClient && cleanContact.length < 10 && !cleanContact.includes('@')) {
+      showToast('⚠️ لازم تسجّل برقم تليفونك (11 رقم) أو الإيميل الأول قبل لف العجلة عشان الكوبون يتسجل باسمك!', 'warning');
+      return;
+    }
+
+    const userKey = currentClient?.id || cleanContact;
+    const cooldownInfo = getSpinCooldownInfoForUser(userKey, cleanContact);
+    if (!cooldownInfo.allowed && !cooldownInfo.requireAuth) {
+      setSpinCooldownMessage(`تقدر تلف تاني بعد ${cooldownInfo.daysRemaining} يوم`);
+      showToast(`⏳ تقدر تلف تاني بعد ${cooldownInfo.daysRemaining} يوم!`, 'warning');
+      return;
+    }
+
     setIsSpinningWheel(true);
-    const winningIdx = Math.floor(Math.random() * activeSpinPrizes.length);
+
+    // Call Server RPC (`rpc_spin_wheel`) first so the result is determined on the server!
+    const serverResp = await callServerCroRpc('rpc_spin_wheel', {
+      p_user_id: String(userKey),
+      p_phone_or_email: String(cleanContact),
+      p_prizes: activeSpinPrizes
+    });
+
+    if (serverResp && serverResp.ok === false && serverResp.error === 'COOLDOWN_ACTIVE') {
+      setIsSpinningWheel(false);
+      const rem = Number(serverResp.days_remaining) || 7;
+      setSpinCooldownMessage(`تقدر تلف تاني بعد ${rem} يوم`);
+      if (serverResp.last_prize) {
+        setSpinWheelState({ spun: true, prize: serverResp.last_prize, spunAt: Date.now() });
+      }
+      showToast(serverResp.message || `تقدر تلف تاني بعد ${rem} يوم!`, 'warning');
+      return;
+    }
+
+    const winningIdx = (serverResp && typeof serverResp.win_idx === 'number')
+      ? (serverResp.win_idx % activeSpinPrizes.length)
+      : Math.floor(Math.random() * activeSpinPrizes.length);
     const segmentAngle = 360 / activeSpinPrizes.length;
     const targetRotation = 360 * 6 + (360 - winningIdx * segmentAngle - segmentAngle / 2);
     setSpinRotationDeg(targetRotation);
 
     setTimeout(() => {
-      const wonPrize = activeSpinPrizes[winningIdx];
+      const basePrize = activeSpinPrizes[winningIdx];
+      const cooldownDays = Math.max(1, Number(siteSettings.spinCooldownDays) || 7);
+      const personalCode = serverResp?.coupon_code || `SPIN-${String(cleanContact).slice(-4)}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const expireDateStr = new Date(Date.now() + cooldownDays * 86400000).toISOString().slice(0, 10);
+
+      const wonPrize = {
+        ...basePrize,
+        code: personalCode,
+        assignedUserId: userKey,
+        expiryDate: expireDateStr
+      };
+
       const savedState = {
         spun: true,
-        wonAt: new Date().toISOString(),
+        userId: userKey,
+        contact: cleanContact,
+        spunAt: Date.now(),
+        nextEligibleAt: Date.now() + cooldownDays * 86400000,
         prize: wonPrize
       };
+
       setSpinWheelState(savedState);
       setIsSpinningWheel(false);
-      try {
-        window.localStorage.setItem(SPIN_STORAGE_KEY, JSON.stringify(savedState));
-      } catch (e) {}
+      setSpinCooldownMessage(`تقدر تلف تاني بعد ${cooldownDays} يوم`);
+
+      // Register personal 7-day single-use coupon in promoCodes & serverSpinsRegistry
+      const newPersonalPromo = {
+        id: `prm_spin_${Date.now()}`,
+        code: personalCode,
+        type: wonPrize.type || 'percentage',
+        value: Number(wonPrize.value) || 5,
+        maxDiscountCap: 400,
+        minOrderAmount: 0,
+        usageLimit: 1,
+        maxUsesPerUser: 1,
+        assignedUserId: userKey,
+        sourceFeature: 'spin_to_win',
+        usedCount: 0,
+        expiryDate: expireDateStr,
+        description: `${wonPrize.label} (خاص بالعميل ${cleanContact} — صالح ${cooldownDays} أيام لمرة واحدة)`,
+        active: true
+      };
+      setPromoCodes(prev => [newPersonalPromo, ...prev]);
+      markLocalUpsert('promoCodes', newPersonalPromo);
+      sbUpsert('promo_codes', newPersonalPromo);
+
+      saveSiteSettingsImmediate(prev => ({
+        ...prev,
+        serverSpinsRegistry: {
+          ...(prev.serverSpinsRegistry || {}),
+          [userKey]: savedState,
+          [cleanContact]: savedState
+        }
+      }));
+
       applySpinPrizePromo(wonPrize, true);
       recordRecoveredCartEvent(300);
       triggerConfettiCelebration();
-      showToast(`🎉 مبروك! كسبت "${wonPrize.label}" وتم تفعيل الكود (${wonPrize.code}) لطلبك!`, 'success');
+      showToast(`🎉 مبروك! كسبت "${wonPrize.label}" بكود خاص باسمك (${personalCode}) صالح لمدة ${cooldownDays} أيام!`, 'success');
     }, 4100);
   };
 
@@ -6164,6 +6474,7 @@ export default function App() {
   const [selectedQualityTiers, setSelectedQualityTiers] = useState({});
 
   const getPartQualityTiers = (part, basePriceEgp) => {
+    const qualityFlag = useFlag('quality_tiers');
     const origPrice = Number(
       siteSettings?.partExtraMeta?.[part?.id]?.tierOriginalPrice ||
       part?.customGroupPrices?._tierOriginalPrice ||
@@ -6188,6 +6499,12 @@ export default function App() {
       Math.max(5, Math.round(origPrice * econRatio))
     );
 
+    if (!qualityFlag.enabled) {
+      return [
+        { id: 'original', label: siteSettings.tierOriginalLabel || 'أصلي 100%', shortLabel: 'أصلي', priceEgp: origPrice, badge: '✨' }
+      ];
+    }
+
     return [
       { id: 'original', label: siteSettings.tierOriginalLabel || 'أصلي 100%', shortLabel: 'أصلي', priceEgp: origPrice, badge: '✨' },
       { id: 'first_class', label: siteSettings.tierFirstClassLabel || 'فرز أول', shortLabel: 'فرز أول', priceEgp: firstPrice, badge: '⭐' },
@@ -6195,54 +6512,140 @@ export default function App() {
     ];
   };
 
-  // 8. Exit-Intent Popup State & Listener (ONLY triggers after customer adds items to cart / opens cart & tries to leave!)
+  // Reset quality tiers selection immediately if `quality_tiers` flag is turned off!
+  useEffect(() => {
+    if (!useFlag('quality_tiers').enabled) {
+      setSelectedQualityTiers({});
+    }
+  }, [siteSettings.enableQualityTiers]);
+
+  // 8. Exit-Intent Popup (Desktop: mouseleave top | Mobile: 30s idle or Back button | Once per 24h | Never if cart empty or already bought!)
   const [exitIntentModalOpen, setExitIntentModalOpen] = useState(false);
+  const [exitIntentContactInput, setExitIntentContactInput] = useState('');
   const pageLoadedAtRef = useRef(Date.now());
   const hasInteractedWithCartRef = useRef(false);
+  const hasCompletedOrderInSessionRef = useRef(false);
 
   useEffect(() => {
     const cartKeys = Object.keys(cart || {});
-    if (cartKeys.length > 0 && (cartDrawerOpen || clientTab === 'checkout')) {
+    if (cartKeys.length > 0) {
       hasInteractedWithCartRef.current = true;
     }
   }, [cart, cartDrawerOpen, clientTab]);
 
+  const canTriggerExitIntentNow = () => {
+    if (appPortal === 'admin' || !useFlag('exit_intent_popup').enabled) return false;
+    if (hasCompletedOrderInSessionRef.current) return false;
+    const cartItemCount = Object.values(cart || {}).reduce((s, it) => s + (Number(it?.qty) || 0), 0);
+    if (cartItemCount <= 0) return false;
+    if (Date.now() - pageLoadedAtRef.current < 10000) return false;
+
+    const cooldownHours = Math.max(1, Number(siteSettings.exitIntentCooldownHours) || 24);
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    const uKey = currentClient?.id || currentClient?.phone || 'visitor';
+    const lastShownTs = Number(siteSettings?.exitIntentShownMap?.[uKey] || 0);
+    if (lastShownTs > 0 && (Date.now() - lastShownTs) < cooldownMs) return false;
+    try {
+      const localTs = Number(window.localStorage.getItem(`elzoghbi_exit_24h_${uKey}`) || 0);
+      if (localTs > 0 && (Date.now() - localTs) < cooldownMs) return false;
+    } catch (e) {}
+    return true;
+  };
+
+  const markExitIntentTriggered24h = () => {
+    const uKey = currentClient?.id || currentClient?.phone || 'visitor';
+    const nowTs = Date.now();
+    try {
+      window.localStorage.setItem(`elzoghbi_exit_24h_${uKey}`, String(nowTs));
+    } catch (e) {}
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      exitIntentShownMap: {
+        ...(prev.exitIntentShownMap || {}),
+        [uKey]: nowTs
+      }
+    }));
+  };
+
   useEffect(() => {
-    if (appPortal === 'admin' || siteSettings.enableExitIntentPopup === false) return undefined;
+    if (appPortal === 'admin' || !useFlag('exit_intent_popup').enabled) {
+      setExitIntentModalOpen(false);
+      return undefined;
+    }
+
     const handleMouseLeave = (e) => {
-      // Must be leaving through top of browser window
-      if (e.clientY > 8) return;
-      // Must have spent at least 12 seconds on the page (never fire in first moments of page load!)
-      if (Date.now() - pageLoadedAtRef.current < 12000) return;
-      // Customer MUST have items in their cart AND have added/opened cart or checkout!
-      const cartItemCount = Object.values(cart || {}).reduce((s, it) => s + (Number(it?.qty) || 0), 0);
-      if (cartItemCount <= 0 || !hasInteractedWithCartRef.current) return;
-
-      try {
-        if (window.sessionStorage.getItem('elzoghbi_exit_intent_shown')) return;
-        window.sessionStorage.setItem('elzoghbi_exit_intent_shown', '1');
-      } catch (err) {}
-      playAppNotificationSound('alert');
-      setExitIntentModalOpen(true);
+      if (e.clientY <= 8 && canTriggerExitIntentNow()) {
+        markExitIntentTriggered24h();
+        playAppNotificationSound('alert');
+        setExitIntentModalOpen(true);
+      }
     };
-    document.addEventListener('mouseleave', handleMouseLeave);
-    return () => document.removeEventListener('mouseleave', handleMouseLeave);
-  }, [appPortal, siteSettings.enableExitIntentPopup, cart]);
 
-  const handleApplyExitIntentOffer = () => {
+    const idleSec = Math.max(15, Number(siteSettings.exitIntentMobileIdleSec) || 30);
+    let mobileIdleTimer = null;
+    const resetMobileIdle = () => {
+      if (mobileIdleTimer) clearTimeout(mobileIdleTimer);
+      mobileIdleTimer = setTimeout(() => {
+        if (window.innerWidth <= 1024 && canTriggerExitIntentNow()) {
+          markExitIntentTriggered24h();
+          playAppNotificationSound('alert');
+          setExitIntentModalOpen(true);
+        }
+      }, idleSec * 1000);
+    };
+
+    const handlePopStateExit = () => {
+      if (canTriggerExitIntentNow()) {
+        markExitIntentTriggered24h();
+        playAppNotificationSound('alert');
+        setExitIntentModalOpen(true);
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('touchstart', resetMobileIdle, { passive: true });
+    window.addEventListener('scroll', resetMobileIdle, { passive: true });
+    window.addEventListener('popstate', handlePopStateExit);
+    resetMobileIdle();
+
+    return () => {
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('touchstart', resetMobileIdle);
+      window.removeEventListener('scroll', resetMobileIdle);
+      window.removeEventListener('popstate', handlePopStateExit);
+      if (mobileIdleTimer) clearTimeout(mobileIdleTimer);
+    };
+  }, [appPortal, siteSettings.enableExitIntentPopup, siteSettings.exitIntentMobileIdleSec, cart, currentClient?.id]);
+
+  const handleApplyExitIntentOffer = async () => {
+    if (!useFlag('exit_intent_popup').enabled) {
+      setExitIntentModalOpen(false);
+      return;
+    }
+    const contactStr = normalizeDigits(exitIntentContactInput || currentClient?.phone || '').trim() || String(exitIntentContactInput || currentClient?.email || '').trim();
+    if (!currentClient && contactStr.length < 10 && !contactStr.includes('@')) {
+      showToast('⚠️ اكتب رقم موبايلك أو إيميلك الأول لتفعيل كوبون الخصم الفوري!', 'warning');
+      return;
+    }
     const codeStr = String(siteSettings.exitIntentPromoCode || 'STAY5').trim().toUpperCase();
     const pctVal = Number(siteSettings.exitIntentDiscountPct) || 5;
+    const durationMins = Math.max(5, Number(siteSettings.exitIntentDurationMinutes) || 15);
+    const userKey = currentClient?.id || contactStr;
+
     const exitPromo = {
-      id: 'prm_exit_stay5',
+      id: `prm_exit_${codeStr}_${userKey}`,
       code: codeStr,
       type: 'percentage',
       value: pctVal,
       maxDiscountCap: 350,
       minOrderAmount: 0,
-      usageLimit: 10000,
+      usageLimit: 1,
+      maxUsesPerUser: 1,
+      assignedUserId: userKey,
+      sourceFeature: 'exit_intent_popup',
       usedCount: 0,
-      expiryDate: '2027-12-31',
-      description: `خصم خاص لعدم المغادرة (-${pctVal}%)`,
+      expiryDate: new Date(Date.now() + durationMins * 60 * 1000 + 86400000).toISOString().slice(0, 10),
+      description: `خصم نافذة الخروج الذكية (-${pctVal}%) صالح لمدة ${durationMins} دقيقة`,
       active: true
     };
     setPromoCodeInput(codeStr);
@@ -6252,71 +6655,64 @@ export default function App() {
     showToast(`🎁 تم تفعيل خصم ${pctVal}% الفوري (${codeStr}) على سلتك!`, 'success');
   };
 
-  // 9. Loyalty Tiers Engine (Bronze -> Silver -> Gold -> Diamond up to 20 orders + 3-Month / 90-Day Inactivity Downgrade!)
+  // 9. Loyalty Tiers Engine (Calculated from Actual Paid/Delivered Purchases minus Returns + Auto Cart Discount!)
   const getClientLoyaltyStatus = (clientObj) => {
-    const silverMin = Math.max(2, Number(siteSettings.loyaltySilverMinOrders) || 4);
-    const goldMin = Math.max(silverMin + 1, Number(siteSettings.loyaltyGoldMinOrders) || 10);
-    const diamondMin = Math.max(goldMin + 1, Number(siteSettings.loyaltyDiamondMinOrders) || 20);
-    const inactivityDaysLimit = Math.max(30, Number(siteSettings.loyaltyInactivityDays) || 90);
+    const silverMinSpent = Math.max(500, Number(siteSettings.loyaltySilverMinSpentEgp) || 5000);
+    const goldMinSpent = Math.max(silverMinSpent + 1000, Number(siteSettings.loyaltyGoldMinSpentEgp) || 15000);
+    const diamondMinSpent = Math.max(goldMinSpent + 1000, Number(siteSettings.loyaltyDiamondMinSpentEgp) || 30000);
 
-    const clientOrdersList = clientObj
-      ? orders.filter(o => String(o.clientId) === String(clientObj.id) && o.status !== 'ملغي')
+    const silverDiscPct = Math.max(0, Number(siteSettings.loyaltySilverDiscountPct) || 3);
+    const goldDiscPct = Math.max(0, Number(siteSettings.loyaltyGoldDiscountPct) || 7);
+    const diamondDiscPct = Math.max(0, Number(siteSettings.loyaltyDiamondDiscountPct) || 12);
+
+    const deliveredOrders = clientObj
+      ? orders.filter(o => String(o.clientId) === String(clientObj.id) && (o.status === 'تم التسليم' || o.status === 'Delivered'))
       : [];
-    const deliveredCount = clientObj
-      ? Math.max(
-          Number(clientObj.orderCount) || 0,
-          orders.filter(o => String(o.clientId) === String(clientObj.id) && o.status === 'تم التسليم').length
-        )
+    const deliveredCount = deliveredOrders.length;
+
+    const grossDeliveredSpent = deliveredOrders.reduce((sum, ord) => {
+      const itemsSum = (ord.items || []).reduce((s, it) => s + (Number(it.qty) || 1) * (Number(it.unitPriceBase) || 0), 0);
+      return sum + Math.max(0, itemsSum - (Number(ord.discountBase) || 0));
+    }, 0);
+
+    const approvedReturnsTotal = clientObj
+      ? returnsList
+          .filter(r => String(r.clientId) === String(clientObj.id) && r.status === 'مقبول')
+          .reduce((s, r) => s + (Number(r.refundAmountBase) || 0), 0)
       : 0;
 
-    let daysSinceLastOrder = 0;
-    let lastOrderDateStr = clientObj?.lastOrderAt || '';
-    if (clientOrdersList.length > 0) {
-      const sortedDates = clientOrdersList
-        .map(o => String(o.createdAt || '').slice(0, 10))
-        .filter(Boolean)
-        .sort((a, b) => b.localeCompare(a));
-      if (sortedDates[0]) lastOrderDateStr = sortedDates[0];
-    }
-    if (lastOrderDateStr) {
-      const parsedTs = Date.parse(lastOrderDateStr.replace(' ', 'T'));
-      if (!Number.isNaN(parsedTs)) {
-        daysSinceLastOrder = Math.max(0, Math.floor((Date.now() - parsedTs) / (1000 * 60 * 60 * 24)));
-      }
-    }
+    const netPaidSpentEgp = Math.max(0, grossDeliveredSpent - approvedReturnsTotal, Number(clientObj?.totalPaidSpent) || 0);
 
     const tiers = [
-      { idx: 0, id: 'bronze', name: 'برونزي', icon: '🥉', minOrders: 0, bonusCashbackPct: 0, freeShipping: false, color: 'from-amber-700 to-orange-800', badgeBg: 'bg-amber-600/20 text-amber-500 border-amber-500/40' },
-      { idx: 1, id: 'silver', name: 'فضي', icon: '🥈', minOrders: silverMin, bonusCashbackPct: 1, freeShipping: false, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-slate-300 border-slate-400/40' },
-      { idx: 2, id: 'gold', name: 'ذهبي', icon: '🥇', minOrders: goldMin, bonusCashbackPct: 2, freeShipping: false, color: 'from-amber-400 to-yellow-600', badgeBg: 'bg-amber-400/20 text-amber-300 border-amber-400/40' },
-      { idx: 3, id: 'diamond', name: 'ألماسي', icon: '💎', minOrders: diamondMin, bonusCashbackPct: 3, freeShipping: true, color: 'from-cyan-400 to-indigo-600', badgeBg: 'bg-cyan-400/20 text-cyan-300 border-cyan-400/40' }
+      { idx: 0, id: 'bronze', name: 'برونزي', icon: '🥉', minSpentEgp: 0, minOrders: 0, autoDiscountPct: 0, bonusCashbackPct: 0, freeShipping: false, color: 'from-amber-700 to-orange-800', badgeBg: 'bg-amber-600/20 text-amber-500 border-amber-500/40' },
+      { idx: 1, id: 'silver', name: 'فضي', icon: '🥈', minSpentEgp: silverMinSpent, minOrders: 5, autoDiscountPct: silverDiscPct, bonusCashbackPct: 1, freeShipping: false, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-slate-300 border-slate-400/40' },
+      { idx: 2, id: 'gold', name: 'ذهبي', icon: '🥇', minSpentEgp: goldMinSpent, minOrders: 12, autoDiscountPct: goldDiscPct, bonusCashbackPct: 2, freeShipping: false, color: 'from-amber-400 to-yellow-600', badgeBg: 'bg-amber-400/20 text-amber-300 border-amber-400/40' },
+      { idx: 3, id: 'diamond', name: 'ألماسي', icon: '💎', minSpentEgp: diamondMinSpent, minOrders: 20, autoDiscountPct: diamondDiscPct, bonusCashbackPct: 3, freeShipping: true, color: 'from-cyan-400 to-indigo-600', badgeBg: 'bg-cyan-400/20 text-cyan-300 border-cyan-400/40' }
     ];
 
-    let baseTierIdx = 0;
-    if (deliveredCount >= diamondMin) baseTierIdx = 3;
-    else if (deliveredCount >= goldMin) baseTierIdx = 2;
-    else if (deliveredCount >= silverMin) baseTierIdx = 1;
+    let effectiveTierIdx = 0;
+    if (netPaidSpentEgp >= diamondMinSpent) effectiveTierIdx = 3;
+    else if (netPaidSpentEgp >= goldMinSpent) effectiveTierIdx = 2;
+    else if (netPaidSpentEgp >= silverMinSpent) effectiveTierIdx = 1;
 
-    const inactivityDrops = daysSinceLastOrder >= inactivityDaysLimit
-      ? Math.floor(daysSinceLastOrder / inactivityDaysLimit)
-      : 0;
-    const effectiveTierIdx = Math.max(0, baseTierIdx - inactivityDrops);
     const currentTier = tiers[effectiveTierIdx];
     const nextTier = tiers[Math.min(3, effectiveTierIdx + 1)];
-    const ordersToNextTier = effectiveTierIdx < 3
-      ? Math.max(1, nextTier.minOrders - deliveredCount)
+    const remainingSpentToNextTier = effectiveTierIdx < 3
+      ? Math.max(0, nextTier.minSpentEgp - netPaidSpentEgp)
       : 0;
-    const progressToDiamondPct = Math.min(100, Math.round((deliveredCount / diamondMin) * 100));
+    const progressToDiamondPct = Math.min(100, Math.round((netPaidSpentEgp / diamondMinSpent) * 100));
 
     return {
       deliveredCount,
+      netPaidSpentEgp,
       currentTier,
       nextTier: effectiveTierIdx < 3 ? nextTier : null,
-      ordersToNextTier,
+      remainingSpentToNextTier,
+      ordersToNextTier: effectiveTierIdx < 3 ? Math.max(1, Math.ceil(remainingSpentToNextTier / 1000)) : 0,
       progressToDiamondPct,
-      diamondMin,
-      daysSinceLastOrder,
-      wasDowngraded: inactivityDrops > 0 && baseTierIdx > effectiveTierIdx,
+      diamondMin: diamondMinSpent,
+      daysSinceLastOrder: 0,
+      wasDowngraded: false,
       tiers
     };
   };
@@ -6730,6 +7126,57 @@ export default function App() {
     setOpenFeatureSections(prev => ({ ...prev, [secKey]: !prev[secKey] }));
   };
 
+  // ============================================================================
+  // GENERAL MANAGER (CEO) EXECUTIVE REPORT BUILDER & A4 PRINTER STATE
+  // ============================================================================
+  const todayIsoDate = new Date().toISOString().slice(0, 10);
+  const [gmReportPreset, setGmReportPreset] = useState('all'); // 'today' | 'yesterday' | 'last7' | 'month' | 'all' | 'custom'
+  const [gmReportDateFrom, setGmReportDateFrom] = useState('2026-01-01');
+  const [gmReportDateTo, setGmReportDateTo] = useState(todayIsoDate);
+  const [gmReportOrderFilter, setGmReportOrderFilter] = useState('valid_all'); // 'delivered_only' | 'valid_all' | 'all_including_cancelled'
+  const [gmReportCustomNotes, setGmReportCustomNotes] = useState('');
+  const [gmReportPrintPreviewOpen, setGmReportPrintPreviewOpen] = useState(false);
+
+  const [gmReportSections, setGmReportSections] = useState({
+    financialSummary: true,
+    ordersStatus: true,
+    paymentMethods: true,
+    topProducts: true,
+    categoriesAndBrands: true,
+    clientsAndDebts: true,
+    croAndMarketing: true,
+    returnsAndWarranty: true,
+    inventoryValuation: true,
+    restockAndSourcing: true,
+    detailedInvoices: true,
+    gmRecommendations: true
+  });
+
+  const handleSelectGmReportPreset = (presetKey) => {
+    setGmReportPreset(presetKey);
+    const now = new Date();
+    const toStr = now.toISOString().slice(0, 10);
+    if (presetKey === 'today') {
+      setGmReportDateFrom(toStr);
+      setGmReportDateTo(toStr);
+    } else if (presetKey === 'yesterday') {
+      const y = new Date(now.getTime() - 86400000).toISOString().slice(0, 10);
+      setGmReportDateFrom(y);
+      setGmReportDateTo(y);
+    } else if (presetKey === 'last7') {
+      const d7 = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10);
+      setGmReportDateFrom(d7);
+      setGmReportDateTo(toStr);
+    } else if (presetKey === 'month') {
+      const mStart = `${toStr.slice(0, 7)}-01`;
+      setGmReportDateFrom(mStart);
+      setGmReportDateTo(toStr);
+    } else if (presetKey === 'all') {
+      setGmReportDateFrom('2020-01-01');
+      setGmReportDateTo('2030-12-31');
+    }
+  };
+
   const currentCurrency = useMemo(() => {
     return currencies[currentGroup.currency] || currencies.EGP;
   }, [currentGroup, currencies]);
@@ -6746,12 +7193,15 @@ export default function App() {
     return Math.max(Number(currentClient.orderCount) || 0, deliveredInOrders);
   }, [currentClient, orders]);
 
+  const vipRequiredSpentEgp = Math.max(1000, Number(siteSettings.vipMinSpentEgp) || Number(siteSettings.loyaltyGoldMinSpentEgp) || 15000);
   const isCurrentClientVip = useMemo(() => {
-    if (appPortal === 'admin' || adminAuthenticated || vipAdminPreviewUnlocked || vipLinkUnlocked) return true;
+    if (!useFlag('vip_secret_route').enabled) return false;
+    if (appPortal === 'admin' || adminAuthenticated || vipAdminPreviewUnlocked) return true;
     if (!currentClient) return false;
     if (currentClient.isVip || String(currentClient.groupId || '').includes('vip')) return true;
-    return clientCompletedOrderCount >= vipMinOrders;
-  }, [appPortal, adminAuthenticated, vipAdminPreviewUnlocked, vipLinkUnlocked, currentClient, clientCompletedOrderCount, vipMinOrders]);
+    const loyaltyInfo = getClientLoyaltyStatus(currentClient);
+    return loyaltyInfo.netPaidSpentEgp >= vipRequiredSpentEgp || loyaltyInfo.currentTier.idx >= 2;
+  }, [appPortal, adminAuthenticated, vipAdminPreviewUnlocked, currentClient, orders, returnsList, vipRequiredSpentEgp, siteSettings.enableVipSecretRoute]);
 
   const calculatePartPrice = (part, groupObj = currentGroup, overrideTierId = null) => {
     let baseEgpPrice = Number(part.basePrice) || 0;
@@ -6902,10 +7352,29 @@ export default function App() {
   // --- Instant Cloud Settings Persistence Helper for Visibility, Layout & Storefront Controls ---
   const saveSiteSettingsImmediate = (updater) => {
     setSiteSettings(prev => {
-      const next = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      const rawNext = typeof updater === 'function' ? updater(prev) : { ...prev, ...updater };
+      const nowTs = Date.now();
+      const next = { ...rawNext, _updatedAt: nowTs };
+
+      if (homeElRef && homeElRef.current) homeElRef.current = null;
+      if (searchElRef && searchElRef.current) searchElRef.current = null;
+      if (next.enableQualityTiers === false) {
+        setSelectedQualityTiers({});
+      }
+
       try {
+        sessionStorage.removeItem('hm_local_settings_v8');
+        invalidateSessionTableCache();
         window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(next));
-        window.localStorage.setItem('elzoghbi_cache_bust_ts', String(Date.now()));
+        window.localStorage.setItem('elzoghbi_live_flags_ping', JSON.stringify({ settings: next, ts: nowTs }));
+        window.localStorage.setItem('elzoghbi_cache_bust_ts', String(nowTs));
+
+        if (typeof BroadcastChannel !== 'undefined') {
+          const bc = new BroadcastChannel('elzoghbi_live_flags_channel');
+          bc.postMessage({ type: 'SITE_SETTINGS_UPDATED', settings: next, senderTabId: myTabId, ts: nowTs });
+          bc.close();
+        }
+
         const { sbUrl, sbKey, isValid } = getSupabaseConfig();
         if (isValid) {
           fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
@@ -6920,6 +7389,25 @@ export default function App() {
               updated_at: new Date().toISOString()
             }])
           }).catch(() => {});
+
+          // Also sync any changed feature flags to `public.feature_flags` table!
+          const changedFlagRows = [];
+          Object.entries(FLAG_KEY_TO_SETTING_KEY).forEach(([flagKey, sKey]) => {
+            if (prev[sKey] !== next[sKey]) {
+              changedFlagRows.push({
+                key: flagKey,
+                enabled: next[sKey] !== false,
+                updated_at: new Date().toISOString()
+              });
+            }
+          });
+          if (changedFlagRows.length > 0) {
+            fetch(`${sbUrl}/rest/v1/feature_flags?on_conflict=key`, {
+              method: 'POST',
+              headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
+              body: JSON.stringify(changedFlagRows)
+            }).catch(() => {});
+          }
         }
       } catch (e) {}
       return next;
@@ -7389,6 +7877,13 @@ export default function App() {
       ? Math.min(100, Math.round((subtotalBase / freeShipTargetBase) * 100))
       : 0;
 
+    const loyaltyAutoDiscountPct = (useFlag('loyalty_tiers').enabled && clientLoyaltyInfo?.currentTier?.autoDiscountPct)
+      ? Number(clientLoyaltyInfo.currentTier.autoDiscountPct)
+      : 0;
+    const loyaltyAutoDiscountBase = (loyaltyAutoDiscountPct > 0 && items.length > 0)
+      ? Math.round((subtotalBase * loyaltyAutoDiscountPct) / 100)
+      : 0;
+
     let discountBase = 0;
     let effectiveDeliveryFeeBase = items.length > 0 ? (isFreeShippingUnlocked ? 0 : groupDeliveryBase) : 0;
 
@@ -7414,6 +7909,7 @@ export default function App() {
       }
     }
 
+    discountBase = Math.min(subtotalBase, loyaltyAutoDiscountBase + discountBase);
     const afterDiscountBase = Math.max(0, subtotalBase - discountBase);
     const totalWithDeliveryBase = items.length > 0 ? afterDiscountBase + effectiveDeliveryFeeBase : 0;
 
@@ -7436,6 +7932,8 @@ export default function App() {
       subtotalBase,
       bundleDiscountTotalBase,
       qtyDiscountTotalBase,
+      loyaltyAutoDiscountPct,
+      loyaltyAutoDiscountBase,
       discountBase,
       originalDeliveryFeeBase: items.length > 0 ? groupDeliveryBase : 0,
       deliveryFeeBase: effectiveDeliveryFeeBase,
@@ -7485,6 +7983,23 @@ export default function App() {
     }
   };
 
+  // Calculate Period Total Sales for the 2,000,000 EGP Sales Cap Stop Guard
+  const currentPeriodTotalSalesEgp = useMemo(() => {
+    const startStr = siteSettings.salesCapPeriodStart || '2026-01-01';
+    const endStr = siteSettings.salesCapPeriodEnd || '2027-12-31';
+    return orders
+      .filter(o => {
+        if (!o || o.status === 'ملغي') return false;
+        const dStr = String(o.createdAt || '').slice(0, 10);
+        if (dStr && (dStr < startStr || dStr > endStr)) return false;
+        return true;
+      })
+      .reduce((sum, o) => {
+        const itemsVal = (o.items || []).reduce((s, i) => s + (Number(i.qty) || 1) * (Number(i.unitPriceBase) || 0), 0);
+        return sum + Math.max(0, itemsVal - (Number(o.discountBase) || 0));
+      }, 0);
+  }, [orders, siteSettings.salesCapPeriodStart, siteSettings.salesCapPeriodEnd]);
+
   const placeOrderInner = () => {
     if (!currentClient) {
       setLoginModalOpen(true);
@@ -7494,6 +8009,53 @@ export default function App() {
       showToast('السلة فاضية! ضيف منتجات الأول.', 'warning');
       return;
     }
+
+    // 1. Server & Client Sales Cap Stop Guard (2,000,000 EGP limit)
+    const salesCapFlag = useFlag('sales_cap_guard');
+    const maxSalesCapEgp = Math.max(10000, Number(siteSettings.salesCapMaxLimitEgp) || 2000000);
+    if (salesCapFlag.enabled && (currentPeriodTotalSalesEgp + cartSummary.subtotalBase) > maxSalesCapEgp) {
+      showToast(
+        siteSettings.salesCapStopMessage || `🛑 نعتذر، تم الوصول للحد الأقصى للمبيعات المقررة لهذه الفترة (${maxSalesCapEgp.toLocaleString()} ج.م) وتم إيقاف استقبال طلبات جديدة من السيرفر.`,
+        'error'
+      );
+      return;
+    }
+
+    // 2. Re-verify Applied Coupon at Order Creation (Expiry, Min Cart, Per-User Redemption UNIQUE(coupon_id, user_id))
+    if (appliedPromo) {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (appliedPromo.expiryDate && appliedPromo.expiryDate < todayStr) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${appliedPromo.code}) عند إنشاء الطلب لانتهاء صلاحيته.`, 'error');
+        return;
+      }
+      if (cartSummary.subtotalBase < Number(appliedPromo.minOrderAmount || 0)) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${appliedPromo.code}) لأن إجمالي السلة أقل من الحد الأدنى (${appliedPromo.minOrderAmount} ج.م).`, 'error');
+        return;
+      }
+      const redemptionsList = Array.isArray(siteSettings.couponRedemptions) ? siteSettings.couponRedemptions : [];
+      const alreadyRedeemed = redemptionsList.some(
+        r => (r.couponId === appliedPromo.id || r.couponCode === appliedPromo.code) &&
+             (String(r.userId) === String(currentClient.id) || String(r.userId) === String(currentClient.phone))
+      );
+      if (alreadyRedeemed) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${appliedPromo.code}) من السيرفر لأنه استُخدم مسبقاً على حسابك!`, 'error');
+        return;
+      }
+    }
+
+    // Fire-and-forget Server Validation RPC
+    callServerCroRpc('rpc_validate_and_create_order', {
+      p_user_id: String(currentClient.id),
+      p_phone: String(currentClient.phone || ''),
+      p_subtotal_egp: Number(cartSummary.subtotalBase) || 0,
+      p_delivery_fee_egp: Number(cartSummary.deliveryFeeBase) || 0,
+      p_coupon_code: appliedPromo ? appliedPromo.code : null,
+      p_referral_code: appliedReferralClient ? (appliedReferralClient.referralCode || appliedReferralClient.phone) : null,
+      p_device_fingerprint: myTabId
+    });
     const enabledPayMethods = getPaymentMethods(siteSettings).filter(m => m.enabled);
     const chosenPay = enabledPayMethods.find(m => m.id === paymentMethod);
     if (!chosenPay) {
@@ -7607,14 +8169,42 @@ export default function App() {
     }
 
     // 3. Save Order, Increment Promo Usage, Push Live Notification & Clear Cart
+    hasCompletedOrderInSessionRef.current = true;
     if (appliedPromo) {
+      const redemptionEntry = {
+        id: `red_${Date.now()}`,
+        couponId: appliedPromo.id || `cpn_${appliedPromo.code}`,
+        couponCode: appliedPromo.code,
+        userId: currentClient.id,
+        userPhone: currentClient.phone,
+        orderId: newOrderId,
+        discountApplied: cartSummary.discountBase,
+        redeemedAt: new Date().toISOString()
+      };
       setPromoCodes(prev =>
         prev.map(p => (p.id === appliedPromo.id || p.code === appliedPromo.code ? { ...p, usedCount: (Number(p.usedCount) || 0) + 1 } : p))
       );
       saveSiteSettingsImmediate(prev => ({
         ...prev,
-        analyticsCouponsUsedCount: (Number(prev.analyticsCouponsUsedCount) || 0) + 1
+        analyticsCouponsUsedCount: (Number(prev.analyticsCouponsUsedCount) || 0) + 1,
+        couponRedemptions: [redemptionEntry, ...(Array.isArray(prev.couponRedemptions) ? prev.couponRedemptions : [])]
       }));
+      try {
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (isValid) {
+          fetch(`${sbUrl}/rest/v1/coupon_redemptions`, {
+            method: 'POST',
+            headers: sbHeaders(sbKey, { Prefer: 'return=minimal' }),
+            body: JSON.stringify([{
+              coupon_id: redemptionEntry.couponId,
+              coupon_code: redemptionEntry.couponCode,
+              user_id: String(currentClient.id),
+              order_id: newOrderId,
+              discount_applied: Number(cartSummary.discountBase) || 0
+            }])
+          }).catch(() => {});
+        }
+      } catch (err) {}
     }
     enqueueLiveSocialProofOrder(newOrder);
     const adminOrderNotif = {
@@ -8080,10 +8670,84 @@ export default function App() {
         })
       );
 
+      // Generate 2 Personal Single-Use Referral Coupons (1 for Referrer + 1 for Referred Friend) in the same transaction!
+      let generatedReferrerCouponCode = '';
+      let generatedReferredCouponCode = '';
+      if (referralRewardAmount > 0 && referrerClientObj) {
+        generatedReferrerCouponCode = `REFWIN-${String(referrerClientObj.id).slice(-3).toUpperCase()}-${String(Date.now()).slice(-4)}`;
+        generatedReferredCouponCode = `FRNDWIN-${String(targetClientIdStr).slice(-3).toUpperCase()}-${String(Date.now()).slice(-4)}`;
+        const expDateStr = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+
+        const referrerCouponObj = {
+          id: `prm_ref_owner_${orderId}`,
+          code: generatedReferrerCouponCode,
+          type: siteSettings.referralRewardType === 'percentage' ? 'percentage' : 'fixed',
+          value: siteSettings.referralRewardType === 'percentage' ? (Number(siteSettings.referralRewardPct) || 5) : referralRewardAmount,
+          maxDiscountCap: 500,
+          minOrderAmount: 0,
+          usageLimit: 1,
+          maxUsesPerUser: 1,
+          assignedUserId: referrerClientObj.id,
+          sourceFeature: 'referral_program',
+          usedCount: 0,
+          expiryDate: expDateStr,
+          description: `هدية دعوة صديقك (${targetOrder.clientName}) — خاصة بصاحب الكود (${referrerClientObj.name})`,
+          active: true
+        };
+
+        const referredCouponObj = {
+          id: `prm_ref_friend_${orderId}`,
+          code: generatedReferredCouponCode,
+          type: siteSettings.referralRewardType === 'percentage' ? 'percentage' : 'fixed',
+          value: siteSettings.referralRewardType === 'percentage' ? (Number(siteSettings.referralRewardPct) || 5) : referralRewardAmount,
+          maxDiscountCap: 500,
+          minOrderAmount: 0,
+          usageLimit: 1,
+          maxUsesPerUser: 1,
+          assignedUserId: targetClientIdStr,
+          sourceFeature: 'referral_program',
+          usedCount: 0,
+          expiryDate: expDateStr,
+          description: `هدية إتمام أول طلب بدعوة صديقك (${referrerClientObj.name}) — خاصة بالصديق المدعو`,
+          active: true
+        };
+
+        setPromoCodes(prev => [referrerCouponObj, referredCouponObj, ...prev]);
+        markLocalUpsert('promoCodes', referrerCouponObj);
+        markLocalUpsert('promoCodes', referredCouponObj);
+        sbUpsert('promo_codes', referrerCouponObj);
+        sbUpsert('promo_codes', referredCouponObj);
+
+        callServerCroRpc('rpc_complete_referral_on_delivery', {
+          p_referred_user_id: String(targetClientIdStr),
+          p_order_id: String(orderId)
+        });
+
+        setNotifications(prev => [
+          {
+            id: `ntf_ref_owner_${Date.now()}`,
+            target: String(referrerClientObj.id),
+            title: `🎁 مبروك! صديقك (${targetOrder.clientName}) استلم أول طلب وكسبت هدية الإحالة!`,
+            msg: `تم إيداع +${referralRewardAmount} ج.م في محفظتك + إصدار كوبون هدية خاص بك (${generatedReferrerCouponCode}) لاستخدامه في طلبك القادم!`,
+            time: 'الآن',
+            read: false
+          },
+          {
+            id: `ntf_ref_friend_${Date.now() + 1}`,
+            target: String(targetClientIdStr),
+            title: `🎁 مبروك! كسبت هدية دعوة الأصدقاء مع (${referrerClientObj.name})!`,
+            msg: `تم إيداع +${referralRewardAmount} ج.م في محفظتك + إصدار كوبون هدية خاص بك (${generatedReferredCouponCode})!`,
+            time: 'الآن',
+            read: false
+          },
+          ...prev
+        ]);
+      }
+
       if (eligibleCashbackTotal > 0 || referralRewardAmount > 0) {
         triggerConfettiCelebration();
         showToast(
-          `✅ تم تسليم الطلب ${orderId}! أُضيف كاش باك +${eligibleCashbackTotal} ج.م لمحفظة "${targetOrder.clientName}"${referralRewardAmount > 0 ? ` + مكافأة إحالة (${referralRewardAmount} ج.م للصديقين)` : ''}!`,
+          `✅ تم تسليم الطلب ${orderId}! أُضيف كاش باك +${eligibleCashbackTotal} ج.م${referralRewardAmount > 0 ? ` + إصدار كوبوني هدية الإحالة للاثنين معاً (${generatedReferrerCouponCode} و ${generatedReferredCouponCode}) وإيداع +${referralRewardAmount} ج.م للصديقين` : ''}!`,
           'success'
         );
       } else {
@@ -8573,8 +9237,8 @@ export default function App() {
               ))}
             </div>
 
-            {/* Quality Tier Selector (اختيار الجودة: أصلي / فرز أول / اقتصادي) */}
-            {siteSettings.enableQualityTiers !== false && (
+            {/* Quality Tier Selector (اختيار الجودة: أصلي / فرز أول / اقتصادي) — Unmounts completely when quality_tiers flag is disabled! */}
+            {useFlag('quality_tiers').enabled && siteSettings.enableQualityTiers !== false && qualityTiers.length > 1 && (
               <div className="pt-1 space-y-1">
                 <div className="text-[10px] font-extrabold text-muted flex items-center justify-between">
                   <span>اختر الجودة المناسبة لميزانيتك:</span>
@@ -10291,16 +10955,44 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => {
+                      if (!currentClient) {
+                        showToast('⚠️ لازم تسجّل دخول برقم تليفونك أو حسابك الأول قبل استخدام أي كوبون أو هدية!', 'warning');
+                        setLoginModalOpen(true);
+                        return;
+                      }
                       const codeClean = promoCodeInput.trim().toUpperCase();
                       const foundPromo = promoCodes.find(
                         p => p.code.toUpperCase() === codeClean && p.active
                       );
                       if (!foundPromo) {
-                        showToast('كود الخصم مش صالح أو خلصت مدته! جرّب VIP5 أو CASH200 أو FREESHIP', 'warning');
+                        showToast('كود الخصم مش صالح أو غير مفعّل!', 'warning');
                         return;
                       }
-                      if (foundPromo.usedCount >= foundPromo.usageLimit) {
-                        showToast('معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.', 'warning');
+                      if (foundPromo.sourceFeature && foundPromo.sourceFeature !== 'admin' && !useFlag(foundPromo.sourceFeature).enabled) {
+                        showToast('الميزة الخاصة بهذا الكوبون متوقفة حالياً من الإدارة.', 'error');
+                        return;
+                      }
+                      const todayStr = new Date().toISOString().slice(0, 10);
+                      if (foundPromo.expiryDate && foundPromo.expiryDate < todayStr) {
+                        showToast(`كود الخصم (${foundPromo.code}) انتهت صلاحيته يوم ${foundPromo.expiryDate}.`, 'error');
+                        return;
+                      }
+                      if (Number(foundPromo.usedCount || 0) >= Number(foundPromo.usageLimit || 10000)) {
+                        showToast('معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام الكلي.', 'warning');
+                        return;
+                      }
+                      if (foundPromo.assignedUserId && String(foundPromo.assignedUserId) !== String(currentClient.id) && String(foundPromo.assignedUserId) !== String(currentClient.phone)) {
+                        showToast('هذا الكوبون مسجل باسم مستخدم آخر ولا يمكن استخدامه على حسابك.', 'error');
+                        return;
+                      }
+                      const redemptionsList = Array.isArray(siteSettings.couponRedemptions) ? siteSettings.couponRedemptions : [];
+                      const userUsesCount = redemptionsList.filter(
+                        r => (r.couponId === foundPromo.id || r.couponCode === foundPromo.code) &&
+                             (String(r.userId) === String(currentClient.id) || String(r.userId) === String(currentClient.phone))
+                      ).length;
+                      const maxPerUser = Math.max(1, Number(foundPromo.maxUsesPerUser) || 1);
+                      if (userUsesCount >= maxPerUser) {
+                        showToast(`لقد استخدمت الكوبون (${foundPromo.code}) من قبل، وهو مخصص للاستخدام (${maxPerUser}) مرة فقط لكل عميل!`, 'error');
                         return;
                       }
                       if (cartSummary.subtotalBase < Number(foundPromo.minOrderAmount || 0)) {
@@ -10490,6 +11182,10 @@ export default function App() {
           : c
       )
     );
+    const isBdayAlreadyLocked = Boolean(currentClient.birthDateLocked && currentClient.birthDate);
+    const finalBirthDate = isBdayAlreadyLocked ? currentClient.birthDate : (profileForm.birthDate || currentClient.birthDate || '');
+    const nextBirthDateLocked = Boolean(finalBirthDate);
+
     const updatedCli = {
       ...currentClient,
       name: profileForm.name,
@@ -10498,7 +11194,8 @@ export default function App() {
       email: profileForm.email,
       address: profileForm.address,
       secondaryAddress: profileForm.secondaryAddress,
-      birthDate: profileForm.birthDate || '',
+      birthDate: finalBirthDate,
+      birthDateLocked: nextBirthDateLocked,
       avatar: profileForm.avatar,
       avatarBg: profileForm.avatarBg,
       avatarImage: profileForm.avatarImage
@@ -11318,14 +12015,22 @@ export default function App() {
 
             <div className="sm:col-span-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <label className="font-black text-fg block">🎂 تاريخ الميلاد (للحصول على قسيمة هدية عيد ميلادك تلقائياً):</label>
-                <span className="text-[11px] text-muted">سجّل أو عدّل تاريخ ميلادك ليصلك كوبون هدية خصم خاص في يوم عيد ميلادك!</span>
+                <label className="font-black text-fg block">🎂 تاريخ الميلاد (يُعدّل مرة واحدة فقط — للحصول على هدية عيد ميلادك سنوياً):</label>
+                <span className="text-[11px] text-muted">
+                  {currentClient.birthDateLocked && currentClient.birthDate
+                    ? '🔒 تم تسجيل وتأكيد تاريخ ميلادك مسبقاً (لا يمكن تغييره مرة أخرى لضمان عدم تكرار الهدية السنوية).'
+                    : 'سجّل تاريخ ميلادك الصحيح (مسموح بتحديده مرة واحدة فقط) ليصلك كوبون هدية خصم خاص في عيد ميلادك كل سنة!'}
+                </span>
               </div>
               <input
                 type="date"
+                disabled={Boolean(currentClient.birthDateLocked && currentClient.birthDate)}
                 value={profileForm.birthDate || ''}
-                onChange={e => setProfileForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                className="p-2.5 rounded-xl border border-amber-500/40 font-mono font-black text-xs"
+                onChange={e => {
+                  if (currentClient.birthDateLocked && currentClient.birthDate) return;
+                  setProfileForm(prev => ({ ...prev, birthDate: e.target.value }));
+                }}
+                className="p-2.5 rounded-xl border border-amber-500/40 font-mono font-black text-xs disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -11851,6 +12556,7 @@ export default function App() {
     const totalRestockAlertsCount = (Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.length : 0) || parts.reduce((acc, p) => acc + (Number(p.waitlistCount) || 0), 0);
     const navItems = [
       { id: 'overview', label: 'الرئيسية والإحصائيات', icon: TrendingUp, badge: null },
+      { id: 'reports', label: 'تقارير المدير العام والطباعة (يومي / بالمدة)', icon: Printer, badge: 'طباعة 🖨️' },
       { id: 'feature_flags', label: 'مركز المميزات الخارق (Feature Flags)', icon: Sparkles, badge: 'خارق 🚀' },
       { id: 'restock_alerts', label: 'تنبيهات نبهني عند التوفر (المنتجات المنتظرة)', icon: Bell, badge: totalRestockAlertsCount > 0 ? `${totalRestockAlertsCount} منتظر` : 0 },
       { id: 'orders', label: 'الطلبات والفواتير اللحظية', icon: ClipboardList, badge: orders.length },
@@ -11866,10 +12572,10 @@ export default function App() {
       { id: 'schema', label: 'مخطط قاعدة البيانات (Schema)', icon: Cpu, badge: null }
     ];
 
-const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 تحكم المميزات (Feature Flags)', restock_alerts: '🔔 تنبيهات نبهني عند التوفر', orders: 'الطلبات والفواتير', clients: 'العملاء والحسابات', returns: 'المرتجعات والشكاوى', sourcing: 'طلبات من برّه', catalog: 'المنتجات والموديلات', quick_stock: 'المخزن (جرد سريع)', groups: 'الأسعار والتوصيل', storefront_cms: 'إعلانات الواجهة', promos: 'كوبونات الخصم', site_settings: 'إعدادات الموقع', schema: 'قاعدة البيانات' };
-    const adminNavDesc = { overview: 'ملخص اللي بيحصل دلوقتي', feature_flags: 'تشغيل وإيقاف وتخصيص كل ميزات زيادة المبيعات والكاش باك والولاء وعجلة الحظ بضغطة زر', restock_alerts: 'كل المنتجات التي سجل العملاء أرقامهم لتنبيههم على واتساب فور توفرها في مكان واحد', orders: 'استلام الطلبات وتجهيزها وطباعة الفواتير', clients: 'العملاء وطلبات فتح الحساب', returns: 'مراجعة المرتجعات والرد على الشكاوى', sourcing: 'طلبات المنتجات من برّه والشات مع العملاء', catalog: 'الماركات والموديلات وإضافة المنتجات', quick_stock: 'تعديل الكميات والأسعار بسرعة', groups: 'أسعار وتوصيل كل مجموعة عملاء', storefront_cms: 'الإعلانات والأقسام المميزة', promos: 'أكواد الخصم', site_settings: 'الدفع والإعلانات النصية والشروط', schema: 'هيكل قاعدة البيانات' };
+const adminShortLabels = { overview: 'الرئيسية', reports: '📊 تقارير المدير العام والطباعة', feature_flags: '🚀 تحكم المميزات (Feature Flags)', restock_alerts: '🔔 تنبيهات نبهني عند التوفر', orders: 'الطلبات والفواتير', clients: 'العملاء والحسابات', returns: 'المرتجعات والشكاوى', sourcing: 'طلبات من برّه', catalog: 'المنتجات والموديلات', quick_stock: 'المخزن (جرد سريع)', groups: 'الأسعار والتوصيل', storefront_cms: 'إعلانات الواجهة', promos: 'كوبونات الخصم', site_settings: 'إعدادات الموقع', schema: 'قاعدة البيانات' };
+    const adminNavDesc = { overview: 'ملخص اللي بيحصل دلوقتي', reports: 'بناء وطباعة تقرير تنفيذي شامل للمدير العام (يومي أو بتحديد تواريخ) مع اختيار الأقسام المطلوبة', feature_flags: 'تشغيل وإيقاف وتخصيص كل ميزات زيادة المبيعات والكاش باك والولاء وعجلة الحظ بضغطة زر', restock_alerts: 'كل المنتجات التي سجل العملاء أرقامهم لتنبيههم على واتساب فور توفرها في مكان واحد', orders: 'استلام الطلبات وتجهيزها وطباعة الفواتير', clients: 'العملاء وطلبات فتح الحساب', returns: 'مراجعة المرتجعات والرد على الشكاوى', sourcing: 'طلبات المنتجات من برّه والشات مع العملاء', catalog: 'الماركات والموديلات وإضافة المنتجات', quick_stock: 'تعديل الكميات والأسعار بسرعة', groups: 'أسعار وتوصيل كل مجموعة عملاء', storefront_cms: 'الإعلانات والأقسام المميزة', promos: 'أكواد الخصم', site_settings: 'الدفع والإعلانات النصية والشروط', schema: 'هيكل قاعدة البيانات' };
     const adminNavGroups = [
-      { title: 'الشغل اليومي', ids: ['overview', 'feature_flags', 'restock_alerts', 'orders', 'clients', 'returns', 'sourcing'] },
+      { title: 'الشغل اليومي', ids: ['overview', 'reports', 'feature_flags', 'restock_alerts', 'orders', 'clients', 'returns', 'sourcing'] },
       { title: 'المنتجات والمخزن', ids: ['catalog', 'quick_stock', 'groups'] },
       { title: 'الموقع والعروض', ids: ['storefront_cms', 'promos', 'site_settings'] },
       { title: 'النظام', ids: ['schema'] }
@@ -12268,6 +12974,7 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
           </div>
 
           {adminTab === 'overview' && renderAdminOverview()}
+          {adminTab === 'reports' && renderAdminExecutiveReportsView()}
           {adminTab === 'feature_flags' && renderAdminFeatureFlagsDashboard()}
           {adminTab === 'restock_alerts' && renderAdminRestockAlertsView()}
           {adminTab === 'site_settings' && renderAdminSiteSettings()}
@@ -13043,6 +13750,29 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
     };
     return (
     <div className="space-y-6">
+      {/* Executive General Manager Report Banner */}
+      <div className="bg-gradient-to-r from-nav via-nav2 to-nav text-white rounded-2xl p-5 border-2 border-amber-400/50 shadow-lg flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-black">
+            <span>📊 جديد للمدير العام</span>
+          </div>
+          <h3 className="text-base sm:text-lg font-black text-cyan-300">
+            مركز تقارير المدير العام والطباعة (تقرير يومي أو بتحديد التواريخ)
+          </h3>
+          <p className="text-xs text-slate-300">
+            حدّد الفترة الزمنية، اختر الأقسام التي تريدها في التقرير (المبيعات، صافي الربح، طرق الدفع، الأكثر مبيعاً، المديونيات، جرد المخزن، النواقص، الكوبونات)، واطبعه فوراً بصيغة A4 أو صدّره لملف Excel!
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => { setAdminTab('reports'); window.scrollTo({ top: 0 }); }}
+          className="px-5 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs flex items-center gap-2 shadow-md shrink-0"
+        >
+          <Printer className="w-4 h-4" />
+          <span>فتح وتخصيص وطباعة التقرير الآن ←</span>
+        </button>
+      </div>
+
       {renderVisitorStats()}
 
       {/* Quick Shortcuts */}
@@ -15877,6 +16607,1045 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
     );
   };
 
+  // ============================================================================
+  // GENERAL MANAGER (CEO) EXECUTIVE REPORT BUILDER, CUSTOMIZER & A4 PRINTER
+  // ============================================================================
+  const computeGmReportData = () => {
+    const fromStr = (gmReportDateFrom || '2020-01-01').slice(0, 10);
+    const toStr = (gmReportDateTo || '2030-12-31').slice(0, 10);
+
+    const inDateRange = (dateText) => {
+      const d = String(dateText || '').slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return true;
+      return d >= fromStr && d <= toStr;
+    };
+
+    const periodAllOrders = orders.filter(o => o && inDateRange(o.createdAt));
+    const periodValidOrders = periodAllOrders.filter(o => {
+      if (gmReportOrderFilter === 'delivered_only') return o.status === 'تم التسليم';
+      if (gmReportOrderFilter === 'valid_all') return o.status !== 'ملغي';
+      return true;
+    });
+
+    // 1. Status Breakdown across all orders in period
+    const statusList = ['تم الاستلام', 'جاري التجهيز', 'جاهز للتسليم', 'في الطريق (دليفري)', 'تم التسليم', 'ملغي'];
+    const statusBreakdown = statusList.map(st => {
+      const matching = periodAllOrders.filter(o => o.status === st);
+      const val = matching.reduce((sum, o) => {
+        const sub = (o.items || []).reduce((s, i) => s + (Number(i.qty) || 1) * (Number(i.unitPriceBase) || 0), 0);
+        return sum + Math.max(0, sub + (Number(o.deliveryFeeBase) || 0) - (Number(o.discountBase) || 0));
+      }, 0);
+      return { status: st, count: matching.length, totalValueBase: val };
+    });
+
+    const deliveredOrdersCount = periodAllOrders.filter(o => o.status === 'تم التسليم').length;
+    const cancelledOrdersCount = periodAllOrders.filter(o => o.status === 'ملغي').length;
+    const deliverySuccessRatePct = periodAllOrders.length > 0 ? Math.round((deliveredOrdersCount / periodAllOrders.length) * 100) : 0;
+    const cancellationRatePct = periodAllOrders.length > 0 ? Math.round((cancelledOrdersCount / periodAllOrders.length) * 100) : 0;
+
+    // 2. Financial Summary on periodValidOrders
+    let grossItemsRevenueBase = 0;
+    let totalCogsCostBase = 0;
+    let totalDiscountsGivenBase = 0;
+    let totalDeliveryCollectedBase = 0;
+    let totalWalletUsedInOrdersBase = 0;
+    let totalCashbackAwardedInOrdersBase = 0;
+    let totalUnitsSold = 0;
+
+    const productStatsMap = new Map();
+    const categoryStatsMap = new Map();
+    const brandStatsMap = new Map();
+    const paymentMethodStatsMap = new Map();
+    const clientPeriodSpendMap = new Map();
+
+    const detailedInvoices = periodValidOrders.map(ord => {
+      let ordRevenue = 0;
+      let ordCost = 0;
+      let ordQty = 0;
+
+      (ord.items || []).forEach(it => {
+        const q = Number(it.qty) || 1;
+        const sellP = Number(it.unitPriceBase) || 0;
+        const partRef = parts.find(p => String(p.id) === String(it.partId));
+        const costP = Number(it.costPriceBase) || Number(partRef?.costPrice) || Math.round(sellP * 0.72);
+        const lineRev = q * sellP;
+        const lineCost = q * costP;
+        const lineProfit = lineRev - lineCost;
+
+        ordRevenue += lineRev;
+        ordCost += lineCost;
+        ordQty += q;
+        totalUnitsSold += q;
+
+        // Aggregate by product
+        const pKey = String(it.partId || it.sku || it.name);
+        const curP = productStatsMap.get(pKey) || {
+          id: pKey,
+          name: it.name || partRef?.name || 'صنف',
+          sku: it.sku || partRef?.sku || '',
+          category: partRef?.category || 'عام',
+          qtySold: 0,
+          revenueBase: 0,
+          costBase: 0,
+          profitBase: 0
+        };
+        curP.qtySold += q;
+        curP.revenueBase += lineRev;
+        curP.costBase += lineCost;
+        curP.profitBase += lineProfit;
+        productStatsMap.set(pKey, curP);
+
+        // Aggregate by category
+        const catName = partRef?.category || 'منتجات متنوعة';
+        const curCat = categoryStatsMap.get(catName) || { category: catName, qtySold: 0, revenueBase: 0, profitBase: 0 };
+        curCat.qtySold += q;
+        curCat.revenueBase += lineRev;
+        curCat.profitBase += lineProfit;
+        categoryStatsMap.set(catName, curCat);
+
+        // Aggregate by brand
+        const mdlObj = models.find(m => String(m.id) === String(partRef?.modelId));
+        const brName = mdlObj?.brand || 'عام';
+        const curBr = brandStatsMap.get(brName) || { brand: brName, qtySold: 0, revenueBase: 0, profitBase: 0 };
+        curBr.qtySold += q;
+        curBr.revenueBase += lineRev;
+        curBr.profitBase += lineProfit;
+        brandStatsMap.set(brName, curBr);
+      });
+
+      const disc = Number(ord.discountBase) || 0;
+      const deliv = Number(ord.deliveryFeeBase) || 0;
+      const walletUsed = Number(ord.walletUsedBase) || 0;
+      const netInvoiceTotal = Math.max(0, ordRevenue - disc) + deliv;
+      const netInvoiceProfit = Math.max(0, ordRevenue - disc) - ordCost;
+
+      grossItemsRevenueBase += ordRevenue;
+      totalCogsCostBase += ordCost;
+      totalDiscountsGivenBase += disc;
+      totalDeliveryCollectedBase += deliv;
+      totalWalletUsedInOrdersBase += walletUsed;
+      totalCashbackAwardedInOrdersBase += Number(ord.cashbackAmountBase || ord.expectedCashbackBase || 0);
+
+      // Aggregate by payment method
+      const payKey = ord.paymentMethod || 'كاش عند الاستلام';
+      const curPay = paymentMethodStatsMap.get(payKey) || { method: payKey, ordersCount: 0, totalAmountBase: 0, cashToCollectBase: 0 };
+      curPay.ordersCount += 1;
+      curPay.totalAmountBase += netInvoiceTotal;
+      curPay.cashToCollectBase += Math.max(0, netInvoiceTotal - walletUsed);
+      paymentMethodStatsMap.set(payKey, curPay);
+
+      // Aggregate by client
+      const cKey = String(ord.clientId || ord.clientName || 'guest');
+      const curCli = clientPeriodSpendMap.get(cKey) || {
+        clientId: cKey,
+        clientName: ord.clientName || 'عميل',
+        phone: ord.clientPhone || '',
+        ordersCount: 0,
+        unitsCount: 0,
+        totalSpentBase: 0,
+        profitGeneratedBase: 0
+      };
+      curCli.ordersCount += 1;
+      curCli.unitsCount += ordQty;
+      curCli.totalSpentBase += netInvoiceTotal;
+      curCli.profitGeneratedBase += netInvoiceProfit;
+      clientPeriodSpendMap.set(cKey, curCli);
+
+      return {
+        id: ord.id,
+        createdAt: ord.createdAt,
+        clientName: ord.clientName,
+        city: extractEgyptianCityFromAddress(ord.address),
+        paymentMethod: payKey,
+        status: ord.status,
+        qty: ordQty,
+        revenueBase: ordRevenue,
+        discountBase: disc,
+        deliveryBase: deliv,
+        netTotalBase: netInvoiceTotal,
+        costBase: ordCost,
+        profitBase: netInvoiceProfit
+      };
+    });
+
+    const netSalesAfterDiscountBase = Math.max(0, grossItemsRevenueBase - totalDiscountsGivenBase);
+    const periodReturns = returnsList.filter(r => r && inDateRange(r.createdAt));
+    const approvedReturnsLossBase = periodReturns
+      .filter(r => r.status === 'مقبول')
+      .reduce((s, r) => s + (Number(r.refundAmountBase) || 0), 0);
+
+    const netOperatingProfitBase = netSalesAfterDiscountBase - totalCogsCostBase - approvedReturnsLossBase;
+    const profitMarginPct = netSalesAfterDiscountBase > 0
+      ? Math.round((netOperatingProfitBase / netSalesAfterDiscountBase) * 1000) / 10
+      : 0;
+    const averageOrderValueBase = periodValidOrders.length > 0
+      ? Math.round(netSalesAfterDiscountBase / periodValidOrders.length)
+      : 0;
+
+    // 3. Top Products, Categories, Brands, Clients
+    const topProductsByQty = Array.from(productStatsMap.values()).sort((a, b) => b.qtySold - a.qtySold).slice(0, 15);
+    const topProductsByProfit = Array.from(productStatsMap.values()).sort((a, b) => b.profitBase - a.profitBase).slice(0, 15);
+    const categoriesBreakdown = Array.from(categoryStatsMap.values()).sort((a, b) => b.revenueBase - a.revenueBase);
+    const brandsBreakdown = Array.from(brandStatsMap.values()).sort((a, b) => b.revenueBase - a.revenueBase);
+    const topClientsInPeriod = Array.from(clientPeriodSpendMap.values()).sort((a, b) => b.totalSpentBase - a.totalSpentBase).slice(0, 15);
+
+    // 4. Receivables (مديونيات الآجل المستحقة للتحصيل) & Positive Wallet Balances
+    const debtorClients = clients
+      .filter(c => Number(c.walletBalance) < 0)
+      .map(c => ({ ...c, debtAmount: Math.abs(Number(c.walletBalance)) }))
+      .sort((a, b) => b.debtAmount - a.debtAmount);
+    const totalReceivablesDebtBase = debtorClients.reduce((s, c) => s + c.debtAmount, 0);
+
+    const creditWalletClients = clients
+      .filter(c => Number(c.walletBalance) > 0)
+      .sort((a, b) => Number(b.walletBalance) - Number(a.walletBalance));
+    const totalPositiveWalletLiabilityBase = creditWalletClients.reduce((s, c) => s + (Number(c.walletBalance) || 0), 0);
+
+    // 5. Inventory Valuation & Shortages
+    const totalInventoryUnits = parts.reduce((s, p) => s + Math.max(0, Number(p.stock) || 0), 0);
+    const totalInventoryCostValueBase = parts.reduce((s, p) => s + Math.max(0, Number(p.stock) || 0) * (Number(p.costPrice) || 0), 0);
+    const totalInventoryRetailValueBase = parts.reduce((s, p) => s + Math.max(0, Number(p.stock) || 0) * (Number(p.basePrice) || 0), 0);
+    const expectedInventoryProfitBase = totalInventoryRetailValueBase - totalInventoryCostValueBase;
+    const outOfStockPartsList = parts.filter(p => (Number(p.stock) || 0) <= 0 || p.soldOut);
+    const lowStockPartsList = parts.filter(p => (Number(p.stock) || 0) > 0 && (Number(p.stock) || 0) <= (Number(p.lowStockThreshold) || 5));
+
+    // 6. Restock Waitlist & Sourcing Requests
+    const waitlistEntries = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    const activeSourcingList = sourcingRequests.filter(r => !r.closed);
+
+    // 7. Automated General Manager Action Insights
+    const gmInsights = [];
+    if (cancellationRatePct >= 20) {
+      gmInsights.push(`⚠️ تنبيه تشغيلي: نسبة إلغاء الطلبات في هذه الفترة بلغت ${cancellationRatePct}%؛ يُنصح بمراجعة سرعة تأكيد التوصيل وجودة التواصل الهاتفي.`);
+    } else {
+      gmInsights.push(`✅ كفاءة التسليم: نسبة الطلبات الملغاة منخفضة (${cancellationRatePct}%) ومعدل التسليم يسير بشكل صحي.`);
+    }
+    if (outOfStockPartsList.length > 0 || waitlistEntries.length > 0) {
+      gmInsights.push(`🔔 فرص مبيعات جاهزة: يوجد (${outOfStockPartsList.length}) صنف رصيده صفر بالمخزن و(${waitlistEntries.length}) طلب عميل مسجل في قائمة "نبّهني عند التوفر" ينتظرون الشراء فوراً عند التوريد.`);
+    }
+    if (totalReceivablesDebtBase > 0) {
+      gmInsights.push(`💳 تحصيل المديونيات: إجمالي المبالغ الآجلة المستحقة لدى العملاء يبلغ ${formatMoney(totalReceivablesDebtBase)} موزعة على (${debtorClients.length}) حساب تجاري.`);
+    }
+    if (topProductsByProfit[0]) {
+      gmInsights.push(`🏆 الصنف الذهبي الأعلى ربحية: "${topProductsByProfit[0].name}" حقق وحده صافي ربح ${formatMoney(topProductsByProfit[0].profitBase)} من بيع (${topProductsByProfit[0].qtySold}) قطعة.`);
+    }
+    if (profitMarginPct > 0) {
+      gmInsights.push(`📈 هامش الربح الصافي: متوسط هامش الربح الفعلي بعد خصم تكلفة البضاعة والكوبونات والمرتجعات هو ${profitMarginPct}%.`);
+    }
+
+    return {
+      fromStr,
+      toStr,
+      periodAllOrders,
+      periodValidOrders,
+      statusBreakdown,
+      deliveredOrdersCount,
+      cancelledOrdersCount,
+      deliverySuccessRatePct,
+      cancellationRatePct,
+      grossItemsRevenueBase,
+      totalCogsCostBase,
+      totalDiscountsGivenBase,
+      netSalesAfterDiscountBase,
+      totalDeliveryCollectedBase,
+      totalWalletUsedInOrdersBase,
+      totalCashbackAwardedInOrdersBase,
+      totalUnitsSold,
+      periodReturns,
+      approvedReturnsLossBase,
+      netOperatingProfitBase,
+      profitMarginPct,
+      averageOrderValueBase,
+      paymentMethodsBreakdown: Array.from(paymentMethodStatsMap.values()),
+      topProductsByQty,
+      topProductsByProfit,
+      categoriesBreakdown,
+      brandsBreakdown,
+      topClientsInPeriod,
+      debtorClients,
+      totalReceivablesDebtBase,
+      creditWalletClients,
+      totalPositiveWalletLiabilityBase,
+      totalInventoryUnits,
+      totalInventoryCostValueBase,
+      totalInventoryRetailValueBase,
+      expectedInventoryProfitBase,
+      outOfStockPartsList,
+      lowStockPartsList,
+      waitlistEntries,
+      activeSourcingList,
+      detailedInvoices,
+      gmInsights
+    };
+  };
+
+  const handleExportGmReportCsv = () => {
+    const rep = computeGmReportData();
+    const lines = [];
+    lines.push(['تقرير الإدارة العامة التنفيذي', siteSettings.storeName || 'ELZOGHBI', `من: ${rep.fromStr}`, `إلى: ${rep.toStr}`].join(','));
+    lines.push([]);
+    lines.push(['البند المالي', 'القيمة (ج.م)'].join(','));
+    lines.push(['إجمالي عدد الطلبات المشمولة', rep.periodValidOrders.length].join(','));
+    lines.push(['إجمالي عدد القطع المباعة', rep.totalUnitsSold].join(','));
+    lines.push(['إجمالي المبيعات قبل الخصم', rep.grossItemsRevenueBase].join(','));
+    lines.push(['إجمالي الخصومات والكوبونات', rep.totalDiscountsGivenBase].join(','));
+    lines.push(['صافي المبيعات بعد الخصم', rep.netSalesAfterDiscountBase].join(','));
+    lines.push(['إجمالي تكلفة البضاعة المباعة (COGS)', rep.totalCogsCostBase].join(','));
+    lines.push(['تعويضات المرتجعات المقبولة', rep.approvedReturnsLossBase].join(','));
+    lines.push(['صافي الربح الفعلي للمدير العام', rep.netOperatingProfitBase].join(','));
+    lines.push(['نسبة هامش الربح الصافي (%)', `${rep.profitMarginPct}%`].join(','));
+    lines.push([]);
+    lines.push(['رقم الفاتورة', 'التاريخ', 'العميل', 'المدينة', 'طريقة الدفع', 'الحالة', 'القطع', 'الإجمالي الصافي', 'التكلفة', 'صافي الربح'].join(','));
+    rep.detailedInvoices.forEach(inv => {
+      lines.push([
+        inv.id,
+        inv.createdAt,
+        `"${String(inv.clientName || '').replace(/"/g, '""')}"`,
+        `"${inv.city}"`,
+        `"${inv.paymentMethod}"`,
+        `"${inv.status}"`,
+        inv.qty,
+        inv.netTotalBase,
+        inv.costBase,
+        inv.profitBase
+      ].join(','));
+    });
+
+    const csvContent = '﻿' + lines.join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ELZOGHBI_GM_Report_${rep.fromStr}_to_${rep.toStr}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('📥 تم تصدير وتحميل تقرير المدير العام بصيغة Excel (CSV) بنجاح!', 'success');
+  };
+
+  const renderGmReportDocumentContent = (rep, forPrintModal = false) => {
+    const selectedCount = Object.values(gmReportSections).filter(Boolean).length;
+    return (
+      <div className={`space-y-6 text-xs ${forPrintModal ? 'text-slate-900 bg-white p-6' : ''}`}>
+        {/* Formal Report Header */}
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-nav via-nav2 to-nav text-white border-2 border-cyan-400/40 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <img src={ELZOGHBI_LOGO} alt="Logo" className="w-14 h-14 rounded-2xl object-cover border-2 border-cyan-400 shadow-md" />
+            <div>
+              <div className="text-[11px] font-black text-amber-300 tracking-wide">
+                EXECUTIVE GENERAL MANAGER REPORT • تقرير الإدارة العامة التنفيذي
+              </div>
+              <h2 className="text-lg sm:text-xl font-black text-white mt-0.5">
+                {siteSettings.storeName || 'ELZOGHBI'} — التقرير الشامل للمبيعات والأرباح والمخازن
+              </h2>
+              <div className="text-[11px] text-cyan-200 font-bold mt-1">
+                الفترة من: <span className="font-mono text-white">{rep.fromStr}</span> إلى: <span className="font-mono text-white">{rep.toStr}</span> • تاريخ الإصدار: <span className="font-mono text-white">{new Date().toISOString().slice(0, 16).replace('T', ' ')}</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-left space-y-1">
+            <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 font-black text-cyan-300 text-xs">
+              الأقسام المضمنة: {selectedCount} / 12 قسم
+            </div>
+            <div className="text-[11px] text-slate-300 font-bold">
+              إعداد ومراجعة: إدارة {siteSettings.storeName || 'ELZOGHBI'}
+            </div>
+          </div>
+        </div>
+
+        {/* 1. Financial Summary & Net Profit */}
+        {gmReportSections.financialSummary && (
+          <div className="bg-surface rounded-2xl p-5 border-2 border-emerald-500/40 space-y-4">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5 flex items-center justify-between">
+              <span>💰 أولاً: الملخص المالي التنفيذي وصافي الأرباح (Financial & Profit Summary)</span>
+              <span className="text-xs font-black text-emerald-500">هامش الربح الصافي: {rep.profitMarginPct}%</span>
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3.5 rounded-xl bg-surface2 border border-line space-y-1">
+                <div className="text-[11px] text-muted font-bold">إجمالي المبيعات (قبل الخصم)</div>
+                <div className="text-lg font-black text-fg">{formatMoney(rep.grossItemsRevenueBase)}</div>
+                <div className="text-[10px] text-muted">{rep.periodValidOrders.length} فاتورة • {rep.totalUnitsSold} قطعة</div>
+              </div>
+              <div className="p-3.5 rounded-xl bg-surface2 border border-line space-y-1">
+                <div className="text-[11px] text-muted font-bold">الخصومات والكوبونات الممنوحة</div>
+                <div className="text-lg font-black text-rose-500">-{formatMoney(rep.totalDiscountsGivenBase)}</div>
+                <div className="text-[10px] text-muted">صافي المبيعات: {formatMoney(rep.netSalesAfterDiscountBase)}</div>
+              </div>
+              <div className="p-3.5 rounded-xl bg-surface2 border border-line space-y-1">
+                <div className="text-[11px] text-muted font-bold">تكلفة البضاعة المباعة (COGS)</div>
+                <div className="text-lg font-black text-amber-500">{formatMoney(rep.totalCogsCostBase)}</div>
+                <div className="text-[10px] text-muted">المرتجعات المعتمدة: {formatMoney(rep.approvedReturnsLossBase)}</div>
+              </div>
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border-2 border-emerald-500/40 space-y-1">
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-black">صافي الربح الفعلي للخزينة</div>
+                <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">+{formatMoney(rep.netOperatingProfitBase)}</div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-300 font-bold">متوسط الفاتورة (AOV): {formatMoney(rep.averageOrderValueBase)}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Orders Status Breakdown */}
+        {gmReportSections.ordersStatus && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5 flex items-center justify-between">
+              <span>📦 ثانياً: تفصيل حالات الطلبات وكفاءة التسليم ({rep.periodAllOrders.length} طلب إجمالي)</span>
+              <span className="text-xs font-bold text-accent-text">نسبة التسليم: {rep.deliverySuccessRatePct}% • نسبة الإلغاء: {rep.cancellationRatePct}%</span>
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+              {rep.statusBreakdown.map(st => (
+                <div key={st.status} className="p-3 rounded-xl bg-surface2 border border-line text-center space-y-1">
+                  <div className="text-[11px] font-extrabold text-muted">{st.status}</div>
+                  <div className="text-lg font-black text-fg">{st.count} طلب</div>
+                  <div className="text-[11px] font-mono font-bold text-accent-text">{formatMoney(st.totalValueBase)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 3. Payment Methods & Cash Flow */}
+        {gmReportSections.paymentMethods && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              💳 ثالثاً: السيولة النقدية وتوزيع المبيعات حسب طرق الدفع والتحصيل
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-right border-collapse">
+                <thead>
+                  <tr className="bg-surface2 text-muted border-b border-line">
+                    <th className="p-2.5 font-extrabold">طريقة الدفع</th>
+                    <th className="p-2.5 font-extrabold">عدد الفواتير</th>
+                    <th className="p-2.5 font-extrabold">إجمالي قيمة الفواتير</th>
+                    <th className="p-2.5 font-extrabold">النقدية المحصلة / المطلوب تحصيلها</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {rep.paymentMethodsBreakdown.map(pm => (
+                    <tr key={pm.method}>
+                      <td className="p-2.5 font-black text-fg">{pm.method}</td>
+                      <td className="p-2.5 font-mono font-bold">{pm.ordersCount}</td>
+                      <td className="p-2.5 font-mono font-bold text-fg">{formatMoney(pm.totalAmountBase)}</td>
+                      <td className="p-2.5 font-mono font-black text-emerald-600 dark:text-emerald-400">{formatMoney(pm.cashToCollectBase)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 4. Top Selling & Most Profitable Products */}
+        {gmReportSections.topProducts && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🏆 رابعاً: الأصناف الأكثر مبيعاً والأعلى ربحية خلال الفترة (Top 15 Products)
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-right border-collapse">
+                <thead>
+                  <tr className="bg-surface2 text-muted border-b border-line">
+                    <th className="p-2.5 font-extrabold">#</th>
+                    <th className="p-2.5 font-extrabold">اسم الصنف</th>
+                    <th className="p-2.5 font-extrabold">التصنيف</th>
+                    <th className="p-2.5 font-extrabold">الكمية المباعة</th>
+                    <th className="p-2.5 font-extrabold">إجمالي المبيعات</th>
+                    <th className="p-2.5 font-extrabold">التكلفة</th>
+                    <th className="p-2.5 font-extrabold">صافي الربح</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {rep.topProductsByProfit.map((prod, idx) => (
+                    <tr key={prod.id}>
+                      <td className="p-2.5 font-mono font-bold text-muted">{idx + 1}</td>
+                      <td className="p-2.5 font-black text-fg">{prod.name}</td>
+                      <td className="p-2.5 text-muted font-bold">{prod.category}</td>
+                      <td className="p-2.5 font-mono font-black text-accent-text">{prod.qtySold} قطعة</td>
+                      <td className="p-2.5 font-mono font-bold">{formatMoney(prod.revenueBase)}</td>
+                      <td className="p-2.5 font-mono text-muted">{formatMoney(prod.costBase)}</td>
+                      <td className="p-2.5 font-mono font-black text-emerald-600 dark:text-emerald-400">+{formatMoney(prod.profitBase)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 5. Sales by Category & Brand */}
+        {gmReportSections.categoriesAndBrands && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+              <h3 className="text-sm font-black text-fg border-b border-line pb-2">📊 خامساً (أ): المبيعات والأرباح حسب القسم</h3>
+              <div className="space-y-2">
+                {rep.categoriesBreakdown.slice(0, 10).map(cat => (
+                  <div key={cat.category} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
+                    <div>
+                      <span className="font-black text-fg">{cat.category}</span>
+                      <span className="text-[11px] text-muted mr-2">({cat.qtySold} قطعة)</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="font-mono font-bold text-fg ml-3">{formatMoney(cat.revenueBase)}</span>
+                      <span className="font-mono font-black text-emerald-500">ربح: +{formatMoney(cat.profitBase)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+              <h3 className="text-sm font-black text-fg border-b border-line pb-2">🏷️ خامساً (ب): المبيعات والأرباح حسب الماركة</h3>
+              <div className="space-y-2">
+                {rep.brandsBreakdown.slice(0, 10).map(br => (
+                  <div key={br.brand} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
+                    <div>
+                      <span className="font-black text-fg">{br.brand}</span>
+                      <span className="text-[11px] text-muted mr-2">({br.qtySold} قطعة)</span>
+                    </div>
+                    <div className="text-left">
+                      <span className="font-mono font-bold text-fg ml-3">{formatMoney(br.revenueBase)}</span>
+                      <span className="font-mono font-black text-emerald-500">ربح: +{formatMoney(br.profitBase)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. Top Clients & Receivables / Wallet Balances */}
+        {gmReportSections.clientsAndDebts && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-2.5">
+              <h3 className="text-sm sm:text-base font-black text-fg">
+                👥 سادساً: كبار العملاء + كشف المديونيات الآجل المستحقة للتحصيل وأرصدة المحافظ
+              </h3>
+              <div className="flex gap-3 text-xs font-black">
+                <span className="text-rose-500">إجمالي مديونيات الآجل لنا: {formatMoney(rep.totalReceivablesDebtBase)}</span>
+                <span className="text-emerald-500">أرصدة دائنة للعملاء بالمحفظة: {formatMoney(rep.totalPositiveWalletLiabilityBase)}</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <div className="font-black text-fg mb-2">🥇 أعلى العملاء مساهمة في المبيعات والربح خلال الفترة:</div>
+                <div className="space-y-2">
+                  {rep.topClientsInPeriod.slice(0, 8).map(c => (
+                    <div key={c.clientId} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
+                      <div>
+                        <div className="font-black text-fg">{c.clientName}</div>
+                        <div className="text-[10px] text-muted">{c.ordersCount} فواتير • {c.unitsCount} قطعة</div>
+                      </div>
+                      <div className="text-left">
+                        <div className="font-mono font-black text-fg">{formatMoney(c.totalSpentBase)}</div>
+                        <div className="text-[10px] font-mono font-bold text-emerald-500">ربح محقق: +{formatMoney(c.profitGeneratedBase)}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="font-black text-rose-500 mb-2">⚠️ كشف العملاء المطالبين بمديونيات آجل (مستحقة للتحصيل):</div>
+                {rep.debtorClients.length === 0 ? (
+                  <div className="p-4 rounded-xl bg-surface2 text-emerald-500 font-bold text-center">لا توجد أي مديونيات متأخرة على العملاء حالياً ✓</div>
+                ) : (
+                  <div className="space-y-2">
+                    {rep.debtorClients.map(dc => (
+                      <div key={dc.id} className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-between">
+                        <div>
+                          <div className="font-black text-fg">{dc.name}</div>
+                          <div className="text-[10px] text-muted font-mono">{dc.phone} • حد الائتمان: {formatMoney(dc.creditLimit)}</div>
+                        </div>
+                        <div className="font-mono font-black text-rose-500 text-sm">
+                          مطلوب سداده: {formatMoney(dc.debtAmount)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 7. CRO & Marketing Performance */}
+        {gmReportSections.croAndMarketing && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🚀 سابعاً: أداء الميزات التسويقية والكوبونات والكاش باك وسقف المبيعات
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">السلات المسترجعة (Exit / Spin / Cross-Sell)</div>
+                <div className="text-base font-black text-amber-500">{Number(siteSettings.analyticsRecoveredCartsCount) || 0} سلة</div>
+                <div className="text-[10px] text-muted">بقيمة: {formatMoney(Number(siteSettings.analyticsRecoveredCartsValue) || 0)}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">الكوبونات المستخدمة في الفترة</div>
+                <div className="text-base font-black text-accent-text">{formatMoney(rep.totalDiscountsGivenBase)}</div>
+                <div className="text-[10px] text-muted">إجمالي مرات استخدام الكوبونات: {Number(siteSettings.analyticsCouponsUsedCount) || promoCodes.reduce((a, p) => a + (Number(p.usedCount) || 0), 0)}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">الكاش باك الممنوح للعملاء</div>
+                <div className="text-base font-black text-emerald-500">{formatMoney(rep.totalCashbackAwardedInOrdersBase)}</div>
+                <div className="text-[10px] text-muted">مفعّل على {parts.filter(p => isPartCashbackEnabled(p)).length} صنف</div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">حالة سقف إيقاف البيع الكلي</div>
+                <div className="text-base font-black text-fg">{formatMoney(currentPeriodTotalSalesEgp)}</div>
+                <div className="text-[10px] text-muted">من أصل {formatMoney(Number(siteSettings.salesCapMaxLimitEgp) || 2000000)}</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 8. Returns, Warranty Claims & Complaints */}
+        {gmReportSections.returnsAndWarranty && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5 flex items-center justify-between">
+              <span>🔄 ثامناً: تقرير المرتجعات وطلبات استبدال الضمان ({rep.periodReturns.length} طلب في الفترة)</span>
+              <span className="text-xs font-black text-rose-500">إجمالي تعويضات المرتجعات المقبولة: {formatMoney(rep.approvedReturnsLossBase)}</span>
+            </h3>
+            {rep.periodReturns.length === 0 ? (
+              <div className="p-4 rounded-xl bg-surface2 text-muted font-bold text-center">لا توجد مرتجعات مسجلة خلال هذه الفترة.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                {rep.periodReturns.map(ret => (
+                  <div key={ret.id} className="p-3 rounded-xl bg-surface2 border border-line flex items-center justify-between gap-2">
+                    <div>
+                      <div className="font-black text-fg">{ret.partName} (الكمية: {ret.qty})</div>
+                      <div className="text-[11px] text-muted">العميل: {ret.clientName} • فاتورة #{ret.orderId}</div>
+                      <div className="text-[10px] text-muted">{ret.reason}</div>
+                    </div>
+                    <div className="text-left shrink-0">
+                      <div className="font-mono font-black text-rose-500">{formatMoney(ret.refundAmountBase)}</div>
+                      <span className="px-2 py-0.5 rounded bg-surface border border-line text-[10px] font-bold">{ret.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 9. Inventory Valuation & Shortages */}
+        {gmReportSections.inventoryValuation && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-4">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🏭 تاسعاً: تقييم أصول المخزن الحالي والنواقص الحرجة (Inventory Valuation & Shortages)
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">إجمالي القطع المتوفرة بالمخزن</div>
+                <div className="text-lg font-black text-fg">{rep.totalInventoryUnits.toLocaleString()} قطعة</div>
+                <div className="text-[10px] text-muted">في {parts.length} صنف مسجل</div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">رأس مال البضاعة بالمخزن (بالتكلفة)</div>
+                <div className="text-lg font-black text-amber-500">{formatMoney(rep.totalInventoryCostValueBase)}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line">
+                <div className="text-[11px] text-muted font-bold">القيمة البيعية للبضاعة بالمخزن</div>
+                <div className="text-lg font-black text-accent-text">{formatMoney(rep.totalInventoryRetailValueBase)}</div>
+                <div className="text-[10px] text-emerald-500 font-bold">ربح متوقع: +{formatMoney(rep.expectedInventoryProfitBase)}</div>
+              </div>
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30">
+                <div className="text-[11px] text-rose-500 font-bold">نواقص وأصناف نفدت</div>
+                <div className="text-lg font-black text-rose-500">{rep.outOfStockPartsList.length} نفد • {rep.lowStockPartsList.length} وشك النفاد</div>
+              </div>
+            </div>
+
+            {(rep.outOfStockPartsList.length > 0 || rep.lowStockPartsList.length > 0) && (
+              <div className="space-y-2">
+                <div className="font-black text-fg">⚠️ قائمة الأصناف المطلوب إعادة توريدها للمخزن فوراً:</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {[...rep.outOfStockPartsList, ...rep.lowStockPartsList].slice(0, 15).map(p => (
+                    <div key={p.id} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
+                      <span className="font-bold text-fg truncate">{p.name}</span>
+                      <span className={`px-2 py-0.5 rounded font-mono font-black text-[10px] shrink-0 ${
+                        (Number(p.stock) || 0) <= 0 ? 'bg-rose-600 text-white' : 'bg-amber-500/20 text-amber-500'
+                      }`}>
+                        الرصيد: {p.stock}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 10. Restock Waitlist & External Sourcing Requests */}
+        {gmReportSections.restockAndSourcing && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🔔 عاشراً: طلبات العملاء لمنتجات غير متوفرة ("نبّهني عند التوفر": {rep.waitlistEntries.length} • "طلبات من برّه": {rep.activeSourcingList.length})
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="p-3 rounded-xl bg-surface2 border border-line space-y-1.5">
+                <div className="font-black text-amber-500">أحدث المسجلين في قائمة "نبّهني عند التوفر":</div>
+                {rep.waitlistEntries.length === 0 ? (
+                  <div className="text-muted">لا توجد طلبات مسجلة حالياً.</div>
+                ) : (
+                  rep.waitlistEntries.slice(0, 8).map(w => (
+                    <div key={w.id} className="flex items-center justify-between border-b border-line pb-1">
+                      <span className="font-bold text-fg">{w.partName}</span>
+                      <span className="font-mono text-[11px] text-accent-text">{w.clientName} ({w.phone})</span>
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="p-3 rounded-xl bg-surface2 border border-line space-y-1.5">
+                <div className="font-black text-cyan-500">طلبات التوفير الخاصة من الخارج (Sourcing):</div>
+                {rep.activeSourcingList.length === 0 ? (
+                  <div className="text-muted">لا توجد طلبات توفير مفتوحة.</div>
+                ) : (
+                  rep.activeSourcingList.slice(0, 8).map(s => (
+                    <div key={s.id} className="flex items-center justify-between border-b border-line pb-1">
+                      <span className="font-bold text-fg">{s.partName || s.modelName} (×{s.qty})</span>
+                      <span className="text-[11px] text-muted">{s.clientName} • {s.status}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 11. Detailed Invoices Table */}
+        {gmReportSections.detailedInvoices && (
+          <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🧾 الحادي عشر: كشف الفواتير التفصيلي للفترة ({rep.detailedInvoices.length} فاتورة)
+            </h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-right border-collapse">
+                <thead>
+                  <tr className="bg-surface2 text-muted border-b border-line">
+                    <th className="p-2 font-extrabold">رقم الفاتورة</th>
+                    <th className="p-2 font-extrabold">التاريخ</th>
+                    <th className="p-2 font-extrabold">العميل</th>
+                    <th className="p-2 font-extrabold">المدينة</th>
+                    <th className="p-2 font-extrabold">الدفع</th>
+                    <th className="p-2 font-extrabold">الحالة</th>
+                    <th className="p-2 font-extrabold">القطع</th>
+                    <th className="p-2 font-extrabold">صافي الفاتورة</th>
+                    <th className="p-2 font-extrabold">التكلفة</th>
+                    <th className="p-2 font-extrabold">صافي الربح</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {rep.detailedInvoices.map(inv => (
+                    <tr key={inv.id}>
+                      <td className="p-2 font-mono font-bold text-accent-text">{inv.id}</td>
+                      <td className="p-2 font-mono text-[11px] text-muted">{inv.createdAt}</td>
+                      <td className="p-2 font-bold text-fg">{inv.clientName}</td>
+                      <td className="p-2 text-muted">{inv.city}</td>
+                      <td className="p-2 text-[11px]">{inv.paymentMethod}</td>
+                      <td className="p-2 font-bold">{inv.status}</td>
+                      <td className="p-2 font-mono font-bold">{inv.qty}</td>
+                      <td className="p-2 font-mono font-black text-fg">{formatMoney(inv.netTotalBase)}</td>
+                      <td className="p-2 font-mono text-muted">{formatMoney(inv.costBase)}</td>
+                      <td className="p-2 font-mono font-black text-emerald-600 dark:text-emerald-400">+{formatMoney(inv.profitBase)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* 12. GM Recommendations & Signature Block */}
+        {gmReportSections.gmRecommendations && (
+          <div className="bg-surface rounded-2xl p-5 border-2 border-amber-400/50 space-y-4">
+            <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
+              🧠 الثاني عشر: توصيات وتنبيهات المدير العام الذكية والاعتماد الرسمي
+            </h3>
+            <ul className="space-y-2">
+              {rep.gmInsights.map((ins, idx) => (
+                <li key={idx} className="p-2.5 rounded-xl bg-surface2 border border-line font-bold text-fg">
+                  {ins}
+                </li>
+              ))}
+            </ul>
+            {gmReportCustomNotes && (
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                <div className="font-black text-amber-500 mb-1">📝 ملاحظات وتوجيهات المدير العام:</div>
+                <p className="text-fg font-bold whitespace-pre-wrap">{gmReportCustomNotes}</p>
+              </div>
+            )}
+            <div className="grid grid-cols-3 gap-4 pt-6 border-t border-line text-center">
+              <div className="space-y-6">
+                <div className="font-extrabold text-muted">إعداد مسؤول الحسابات / المخزن</div>
+                <div className="border-b border-dashed border-line w-40 mx-auto" />
+              </div>
+              <div className="space-y-6">
+                <div className="font-extrabold text-muted">مراجعة مدير المبيعات</div>
+                <div className="border-b border-dashed border-line w-40 mx-auto" />
+              </div>
+              <div className="space-y-6">
+                <div className="font-black text-fg">يعتمد، المدير العام ({siteSettings.storeName || 'ELZOGHBI'})</div>
+                <div className="border-b border-dashed border-line w-40 mx-auto" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAdminExecutiveReportsView = () => {
+    const rep = computeGmReportData();
+    const sectionOptions = [
+      { key: 'financialSummary', icon: '💰', label: '1. الملخص المالي وصافي الأرباح والهامش %' },
+      { key: 'ordersStatus', icon: '📦', label: '2. تفصيل حالات الطلبات ونسب التسليم والإلغاء' },
+      { key: 'paymentMethods', icon: '💳', label: '3. السيولة النقدية وطرق الدفع والتحصيل' },
+      { key: 'topProducts', icon: '🏆', label: '4. الأصناف الأكثر مبيعاً والأعلى ربحية' },
+      { key: 'categoriesAndBrands', icon: '📊', label: '5. أداء المبيعات والأرباح حسب الأقسام والماركات' },
+      { key: 'clientsAndDebts', icon: '👥', label: '6. كبار العملاء + مديونيات الآجل وأرصدة المحافظ' },
+      { key: 'croAndMarketing', icon: '🚀', label: '7. أداء العروض والكوبونات والكاش باك وسقف المبيعات' },
+      { key: 'returnsAndWarranty', icon: '🔄', label: '8. تقرير المرتجعات وطلبات الضمان والتعويضات' },
+      { key: 'inventoryValuation', icon: '🏭', label: '9. تقييم أصول المخزن الحالي والنواقص الحرجة' },
+      { key: 'restockAndSourcing', icon: '🔔', label: '10. طلبات "نبّهني عند التوفر" وطلبات التوفير الخارجي' },
+      { key: 'detailedInvoices', icon: '🧾', label: '11. جدول الفواتير التفصيلي للفترة بالتكلفة والربح' },
+      { key: 'gmRecommendations', icon: '🧠', label: '12. توصيات المدير العام الذكية وخانات التوقيع والاعتماد' }
+    ];
+
+    return (
+      <div className="space-y-5 text-xs">
+        {/* Builder Controls Card */}
+        <div className="bg-surface rounded-3xl p-6 border-2 border-cyan-500/40 shadow-lg space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
+            <div>
+              <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
+                📊 EXECUTIVE GM REPORT BUILDER & PRINTER
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-fg mt-2">
+                بناء وتخصيص وطباعة تقرير المدير العام (يومي أو بتحديد تواريخ)
+              </h2>
+              <p className="text-xs text-muted mt-0.5">
+                حدّد الفترة الزمنية، اختر الأقسام التي تهمك كمدير عام لضمها في التقرير، ثم اضغط طباعة (A4 / PDF) أو تصدير لـ Excel.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setGmReportPrintPreviewOpen(true)}
+                className="px-5 py-3 rounded-xl bg-gradient-to-l from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs flex items-center gap-2 shadow-lg"
+              >
+                <Printer className="w-4 h-4" />
+                <span>🖨️ معاينة وطباعة التقرير الرسمي (A4 / PDF)</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleExportGmReportCsv}
+                className="px-4 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+              >
+                <span>📥 تصدير التقرير لـ Excel (CSV)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Step 1: Date Range Presets & Custom Dates */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 space-y-2">
+              <label className="font-black text-fg block">📅 أولاً: اختر الفترة الزمنية للتقرير (يومي أو مخصص):</label>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'today', label: '📅 تقرير اليوم' },
+                  { id: 'yesterday', label: '⏪ تقرير أمس' },
+                  { id: 'last7', label: '📆 آخر 7 أيام' },
+                  { id: 'month', label: '🗓️ هذا الشهر' },
+                  { id: 'all', label: '♾️ كل الفترات (شامل)' },
+                  { id: 'custom', label: '🎯 تحديد تواريخ يدوياً' }
+                ].map(p => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => handleSelectGmReportPreset(p.id)}
+                    className={`px-3.5 py-2 rounded-xl font-black border transition ${
+                      gmReportPreset === p.id
+                        ? 'bg-accent text-accent-ink border-accent shadow-xs'
+                        : 'bg-surface2 text-fg border-line hover:border-accent'
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div>
+                  <label className="font-bold text-muted block mb-1">من تاريخ (From Date):</label>
+                  <input
+                    type="date"
+                    value={gmReportDateFrom}
+                    onChange={e => { setGmReportPreset('custom'); setGmReportDateFrom(e.target.value); }}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">إلى تاريخ (To Date):</label>
+                  <input
+                    type="date"
+                    value={gmReportDateTo}
+                    onChange={e => { setGmReportPreset('custom'); setGmReportDateTo(e.target.value); }}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="font-black text-fg block mb-1">🎯 نطاق الفواتير المحسوبة في الأرباح:</label>
+                <select
+                  value={gmReportOrderFilter}
+                  onChange={e => setGmReportOrderFilter(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-line font-black"
+                >
+                  <option value="valid_all">كل الطلبات النشطة والمسلمة (بدون الملغي)</option>
+                  <option value="delivered_only">الطلبات المسلمة والمحصلة فعلياً فقط (تم التسليم)</option>
+                  <option value="all_including_cancelled">جميع الطلبات شاملة الملغي</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-black text-fg block mb-1">📝 ملاحظات المدير العام (تظهر في التقرير المطبوع):</label>
+                <textarea
+                  rows={2}
+                  value={gmReportCustomNotes}
+                  onChange={e => setGmReportCustomNotes(e.target.value)}
+                  placeholder="اكتب أي توجيهات للمخزن أو المبيعات لتظهر أسفل التقرير..."
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Step 2: Checkboxes for What the Report Should Include */}
+          <div className="space-y-3 pt-3 border-t border-line">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="font-black text-fg text-sm">
+                ☑️ ثانياً: حدّد ماذا تريد أن يضم التقرير (اختر الأقسام التي تهمك كمدير عام):
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allOn = {};
+                    sectionOptions.forEach(s => { allOn[s.key] = true; });
+                    setGmReportSections(allOn);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-black text-[11px]"
+                >
+                  ✓ تحديد كل الأقسام (تقرير شامل)
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setGmReportSections({
+                      financialSummary: true,
+                      ordersStatus: true,
+                      paymentMethods: true,
+                      topProducts: true,
+                      categoriesAndBrands: false,
+                      clientsAndDebts: true,
+                      croAndMarketing: false,
+                      returnsAndWarranty: false,
+                      inventoryValuation: true,
+                      restockAndSourcing: false,
+                      detailedInvoices: false,
+                      gmRecommendations: true
+                    })
+                  }
+                  className="px-3 py-1.5 rounded-xl bg-amber-500/15 text-amber-500 border border-amber-500/30 font-black text-[11px]"
+                >
+                  ⚡ تقرير مالي وتنفيذي مختصر (ورقة واحدة)
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              {sectionOptions.map(sec => {
+                const checked = Boolean(gmReportSections[sec.key]);
+                return (
+                  <label
+                    key={sec.key}
+                    className={`p-3 rounded-2xl border-2 cursor-pointer flex items-center gap-2.5 transition select-none ${
+                      checked
+                        ? 'bg-accent/10 border-accent text-fg font-black'
+                        : 'bg-surface2 border-line text-muted font-bold opacity-75'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={e => setGmReportSections(prev => ({ ...prev, [sec.key]: e.target.checked }))}
+                      className="w-4 h-4 accent-cyan-500 shrink-0"
+                    />
+                    <span>{sec.icon}</span>
+                    <span className="leading-snug">{sec.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Live Interactive Report Preview */}
+        {renderGmReportDocumentContent(rep, false)}
+      </div>
+    );
+  };
+
+  const renderGmReportPrintModal = () => {
+    if (!gmReportPrintPreviewOpen) return null;
+    const rep = computeGmReportData();
+    return (
+      <div className="fixed inset-0 bg-nav/90 backdrop-blur-xs z-[230] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        <div className="bg-surface rounded-3xl max-w-5xl w-full p-4 sm:p-6 border-2 border-cyan-400 shadow-2xl space-y-4 my-auto max-h-[94vh] flex flex-col">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 print:hidden">
+            <div className="flex items-center gap-2">
+              <Printer className="w-5 h-5 text-accent-text" />
+              <h3 className="text-base font-black text-fg">
+                معاينة وطباعة تقرير المدير العام الرسمي (من {rep.fromStr} إلى {rep.toStr})
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+              >
+                <Printer className="w-4 h-4" />
+                <span>🖨️ اطبع التقرير الآن أو احفظه PDF</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleExportGmReportCsv}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs"
+              >
+                📥 تحميل Excel
+              </button>
+              <button
+                type="button"
+                onClick={() => setGmReportPrintPreviewOpen(false)}
+                className="px-3.5 py-2.5 rounded-xl bg-surface2 text-muted hover:text-fg font-bold text-xs"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto pr-1">
+            {renderGmReportDocumentContent(rep, false)}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderAdminFeatureFlagsDashboard = () => {
     const cashbackEnabledPartsCount = parts.filter(p => isPartCashbackEnabled(p)).length;
     const vipOnlyPartsCount = parts.filter(p => isPartVipOnly(p)).length;
@@ -16163,6 +17932,165 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
                 >
                   ✅ تفعيل الكاش باك فوراً للأرخص من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م فقط
                 </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 2B: Exit-Intent Full Customizer + 2,000,000 EGP Sales Cap Stop Guard */}
+        <div className="bg-surface rounded-2xl p-5 border-2 border-rose-500/40 space-y-4">
+          {renderCollapsibleHeader(
+            'exit_and_sales_cap',
+            '✋',
+            '2B. إعدادات نافذة الخروج الذكية (Exit-Intent) + حد إيقاف البيع الكلي (2,000,000 ج.م)',
+            'تحكم في عنوان ونص وكود وخصم نافذة الخروج (للكمبيوتر والموبايل بعد 30 ثانية خمول)، وحد إيقاف استقبال الطلبات في السيرفر',
+            `المبيعات الحالية: ${currentPeriodTotalSalesEgp.toLocaleString()} / ${(Number(siteSettings.salesCapMaxLimitEgp) || 2000000).toLocaleString()} ج.م`
+          )}
+          {openFeatureSections.exit_and_sales_cap !== false && (
+            <div className="space-y-4 pt-3 border-t border-line">
+              <div className="p-4 rounded-2xl bg-surface2 border border-line space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="font-black text-fg text-sm flex items-center gap-2">
+                    <span>✋ التحكم الكامل في نافذة الخروج الذكية (Exit-Intent):</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => useFlag('exit_intent_popup').updateFlag(!useFlag('exit_intent_popup').enabled)}
+                      className={`px-3 py-1.5 rounded-xl font-black text-[11px] ${
+                        useFlag('exit_intent_popup').enabled ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                      }`}
+                    >
+                      {useFlag('exit_intent_popup').enabled ? 'النافذة مفعّلة ✓' : 'النافذة متوقفة ✕'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setExitIntentModalOpen(true);
+                        switchPortal('storefront');
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-amber-400 text-slate-950 font-black text-[11px]"
+                    >
+                      👁️ معاينة النافذة الآن
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-bold text-muted block mb-1">عنوان نافذة الخروج:</label>
+                    <input
+                      type="text"
+                      value={siteSettings.exitIntentTitle || 'استنى! قبل ما تمشي.. خد خصم فوري على سلتك 🎁'}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentTitle: e.target.value }))}
+                      className="w-full p-2.5 rounded-xl border border-line font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">النص التوضيحي داخل النافذة:</label>
+                    <input
+                      type="text"
+                      value={siteSettings.exitIntentSubtitle || 'لا تفوّت الفرصة! فعّل الكوبون الآن واستمتع بأفضل جودة مع معاينة قبل الدفع.'}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentSubtitle: e.target.value }))}
+                      className="w-full p-2.5 rounded-xl border border-line font-bold"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label className="font-bold text-muted block mb-1">قيمة الخصم (%):</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={siteSettings.exitIntentDiscountPct ?? 5}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentDiscountPct: Number(e.target.value) || 5 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">كود الكوبون:</label>
+                    <input
+                      type="text"
+                      dir="ltr"
+                      value={siteSettings.exitIntentPromoCode || 'STAY5'}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentPromoCode: e.target.value.toUpperCase() }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">مدة صلاحية العرض (دقيقة):</label>
+                    <input
+                      type="number"
+                      min="5"
+                      max="1440"
+                      value={siteSettings.exitIntentDurationMinutes ?? 15}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentDurationMinutes: Number(e.target.value) || 15 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">خمول الموبايل للظهور (ثانية):</label>
+                    <input
+                      type="number"
+                      min="15"
+                      max="180"
+                      value={siteSettings.exitIntentMobileIdleSec ?? 30}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, exitIntentMobileIdleSec: Number(e.target.value) || 30 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-black text-fg text-sm">🛑 حد "إيقاف البيع بالكامل" التلقائي في السيرفر (Sales Cap Guard):</div>
+                    <p className="text-[11px] text-muted">يُحسب من إجمالي مبيعات الفترة المحددة، وعند الوصول للحد يرفض السيرفر إنشاء أي طلبات جديدة:</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => useFlag('sales_cap_guard').updateFlag(!useFlag('sales_cap_guard').enabled)}
+                    className={`px-3 py-1.5 rounded-xl font-black text-[11px] ${
+                      useFlag('sales_cap_guard').enabled ? 'bg-emerald-600 text-white' : 'bg-surface2 text-muted border border-line'
+                    }`}
+                  >
+                    {useFlag('sales_cap_guard').enabled ? 'حارس حد المبيعات مفعّل ✓' : 'متوقف'}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="font-bold text-muted block mb-1">الحد الأقصى لإيقاف البيع (ج.م):</label>
+                    <input
+                      type="number"
+                      step="50000"
+                      value={siteSettings.salesCapMaxLimitEgp ?? 2000000}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, salesCapMaxLimitEgp: Number(e.target.value) || 2000000 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">من تاريخ:</label>
+                    <input
+                      type="date"
+                      value={siteSettings.salesCapPeriodStart || '2026-01-01'}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, salesCapPeriodStart: e.target.value }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="font-bold text-muted block mb-1">إلى تاريخ:</label>
+                    <input
+                      type="date"
+                      value={siteSettings.salesCapPeriodEnd || '2027-12-31'}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, salesCapPeriodEnd: e.target.value }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-bold"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -16567,7 +18495,21 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
 
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-black text-fg">🎰 محرر جوائز ونصوص عجلة الحظ:</span>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-black text-fg">🎰 محرر جوائز ونصوص عجلة الحظ:</span>
+                    <div className="flex items-center gap-1.5 bg-surface2 px-3 py-1 rounded-xl border border-line">
+                      <span className="text-[11px] font-bold text-muted">مدة الانتظار بين كل لفة (بالأيام):</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="90"
+                        value={siteSettings.spinCooldownDays ?? 7}
+                        onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, spinCooldownDays: Math.max(1, Number(e.target.value) || 7) }))}
+                        className="w-16 p-1 rounded-lg border border-line font-mono font-black text-center"
+                      />
+                      <span className="text-[11px] font-bold text-amber-500">يوم</span>
+                    </div>
+                  </div>
                   <button
                     type="button"
                     onClick={() => {
@@ -16696,14 +18638,48 @@ const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 ت
                   </div>
                 )}
                 <div>
-                  <label className="font-bold text-muted block mb-1">أوردرات المستوى الألماسي 💎:</label>
-                  <input
-                    type="number"
-                    min="5"
-                    value={siteSettings.loyaltyDiamondMinOrders ?? 20}
-                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltyDiamondMinOrders: Number(e.target.value) || 20 }))}
-                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
-                  />
+                  <label className="font-bold text-muted block mb-1">حد المشتريات للفضي 🥈 (ج.م) وخصمه (%):</label>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="number"
+                      step="500"
+                      value={siteSettings.loyaltySilverMinSpentEgp ?? 5000}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltySilverMinSpentEgp: Number(e.target.value) || 5000 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                      title="إجمالي المشتريات المدفوعة للوصول للفضي"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      max="25"
+                      value={siteSettings.loyaltySilverDiscountPct ?? 3}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltySilverDiscountPct: Number(e.target.value) || 3 }))}
+                      className="w-16 p-2 rounded-xl border border-line font-mono font-black text-center"
+                      title="نسبة الخصم التلقائي في السلة (%)"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">حد المشتريات للذهبي 🥇 و VIP (ج.م) وخصمه (%):</label>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="number"
+                      step="1000"
+                      value={siteSettings.loyaltyGoldMinSpentEgp ?? 15000}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltyGoldMinSpentEgp: Number(e.target.value) || 15000, vipMinSpentEgp: Number(e.target.value) || 15000 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                      title="إجمالي المشتريات المدفوعة للوصول للذهبي وقسم VIP"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={siteSettings.loyaltyGoldDiscountPct ?? 7}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltyGoldDiscountPct: Number(e.target.value) || 7 }))}
+                      className="w-16 p-2 rounded-xl border border-line font-mono font-black text-center"
+                      title="نسبة الخصم التلقائي في السلة (%)"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -19500,6 +21476,29 @@ model OrderInvoice {
             </button>
           </div>
 
+          {/* Mandatory Phone/Email Input for Visitors Before Spinning + 7-Day Cooldown Notice */}
+          {!currentClient && !spinWheelState?.spun && (
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/40 text-right space-y-1.5">
+              <label className="text-[11px] font-black text-fg block">
+                📱 سجّل رقم موبايلك أو إيميلك الأول عشان الكوبون يتسجل باسمك (لفة واحدة كل {siteSettings.spinCooldownDays || 7} أيام):
+              </label>
+              <input
+                type="text"
+                dir="ltr"
+                value={spinContactInput}
+                onChange={e => setSpinContactInput(e.target.value)}
+                placeholder="01012345678 أو email@example.com"
+                className="w-full p-2.5 rounded-xl border border-line font-mono font-black text-xs text-center"
+              />
+            </div>
+          )}
+
+          {spinCooldownMessage && (
+            <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 font-black text-xs">
+              ⏳ {spinCooldownMessage} (صلاحية الكوبون {siteSettings.spinCooldownDays || 7} أيام ويُستخدم مرة واحدة)
+            </div>
+          )}
+
           {/* Clear Prize Legend Chips so customer can read every single option clearly */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
             {activeSpinPrizes.map((prz, idx) => (
@@ -19598,7 +21597,7 @@ model OrderInvoice {
               <span className="text-[9px] text-nav-fg/70 font-bold">{liveSocialToast.timeLabel}</span>
             </div>
             <div className="text-xs font-extrabold text-white truncate mt-0.5">
-              عميل من <span className="text-amber-300">{liveSocialToast.city}</span> طلب:
+              عميل ({liveSocialToast.customerInitial || 'أ.'}) من <span className="text-amber-300">{liveSocialToast.city}</span> طلب:
             </div>
             <div className="text-xs font-black text-nav-cyan truncate">
               {liveSocialToast.productName}
@@ -19642,12 +21641,26 @@ model OrderInvoice {
 
           <div className="space-y-1.5">
             <h3 className="text-xl font-black text-fg">
-              استنى! قبل ما تمشي.. خد خصم {pct}% فوري على طلبك 🎁
+              {siteSettings.exitIntentTitle || `استنى! قبل ما تمشي.. خد خصم ${pct}% فوري على طلبك 🎁`}
             </h3>
             <p className="text-xs text-muted leading-relaxed">
-              لا تفوّت الفرصة! فعّل العرض الحصري الآن واستمتع بأفضل جودة مع ضمان كامل ومعاينة قبل الدفع.
+              {siteSettings.exitIntentSubtitle || 'لا تفوّت الفرصة! فعّل العرض الحصري الآن واستمتع بأفضل جودة مع ضمان كامل ومعاينة قبل الدفع.'}
             </p>
           </div>
+
+          {!currentClient && (
+            <div className="p-3 rounded-2xl bg-surface2 border border-line text-right space-y-1">
+              <label className="text-[11px] font-black text-fg block">📱 اكتب رقم تليفونك أو إيميلك لتفعيل الكوبون باسمك:</label>
+              <input
+                type="text"
+                dir="ltr"
+                value={exitIntentContactInput}
+                onChange={e => setExitIntentContactInput(e.target.value)}
+                placeholder="01012345678 أو البريد الإلكتروني"
+                className="w-full p-2 rounded-xl border border-line font-mono font-black text-xs text-center"
+              />
+            </div>
+          )}
 
           <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-extrabold">
             <span className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">🤝 الدفع عند الاستلام</span>
@@ -25752,6 +27765,7 @@ ${footer}
       {renderLoginModal()}
       {renderReturnRequestModal()}
       {renderPrintModal()}
+      {renderGmReportPrintModal()}
       {renderBrandManagerModal()}
       {renderBrandImageModal()}
       {renderTemplateManagerModal()}
@@ -25767,14 +27781,14 @@ ${footer}
       {renderFilterSheet()}
       {renderSourcingFormModal()}
       {renderLightbox()}
-      {renderSpinToWinModal()}
-      {renderFloatingSpinTrigger()}
-      {renderLiveSocialProofToast()}
-      {renderExitIntentModal()}
-      {renderCustomerRestockNotifyModal()}
+      {useFlag('spin_to_win').enabled && renderSpinToWinModal()}
+      {useFlag('spin_to_win').enabled && renderFloatingSpinTrigger()}
+      {useFlag('live_social_proof').enabled && renderLiveSocialProofToast()}
+      {useFlag('exit_intent_popup').enabled && renderExitIntentModal()}
+      {useFlag('out_of_stock_notify').enabled && renderCustomerRestockNotifyModal()}
       {renderAdminRestockWhatsappModal()}
-      {renderWarrantyLookupModal()}
-      {renderFamilyDevicesModal()}
+      {useFlag('warranty_lookup').enabled && renderWarrantyLookupModal()}
+      {useFlag('family_saved_devices').enabled && renderFamilyDevicesModal()}
       {renderConfettiOverlay()}
     </div>
   );
