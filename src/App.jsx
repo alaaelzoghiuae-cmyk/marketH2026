@@ -45,7 +45,7 @@ const INITIAL_GROUPS = [
     modifierValue: -14,
     deliveryFeeBase: 50,
     isDefault: false,
-    description: 'خصم جملة 14% على كافة القطع لمراكز الصيانة المعتمدة + شحن مخفض'
+    description: 'خصم خاص 14% للعملاء المميزين والتجار المعتمدين + شحن مخفض'
   },
   {
     id: 'grp_vip_ flat',
@@ -79,7 +79,7 @@ const INITIAL_AUTO_TEMPLATES = [
     namePattern: 'شاشة {model} أصلية توكيل (Service Pack)',
     qualityGrade: 'أصلي توكيل Service Pack',
     colors: ['أسود', 'أبيض'],
-    warrantyText: 'ضمان تجربة 14 يوم قبل اللزق والتركيب النهائي',
+    warrantyText: 'ضمان تجربة ومعاينة 14 يوم بحالته الأصلية',
     imageKey: 'screen',
     defaultStock: 10,
     lowStockThreshold: 4,
@@ -111,7 +111,7 @@ const INITIAL_AUTO_TEMPLATES = [
     namePattern: 'شاشة {model} إن سيل اقتصادية (In-Cell)',
     qualityGrade: 'إن سيل In-Cell',
     colors: ['أسود'],
-    warrantyText: 'ضمان تجربة قبل اللزق',
+    warrantyText: 'ضمان معاينة وتجربة المنتج قبل الاستخدام',
     imageKey: 'screen',
     defaultStock: 25,
     lowStockThreshold: 6,
@@ -195,6 +195,110 @@ const INITIAL_MODELS = [
 ];
 
 const INITIAL_PROMO_CODES = [
+  {
+    id: 'prm_spin_freeship',
+    code: 'SPIN-FREESHIP',
+    type: 'free_delivery',
+    value: 100,
+    maxDiscountCap: 0,
+    minOrderAmount: 0,
+    usageLimit: 5000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'هدية عجلة الحظ: شحن مجاني بالكامل لأول طلب لك!',
+    active: true
+  },
+  {
+    id: 'prm_spin_5off',
+    code: 'SPIN-5OFF',
+    type: 'percentage',
+    value: 5,
+    maxDiscountCap: 250,
+    minOrderAmount: 0,
+    usageLimit: 5000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'هدية عجلة الحظ: خصم 5% فوري على طلبك الأول!',
+    active: true
+  },
+  {
+    id: 'prm_spin_gift',
+    code: 'SPIN-GIFT',
+    type: 'fixed',
+    value: 65,
+    maxDiscountCap: 65,
+    minOrderAmount: 250,
+    usageLimit: 5000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'هدية عجلة الحظ: منتج إضافي مجاني (خصم فوري 65 ج.م)!',
+    active: true
+  },
+  {
+    id: 'prm_spin_50egp',
+    code: 'SPIN-50EGP',
+    type: 'fixed',
+    value: 50,
+    maxDiscountCap: 50,
+    minOrderAmount: 500,
+    usageLimit: 5000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'هدية عجلة الحظ: خصم فوري 50 ج.م على سلة مشترياتك!',
+    active: true
+  },
+  {
+    id: 'prm_exit_stay5',
+    code: 'STAY5',
+    type: 'percentage',
+    value: 5,
+    maxDiscountCap: 300,
+    minOrderAmount: 0,
+    usageLimit: 10000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'عرض خاص قبل المغادرة: خصم فوري 5% على طلبك!',
+    active: true
+  },
+  {
+    id: 'prm_renew10',
+    code: 'RENEW10',
+    type: 'percentage',
+    value: 10,
+    maxDiscountCap: 300,
+    minOrderAmount: 0,
+    usageLimit: 10000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'خصم تجديد وإعادة الشراء لعملائنا المميزين (-10%)',
+    active: true
+  },
+  {
+    id: 'prm_bday15',
+    code: 'BDAY15',
+    type: 'percentage',
+    value: 15,
+    maxDiscountCap: 400,
+    minOrderAmount: 0,
+    usageLimit: 10000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'هدية عيد ميلادك من الزغبي: خصم 15% احتفالاً بك 🎂!',
+    active: true
+  },
+  {
+    id: 'prm_season10',
+    code: 'SEASON10',
+    type: 'percentage',
+    value: 10,
+    maxDiscountCap: 500,
+    minOrderAmount: 0,
+    usageLimit: 10000,
+    usedCount: 0,
+    expiryDate: '2027-12-31',
+    description: 'كوبون عروض الموسم الحصري (-10%)!',
+    active: true
+  },
   {
     id: 'prm_1',
     code: 'VIP5',
@@ -284,7 +388,7 @@ const INITIAL_SHOWCASE_BARS = [
   {
     id: 'bar_1',
     title: '🔥 الأكثر مبيعاً من الشاشات وقطع الغيار الأصلية',
-    subtitle: 'القطع الأعلى طلباً من المحلات ومراكز الصيانة مع توفر فوري بالمخزن',
+    subtitle: 'المنتجات الأكثر طلباً ومبيعاً مع توفر فوري في المخزن وشحن سريع',
     badgeColor: 'bg-cyan-500 text-fg',
     partIds: ['prt_1', 'prt_5', 'prt_3', 'prt_2'],
     active: true
@@ -292,7 +396,7 @@ const INITIAL_SHOWCASE_BARS = [
   {
     id: 'bar_2',
     title: '⚡ شاشات أوليد وإن سيل اقتصادية عالية الإضاءة',
-    subtitle: 'أفضل توازن بين السعر والجودة مع ضمان 30 يوم قبل اللزق',
+    subtitle: 'أفضل توازن بين السعر والجودة مع ضمان استبدال ومعاينة 30 يوم',
     badgeColor: 'bg-blue-600 text-white',
     partIds: ['prt_2', 'prt_7', 'prt_9'],
     active: true
@@ -379,6 +483,8 @@ const EMPTY_REG_FORM = {
   ownerName: '',
   phone: '',
   email: '',
+  birthDate: '',
+  referredByCode: '',
   password: '',
   confirmPassword: '',
   address: '',
@@ -617,7 +723,7 @@ We may amend these terms at any time; changes apply from the moment they are pub
 13) Governing law and disputes
 These terms are governed by Egyptian law. We try to resolve any dispute amicably first; otherwise it is referred to the competent authority (including the Consumer Protection Agency) or the competent Egyptian courts.`;
 
-const EN_DICT = {"اطلب منتجك":"Order your product","تم البيع":"Sold","إغلاق":"Close","🌍 اطلب منتجك من أي مكان":"🌍 Order any product from anywhere","ابعت طلبك":"Send your request","اسم المنتج *":"Product name *","وصف المنتج والمواصفات *":"Product description & specifications *","رقم الموبايل للتواصل *":"Contact phone *","صورة المنتج (اختياري — بتتضغط تلقائي)":"Product photo (optional — auto-compressed)","شروط الخدمة":"Service terms","قرأت شروط الخدمة وموافق عليها *":"I have read and agree to the service terms *","ابعت الطلب":"Send request","+ اطلب منتج جديد":"+ Request a new product","المحادثة":"Chat","إرسال":"Send","اكتب رسالتك...":"Write your message...","إلغاء الطلب":"Cancel request","جديد":"New","قيد المراجعة":"Under review","تم تحديد السعر":"Price set","تم استلام العربون":"Deposit received","جاري التوصيل":"Out for delivery","ملغي":"Cancelled","سعر المنتج المتفق عليه":"Agreed product price","العربون":"Deposit","طلباتي من برّه (":"My global requests (","🔥 الأكتر طلباً:":"🔥 Top picks:","☰ قايمة":"☰ List","▦ مربعات":"▦ Grid","طلبك مؤمّن":"Secure order","معاينة عند الاستلام":"Inspect on delivery","ضمان على المنتجات":"Product warranty","← كمّل تسوّق":"← Continue shopping","محتاج مساعدة؟ كلّمنا على واتساب":"Need help? Chat on WhatsApp","تحميل PDF":"Download PDF","إغلاق":"Close","مشاركة":"Share","تصفّح المنتجات (":"Browse products (","الرئيسية والعروض":"Home & offers","إشعارات":"Alerts","حسابي":"Account","خروج":"Log out","الماركة":"Brand","التصنيف":"Category","الموديل":"Model","الكل":"All","اختار الماركة":"Choose brand","اختار التصنيف":"Choose category","اختار الموديل":"Choose model","كل الماركات":"All brands","كل التصنيفات":"All categories","كل الموديلات":"All models","دوّر هنا...":"Search here...","عرض النتايج (":"Show results (","مفيش نتايج":"No results","الأقسام الأكتر طلباً":"Top categories","منتج متاح":"products available","شوف كل المنتجات ›":"All products ›","الأكتر طلباً":"Top seller","مشاركة":"Share","تصفّح":"Browse","طباعة الفاتورة":"Print invoice","إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","إغلاق":"Close","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك": "Welcome", "الأسعار والسلة اتحدّثت على حسابك.": "Prices and cart were updated for your account.", "إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).": "You are browsing as a guest (you can log in or request a new account).", "معلش، الكمية المتاحة في المخزن من": "Sorry, the available stock of", "معلش، المتاح في المخزن من": "Sorry, the available stock of", "قطع بس.": "pieces only.", "قياسي": "Standard", "سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.": "We added you to the waitlist! We'll notify you as soon as stock arrives.", "حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (": "Something went wrong while sending the order, please try again. (", "السلة فاضية! ضيف منتجات الأول.": "Your cart is empty! Add products first.", "اختار طريقة الدفع الأول.": "Please choose a payment method first.", "آجل / على الحساب": "Credit / On account", "قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.": "The order exceeds your available credit limit. Choose another payment method or settle part of your balance.", "اكتب عنوان التوصيل الأول.": "Please enter the delivery address first.", "تم الاستلام": "Received", "استلمنا طلبك": "Order received", "فاتورتك اتسجّلت وبنجهّز القطع في المخزن (": "Your invoice is registered and we are preparing your items (", "قطع).": "pcs).", "طلبك رقم": "Your order No.", "اتأكّد وبعتنا إشعار للإدارة والمخزن!": "is confirmed and the team has been notified!", "ضفنا": "Added", "أصناف متاحة للسلة (وعدّينا": "available items to the cart (skipped", "صنف مش متوفر دلوقتي).": "unavailable items).", "رجّعنا كل أصناف الفاتورة": "All invoice items were re-added", "للسلة!": "to the cart!", "الصورة السابقة": "Previous image", "الصورة التالية": "Next image", "عرض التفاصيل والصورة المكبرة": "View details and enlarged image", "الكمية خلصت": "Out of stock", "كمية محدودة: فاضل": "Limited stock: only", "متوفر في المخزن (": "In stock (", "في السلة:": "In cart:", "المتاح:": "Available:", "قطعة": "pcs", "التوافق:": "Compatible:", "اللون:": "Color:", "سعر الوحدة": "Unit price", "نبّهني لما يتوفر (": "Notify me when available (", "زوّد الكمية": "Increase quantity", "قلّل الكمية": "Decrease quantity", "كلّمنا على واتساب": "Chat on WhatsApp", "صفحتنا على فيسبوك": "Our Facebook page", "حسابنا على إنستجرام": "Our Instagram", "الرئيسية والعروض": "Home & offers", "دوّر في الكتالوج (": "Search the catalog (", "طلباتي": "My orders", "إشعارات الطلبات": "Order notifications", "إشعارات الطلبات اللحظية": "Live order notifications", "مفيش إشعارات جديدة": "No new notifications", "رصيد:": "Balance:", "مديونية:": "Debt:", "خرجت من حسابك.": "You have logged out.", "تسجيل الخروج": "Log out", "دخول": "Log in", "طلب فتح حساب": "Request an account", "السلة": "Cart", "دوّر في الكتالوج كله": "Search the whole catalog", "دوّر على أي منتج أو إكسسوار أو موديل موبايل": "Search any product, accessory or phone model", "أكثر من": "More than", "صنف وموديل متوفر في المخزن وجاهز يتشحن على طول": "items and models in stock, ready to ship right away", "دوس هنا للبحث والفلترة...": "Tap here to search and filter...", "دوّر": "Search", "أكتر الأقسام طلباً:": "Top categories:", "شاشات": "Screens", "بطاريات": "Batteries", "فلاتات وبوردات": "Flex cables & boards", "كاميرات": "Cameras", "شواحن وكابلات": "Chargers & cables", "جرابات وحمايات": "Cases & protectors", "أكواد خصم شغّالة:": "Active discount codes:", "نسخنا الكود (": "Code copied (", "الإعلان السابق": "Previous ad", "الإعلان التالي": "Next ad", "إعلان": "Ad", "من": "of", "شوف تفاصيل العرض واطلب": "View offer details & order", "دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول": "Tap the ad to see details and order directly", "اتصفّح المنتجات على حسب موديل الموبايل": "Browse products by phone model", "دوس على أي موديل وشوف كل المنتجات اللي بتناسبه": "Tap any model to see all compatible products", "شوف كل الموديلات والبحث المتقدم": "All models & advanced search", "قطع متاحة": "pcs available", "قسم مميز": "Featured", "شوف الكل في صفحة البحث": "See all in search", "دوس عشان تفتح السلة وتراجع الأصناف": "Tap to open the cart and review items", "سلة المشتريات": "Shopping cart", "صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)": "Instant search & full catalog (cart saved automatically)", "دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق": "Search by model, product name, quality or compatibility code", "ارجع للرئيسية والعروض": "Back to home & offers", "دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن": "Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex", "، بطارية)...": ", battery)...", "امسح البحث": "Clear search", "الفلاتر الشغّالة:": "Active filters:", "موديل": "Model", "فلتر المخزون": "Stock filter", "بحث:": "Search:", "مسح كل الفلاتر": "Clear all filters", "الماركة:": "Brand:", "كل الماركات": "All brands", "التصنيف:": "Category:", "كل المنتجات (": "All products (", "موديلات الموبايلات:": "Phone models:", "كل الموديلات (": "All models (", "فلترة وترتيب:": "Filter & sort:", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "الاسم: (أ - ي)": "Name: (A - Z)", "الاسم: (ي - أ)": "Name: (Z - A)", "العدد: الأكتر كمية": "Stock: highest", "العدد: الأقل كمية": "Stock: lowest", "السعر: من الأقل للأعلى": "Price: low to high", "السعر: من الأعلى للأقل": "Price: high to low", "حالة المخزون: الكل": "Stock: all", "المتوفر في المخزن بس": "In stock only", "كميات محدودة": "Limited quantities", "النتايج:": "Results:", "منتج": "products", "مفيش منتجات مطابقة لبحثك": "No products match your search", "اعرض كل المنتجات": "Show all products", "سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك": "Log in first to complete your order and see your group prices", "أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.": "Once you log in with your trader account, cart prices and currency update automatically to your discount tier.", "سجّل دخول دلوقتي": "Log in now", "كمّل الطلب وادفع —": "Checkout —", "راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن": "Review the delivery address, choose a payment method and send the order", "ارجع ضيف قطع تانية": "Back to add more items", "عنوان توصيل الطلب (عناوين المحل المسجّلة)": "Delivery address (your saved addresses)", "العنوان الأساسي للمحل": "Main address", "عنوان الفرع الثاني": "Second branch address", "وصّل لعنوان تاني للفاتورة دي بس": "Deliver to another address for this invoice only", "اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...": "Write the full address and the receiver phone number...", "حالة المحفظة والآجل (ليك / عليك)": "Wallet & credit status", "رصيد حسابك دلوقتي:": "Current balance:", "دائن (ليك):": "Credit (yours):", "مدين (عليك):": "Debit (you owe):", "سقف الآجل المسموح:": "Credit limit:", "المتاح تسحبه آجل:": "Available on credit:", "استخدم رصيدك الدائن في المحفظة (": "Use your wallet credit (", "واخصمه من الفاتورة": "and deduct it from the invoice", "طريقة الدفع": "Payment method", "مش متاح: الفاتورة أكبر من سقف الآجل المتبقي": "Unavailable: invoice exceeds remaining credit", "ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:": "Invoice notes or packing instructions:", "مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...": "e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...", "ملخص الفاتورة (": "Invoice summary (", "قطع)": "pcs)", "الكمية:": "Qty:", "كود خصم (مثال:": "Discount code (e.g.", "أو": "or", "كود الخصم مش صالح أو خلصت مدته! جرّب": "Invalid or expired discount code! Try", "معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.": "Sorry, this code reached its maximum number of uses.", "أقل فاتورة عشان الكود يشتغل (": "Minimum order for this code (", "فعّلنا كود الخصم (": "Discount code applied (", "تطبيق": "Apply", "مفعل:": "Active:", "إلغاء": "Cancel", "إجمالي قيمة الأصناف:": "Items subtotal:", "كوبون الخصم (": "Discount coupon (", "مصاريف التوصيل السريع:": "Express delivery fee:", "متخصوم من رصيد المحفظة:": "Deducted from wallet:", "الصافي اللي هتدفعه:": "Net amount to pay:", "أكّد وابعت الطلب": "Confirm & send order", "الصورة اتحفظت!": "Photo saved!", "بياناتك وعناوينك اتحفظت!": "Your details and addresses were saved!", "كلمة المرور الحالية غلط!": "Current password is incorrect!", "اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).": "Enter a new password (at least 3 characters).", "كلمة المرور الجديدة والتأكيد مش زي بعض!": "New password and confirmation do not match!", "كلمة المرور اتغيّرت!": "Password changed!", "جاري التجهيز": "Preparing", "جاهز للتسليم": "Ready for delivery", "في الطريق (دليفري)": "On the way (delivery)", "تم التسليم": "Delivered", "سجل طلباتك وفواتيرك": "Your orders & invoices", "دوس على زرار": "Tap the button", "جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل": "next to any order to expand or collapse its details. You can search, filter and cancel before delivery", "افتح الكل": "Expand all", "اقفل الكل": "Collapse all", "دوّر برقم الفاتورة (": "Search by invoice number (", "أو اسم القطعة أو التاريخ...": "or product name or date...", "جميع الحالات (": "All statuses (", "الأعلى قيمة": "Highest value", "الأقل قيمة": "Lowest value", "مفيش طلبات مطابقة للفلتر ده": "No orders match this filter", "اعرض كل الطلبات": "Show all orders", "اقفل تفاصيل الطلب (-)": "Collapse order details (-)", "افتح تفاصيل الطلب (": "Expand order details (", "قطع •": "pcs •", "الحالة:": "Status:", "السداد:": "Payment:", "اطبع الفاتورة الرسمية": "Print official invoice", "ملغي": "Cancelled", "إلغي الطلب قبل الشحن": "Cancel order before shipping", "اطلب تاني": "Reorder", "اطلب استرجاع بالضمان": "Request warranty return", "تعديل من الإدارة على الفاتورة:": "Admin update on the invoice:", "الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.": "This order was cancelled; stock was returned and the account settled.", "الكود": "Code", "الصنف والجودة": "Item & quality", "اللون": "Color", "الكمية": "Qty", "الإجمالي": "Total", "عنوان التوصيل:": "Delivery address:", "ملاحظات:": "Notes:", "تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).": "You can print the official invoice once you confirm you received the order (Delivered).", "إجمالي الفاتورة شامل التوصيل:": "Invoice total incl. delivery:", "صافي رصيد المحفظة والحساب": "Net wallet & account balance", "رصيد دائن (ليك):": "Credit balance (yours):", "مديونية (عليك):": "Debt (you owe):", "بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات": "Updates automatically with invoices, payments and returns", "سقف الآجل المسموح": "Credit limit", "المتاح تسحبه آجل دلوقتي:": "Available on credit now:", "عملة التعامل في الفواتير": "Invoice currency", "كل الفواتير وكشف الحساب معروضة بعملة حسابك": "All invoices and statements are shown in your account currency", "كشف الحساب التفصيلي وحركات المحفظة": "Detailed statement & wallet transactions", "حركات مالية": "transactions", "التاريخ": "Date", "رقم المرجع": "Reference", "البيان والتفاصيل": "Description", "قيمة الحركة": "Amount", "الرصيد بعد الحركة": "Balance after", "له": "Credit", "عليه": "Debit", "الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)": "Returns & product warranty (within 7 days of delivery)", "عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي": "To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation", "قدّم طلب مرتجع جديد": "Submit a new return request", "مفيش طلبات استرجاع مسجّلة.": "No return requests yet.", "فاتورة رقم:": "Invoice No.:", "مقبول": "Accepted", "مرفوض": "Rejected", "حالة الطلب:": "Order status:", "القيمة:": "Value:", "سبب الاسترجاع:": "Return reason:", "رد قسم الضمان والفحص الفني:": "Warranty & technical inspection reply:", "مقترح توفير صنف": "Item request", "مفتوح": "Open", "رسالتك وصلت للإدارة وهنرد عليك قريب.": "Your message reached the admin; we will reply soon.", "ردّك اتبعت!": "Your reply was sent!", "ابعت شكوى أو اطلب صنف": "Send a complaint or request an item", "نوع الرسالة:": "Message type:", "شكوى شحن وتوصيل": "Shipping complaint", "استفسار مالي / فواتير": "Billing inquiry", "أخرى": "Other", "العنوان:": "Subject:", "عنوان مختصر للرسالة...": "Short subject...", "التفاصيل:": "Details:", "اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...": "Write the complaint details or the item you want us to stock...", "ابعت للإدارة": "Send to admin", "رسائلي وتذاكر الدعم السابقة": "My messages & previous tickets", "مفيش رسائل قبل كده.": "No previous messages.", "تم الرد": "Replied", "رد الإدارة": "Admin reply", "ضيف رد أو سؤال تاني في الرسالة دي...": "Add another reply or question...", "ابعت الرد": "Send reply", "البيانات الأساسية والصورة الشخصية والعناوين": "Basic details, photo & addresses", "عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن": "Edit shop name, photo, contact numbers and shipping addresses", "صورة الحساب / شعار المحل:": "Account photo / shop logo:", "ارفع صورة من جهازك": "Upload a photo", "استخدم الأيقونة الملوّنة": "Use colored icon", "أو اختار لون الشعار:": "Or pick a logo color:", "حروف الشعار": "Logo letters", "اسم المحل / الشركة / المركز:": "Shop / company name:", "اسم المسؤول / صاحب الحساب:": "Owner name:", "رقم الموبايل (المستخدم للدخول):": "Mobile (used to log in):", "البريد الإلكتروني:": "Email:", "العنوان الأساسي للتوصيل:": "Main delivery address:", "عنوان الفرع الثاني (اختياري):": "Second address (optional):", "احفظ التغييرات": "Save changes", "تغيير كلمة المرور والأمان": "Change password & security", "تقدر تغيّر كلمة السر في أي وقت": "You can change your password anytime", "كلمة المرور الحالية:": "Current password:", "اكتب كلمة المرور الحالية...": "Enter current password...", "كلمة المرور الجديدة:": "New password:", "اكتب كلمة المرور الجديدة...": "Enter new password...", "تأكيد كلمة المرور الجديدة:": "Confirm new password:", "اكتب كلمة المرور الجديدة تاني...": "Re-enter new password...", "غيّر كلمة المرور": "Change password", "سجّل دخولك عشان تفتح حسابك": "Log in to open your account", "البروفايل وإعدادات الحساب": "Profile & settings", "طلباتي وفواتيري": "My orders & invoices", "المحفظة وكشف الحساب": "Wallet & statement", "المرتجعات والضمان": "Returns & warranty", "الشكاوى وطلبات الأصناف": "Complaints & item requests", "حساب معتمد نشط ✓": "Active verified account ✓", "المسؤول:": "Owner:", "الجوال:": "Mobile:", "صافي رصيد المحفظة": "Net wallet balance", "رصيد ليك:": "Credit:", "اطلب منتجات جديدة": "Order new products", "لوحة تحكم الحساب": "Account dashboard", "سلة المشتريات (": "Shopping cart (", "السلة فاضية دلوقتي": "Your cart is empty", "السعر:": "Price:", "إجمالي السلة:": "Cart total:", "كمّل الطلب وادفع": "Checkout", "مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.": "No account found with this phone or email. You can request a new account.", "كلمة المرور غلط! اتأكد وجرّب تاني.": "Wrong password! Please check and try again.", "اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)": "Enter your full name (at least 5 characters)", "اكتب اسم المالك أو المسؤول ثنائي على الأقل": "Enter the owner name (first and last)", "اكتب اسم المحل أو مركز الصيانة صح (3 حروف على الأقل)": "Enter the shop or center name (at least 3 characters)", "رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)": "Phone must be 11 digits starting with 010, 011, 012 or 015", "الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.": "This number is already registered! You can log in with it directly.", "اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح": "Enter the full address (governorate, city, street) so delivery is accurate", "كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل": "Password must be at least 6 characters", "كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط": "Passwords do not match, please retype them", "لازم توافق على الشروط والأحكام عشان تكمّل": "You must accept the Terms & Conditions to continue", "صحّح الحقول الحمرا في الفورم.": "Please fix the red fields in the form.", "حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (": "Something went wrong while sending your request, please try again. (", "عميل فردي (شخص عادي)": "Individual customer", "أهلاً بيك يا": "Welcome", "حسابك اتفتح وإنت دخلت عليه.": "your account is ready and you are logged in.", "طلب فتح حسابك (": "Your account request (", "اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.": "was sent to admin! We will verify and activate it soon.", "حسابات التجار والمحلات": "Trader & shop accounts", "سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة": "Log in or request a new account", "تسجيل الدخول لحسابي": "Log in to my account", "طلب فتح حساب جديد": "Request a new account", "رقم الموبايل أو الإيميل المسجّل:": "Registered phone or email:", "اكتب رقم الموبايل (مثلاً: 01012345678)...": "Enter phone number (e.g. 01012345678)...", "كلمة المرور (": "Password (", "اكتب كلمة المرور...": "Enter password...", "ادخل وحدّث الأسعار": "Log in & update prices", "لسه معندكش حساب؟": "Don't have an account?", "دوس هنا واطلب فتح حساب": "Tap here to request one", "في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.": "Some details are missing or wrong, please fix the red fields below.", "اختار نوع الحساب:": "Choose account type:", "شخص عادي (استخدام شخصي)": "Individual (personal use)", "عميل فردي (استخدام شخصي)": "Individual (personal use)", "اشتري منتجات وإكسسوارات لموبايلك بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة": "Buy products and accessories at retail prices; your account opens instantly with no approval", "مركز صيانة ومبيعات منتجات": "Repair center & product sales", "صاحب محل أو مركز صيانة": "Shop or repair center owner", "حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع": "Trader account for wholesale prices and distribution discounts", "اسم المحل / مركز الصيانة / الشركة *": "Shop / repair center / company name *", "مثلاً: مركز الأهرام لصيانة الموبايلات...": "e.g. Al-Ahram Mobile Repair Center...", "الاسم بالكامل (ثنائي أو ثلاثي) *": "Full name *", "اسم المالك أو الفني المسؤول *": "Owner / technician name *", "مثلاً: محمود أحمد حسن...": "e.g. Mahmoud Ahmed Hassan...", "مثلاً: م. محمد إبراهيم...": "e.g. Mohamed Ibrahim...", "رقم الموبايل (للتواصل والدخول) *": "Mobile number (for contact & login) *", "نوع النشاط التجاري:": "Business type:", "محل إكسسوارات وجوالات": "Mobile & accessories shop", "تاجر جملة وموزع محلي": "Wholesaler / local distributor", "فني صيانة مستقل": "Independent repair technician", "العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *": "Full address (governorate - city - street) *", "مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...": "e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...", "كلمة المرور (6 على الأقل) *": "Password (min. 6) *", "اختار كلمة مرور قوية...": "Choose a strong password...", "تأكيد كلمة المرور *": "Confirm password *", "اكتب نفس كلمة المرور تاني...": "Re-enter the same password...", "الشروط والأحكام": "Terms & Conditions", "قرأت الشروط والأحكام وموافق عليها *": "I have read and agree to the Terms & Conditions *", "اعمل الحساب وادخل على طول": "Create account & log in", "ابعت طلب فتح حساب المحل للإدارة": "Send shop account request to admin", "قيد المراجعة": "Under review", "طلب الاسترجاع والصور وصلوا لقسم الضمان!": "Your return request and photos reached the warranty department!", "طلب استرجاع بالضمان — فاتورة": "Warranty return request — invoice", "اختار القطعة اللي عايز ترجّعها:": "Choose the item to return:", "سعر الفاتورة:": "Invoice price:", "اشرح حالة القطعة والعيب:": "Describe the item condition and the defect:", "اكتب حالة القطعة والعيب اللي ظهر...": "Describe the condition and defect...", "صور للقطعة (اختياري — من 1 لـ 5):": "Photos (optional — 1 to 5):", "ابعت طلب الاسترجاع للمراجعة": "Submit return request for review", "ج.م)": "EGP)", "ج.م": "EGP", "شروطنا وسياسات الضمان والشحن عند": "Our terms, warranty & shipping policies at", "واتساب وخدمة العملاء:": "WhatsApp & customer service:", "مواعيد العمل:": "Working hours:", "تابعنا وتواصل معنا:": "Follow & contact us:", "جميع الحقوق محفوظة.": "All rights reserved.", "فاتورة مبيعات رسمية (": "Official sales invoice (", "إذن تحضير مخزني (بدون أسعار لعمال المخزن)": "Warehouse picking slip (no prices)", "نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)": "Official customer invoice copy (after delivery)", "فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:": "Sales & warranty invoice — WhatsApp / customer service:", "رقم الفاتورة:": "Invoice No.:", "التاريخ:": "Date:", "بيانات المحل / العميل المستلم:": "Customer details:", "تفاصيل الشحنة والسداد:": "Shipment & payment:", "طريقة الدفع:": "Payment method:", "إجمالي عدد القطع بالفاتورة:": "Total pieces:", "قطع": "pcs", "كود": "Code", "بيان الصنف ودرجة الجودة": "Item & quality", "مراجعة وفحص المخزن": "Warehouse check", "سليم ومختوم بختم الضمان": "OK & warranty-sealed", "شروط الضمان والاسترجاع (": "Warranty & return terms (", "الموقف المالي الحالي للحساب:": "Current account balance:", "رصيد دائن لكم": "Credit balance", "مديونية عليكم": "Debt", "الخصم المطبق:": "Discount applied:", "رسوم الشحن والتوصيل:": "Delivery fee:", "الصافي النهائي للفاتورة:": "Invoice net total:", "تحميل الفاتورة كملف": "Download invoice as", "مباشر (": "directly (", "طباعة ورقية فورية": "Print now", "دوس عشان تكبّر الصورة": "Tap to enlarge photo", "الموديل الأساسي:": "Main model:", "سعر الوحدة:": "Unit price:", "نفذت الكمية حالياً": "Currently out of stock", "متوفر بالمخزن (": "In stock (", "المواصفات الفنية والتفاصيل:": "Specifications & details:", "الموديلات المتوافقة معها القطعة:": "Compatible models:", "اختر اللون / النسخة:": "Choose color / version:", "أبلغني فور توفر القطعة بالمخزن": "Notify me when it is back in stock", "تمت إضافة": "Added", "إلى سلة المشتريات!": "to your cart!", "تأكيد الكمية بالسلة (": "Confirm cart quantity (", "إضافة للسلة الآن": "Add to cart", "ملاحظة": "Note", "الصورة": "Image", "صورة": "Photo", "الفاتورة": "Invoice"};
+const EN_DICT = {"اطلب منتجك":"Order your product","تم البيع":"Sold","إغلاق":"Close","🌍 اطلب منتجك من أي مكان":"🌍 Order any product from anywhere","ابعت طلبك":"Send your request","اسم المنتج *":"Product name *","وصف المنتج والمواصفات *":"Product description & specifications *","رقم الموبايل للتواصل *":"Contact phone *","صورة المنتج (اختياري — بتتضغط تلقائي)":"Product photo (optional — auto-compressed)","شروط الخدمة":"Service terms","قرأت شروط الخدمة وموافق عليها *":"I have read and agree to the service terms *","ابعت الطلب":"Send request","+ اطلب منتج جديد":"+ Request a new product","المحادثة":"Chat","إرسال":"Send","اكتب رسالتك...":"Write your message...","إلغاء الطلب":"Cancel request","جديد":"New","قيد المراجعة":"Under review","تم تحديد السعر":"Price set","تم استلام العربون":"Deposit received","جاري التوصيل":"Out for delivery","ملغي":"Cancelled","سعر المنتج المتفق عليه":"Agreed product price","العربون":"Deposit","طلباتي من برّه (":"My global requests (","🔥 الأكتر طلباً:":"🔥 Top picks:","☰ قايمة":"☰ List","▦ مربعات":"▦ Grid","طلبك مؤمّن":"Secure order","معاينة عند الاستلام":"Inspect on delivery","ضمان على المنتجات":"Product warranty","← كمّل تسوّق":"← Continue shopping","محتاج مساعدة؟ كلّمنا على واتساب":"Need help? Chat on WhatsApp","تحميل PDF":"Download PDF","إغلاق":"Close","مشاركة":"Share","تصفّح المنتجات (":"Browse products (","الرئيسية والعروض":"Home & offers","إشعارات":"Alerts","حسابي":"Account","خروج":"Log out","الماركة":"Brand","التصنيف":"Category","الموديل":"Model","الكل":"All","اختار الماركة":"Choose brand","اختار التصنيف":"Choose category","اختار الموديل":"Choose model","كل الماركات":"All brands","كل التصنيفات":"All categories","كل الموديلات":"All models","دوّر هنا...":"Search here...","عرض النتايج (":"Show results (","مفيش نتايج":"No results","الأقسام الأكتر طلباً":"Top categories","منتج متاح":"products available","شوف كل المنتجات ›":"All products ›","الأكتر طلباً":"Top seller","مشاركة":"Share","تصفّح":"Browse","طباعة الفاتورة":"Print invoice","إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","إغلاق":"Close","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك": "Welcome", "الأسعار والسلة اتحدّثت على حسابك.": "Prices and cart were updated for your account.", "إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).": "You are browsing as a guest (you can log in or request a new account).", "معلش، الكمية المتاحة في المخزن من": "Sorry, the available stock of", "معلش، المتاح في المخزن من": "Sorry, the available stock of", "قطع بس.": "pieces only.", "قياسي": "Standard", "سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.": "We added you to the waitlist! We'll notify you as soon as stock arrives.", "حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (": "Something went wrong while sending the order, please try again. (", "السلة فاضية! ضيف منتجات الأول.": "Your cart is empty! Add products first.", "اختار طريقة الدفع الأول.": "Please choose a payment method first.", "آجل / على الحساب": "Credit / On account", "قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.": "The order exceeds your available credit limit. Choose another payment method or settle part of your balance.", "اكتب عنوان التوصيل الأول.": "Please enter the delivery address first.", "تم الاستلام": "Received", "استلمنا طلبك": "Order received", "فاتورتك اتسجّلت وبنجهّز القطع في المخزن (": "Your invoice is registered and we are preparing your items (", "قطع).": "pcs).", "طلبك رقم": "Your order No.", "اتأكّد وبعتنا إشعار للإدارة والمخزن!": "is confirmed and the team has been notified!", "ضفنا": "Added", "أصناف متاحة للسلة (وعدّينا": "available items to the cart (skipped", "صنف مش متوفر دلوقتي).": "unavailable items).", "رجّعنا كل أصناف الفاتورة": "All invoice items were re-added", "للسلة!": "to the cart!", "الصورة السابقة": "Previous image", "الصورة التالية": "Next image", "عرض التفاصيل والصورة المكبرة": "View details and enlarged image", "الكمية خلصت": "Out of stock", "كمية محدودة: فاضل": "Limited stock: only", "متوفر في المخزن (": "In stock (", "في السلة:": "In cart:", "المتاح:": "Available:", "قطعة": "pcs", "التوافق:": "Compatible:", "اللون:": "Color:", "سعر الوحدة": "Unit price", "نبّهني لما يتوفر (": "Notify me when available (", "زوّد الكمية": "Increase quantity", "قلّل الكمية": "Decrease quantity", "كلّمنا على واتساب": "Chat on WhatsApp", "صفحتنا على فيسبوك": "Our Facebook page", "حسابنا على إنستجرام": "Our Instagram", "الرئيسية والعروض": "Home & offers", "دوّر في الكتالوج (": "Search the catalog (", "طلباتي": "My orders", "إشعارات الطلبات": "Order notifications", "إشعارات الطلبات اللحظية": "Live order notifications", "مفيش إشعارات جديدة": "No new notifications", "رصيد:": "Balance:", "مديونية:": "Debt:", "خرجت من حسابك.": "You have logged out.", "تسجيل الخروج": "Log out", "دخول": "Log in", "طلب فتح حساب": "Request an account", "السلة": "Cart", "دوّر في الكتالوج كله": "Search the whole catalog", "ابحث عن أي منتج أو قسم أو موديل في الكتالوج": "Search any product, accessory or phone model", "أكثر من": "More than", "صنف وموديل متوفر في المخزن وجاهز يتشحن على طول": "items and models in stock, ready to ship right away", "دوس هنا للبحث والفلترة...": "Tap here to search and filter...", "دوّر": "Search", "أكتر الأقسام طلباً:": "Top categories:", "شاشات": "Screens", "بطاريات": "Batteries", "فلاتات وبوردات": "Flex cables & boards", "كاميرات": "Cameras", "شواحن وكابلات": "Chargers & cables", "جرابات وحمايات": "Cases & protectors", "أكواد خصم شغّالة:": "Active discount codes:", "نسخنا الكود (": "Code copied (", "الإعلان السابق": "Previous ad", "الإعلان التالي": "Next ad", "إعلان": "Ad", "من": "of", "شوف تفاصيل العرض واطلب": "View offer details & order", "دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول": "Tap the ad to see details and order directly", "تصفّح التشكيلة حسب القسم أو الموديل": "Browse products by phone model", "اختر القسم أو الموديل لاستعراض كافة المنتجات المتاحة فوراً": "Tap any model to see all compatible products", "شوف كل الموديلات والبحث المتقدم": "All models & advanced search", "قطع متاحة": "pcs available", "قسم مميز": "Featured", "شوف الكل في صفحة البحث": "See all in search", "دوس عشان تفتح السلة وتراجع الأصناف": "Tap to open the cart and review items", "سلة المشتريات": "Shopping cart", "صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)": "Instant search & full catalog (cart saved automatically)", "دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق": "Search by model, product name, quality or compatibility code", "ارجع للرئيسية والعروض": "Back to home & offers", "دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن": "Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex", "، بطارية)...": ", battery)...", "امسح البحث": "Clear search", "الفلاتر الشغّالة:": "Active filters:", "موديل": "Model", "فلتر المخزون": "Stock filter", "بحث:": "Search:", "مسح كل الفلاتر": "Clear all filters", "الماركة:": "Brand:", "كل الماركات": "All brands", "التصنيف:": "Category:", "كل المنتجات (": "All products (", "الأقسام والموديلات:": "Phone models:", "كل الموديلات (": "All models (", "فلترة وترتيب:": "Filter & sort:", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "الاسم: (أ - ي)": "Name: (A - Z)", "الاسم: (ي - أ)": "Name: (Z - A)", "العدد: الأكتر كمية": "Stock: highest", "العدد: الأقل كمية": "Stock: lowest", "السعر: من الأقل للأعلى": "Price: low to high", "السعر: من الأعلى للأقل": "Price: high to low", "حالة المخزون: الكل": "Stock: all", "المتوفر في المخزن بس": "In stock only", "كميات محدودة": "Limited quantities", "النتايج:": "Results:", "منتج": "products", "مفيش منتجات مطابقة لبحثك": "No products match your search", "اعرض كل المنتجات": "Show all products", "سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك": "Log in first to complete your order and see your group prices", "أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.": "Once you log in with your trader account, cart prices and currency update automatically to your discount tier.", "سجّل دخول دلوقتي": "Log in now", "كمّل الطلب وادفع —": "Checkout —", "راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن": "Review the delivery address, choose a payment method and send the order", "ارجع ضيف قطع تانية": "Back to add more items", "عنوان توصيل الطلب (عناوين المحل المسجّلة)": "Delivery address (your saved addresses)", "العنوان الأساسي للمحل": "Main address", "عنوان الفرع الثاني": "Second branch address", "وصّل لعنوان تاني للفاتورة دي بس": "Deliver to another address for this invoice only", "اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...": "Write the full address and the receiver phone number...", "حالة المحفظة والآجل (ليك / عليك)": "Wallet & credit status", "رصيد حسابك دلوقتي:": "Current balance:", "دائن (ليك):": "Credit (yours):", "مدين (عليك):": "Debit (you owe):", "سقف الآجل المسموح:": "Credit limit:", "المتاح تسحبه آجل:": "Available on credit:", "استخدم رصيدك الدائن في المحفظة (": "Use your wallet credit (", "واخصمه من الفاتورة": "and deduct it from the invoice", "طريقة الدفع": "Payment method", "مش متاح: الفاتورة أكبر من سقف الآجل المتبقي": "Unavailable: invoice exceeds remaining credit", "ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:": "Invoice notes or packing instructions:", "مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...": "e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...", "ملخص الفاتورة (": "Invoice summary (", "قطع)": "pcs)", "الكمية:": "Qty:", "كود خصم (مثال:": "Discount code (e.g.", "أو": "or", "كود الخصم مش صالح أو خلصت مدته! جرّب": "Invalid or expired discount code! Try", "معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.": "Sorry, this code reached its maximum number of uses.", "أقل فاتورة عشان الكود يشتغل (": "Minimum order for this code (", "فعّلنا كود الخصم (": "Discount code applied (", "تطبيق": "Apply", "مفعل:": "Active:", "إلغاء": "Cancel", "إجمالي قيمة الأصناف:": "Items subtotal:", "كوبون الخصم (": "Discount coupon (", "مصاريف التوصيل السريع:": "Express delivery fee:", "متخصوم من رصيد المحفظة:": "Deducted from wallet:", "الصافي اللي هتدفعه:": "Net amount to pay:", "أكّد وابعت الطلب": "Confirm & send order", "الصورة اتحفظت!": "Photo saved!", "بياناتك وعناوينك اتحفظت!": "Your details and addresses were saved!", "كلمة المرور الحالية غلط!": "Current password is incorrect!", "اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).": "Enter a new password (at least 3 characters).", "كلمة المرور الجديدة والتأكيد مش زي بعض!": "New password and confirmation do not match!", "كلمة المرور اتغيّرت!": "Password changed!", "جاري التجهيز": "Preparing", "جاهز للتسليم": "Ready for delivery", "في الطريق (دليفري)": "On the way (delivery)", "تم التسليم": "Delivered", "سجل طلباتك وفواتيرك": "Your orders & invoices", "دوس على زرار": "Tap the button", "جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل": "next to any order to expand or collapse its details. You can search, filter and cancel before delivery", "افتح الكل": "Expand all", "اقفل الكل": "Collapse all", "دوّر برقم الفاتورة (": "Search by invoice number (", "أو اسم القطعة أو التاريخ...": "or product name or date...", "جميع الحالات (": "All statuses (", "الأعلى قيمة": "Highest value", "الأقل قيمة": "Lowest value", "مفيش طلبات مطابقة للفلتر ده": "No orders match this filter", "اعرض كل الطلبات": "Show all orders", "اقفل تفاصيل الطلب (-)": "Collapse order details (-)", "افتح تفاصيل الطلب (": "Expand order details (", "قطع •": "pcs •", "الحالة:": "Status:", "السداد:": "Payment:", "اطبع الفاتورة الرسمية": "Print official invoice", "ملغي": "Cancelled", "إلغي الطلب قبل الشحن": "Cancel order before shipping", "اطلب تاني": "Reorder", "اطلب استرجاع بالضمان": "Request warranty return", "تعديل من الإدارة على الفاتورة:": "Admin update on the invoice:", "الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.": "This order was cancelled; stock was returned and the account settled.", "الكود": "Code", "الصنف والجودة": "Item & quality", "اللون": "Color", "الكمية": "Qty", "الإجمالي": "Total", "عنوان التوصيل:": "Delivery address:", "ملاحظات:": "Notes:", "تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).": "You can print the official invoice once you confirm you received the order (Delivered).", "إجمالي الفاتورة شامل التوصيل:": "Invoice total incl. delivery:", "صافي رصيد المحفظة والحساب": "Net wallet & account balance", "رصيد دائن (ليك):": "Credit balance (yours):", "مديونية (عليك):": "Debt (you owe):", "بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات": "Updates automatically with invoices, payments and returns", "سقف الآجل المسموح": "Credit limit", "المتاح تسحبه آجل دلوقتي:": "Available on credit now:", "عملة التعامل في الفواتير": "Invoice currency", "كل الفواتير وكشف الحساب معروضة بعملة حسابك": "All invoices and statements are shown in your account currency", "كشف الحساب التفصيلي وحركات المحفظة": "Detailed statement & wallet transactions", "حركات مالية": "transactions", "التاريخ": "Date", "رقم المرجع": "Reference", "البيان والتفاصيل": "Description", "قيمة الحركة": "Amount", "الرصيد بعد الحركة": "Balance after", "له": "Credit", "عليه": "Debit", "الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)": "Returns & product warranty (within 7 days of delivery)", "عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي": "To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation", "قدّم طلب مرتجع جديد": "Submit a new return request", "مفيش طلبات استرجاع مسجّلة.": "No return requests yet.", "فاتورة رقم:": "Invoice No.:", "مقبول": "Accepted", "مرفوض": "Rejected", "حالة الطلب:": "Order status:", "القيمة:": "Value:", "سبب الاسترجاع:": "Return reason:", "رد قسم الضمان والفحص الفني:": "Warranty & technical inspection reply:", "مقترح توفير صنف": "Item request", "مفتوح": "Open", "رسالتك وصلت للإدارة وهنرد عليك قريب.": "Your message reached the admin; we will reply soon.", "ردّك اتبعت!": "Your reply was sent!", "ابعت شكوى أو اطلب صنف": "Send a complaint or request an item", "نوع الرسالة:": "Message type:", "شكوى شحن وتوصيل": "Shipping complaint", "استفسار مالي / فواتير": "Billing inquiry", "أخرى": "Other", "العنوان:": "Subject:", "عنوان مختصر للرسالة...": "Short subject...", "التفاصيل:": "Details:", "اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...": "Write the complaint details or the item you want us to stock...", "ابعت للإدارة": "Send to admin", "رسائلي وتذاكر الدعم السابقة": "My messages & previous tickets", "مفيش رسائل قبل كده.": "No previous messages.", "تم الرد": "Replied", "رد الإدارة": "Admin reply", "ضيف رد أو سؤال تاني في الرسالة دي...": "Add another reply or question...", "ابعت الرد": "Send reply", "البيانات الأساسية والصورة الشخصية والعناوين": "Basic details, photo & addresses", "عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن": "Edit shop name, photo, contact numbers and shipping addresses", "صورة الحساب / شعار المحل:": "Account photo / shop logo:", "ارفع صورة من جهازك": "Upload a photo", "استخدم الأيقونة الملوّنة": "Use colored icon", "أو اختار لون الشعار:": "Or pick a logo color:", "حروف الشعار": "Logo letters", "اسم المحل / الشركة / المركز:": "Shop / company name:", "اسم المسؤول / صاحب الحساب:": "Owner name:", "رقم الموبايل (المستخدم للدخول):": "Mobile (used to log in):", "البريد الإلكتروني:": "Email:", "العنوان الأساسي للتوصيل:": "Main delivery address:", "عنوان الفرع الثاني (اختياري):": "Second address (optional):", "احفظ التغييرات": "Save changes", "تغيير كلمة المرور والأمان": "Change password & security", "تقدر تغيّر كلمة السر في أي وقت": "You can change your password anytime", "كلمة المرور الحالية:": "Current password:", "اكتب كلمة المرور الحالية...": "Enter current password...", "كلمة المرور الجديدة:": "New password:", "اكتب كلمة المرور الجديدة...": "Enter new password...", "تأكيد كلمة المرور الجديدة:": "Confirm new password:", "اكتب كلمة المرور الجديدة تاني...": "Re-enter new password...", "غيّر كلمة المرور": "Change password", "سجّل دخولك عشان تفتح حسابك": "Log in to open your account", "البروفايل وإعدادات الحساب": "Profile & settings", "طلباتي وفواتيري": "My orders & invoices", "المحفظة وكشف الحساب": "Wallet & statement", "المرتجعات والضمان": "Returns & warranty", "الشكاوى وطلبات الأصناف": "Complaints & item requests", "حساب معتمد نشط ✓": "Active verified account ✓", "المسؤول:": "Owner:", "الجوال:": "Mobile:", "صافي رصيد المحفظة": "Net wallet balance", "رصيد ليك:": "Credit:", "اطلب منتجات جديدة": "Order new products", "لوحة تحكم الحساب": "Account dashboard", "سلة المشتريات (": "Shopping cart (", "السلة فاضية دلوقتي": "Your cart is empty", "السعر:": "Price:", "إجمالي السلة:": "Cart total:", "كمّل الطلب وادفع": "Checkout", "مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.": "No account found with this phone or email. You can request a new account.", "كلمة المرور غلط! اتأكد وجرّب تاني.": "Wrong password! Please check and try again.", "اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)": "Enter your full name (at least 5 characters)", "اكتب اسم المالك أو المسؤول ثنائي على الأقل": "Enter the owner name (first and last)", "اكتب اسم النشاط أو الحساب التجاري بشكل صحيح (3 حروف على الأقل)": "Enter the shop or center name (at least 3 characters)", "رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)": "Phone must be 11 digits starting with 010, 011, 012 or 015", "الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.": "This number is already registered! You can log in with it directly.", "اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح": "Enter the full address (governorate, city, street) so delivery is accurate", "كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل": "Password must be at least 6 characters", "كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط": "Passwords do not match, please retype them", "لازم توافق على الشروط والأحكام عشان تكمّل": "You must accept the Terms & Conditions to continue", "صحّح الحقول الحمرا في الفورم.": "Please fix the red fields in the form.", "حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (": "Something went wrong while sending your request, please try again. (", "عميل فردي (شخص عادي)": "Individual customer", "أهلاً بيك يا": "Welcome", "حسابك اتفتح وإنت دخلت عليه.": "your account is ready and you are logged in.", "طلب فتح حسابك (": "Your account request (", "اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.": "was sent to admin! We will verify and activate it soon.", "حسابات التجار والمحلات": "Trader & shop accounts", "سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة": "Log in or request a new account", "تسجيل الدخول لحسابي": "Log in to my account", "طلب فتح حساب جديد": "Request a new account", "رقم الموبايل أو الإيميل المسجّل:": "Registered phone or email:", "اكتب رقم الموبايل (مثلاً: 01012345678)...": "Enter phone number (e.g. 01012345678)...", "كلمة المرور (": "Password (", "اكتب كلمة المرور...": "Enter password...", "ادخل وحدّث الأسعار": "Log in & update prices", "لسه معندكش حساب؟": "Don't have an account?", "دوس هنا واطلب فتح حساب": "Tap here to request one", "في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.": "Some details are missing or wrong, please fix the red fields below.", "اختار نوع الحساب:": "Choose account type:", "شخص عادي (استخدام شخصي)": "Individual (personal use)", "عميل فردي (استخدام شخصي)": "Individual (personal use)", "تسوّق جميع المنتجات المختارة بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة": "Buy products and accessories at retail prices; your account opens instantly with no approval", "تاجر / موزع ومبيعات معتمد": "Repair center & product sales", "صاحب محل أو مركز صيانة": "Shop or repair center owner", "حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع": "Trader account for wholesale prices and distribution discounts", "اسم النشاط التجاري / المعرض / الشركة *": "Shop / repair center / company name *", "مثلاً: شركة أو معرض الأهرام للتجارة...": "e.g. Al-Ahram Mobile Repair Center...", "الاسم بالكامل (ثنائي أو ثلاثي) *": "Full name *", "اسم المالك أو الفني المسؤول *": "Owner / technician name *", "مثلاً: محمود أحمد حسن...": "e.g. Mahmoud Ahmed Hassan...", "مثلاً: م. محمد إبراهيم...": "e.g. Mohamed Ibrahim...", "رقم الموبايل (للتواصل والدخول) *": "Mobile number (for contact & login) *", "نوع النشاط التجاري:": "Business type:", "محل إكسسوارات وجوالات": "Mobile & accessories shop", "تاجر جملة وموزع محلي": "Wholesaler / local distributor", "فني صيانة مستقل": "Independent repair technician", "العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *": "Full address (governorate - city - street) *", "مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...": "e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...", "كلمة المرور (6 على الأقل) *": "Password (min. 6) *", "اختار كلمة مرور قوية...": "Choose a strong password...", "تأكيد كلمة المرور *": "Confirm password *", "اكتب نفس كلمة المرور تاني...": "Re-enter the same password...", "الشروط والأحكام": "Terms & Conditions", "قرأت الشروط والأحكام وموافق عليها *": "I have read and agree to the Terms & Conditions *", "اعمل الحساب وادخل على طول": "Create account & log in", "ابعت طلب فتح حساب المحل للإدارة": "Send shop account request to admin", "قيد المراجعة": "Under review", "طلب الاسترجاع والصور وصلوا لقسم الضمان!": "Your return request and photos reached the warranty department!", "طلب استرجاع بالضمان — فاتورة": "Warranty return request — invoice", "اختار القطعة اللي عايز ترجّعها:": "Choose the item to return:", "سعر الفاتورة:": "Invoice price:", "اشرح حالة القطعة والعيب:": "Describe the item condition and the defect:", "اكتب حالة القطعة والعيب اللي ظهر...": "Describe the condition and defect...", "صور للقطعة (اختياري — من 1 لـ 5):": "Photos (optional — 1 to 5):", "ابعت طلب الاسترجاع للمراجعة": "Submit return request for review", "ج.م)": "EGP)", "ج.م": "EGP", "شروطنا وسياسات الضمان والشحن عند": "Our terms, warranty & shipping policies at", "واتساب وخدمة العملاء:": "WhatsApp & customer service:", "مواعيد العمل:": "Working hours:", "تابعنا وتواصل معنا:": "Follow & contact us:", "جميع الحقوق محفوظة.": "All rights reserved.", "فاتورة مبيعات رسمية (": "Official sales invoice (", "إذن تحضير مخزني (بدون أسعار لعمال المخزن)": "Warehouse picking slip (no prices)", "نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)": "Official customer invoice copy (after delivery)", "فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:": "Sales & warranty invoice — WhatsApp / customer service:", "رقم الفاتورة:": "Invoice No.:", "التاريخ:": "Date:", "بيانات المحل / العميل المستلم:": "Customer details:", "تفاصيل الشحنة والسداد:": "Shipment & payment:", "طريقة الدفع:": "Payment method:", "إجمالي عدد القطع بالفاتورة:": "Total pieces:", "قطع": "pcs", "كود": "Code", "بيان الصنف ودرجة الجودة": "Item & quality", "مراجعة وفحص المخزن": "Warehouse check", "سليم ومختوم بختم الضمان": "OK & warranty-sealed", "شروط الضمان والاسترجاع (": "Warranty & return terms (", "الموقف المالي الحالي للحساب:": "Current account balance:", "رصيد دائن لكم": "Credit balance", "مديونية عليكم": "Debt", "الخصم المطبق:": "Discount applied:", "رسوم الشحن والتوصيل:": "Delivery fee:", "الصافي النهائي للفاتورة:": "Invoice net total:", "تحميل الفاتورة كملف": "Download invoice as", "مباشر (": "directly (", "طباعة ورقية فورية": "Print now", "دوس عشان تكبّر الصورة": "Tap to enlarge photo", "الموديل الأساسي:": "Main model:", "سعر الوحدة:": "Unit price:", "نفذت الكمية حالياً": "Currently out of stock", "متوفر بالمخزن (": "In stock (", "المواصفات الفنية والتفاصيل:": "Specifications & details:", "الموديلات المتوافقة معها القطعة:": "Compatible models:", "اختر اللون / النسخة:": "Choose color / version:", "🔔 نبّهني على واتساب فور توفر المنتج بالمخزن": "Notify me when it is back in stock", "تمت إضافة": "Added", "إلى سلة المشتريات!": "to your cart!", "تأكيد الكمية بالسلة (": "Confirm cart quantity (", "إضافة للسلة الآن": "Add to cart", "ملاحظة": "Note", "الصورة": "Image", "صورة": "Photo", "الفاتورة": "Invoice"};
 const EN_KEYS = Object.keys(EN_DICT).sort((a, b) => b.length - a.length);
 const AR_TEST = /[\u0600-\u06FF]/;
 const isArLetter = ch => !!ch && AR_TEST.test(ch);
@@ -1078,10 +1184,25 @@ const normalizeDigits = (str) =>
     .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d))
     .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d));
 
+const DEFAULT_SPIN_PRIZES = [
+  { id: 'spin_1', label: 'شحن مجاني بالكامل 🚚', shortLabel: 'شحن مجاني 🚚', code: 'SPIN-FREESHIP', type: 'free_delivery', value: 100, desc: 'توصيل مجاني 100% على طلبك الأول', color: '#0d9488' },
+  { id: 'spin_2', label: 'خصم 5% فوري 🔥', shortLabel: 'خصم 5% 🔥', code: 'SPIN-5OFF', type: 'percentage', value: 5, desc: 'خصم 5% فوري على إجمالي السلة', color: '#0284c7' },
+  { id: 'spin_3', label: 'هدية مجانية 65 ج.م 🎁', shortLabel: 'هدية 65 ج.م 🎁', code: 'SPIN-GIFT', type: 'fixed', value: 65, desc: 'هدية مجانية بقيمة 65 ج.م على طلبك', color: '#7c3aed' },
+  { id: 'spin_4', label: 'خصم 50 ج.م نقدي 💸', shortLabel: 'خصم 50 ج.م 💸', code: 'SPIN-50EGP', type: 'fixed', value: 50, desc: 'خصم فوري 50 ج.م للطلبات فوق 500 ج.م', color: '#e11d48' },
+  { id: 'spin_5', label: 'كوبون خصم 5% ⭐', shortLabel: 'كوبون 5% ⭐', code: 'SPIN-5OFF', type: 'percentage', value: 5, desc: 'خصم 5% فوري على طلبك', color: '#d97706' },
+  { id: 'spin_6', label: 'توصيل مجاني سريع 🚀', shortLabel: 'توصيل مجاني 🚀', code: 'SPIN-FREESHIP', type: 'free_delivery', value: 100, desc: 'توصيل مجاني بالكامل لأي محافظة', color: '#059669' }
+];
+
 const INITIAL_SITE_SETTINGS = {
   storeName: 'ELZOGHBI',
-  storeSubtitle: 'MOBILE ACCESSORIES & SPARE PARTS SHOP',
-  storeTagline: 'كل اللي محتاجه لموبايلك في مكان واحد: إكسسوارات أصلية، شواحن، سماعات، وقطع غيار جملة وقطاعي',
+  storeSubtitle: 'SMART SHOPPING & ORIGINAL PRODUCTS',
+  storeTagline: 'تشكيلة مختارة من المنتجات الأصلية بأعلى معايير الجودة • ضمان معتمد وشحن سريع لجميع المحافظات',
+  homeSearchTitle: 'ابحث في الكتالوج الشامل',
+  homeSearchSubtitle: 'تصفّح المنتجات الأصلية والمختارة بعناية وجاهزة للشحن الفوري',
+  homeSearchPlaceholder: 'ابحث باسم المنتج، القسم، الماركة، أو الكود...',
+  homeTopCategoriesTitle: 'الأقسام الأكثر طلباً:',
+  homeModelsSectionTitle: 'تصفّح التشكيلة حسب القسم أو الموديل',
+  homeModelsSectionSubtitle: 'اختر القسم أو الموديل لاستعراض كافة المنتجات المتوافقة فوراً',
   whatsappUrl: 'https://wa.me/201012345678',
   whatsappNumber: '01012345678',
   facebookUrl: 'https://facebook.com/elzoghbi.official',
@@ -1089,11 +1210,11 @@ const INITIAL_SITE_SETTINGS = {
   hotline: '19950',
   workingHours: 'كل يوم من 10 الصبح لحد 11 بالليل',
   termsTitle: 'قواعد الشغل والشروط العامة',
-  termsText: 'كل المنتجات في ELZOGHBI متفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
-  returnPolicyTitle: 'سياسة الاسترجاع والضمان (القطع والإكسسوارات)',
-  returnPolicyText: 'الضمان ساري من 7 لـ 14 يوم من يوم الاستلام. في قطع الغيار لازم الختم المائي والاستيكر الأصلي يفضلوا زي ما جم من المصنع من غير لزق أو لحام، وفي الإكسسوارات لازم العلبة الأصلية والسيريال يتحافظ عليهم.',
+  termsText: 'كل المنتجات في ELZOGHBI مفحوصة ومضمونة. الأسعار بتتحدّث لحظياً، والكمية بتتحجزلك أول ما تكمّل الطلب.',
+  returnPolicyTitle: 'سياسة الاسترجاع والضمان المعتمدة',
+  returnPolicyText: 'الضمان ساري حسب المدة الموضحة لكل منتج من يوم الاستلام، مع بشرط الحفاظ على الحالة الأصلية والملحقات.',
   deliveryPolicyTitle: 'سياسة الشحن والتوصيل السريع',
-  deliveryPolicyText: 'بنوصّل لكل المحافظات والمحلات ومراكز الصيانة في خلال 24 لـ 48 ساعة، وتقدر تعاين وتفحص القطع وقت الاستلام.',
+  deliveryPolicyText: 'بنوصّل لكل المحافظات في خلال 24 لـ 48 ساعة، وتقدر تعاين وتفحص طلبك وقت الاستلام قبل الدفع.',
   paymentMethods: INITIAL_PAYMENT_METHODS,
   showHomeAds: true,
   showHomeModels: true,
@@ -1107,7 +1228,90 @@ const INITIAL_SITE_SETTINGS = {
   registrationTermsTitle: 'الشروط والأحكام',
   registrationTermsText: DEFAULT_REGISTRATION_TERMS,
   supabaseUrl: 'https://pomuumsgsujcgvamaxmr.supabase.co',
-  supabaseAnonKey: 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q'
+  supabaseAnonKey: 'sb_publishable_Y4XbNsaCNXR9_VUctCpimg_P2C7Cu_Q',
+
+  // --- Super Admin Feature Flags & CRO Controls ---
+  enableLiveSocialProof: true,
+  socialProofIntervalSec: 35,
+  socialProofDemoEnabled: true,
+  socialProofCustomCities: 'المنصورة - الدقهلية, أجا - الدقهلية, ميت غمر - الدقهلية, السنبلاوين - الدقهلية, طلخا - الدقهلية, القاهرة, الإسكندرية, طنطا, الزقازيق, دمياط',
+
+  enableSpinToWin: true,
+  spinWheelTitle: '🎁 لف عجلة الحظ واكسب هديتك الفورية!',
+  spinWheelSubtitle: 'فرصة حقيقية لكل زائر جديد: شحن مجاني، خصم فوري، أو هدية مجانية!',
+  spinWheelPrizes: DEFAULT_SPIN_PRIZES,
+
+  enableFreeShippingBar: true,
+  freeShippingTargetBase: 2000,
+
+  enableSmartCrossSell: true,
+  crossSellBundleDiscountPct: 10,
+  pinnedCrossSellPartIds: [],
+
+  enableWalletCashback: true,
+  defaultCashbackPct: 2,
+  cashbackMaxPartPrice: 1500,
+  cashbackPartMap: {},
+
+  enableQualityTiers: true,
+  tierOriginalLabel: 'أصلي 100%',
+  tierFirstClassLabel: 'فرز أول',
+  tierFirstClassRatio: 60,
+  tierEconomyLabel: 'اقتصادي',
+  tierEconomyRatio: 35,
+
+  enableTrustBadges: true,
+  enableExitIntentPopup: true,
+  exitIntentDiscountPct: 5,
+  exitIntentPromoCode: 'STAY5',
+  lowStockUrgencyThreshold: 5,
+
+  enableBuyMoreSaveMore: true,
+  qtyTier2Min: 2,
+  qtyTier2DiscountPct: 5,
+  qtyTier3Min: 3,
+  qtyTier3DiscountPct: 10,
+
+  enableCashierImpulse: true,
+  cashierMaxPrice: 1000,
+
+  enableLoyaltyTiers: true,
+  loyaltySilverMinOrders: 4,
+  loyaltyGoldMinOrders: 10,
+  loyaltyDiamondMinOrders: 20,
+  loyaltyInactivityDays: 90,
+
+  enableFamilySavedDevices: true,
+  enableRepurchaseReminders: true,
+  repurchaseReminderMonths: 6,
+  repurchaseDiscountPct: 10,
+  repurchasePromoCode: 'RENEW10',
+
+  enableVipSecretRoute: true,
+  vipMinOrdersRequired: 3,
+  vipSecretToken: 'elzoghbi-vip',
+
+  enableWarrantyLookup: true,
+  defaultWarrantyDays: 90,
+
+  enableReferralProgram: true,
+  referralRewardType: 'fixed', // 'fixed' | 'percentage'
+  referralRewardFixedAmount: 50,
+  referralRewardPct: 5,
+
+  enableBirthdayAndSeasonal: true,
+  birthdayCouponCode: 'BDAY15',
+  birthdayDiscountPct: 15,
+  seasonalCampaignActive: false,
+  seasonalCampaignName: 'عروض الجمعة البيضاء والموسم 🖤',
+  seasonalCouponCode: 'SEASON10',
+  seasonalDiscountPct: 10,
+
+  keepOutOfStockVisible: true,
+  restockWaitlist: [],
+  analyticsRecoveredCartsCount: 0,
+  analyticsRecoveredCartsValue: 0,
+  analyticsCouponsUsedCount: 0
 };
 
 const QUALITY_GRADE_SUGGESTIONS = [
@@ -1126,6 +1330,159 @@ const QUALITY_GRADE_SUGGESTIONS = [
 
 const INITIAL_PARTS = [
   {
+    id: 'prt_acc_1',
+    createdAt: '2026-11-01 10:00',
+    sku: 'ACC-CASE-MAG',
+    modelId: 'mdl_15pm',
+    category: 'جرابات وحمايات',
+    name: 'جراب حماية ماج سيف مقاوم للصدمات (شفاف مضاد للاصفرار)',
+    qualityGrade: 'أصلي بضمان سنة (إكسسوارات)',
+    colors: ['شفاف كريستال', 'أسود مطفي', 'كحلي'],
+    compatibleModels: ['iPhone 15 Pro Max', 'iPhone 14 Pro Max', 'Samsung S24 Ultra'],
+    searchAliases: 'جراب كفر حماية ماج سيف اصلي فرز اول اقتصادي',
+    description: 'حماية فائقة للكاميرا والحواف مع حلقة مغناطيسية قوية للشحن اللاسلكي.',
+    warrantyText: 'ضمان استبدال 60 يوم ضد الاصفرار والعيوب',
+    image: PART_IMAGES.backglass,
+    stock: 35,
+    lowStockThreshold: 5,
+    maxOrderQty: 20,
+    costPrice: 65,
+    basePrice: 300,
+    cashbackEnabled: true,
+    cashbackPct: 3,
+    customGroupPrices: {
+      _cashbackEnabled: true,
+      _cashbackPct: 3,
+      _tierOriginalPrice: 300,
+      _tierFirstClassPrice: 180,
+      _tierEconomyPrice: 90
+    },
+    waitlistCount: 0
+  },
+  {
+    id: 'prt_acc_2',
+    createdAt: '2026-11-01 11:00',
+    sku: 'ACC-GLASS-9H',
+    modelId: 'mdl_15pm',
+    category: 'جرابات وحمايات',
+    name: 'إسكرينة زجاج نانو 9H مضادة للبصمة والصدمات (Full Glue)',
+    qualityGrade: 'أصلي بضمان سنة (إكسسوارات)',
+    colors: ['شفاف HD', 'برايفسي (مضاد للتجسس)'],
+    compatibleModels: ['iPhone 15 Pro Max', 'iPhone 13 Pro Max', 'Samsung S24 Ultra', 'Redmi Note 13'],
+    searchAliases: 'اسكرينة سكرينة حماية زجاج نانو 9H',
+    description: 'طبقة حماية نانو ضد الخدش والكسر مع ملمس ناعم جداً وحواف دائرية.',
+    warrantyText: 'ضمان 30 يوم ضد العيوب',
+    image: PART_IMAGES.screen,
+    stock: 80,
+    lowStockThreshold: 10,
+    maxOrderQty: 30,
+    costPrice: 18,
+    basePrice: 85,
+    cashbackEnabled: true,
+    cashbackPct: 3,
+    customGroupPrices: {
+      _cashbackEnabled: true,
+      _cashbackPct: 3,
+      _tierOriginalPrice: 85,
+      _tierFirstClassPrice: 50,
+      _tierEconomyPrice: 25
+    },
+    waitlistCount: 0
+  },
+  {
+    id: 'prt_acc_3',
+    createdAt: '2026-11-01 12:00',
+    sku: 'ACC-CABLE-PD',
+    modelId: 'mdl_15pm',
+    category: 'شواحن وكابلات',
+    name: 'كابل شحن سريع قماش ضد القطع (Type-C PD 60W)',
+    qualityGrade: 'أصلي بضمان سنة (إكسسوارات)',
+    colors: ['أبيض', 'أسود'],
+    compatibleModels: ['جميع الأجهزة المتوافقة مع Type-C'],
+    searchAliases: 'كابل وصلة شاحن تايب سي سريع',
+    description: 'كابل شحن ونقل بيانات فائق السرعة مغلف بطبقة قماش مقواة تتحمل الثني المستمر.',
+    warrantyText: 'ضمان استبدال 6 شهور بالرقم',
+    image: PART_IMAGES.flex,
+    stock: 45,
+    lowStockThreshold: 6,
+    maxOrderQty: 25,
+    costPrice: 35,
+    basePrice: 150,
+    cashbackEnabled: true,
+    cashbackPct: 2,
+    customGroupPrices: {
+      _cashbackEnabled: true,
+      _cashbackPct: 2,
+      _tierOriginalPrice: 150,
+      _tierFirstClassPrice: 95,
+      _tierEconomyPrice: 45
+    },
+    waitlistCount: 0
+  },
+  {
+    id: 'prt_acc_4',
+    createdAt: '2026-11-01 12:30',
+    sku: 'ACC-CLEAN-KIT',
+    modelId: 'mdl_15pm',
+    category: 'إكسسوارات وعناية',
+    name: 'طقم تنظيف وعناية متعدد الاستخدامات + حامل مكتب ذكي',
+    qualityGrade: 'درجة أولى A+ ممتاز',
+    colors: ['أبيض', 'أسود'],
+    compatibleModels: ['مناسب لجميع الأجهزة والاستخدام اليومي'],
+    searchAliases: 'حامل ستاند منظف طقم عناية كاشير',
+    description: 'إضافة عملية بسيطة ومميزة للمكتب والسيارة بسعر اقتصادي.',
+    warrantyText: 'ضمان 30 يوم',
+    image: PART_IMAGES.camera,
+    stock: 60,
+    lowStockThreshold: 8,
+    maxOrderQty: 20,
+    costPrice: 12,
+    basePrice: 30,
+    cashbackEnabled: true,
+    cashbackPct: 2,
+    customGroupPrices: {
+      _cashbackEnabled: true,
+      _cashbackPct: 2,
+      _tierOriginalPrice: 30,
+      _tierFirstClassPrice: 20,
+      _tierEconomyPrice: 15
+    },
+    waitlistCount: 0
+  },
+  {
+    id: 'prt_vip_1',
+    createdAt: '2026-11-01 13:00',
+    sku: 'VIP-BOX-PRO',
+    modelId: 'mdl_15pm',
+    category: 'عروض وباكدجات VIP',
+    name: 'باكدج VIP الحصري (شاحن فائق السرعة + كابل أصلي + جراب + حماية كاملة)',
+    qualityGrade: 'أصلي بضمان سنة (إكسسوارات)',
+    colors: ['أسود ملكي', 'أبيض'],
+    compatibleModels: ['حصري لعملاء الرابط الخاص VIP'],
+    searchAliases: 'باكدج عرض جملة vip',
+    description: 'باكدج متكامل بسعر الجملة الحصري لعملاء الـ VIP فقط.',
+    warrantyText: 'ضمان ذهبي شامل لمدة سنة بالرقم',
+    image: PART_IMAGES.battery,
+    stock: 20,
+    lowStockThreshold: 4,
+    maxOrderQty: 10,
+    costPrice: 550,
+    basePrice: 1250,
+    vipPrice: 790,
+    isVipOnly: true,
+    cashbackEnabled: false,
+    cashbackPct: 0,
+    customGroupPrices: {
+      'grp_vip_ flat': 790,
+      _isVipOnly: true,
+      _vipPrice: 790,
+      _oldPrice: 1250,
+      _cashbackEnabled: false,
+      _cashbackPct: 0
+    },
+    waitlistCount: 0
+  },
+  {
     id: 'prt_1',
     createdAt: '2026-10-30 10:00',
     sku: 'SCR-15PM-ORG',
@@ -1137,7 +1494,7 @@ const INITIAL_PARTS = [
     compatibleModels: ['iPhone 15 Pro Max'],
     searchAliases: 'شاشه ايفون ١٥ برو ماكس اصلي خلع تاتش',
     description: 'شاشة أصلية خلع جهاز بحالة الزيرو تدعم 120Hz ProMotion ونقل الداتا بدون رسالة تحذير.',
-    warrantyText: 'ضمان تجربة 14 يوم قبل اللزق والتركيب النهائي',
+    warrantyText: 'ضمان تجربة ومعاينة 14 يوم بحالته الأصلية',
     image: PART_IMAGES.screen,
     stock: 9,
     lowStockThreshold: 5,
@@ -1269,7 +1626,7 @@ const INITIAL_PARTS = [
     compatibleModels: ['iPhone 13', 'iPhone 13n'],
     searchAliases: 'شاشه ايفون 13 ان سيل اقتصاديه تاتش',
     description: 'شاشة اقتصادية FHD In-Cell بإضاءة 650 شمعة واستجابة تاتش سريعة جداً مناسبة للتجديد الاقتصادي.',
-    warrantyText: 'ضمان 30 يوم قبل اللزق والتركيب',
+    warrantyText: 'ضمان 30 يوم استبدال ومعاينة بحالته الأصلية',
     image: PART_IMAGES.screen,
     stock: 32,
     lowStockThreshold: 10,
@@ -1313,7 +1670,7 @@ const INITIAL_PARTS = [
     compatibleModels: ['Redmi Note 13 Pro 5G', 'Poco X6 5G'],
     searchAliases: 'شاشه ريدمي نوت 13 برو بوكو اكس 6 اموليد بصمه',
     description: 'شاشة أموليد مشتركة متوافقة مع Redmi Note 13 Pro 5G و Poco X6 5G وتدعم بصمة الشاشة و120Hz.',
-    warrantyText: 'ضمان تجربة قبل اللزق',
+    warrantyText: 'ضمان معاينة وتجربة المنتج قبل الاستخدام',
     image: PART_IMAGES.screen,
     stock: 14,
     lowStockThreshold: 5,
@@ -1398,7 +1755,7 @@ const INITIAL_PARTS = [
     name: 'سماعة لاسلكية Pro 2 عزل ضوضاء ANC مايك نقي لمكالمات الموبايل',
     qualityGrade: 'أوليد OLED',
     colors: ['أبيض'],
-    compatibleModels: ['iPhone 15 Pro Max', 'iPhone 13', 'Samsung Galaxy S24 Ultra', 'جميع الهواتف'],
+    compatibleModels: ['iPhone 15 Pro Max', 'iPhone 13', 'Samsung Galaxy S24 Ultra', 'جميع الموديلات والأقسام'],
     searchAliases: 'سماعه بلوتوث ايربودز برو تو سماعات لاسلكيه اكسسوار موبايل',
     description: 'سماعة بلوتوث 5.3 بصوت محيطي وعزل ضوضاء نشط ANC وعلبة شحن تدعم الشحن اللاسلكي ومنفذ Type-C.',
     warrantyText: 'ضمان 3 شهور ضد عيوب الصوت والشحن',
@@ -1414,7 +1771,7 @@ const INITIAL_PARTS = [
 ];
 
 const AVATAR_PRESETS = [
-  { id: 'av_blue', label: 'أيقونة مركز صيانة (أزرق)', bg: 'from-blue-600 to-indigo-700', text: 'TF' },
+  { id: 'av_blue', label: 'أيقونة حساب تجاري (أزرق)', bg: 'from-blue-600 to-indigo-700', text: 'TF' },
   { id: 'av_emerald', label: 'أيقونة تاجر معتمد (أخضر)', bg: 'from-emerald-600 to-teal-700', text: 'VIP' },
   { id: 'av_amber', label: 'أيقونة موزع ذهبي (ذهبي)', bg: 'from-amber-500 to-orange-600', text: 'PRO' },
   { id: 'av_purple', label: 'أيقونة شركة/مؤسسة (بنفسجي)', bg: 'from-purple-600 to-fuchsia-700', text: 'CO' },
@@ -1424,7 +1781,7 @@ const AVATAR_PRESETS = [
 const INITIAL_CLIENTS = [
   {
     id: 'cli_1',
-    name: 'مركز تك فيكس للصيانة الفورية (TechFix)',
+    name: 'مؤسسة تك ستور للتجارة والتوزيع (TechStore)',
     owner: 'م. أحمد عبد الرحمن',
     phone: '01012345678',
     email: 'techfix@cairo-repair.eg',
@@ -1439,15 +1796,19 @@ const INITIAL_CLIENTS = [
     avatarImage: '',
     status: 'active',
     createdAt: '2026-09-15',
+    birthDate: '1996-12-30',
+    orderCount: 3,
+    referralCode: 'REF-10123',
+    savedFamilyDevices: [{ id: 'fam_1', ownerLabel: 'اختياراتي الشخصية', modelId: 'mdl_15pm', modelName: 'iPhone 15 Pro Max' }, { id: 'fam_2', ownerLabel: 'اختيارات زوجتي', modelId: 'mdl_s24u', modelName: 'Samsung Galaxy S24 Ultra' }],
     ledger: [
-      { id: 'ldg_1', date: '2026-10-25 14:20', type: 'invoice', ref: 'INV-1041', desc: 'فاتورة مشتريات قطع غيار آيفون وسامسونج', amount: -8400, balanceAfter: -8400 },
+      { id: 'ldg_1', date: '2026-10-25 14:20', type: 'invoice', ref: 'INV-1041', desc: 'فاتورة مشتريات منتجات أصلية ومختارة', amount: -8400, balanceAfter: -8400 },
       { id: 'ldg_2', date: '2026-10-27 18:10', type: 'payment', ref: 'PAY-882', desc: 'تحصيل نقدي + إنستا باي', amount: 9000, balanceAfter: 600 },
       { id: 'ldg_3', date: '2026-10-29 11:05', type: 'return_credit', ref: 'RET-201', desc: 'تعويض مرتجع شاشة (تعديل فاتورة INV-1041)', amount: 850, balanceAfter: 1450 }
     ]
   },
   {
     id: 'cli_2',
-    name: 'شركة النور لتجارة قطع غيار المحمول',
+    name: 'شركة النور للتجارة والتوريدات الحديثة',
     owner: 'الحاج محمود النور',
     phone: '01198765432',
     email: 'elnoor.parts@gmail.com',
@@ -1462,6 +1823,10 @@ const INITIAL_CLIENTS = [
     avatarImage: '',
     status: 'active',
     createdAt: '2026-08-10',
+    birthDate: '1996-12-30',
+    orderCount: 5,
+    referralCode: 'REF-20987',
+    savedFamilyDevices: [],
     ledger: [
       { id: 'ldg_21', date: '2026-10-22 12:00', type: 'invoice', ref: 'INV-1038', desc: 'طلبية شاشات وبطاريات جملة (آجل)', amount: -21200, balanceAfter: -21200 },
       { id: 'ldg_22', date: '2026-10-28 16:40', type: 'payment', ref: 'PAY-890', desc: 'تحويل بنكي (بنك مصر)', amount: 10000, balanceAfter: -11200 }
@@ -1469,7 +1834,7 @@ const INITIAL_CLIENTS = [
   },
   {
     id: 'cli_3',
-    name: 'مؤسسة الخليج فون للصيانة (الرياض)',
+    name: 'مؤسسة الخليج للتجارة والتوزيع (الرياض)',
     owner: 'أ. فهد القحطاني',
     phone: '0501122334',
     email: 'fahad@gulfphone.sa',
@@ -1484,6 +1849,10 @@ const INITIAL_CLIENTS = [
     avatarImage: '',
     status: 'active',
     createdAt: '2026-10-01',
+    birthDate: '1996-12-30',
+    orderCount: 1,
+    referralCode: 'REF-30501',
+    savedFamilyDevices: [],
     ledger: [
       { id: 'ldg_31', date: '2026-10-26 10:00', type: 'payment', ref: 'PAY-901', desc: 'إيداع رصيد مقدم بحوالة دولية', amount: 4200, balanceAfter: 4200 }
     ]
@@ -1493,13 +1862,13 @@ const INITIAL_CLIENTS = [
 const INITIAL_ACCOUNT_REQUESTS = [
   {
     id: 'req_101',
-    shopName: 'سنترال المستقبل لصيانة المحمول',
+    shopName: 'سنترال المستقبل للتجارة والتوريدات',
     ownerName: 'م. كريم عادل',
     phone: '01223344556',
     email: 'future.mobile@gmail.com',
     requestedPassword: '123',
     address: 'شارع الجمهورية، المنصورة - الدقهلية',
-    shopType: 'مركز صيانة ومبيعات قطع غيار',
+    shopType: 'نشاط تجاري ومبيعات معتمد',
     notes: 'نتعامل في شاشات وبطاريات الآيفون والسامسونج بكميات أسبوعية ونرغب في فتح حساب جملة.',
     createdAt: '2026-11-01 04:30',
     status: 'pending' // 'pending' | 'approved' | 'rejected'
@@ -1512,7 +1881,7 @@ const INITIAL_ACCOUNT_REQUESTS = [
     email: 'amana.phone@yahoo.com',
     requestedPassword: '123',
     address: 'ميدان الساعة، فيصل - الجيزة',
-    shopType: 'محل صيانة وتجديد',
+    shopType: 'معرض ومبيعات تجزئة وجملة',
     notes: 'نرغب في تفعيل حساب لطلب الشاشات والبطاريات مع خدمة التوصيل للجيزة.',
     createdAt: '2026-11-01 05:45',
     status: 'pending'
@@ -1523,7 +1892,7 @@ const INITIAL_ORDERS = [
   {
     id: 'INV-1045',
     clientId: 'cli_1',
-    clientName: 'مركز تك فيكس للصيانة الفورية (TechFix)',
+    clientName: 'مؤسسة تك ستور للتجارة والتوزيع (TechStore)',
     groupId: 'grp_wholesale_a',
     currency: 'EGP',
     exchangeRateUsed: 1,
@@ -1563,7 +1932,7 @@ const INITIAL_ORDERS = [
   {
     id: 'INV-1048',
     clientId: 'cli_2',
-    clientName: 'شركة النور لتجارة قطع غيار المحمول',
+    clientName: 'شركة النور للتجارة والتوريدات الحديثة',
     groupId: 'grp_vip_ flat',
     currency: 'EGP',
     exchangeRateUsed: 1,
@@ -1607,12 +1976,12 @@ const INITIAL_RETURNS = [
     id: 'RET-302',
     orderId: 'INV-1045',
     clientId: 'cli_1',
-    clientName: 'مركز تك فيكس للصيانة الفورية (TechFix)',
+    clientName: 'مؤسسة تك ستور للتجارة والتوزيع (TechStore)',
     partId: 'prt_3',
     partName: 'بطارية iPhone 15 Pro Max أصلية تظهر نسبة 100% (Diagnostics)',
     qty: 1,
     refundAmountBase: 1677,
-    reason: 'فلاتة البطارية بها قطع بسيط في التغليف الخارجي قبل التركيب، لم يتم فك اللزق الأصلي.',
+    reason: 'المنتج به ملاحظة بسيطة في التغليف الخارجي عند المعاينة وبحالته الأصلية.',
     warrantyConfirmed: true,
     photos: [PART_IMAGES.battery, PART_IMAGES.flex],
     status: 'قيد المراجعة', // 'قيد المراجعة' | 'مقبول' | 'مرفوض'
@@ -1626,7 +1995,7 @@ const INITIAL_COMPLAINTS = [
   {
     id: 'TCK-501',
     clientId: 'cli_1',
-    clientName: 'مركز تك فيكس للصيانة الفورية (TechFix)',
+    clientName: 'مؤسسة تك ستور للتجارة والتوزيع (TechStore)',
     type: 'مقترح توفير صنف',
     subject: 'نرجو توفير شاشات Honor Magic 6 Pro أصلية بالتوكيل',
     message: 'السلام عليكم، يوجد طلب متزايد من العملاء في وسط البلد على شاشات وباغات Honor Magic 6 Pro و Huawei Pura 70، نتمنى توفيرها في أقرب شحنة.',
@@ -1640,7 +2009,7 @@ const INITIAL_COMPLAINTS = [
   {
     id: 'TCK-502',
     clientId: 'cli_2',
-    clientName: 'شركة النور لتجارة قطع غيار المحمول',
+    clientName: 'شركة النور للتجارة والتوريدات الحديثة',
     type: 'شكوى شحن وتوصيل',
     subject: 'تأخر مندوب خط الموسكي ساعة عن الموعد',
     message: 'مندوب التوصيل وصل الساعة 6 بدلاً من 5 أمس، نرجو التنبيه لتفادي تعطل تسليم الأجهزة للعملاء.',
@@ -1674,6 +2043,21 @@ const loadPersisted = (key, fallbackVal) => {
         if (!parsed.storeName || /h-?market/i.test(parsed.storeName)) {
           parsed.storeName = 'ELZOGHBI';
         }
+        if (parsed.storeSubtitle === 'MOBILE ACCESSORIES & SPARE PARTS SHOP') {
+          parsed.storeSubtitle = 'SMART SHOPPING & ORIGINAL PRODUCTS';
+        }
+        if (parsed.storeTagline && parsed.storeTagline.includes('كل اللي محتاجه لموبايلك')) {
+          parsed.storeTagline = 'تشكيلة مختارة من المنتجات الأصلية بأعلى معايير الجودة • ضمان معتمد وشحن سريع لجميع المحافظات';
+        }
+        return { ...fallbackVal, ...parsed };
+      }
+      if (key === 'clients' && Array.isArray(parsed)) {
+        return parsed.map(c => ({
+          ...c,
+          birthDate: c?.birthDate || '1996-12-30',
+          referralCode: c?.referralCode || `REF-${String(c?.phone || c?.id || '1000').replace(/[^0-9]/g, '').slice(-5) || '1000'}`,
+          savedFamilyDevices: Array.isArray(c?.savedFamilyDevices) ? c.savedFamilyDevices : []
+        }));
       }
       if (Array.isArray(fallbackVal)) {
         return Array.isArray(parsed) ? parsed : fallbackVal;
@@ -1806,7 +2190,7 @@ export default function App() {
       id: 'ntf_1',
       target: 'admin',
       title: 'طلبية جديدة #INV-1048',
-      msg: 'شركة النور لتجارة قطع غيار المحمول أرسلت طلبية جديدة بقيمة 28,175 ج.م',
+      msg: 'شركة النور للتجارة والتوريدات الحديثة أرسلت طلبية جديدة بقيمة 28,175 ج.م',
       time: 'منذ 10 دقائق',
       read: false,
       orderId: 'INV-1048'
@@ -2430,7 +2814,18 @@ export default function App() {
     depositStatus: 'deposit_status',
     imagesAllowed: 'images_allowed',
     unreadAdmin: 'unread_admin',
-    unreadClient: 'unread_client'
+    unreadClient: 'unread_client',
+    cashbackEnabled: 'cashback_enabled',
+    cashbackPct: 'cashback_pct',
+    cashbackAwarded: 'cashback_awarded',
+    cashbackAmountBase: 'cashback_amount_base',
+    isVipOnly: 'is_vip_only',
+    vipPrice: 'vip_price',
+    orderCount: 'order_count',
+    isVip: 'is_vip',
+    birthDate: 'birth_date',
+    referralCode: 'referral_code',
+    referredByCode: 'referred_by_code'
   };
 
   const SNAKE_TO_CAMEL_MAP = Object.fromEntries(
@@ -2563,6 +2958,27 @@ export default function App() {
       }
       if (row.isPromotedAd !== undefined) {
         baseCgp._isPromotedAd = Boolean(row.isPromotedAd);
+      }
+      if (row.cashbackEnabled !== undefined) {
+        baseCgp._cashbackEnabled = Boolean(row.cashbackEnabled);
+      }
+      if (row.cashbackPct !== undefined) {
+        baseCgp._cashbackPct = Number(row.cashbackPct) >= 0 ? Number(row.cashbackPct) : 2;
+      }
+      if (row.isVipOnly !== undefined) {
+        baseCgp._isVipOnly = Boolean(row.isVipOnly);
+      }
+      if (row.vipPrice !== undefined) {
+        baseCgp._vipPrice = Number(row.vipPrice) || 0;
+      }
+      if (row.tierOriginalPrice !== undefined) {
+        baseCgp._tierOriginalPrice = Number(row.tierOriginalPrice) || 0;
+      }
+      if (row.tierFirstClassPrice !== undefined) {
+        baseCgp._tierFirstClassPrice = Number(row.tierFirstClassPrice) || 0;
+      }
+      if (row.tierEconomyPrice !== undefined) {
+        baseCgp._tierEconomyPrice = Number(row.tierEconomyPrice) || 0;
       }
       rawSnake.custom_group_prices = baseCgp;
       rawSnake.stock = Number(rawSnake.stock) || 0;
@@ -2709,6 +3125,34 @@ export default function App() {
     if (cgpObj._isPromotedAd !== undefined && out.isPromotedAd === undefined) {
       out.isPromotedAd = Boolean(cgpObj._isPromotedAd);
     }
+    // Always prioritize customGroupPrices metadata over default false DB columns so Cashback/VIP toggles never revert!
+    if (cgpObj._cashbackEnabled !== undefined) {
+      out.cashbackEnabled = Boolean(cgpObj._cashbackEnabled);
+    }
+    if (cgpObj._cashbackPct !== undefined) {
+      out.cashbackPct = Number(cgpObj._cashbackPct);
+    }
+    if (cgpObj._isVipOnly !== undefined) {
+      out.isVipOnly = Boolean(cgpObj._isVipOnly);
+    }
+    if (cgpObj._vipPrice !== undefined) {
+      out.vipPrice = Number(cgpObj._vipPrice) || 0;
+    }
+    if (cgpObj._tierOriginalPrice !== undefined) {
+      out.tierOriginalPrice = Number(cgpObj._tierOriginalPrice) || 0;
+    }
+    if (cgpObj._tierFirstClassPrice !== undefined) {
+      out.tierFirstClassPrice = Number(cgpObj._tierFirstClassPrice) || 0;
+    }
+    if (cgpObj._tierEconomyPrice !== undefined) {
+      out.tierEconomyPrice = Number(cgpObj._tierEconomyPrice) || 0;
+    }
+    if (out.phone && !out.birthDate) {
+      out.birthDate = '1996-12-30';
+    }
+    if (out.phone && !out.referralCode) {
+      out.referralCode = `REF-${String(out.phone || out.id || '1000').replace(/[^0-9]/g, '').slice(-5) || '1000'}`;
+    }
     const resolvedImgUrl = row.image_url || out.image_url || out.imageUrl || out.image || (Array.isArray(out.images) && out.images[0]) || '';
     if (resolvedImgUrl) {
       out.image_url = resolvedImgUrl;
@@ -2838,7 +3282,20 @@ export default function App() {
       seenIds.add(id);
       const localMod = modMap[id];
       if (localMod && localMod.item && (now - (localMod.ts || 0) < TTL_MS)) {
-        mergedServer.push(typeof sRow === 'string' ? localMod.item : { ...sRow, ...localMod.item });
+        if (sliceKey === 'orders' && typeof sRow === 'object' && sRow !== null) {
+          const statusRank = { 'تم الاستلام': 1, 'جاري التجهيز': 2, 'جاهز للتسليم': 3, 'في الطريق (دليفري)': 4, 'تم التسليم': 5, 'ملغي': 6 };
+          const sTs = Number(sRow.statusUpdatedAt || 0);
+          const lTs = Number(localMod.item.statusUpdatedAt || localMod.ts || 0);
+          const sRank = statusRank[sRow.status] || 0;
+          const lRank = statusRank[localMod.item.status] || 0;
+          if (sTs > lTs || sRank > lRank || (sRow.cashbackAwarded && !localMod.item.cashbackAwarded)) {
+            mergedServer.push({ ...localMod.item, ...sRow, status: sRow.status, cashbackAwarded: Boolean(sRow.cashbackAwarded || localMod.item.cashbackAwarded), statusUpdatedAt: Math.max(sTs, lTs) });
+          } else {
+            mergedServer.push({ ...sRow, ...localMod.item });
+          }
+        } else {
+          mergedServer.push(typeof sRow === 'string' ? localMod.item : { ...sRow, ...localMod.item });
+        }
       } else {
         mergedServer.push(sRow);
       }
@@ -2872,9 +3329,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v22_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v23_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v22_storefront_master_controls') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v23_cro_all_12_fixes') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -2887,7 +3344,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v22_storefront_master_controls');
+      window.localStorage.setItem('elzoghbi_app_version', 'v23_cro_all_12_fixes');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -3219,9 +3676,21 @@ export default function App() {
         const map = new Map(prev.map(p => [String(p.id), p]));
         rows.forEach(r => {
           const existing = map.get(String(r.id));
-          map.set(String(r.id), existing ? { ...existing, ...r } : r);
+          if (existing) {
+            map.set(String(r.id), {
+              ...existing,
+              ...r,
+              cashbackEnabled: existing.cashbackEnabled !== undefined ? existing.cashbackEnabled : r.cashbackEnabled,
+              cashbackPct: existing.cashbackPct !== undefined ? existing.cashbackPct : r.cashbackPct,
+              isVipOnly: existing.isVipOnly !== undefined ? existing.isVipOnly : r.isVipOnly,
+              vipPrice: existing.vipPrice !== undefined ? existing.vipPrice : r.vipPrice,
+              customGroupPrices: { ...(r.customGroupPrices || {}), ...(existing.customGroupPrices || {}) }
+            });
+          } else {
+            map.set(String(r.id), r);
+          }
         });
-        const merged = Array.from(map.values());
+        const merged = mergeServerWithLocal('parts', prev, Array.from(map.values()));
         if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
         return merged;
       });
@@ -3868,9 +4337,36 @@ export default function App() {
           incomingSyncUntilRef.current = Date.now() + 800;
           isIncomingSyncRef.current = true;
 
-          if (Array.isArray(data.clients)) setClients(data.clients);
+          if (Array.isArray(data.clients)) {
+            data.clients.forEach(c => {
+              if (c && c.id && localModifiedMapRef.current?.clients?.[c.id]) {
+                localModifiedMapRef.current.clients[c.id] = { item: c, ts: Date.now() };
+              }
+            });
+            setClients(data.clients);
+          }
           if (Array.isArray(data.accountRequests)) setAccountRequests(data.accountRequests);
-          if (Array.isArray(data.orders)) setOrders(data.orders);
+          if (Array.isArray(data.orders)) {
+            const statusRank = { 'تم الاستلام': 1, 'جاري التجهيز': 2, 'جاهز للتسليم': 3, 'في الطريق (دليفري)': 4, 'تم التسليم': 5, 'ملغي': 6 };
+            setOrders(prevOrders => {
+              const prevMap = new Map((Array.isArray(prevOrders) ? prevOrders : []).map(o => [String(o.id), o]));
+              const merged = data.orders.map(inc => {
+                const loc = prevMap.get(String(inc.id));
+                if (!loc) return inc;
+                const incTs = Number(inc.statusUpdatedAt || 0);
+                const locTs = Number(loc.statusUpdatedAt || 0);
+                const incRank = statusRank[inc.status] || 0;
+                const locRank = statusRank[loc.status] || 0;
+                const winner = (incTs >= locTs || incRank >= locRank || inc.cashbackAwarded) ? { ...loc, ...inc } : { ...inc, ...loc };
+                if (localModifiedMapRef.current?.orders?.[winner.id]) {
+                  localModifiedMapRef.current.orders[winner.id] = { item: winner, ts: Date.now() };
+                }
+                return winner;
+              });
+              try { persistMutationMaps(); } catch (e) {}
+              return merged;
+            });
+          }
           if (Array.isArray(data.returnsList)) setReturnsList(data.returnsList);
           if (Array.isArray(data.complaints)) setComplaints(data.complaints);
           if (Array.isArray(data.notifications)) setNotifications(data.notifications);
@@ -3888,6 +4384,28 @@ export default function App() {
             if (Array.isArray(data.promoCodes)) setPromoCodes(data.promoCodes);
             if (Array.isArray(data.storeAds)) setStoreAds(data.storeAds);
             if (Array.isArray(data.showcaseBars)) setShowcaseBars(data.showcaseBars);
+          } else if (data.siteSettings) {
+            // Sync customer-side additions (restockWaitlist, analytics counters) immediately to Admin tab!
+            setSiteSettings(prev => {
+              const incWaitlist = Array.isArray(data.siteSettings.restockWaitlist) ? data.siteSettings.restockWaitlist : [];
+              const curWaitlist = Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : [];
+              const seenW = new Set();
+              const mergedWaitlist = [];
+              [...incWaitlist, ...curWaitlist].forEach(w => {
+                if (!w || !w.id || seenW.has(w.id)) return;
+                seenW.add(w.id);
+                mergedWaitlist.push(w);
+              });
+              const nextS = {
+                ...prev,
+                restockWaitlist: mergedWaitlist,
+                analyticsRecoveredCartsCount: Math.max(Number(prev.analyticsRecoveredCartsCount) || 0, Number(data.siteSettings.analyticsRecoveredCartsCount) || 0),
+                analyticsRecoveredCartsValue: Math.max(Number(prev.analyticsRecoveredCartsValue) || 0, Number(data.siteSettings.analyticsRecoveredCartsValue) || 0),
+                analyticsCouponsUsedCount: Math.max(Number(prev.analyticsCouponsUsedCount) || 0, Number(data.siteSettings.analyticsCouponsUsedCount) || 0)
+              };
+              try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(nextS)); } catch (e) {}
+              return nextS;
+            });
           }
         }
       } catch (err) {}
@@ -4455,6 +4973,14 @@ export default function App() {
                 if (isDelete) {
                   next = list.filter(item => String(item?.id) !== String(delId));
                 } else {
+                  if (storageKey === 'elzoghbi_v2_orders' && rowObj && rowObj.id) {
+                    const stamped = { ...rowObj, statusUpdatedAt: Date.now() };
+                    if (localModifiedMapRef.current?.orders) {
+                      localModifiedMapRef.current.orders[stamped.id] = { item: stamped, ts: Date.now() };
+                      try { persistMutationMaps(); } catch (e) {}
+                    }
+                    rowObj = stamped;
+                  }
                   const exists = list.some(item => String(item?.id) === String(rowObj.id));
                   next = exists
                     ? list.map(item => (String(item?.id) === String(rowObj.id) ? { ...item, ...rowObj } : item))
@@ -4472,6 +4998,11 @@ export default function App() {
             if (table === 'orders' && (camelRow || isDel)) {
               applyRealtimeRow(setOrders, 'elzoghbi_v2_orders', camelRow, isDel, delId);
               if (type === 'INSERT' && camelRow) {
+                try {
+                  if (typeof window.__elzoghbiEnqueueSocialProof === 'function') {
+                    window.__elzoghbiEnqueueSocialProof(camelRow);
+                  }
+                } catch (e) {}
                 const notif = {
                   id: `ntf_rt_${Date.now()}`,
                   target: 'admin',
@@ -4943,15 +5474,1291 @@ export default function App() {
     return groups.find(g => g.isDefault) || groups[0];
   }, [currentClient, groups]);
 
+  // ============================================================================
+  // SUPER CRO, RETENTION, LOYALTY, WARRANTY, REFERRAL & FEATURE FLAGS ENGINE
+  // ============================================================================
+
+  // 1. Live Social Proof State & Engine (Works in Storefront + Instant Admin Test!)
+  const [liveSocialToast, setLiveSocialToast] = useState(null);
+  const liveSocialQueueRef = useRef([]);
+  const lastSocialToastTsRef = useRef(0);
+  const socialToastCountSessionRef = useRef(0);
+
+  const extractEgyptianCityFromAddress = (addrStr) => {
+    const s = String(addrStr || '').trim();
+    const cities = [
+      'المنصورة - الدقهلية', 'ميت غمر - الدقهلية', 'طلخا - الدقهلية', 'أجا - الدقهلية',
+      'السنبلاوين - الدقهلية', 'دكرنس - الدقهلية', 'بلقاس - الدقهلية', 'شربين - الدقهلية',
+      'الدقهلية', 'القاهرة', 'الإسكندرية', 'الجيزة', 'طنطا - الغربية', 'المحلة الكبرى',
+      'الزقازيق - الشرقية', 'المنوفية', 'دمياط', 'بورسعيد', 'الإسماعيلية', 'كفر الشيخ',
+      'بنها - القليوبية', 'الفيوم', 'بني سويف', 'المنيا', 'أسيوط', 'سوهاج'
+    ];
+    for (const city of cities) {
+      const baseName = city.split('-')[0].trim();
+      if (s.includes(baseName)) return city;
+    }
+    const customList = String(siteSettings.socialProofCustomCities || '')
+      .split(',')
+      .map(x => x.trim())
+      .filter(Boolean);
+    if (customList.length > 0) {
+      return customList[Math.floor(Math.random() * customList.length)];
+    }
+    return 'المنصورة - الدقهلية';
+  };
+
+  const triggerLiveSocialToastImmediate = (customOrderOrPart = null, forceInAdmin = false) => {
+    const availParts = parts.filter(p => !p.hidden && Number(p.basePrice) > 0);
+    const fallbackPart = availParts[Math.floor(Math.random() * Math.max(1, availParts.length))] || parts[0];
+    const cityList = String(siteSettings.socialProofCustomCities || 'المنصورة - الدقهلية, أجا - الدقهلية, ميت غمر - الدقهلية, القاهرة, الإسكندرية, طنطا')
+      .split(',')
+      .map(x => x.trim())
+      .filter(Boolean);
+    const randomCity = cityList[Math.floor(Math.random() * Math.max(1, cityList.length))] || 'المنصورة - الدقهلية';
+
+    let toastPayload;
+    if (customOrderOrPart && customOrderOrPart.items) {
+      const firstItem = customOrderOrPart.items[0] || {};
+      const matchedPart = parts.find(p => String(p.id) === String(firstItem.partId));
+      toastPayload = {
+        id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        city: extractEgyptianCityFromAddress(customOrderOrPart.address),
+        productName: firstItem.name || matchedPart?.name || fallbackPart?.name || 'منتج أصلي',
+        productImage: matchedPart?.image || fallbackPart?.image || PART_IMAGES.screen,
+        partId: firstItem.partId || matchedPart?.id || fallbackPart?.id || null,
+        timeLabel: 'منذ لحظات',
+        forceShowInAdmin: forceInAdmin
+      };
+    } else {
+      const chosenPart = (customOrderOrPart && customOrderOrPart.name) ? customOrderOrPart : fallbackPart;
+      toastPayload = {
+        id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        city: randomCity,
+        productName: chosenPart?.name || 'منتج أصلي مضمون',
+        productImage: chosenPart?.image || PART_IMAGES.screen,
+        partId: chosenPart?.id || null,
+        timeLabel: 'الآن مباشر',
+        forceShowInAdmin: forceInAdmin
+      };
+    }
+    setLiveSocialToast(toastPayload);
+    setTimeout(() => {
+      setLiveSocialToast(curr => (curr && curr.id === toastPayload.id ? null : curr));
+    }, 6500);
+  };
+
+  const enqueueLiveSocialProofOrder = (orderObj) => {
+    if (!orderObj || siteSettings.enableLiveSocialProof === false) return;
+    const firstItem = Array.isArray(orderObj.items) && orderObj.items[0] ? orderObj.items[0] : null;
+    if (!firstItem) return;
+    const matchedPart = parts.find(p => String(p.id) === String(firstItem.partId) || p.sku === firstItem.sku);
+    const city = extractEgyptianCityFromAddress(orderObj.address);
+    liveSocialQueueRef.current.push({
+      id: `sp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      city,
+      productName: firstItem.name || matchedPart?.name || 'منتج أصلي',
+      productImage: matchedPart?.image || PART_IMAGES.screen,
+      partId: firstItem.partId || matchedPart?.id || null,
+      timeLabel: 'منذ لحظات',
+      forceShowInAdmin: false
+    });
+  };
+
+  useEffect(() => {
+    window.__elzoghbiEnqueueSocialProof = enqueueLiveSocialProofOrder;
+    return () => {
+      delete window.__elzoghbiEnqueueSocialProof;
+    };
+  });
+
+  useEffect(() => {
+    if (siteSettings.enableLiveSocialProof === false) return undefined;
+    const minGapMs = Math.max(12000, (Number(siteSettings.socialProofIntervalSec) || 35) * 1000);
+
+    const welcomeTimer = setTimeout(() => {
+      if (appPortal === 'admin') return;
+      if (siteSettings.socialProofDemoEnabled !== false && liveSocialQueueRef.current.length === 0 && socialToastCountSessionRef.current === 0) {
+        triggerLiveSocialToastImmediate(null, false);
+        socialToastCountSessionRef.current += 1;
+        lastSocialToastTsRef.current = Date.now();
+      }
+    }, 9000);
+
+    const queueInterval = setInterval(() => {
+      if (appPortal === 'admin') return;
+      const now = Date.now();
+      if (now - lastSocialToastTsRef.current < minGapMs && lastSocialToastTsRef.current !== 0) return;
+      if (liveSocialQueueRef.current.length > 0) {
+        const nextToast = liveSocialQueueRef.current.shift();
+        if (nextToast) {
+          lastSocialToastTsRef.current = now;
+          socialToastCountSessionRef.current += 1;
+          setLiveSocialToast(nextToast);
+          setTimeout(() => {
+            setLiveSocialToast(curr => (curr && curr.id === nextToast.id ? null : curr));
+          }, 6500);
+        }
+      } else if (siteSettings.socialProofDemoEnabled !== false && socialToastCountSessionRef.current < 8) {
+        lastSocialToastTsRef.current = now;
+        socialToastCountSessionRef.current += 1;
+        triggerLiveSocialToastImmediate(null, false);
+      }
+    }, 6000);
+
+    return () => {
+      clearTimeout(welcomeTimer);
+      clearInterval(queueInterval);
+    };
+  }, [appPortal, siteSettings.enableLiveSocialProof, siteSettings.socialProofIntervalSec, siteSettings.socialProofDemoEnabled, parts.length]);
+
+  // 2. Spin-to-Win Gamification Engine (Customizable Slices + High Clarity Typography)
+  const SPIN_STORAGE_KEY = 'elzoghbi_spin_wheel_v1';
+  const activeSpinPrizes = useMemo(() => {
+    const arr = Array.isArray(siteSettings.spinWheelPrizes) && siteSettings.spinWheelPrizes.length >= 2
+      ? siteSettings.spinWheelPrizes
+      : DEFAULT_SPIN_PRIZES;
+    return arr;
+  }, [siteSettings.spinWheelPrizes]);
+
+  const [spinWheelState, setSpinWheelState] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem(SPIN_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return null;
+  });
+  const [spinModalOpen, setSpinModalOpen] = useState(false);
+  const [isSpinningWheel, setIsSpinningWheel] = useState(false);
+  const [spinRotationDeg, setSpinRotationDeg] = useState(0);
+
+  useEffect(() => {
+    if (appPortal === 'admin' || siteSettings.enableSpinToWin === false) return undefined;
+    if (spinWheelState) return undefined;
+    try {
+      if (window.sessionStorage.getItem('elzoghbi_spin_prompted_once')) return undefined;
+    } catch (e) {}
+    const timer = setTimeout(() => {
+      try { window.sessionStorage.setItem('elzoghbi_spin_prompted_once', '1'); } catch (e) {}
+      setSpinModalOpen(true);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [appPortal, siteSettings.enableSpinToWin, spinWheelState]);
+
+  // 3. Confetti Celebration Engine
+  const [confettiActive, setConfettiActive] = useState(false);
+  const triggerConfettiCelebration = () => {
+    setConfettiActive(true);
+    setTimeout(() => setConfettiActive(false), 4200);
+  };
+
+  const recordRecoveredCartEvent = (estimatedVal = 250) => {
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      analyticsRecoveredCartsCount: (Number(prev.analyticsRecoveredCartsCount) || 0) + 1,
+      analyticsRecoveredCartsValue: (Number(prev.analyticsRecoveredCartsValue) || 0) + (Number(estimatedVal) || 250)
+    }));
+  };
+
+  const applySpinPrizePromo = (prizeObj, silent = false) => {
+    if (!prizeObj || !prizeObj.code) return;
+    const found = promoCodes.find(p => p.code.toUpperCase() === prizeObj.code.toUpperCase());
+    const promoToApply = found || {
+      id: `prm_${prizeObj.id || Date.now()}`,
+      code: prizeObj.code,
+      type: prizeObj.type || (prizeObj.code.includes('FREE') ? 'free_delivery' : prizeObj.code.includes('OFF') ? 'percentage' : 'fixed'),
+      value: Number(prizeObj.value) || (prizeObj.code.includes('FREE') ? 100 : prizeObj.code.includes('5OFF') ? 5 : 50),
+      maxDiscountCap: 400,
+      minOrderAmount: 0,
+      usageLimit: 10000,
+      usedCount: 0,
+      expiryDate: '2027-12-31',
+      description: prizeObj.desc || prizeObj.label,
+      active: true
+    };
+    setPromoCodeInput(promoToApply.code);
+    setAppliedPromo(promoToApply);
+    if (!silent) {
+      showToast(`🎁 تم تفعيل جائزتك (${prizeObj.label}) في السلة تلقائياً!`, 'success');
+    }
+  };
+
+  const handleSpinTheWheel = () => {
+    if (isSpinningWheel || spinWheelState?.spun) return;
+    setIsSpinningWheel(true);
+    const winningIdx = Math.floor(Math.random() * activeSpinPrizes.length);
+    const segmentAngle = 360 / activeSpinPrizes.length;
+    const targetRotation = 360 * 6 + (360 - winningIdx * segmentAngle - segmentAngle / 2);
+    setSpinRotationDeg(targetRotation);
+
+    setTimeout(() => {
+      const wonPrize = activeSpinPrizes[winningIdx];
+      const savedState = {
+        spun: true,
+        wonAt: new Date().toISOString(),
+        prize: wonPrize
+      };
+      setSpinWheelState(savedState);
+      setIsSpinningWheel(false);
+      try {
+        window.localStorage.setItem(SPIN_STORAGE_KEY, JSON.stringify(savedState));
+      } catch (e) {}
+      applySpinPrizePromo(wonPrize, true);
+      recordRecoveredCartEvent(300);
+      triggerConfettiCelebration();
+      showToast(`🎉 مبروك! كسبت "${wonPrize.label}" وتم تفعيل الكود (${wonPrize.code}) لطلبك!`, 'success');
+    }, 4100);
+  };
+
+  // 4. Smart Cross-Sell Bundles State (One-Click Add with Guaranteed Discount)
+  const [bundleDiscountPartIds, setBundleDiscountPartIds] = useState(() => {
+    try {
+      const raw = window.sessionStorage.getItem('elzoghbi_bundle_disc_ids');
+      if (raw) return JSON.parse(raw) || {};
+    } catch (e) {}
+    return {};
+  });
+
+  const handleAddCrossSellBundleItem = (targetPart) => {
+    if (!targetPart) return;
+    const discPct = Number(siteSettings.crossSellBundleDiscountPct) || 10;
+    const pid = String(targetPart.id);
+    setBundleDiscountPartIds(prev => {
+      const next = { ...prev, [pid]: discPct };
+      try { window.sessionStorage.setItem('elzoghbi_bundle_disc_ids', JSON.stringify(next)); } catch (e) {}
+      return next;
+    });
+    updateCartQty(targetPart.id, 1);
+    recordRecoveredCartEvent(Number(targetPart.basePrice) || 150);
+    showToast(`🎁 تمت إضافة "${targetPart.name}" للسلة بخصم الباقة الذكية (-${discPct}%) فوراً!`, 'success');
+  };
+
+  // 5. Bulletproof Per-Product Cashback Control (Instant O(1) Toggle & Bulk Price Cap — Zero Browser Freeze!)
+  const isPartCashbackEnabled = (part) => {
+    if (!part || siteSettings.enableWalletCashback === false) return false;
+    const pid = String(part.id || '').trim();
+    // 1. Explicit per-product manual toggle in cashbackPartMap takes priority
+    if (siteSettings?.cashbackPartMap && siteSettings.cashbackPartMap[pid] !== undefined) {
+      return Boolean(siteSettings.cashbackPartMap[pid]);
+    }
+    if (siteSettings?.partExtraMeta?.[pid]?.cashbackEnabled !== undefined) {
+      return Boolean(siteSettings.partExtraMeta[pid].cashbackEnabled);
+    }
+    // 2. Bulk price rule stored in siteSettings.cashbackBulkRule (evaluated in 0.001ms without looping localStorage!)
+    const bulkRule = siteSettings?.cashbackBulkRule;
+    if (bulkRule && bulkRule.mode) {
+      const cap = Number(bulkRule.cap ?? siteSettings.cashbackMaxPartPrice) || 1500;
+      const price = Number(part.basePrice) || 0;
+      if (bulkRule.mode === 'affordable_only') {
+        return price > 0 && price <= cap;
+      }
+      if (bulkRule.mode === 'disable_above_cap' && price > cap) {
+        return false;
+      }
+    }
+    // 3. Fallback to part properties
+    if (part.customGroupPrices?._cashbackEnabled !== undefined) {
+      return Boolean(part.customGroupPrices._cashbackEnabled);
+    }
+    if (part.cashbackEnabled !== undefined) {
+      return Boolean(part.cashbackEnabled);
+    }
+    return false;
+  };
+
+  const getPartCashbackPct = (part) => {
+    if (!part) return Number(siteSettings.defaultCashbackPct) || 2;
+    const pid = String(part.id || '').trim();
+    const rawPct =
+      siteSettings?.partExtraMeta?.[pid]?.cashbackPct ??
+      part.customGroupPrices?._cashbackPct ??
+      part.cashbackPct ??
+      siteSettings?.cashbackBulkRule?.pct ??
+      siteSettings.defaultCashbackPct ??
+      2;
+    const n = Number(rawPct);
+    return !Number.isNaN(n) && n > 0 ? Math.min(35, n) : (Number(siteSettings.defaultCashbackPct) || 2);
+  };
+
+  const togglePartCashback = (partObj, e) => {
+    if (e) e.stopPropagation();
+    if (!partObj || !partObj.id) return;
+    const pid = String(partObj.id).trim();
+    const currentlyOn = isPartCashbackEnabled(partObj);
+    const nextOn = !currentlyOn;
+    const pct = getPartCashbackPct(partObj);
+
+    let updatedPartRef = null;
+    setParts(prev =>
+      prev.map(p => {
+        if (String(p.id).trim() !== pid) return p;
+        const updatedP = {
+          ...p,
+          cashbackEnabled: nextOn,
+          cashbackPct: pct,
+          customGroupPrices: {
+            ...(p.customGroupPrices || {}),
+            _cashbackEnabled: nextOn,
+            _cashbackPct: pct
+          }
+        };
+        updatedPartRef = updatedP;
+        return updatedP;
+      })
+    );
+    if (updatedPartRef) {
+      markLocalUpsert('parts', updatedPartRef);
+      sbUpsert('spare_parts', updatedPartRef);
+    }
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      cashbackPartMap: {
+        ...(prev.cashbackPartMap || {}),
+        [pid]: nextOn
+      },
+      partExtraMeta: {
+        ...(prev.partExtraMeta || {}),
+        [pid]: {
+          ...(prev.partExtraMeta?.[pid] || {}),
+          cashbackEnabled: nextOn,
+          cashbackPct: pct
+        }
+      }
+    }));
+    showToast(
+      nextOn
+        ? `💰 تم تفعيل الكاش باك (${pct}%) للمنتج "${partObj.name}" فوراً ✓`
+        : `🛑 تم إيقاف الكاش باك عن المنتج "${partObj.name}" فوراً ✓`,
+      nextOn ? 'success' : 'info'
+    );
+  };
+
+  // Instant O(1) Bulk Cashback Actions — NO markLocalUpsert loop so browser NEVER hangs even with 10,000+ products!
+  const handleBulkDisableExpensiveCashback = (maxPriceThreshold) => {
+    const cap = Number(maxPriceThreshold ?? siteSettings.cashbackMaxPartPrice) || 1500;
+    let affectedCount = 0;
+    const nextCashbackMap = { ...(siteSettings.cashbackPartMap || {}) };
+    const nextExtraMeta = { ...(siteSettings.partExtraMeta || {}) };
+
+    parts.forEach(p => {
+      const pid = String(p.id).trim();
+      if ((Number(p.basePrice) || 0) > cap) {
+        affectedCount += 1;
+        nextCashbackMap[pid] = false;
+        if (nextExtraMeta[pid]) {
+          nextExtraMeta[pid] = { ...nextExtraMeta[pid], cashbackEnabled: false };
+        }
+      }
+    });
+
+    if (parts.length <= 500) {
+      setParts(prev =>
+        prev.map(p =>
+          (Number(p.basePrice) || 0) > cap
+            ? { ...p, cashbackEnabled: false, customGroupPrices: { ...(p.customGroupPrices || {}), _cashbackEnabled: false } }
+            : p
+        )
+      );
+    }
+
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      cashbackMaxPartPrice: cap,
+      cashbackBulkRule: { mode: 'disable_above_cap', cap, pct: Number(prev.defaultCashbackPct) || 2, updatedAt: Date.now() },
+      cashbackPartMap: nextCashbackMap,
+      partExtraMeta: nextExtraMeta
+    }));
+    showToast(
+      `🛡️ تم فوراً إيقاف الكاش باك عن كل المنتجات الأغلى من ${cap.toLocaleString()} ج.م (${affectedCount} منتج) بدون أي بطء!`,
+      'success'
+    );
+  };
+
+  const handleBulkEnableAffordableCashback = (maxPriceThreshold) => {
+    const cap = Number(maxPriceThreshold ?? siteSettings.cashbackMaxPartPrice) || 1500;
+    const pct = Number(siteSettings.defaultCashbackPct) || 2;
+    let enabledCount = 0;
+    const nextCashbackMap = {};
+    const nextExtraMeta = { ...(siteSettings.partExtraMeta || {}) };
+
+    parts.forEach(p => {
+      const pid = String(p.id).trim();
+      const price = Number(p.basePrice) || 0;
+      const isAffordable = price > 0 && price <= cap;
+      nextCashbackMap[pid] = isAffordable;
+      if (isAffordable) enabledCount += 1;
+      if (nextExtraMeta[pid]) {
+        nextExtraMeta[pid] = { ...nextExtraMeta[pid], cashbackEnabled: isAffordable, cashbackPct: pct };
+      }
+    });
+
+    if (parts.length <= 500) {
+      setParts(prev =>
+        prev.map(p => {
+          const price = Number(p.basePrice) || 0;
+          const isAffordable = price > 0 && price <= cap;
+          return {
+            ...p,
+            cashbackEnabled: isAffordable,
+            cashbackPct: pct,
+            customGroupPrices: { ...(p.customGroupPrices || {}), _cashbackEnabled: isAffordable, _cashbackPct: pct }
+          };
+        })
+      );
+    }
+
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      cashbackMaxPartPrice: cap,
+      cashbackBulkRule: { mode: 'affordable_only', cap, pct, updatedAt: Date.now() },
+      cashbackPartMap: nextCashbackMap,
+      partExtraMeta: nextExtraMeta
+    }));
+    showToast(
+      `✅ تم في لحظة تفعيل كاش باك (${pct}%) على ${enabledCount} منتج بسعر ${cap.toLocaleString()} ج.م فأقل وإيقافه عن الأغلى!`,
+      'success'
+    );
+  };
+
+  // 5B. Cashier Impulse Shelf Manual Product Pinning Control ("التحكم في المنتجات التي تظهر في رف الكاشير")
+  const isPartPinnedToCashier = (part) => {
+    if (!part) return false;
+    const pid = String(part.id || '').trim();
+    const pinnedList = Array.isArray(siteSettings.pinnedCashierPartIds) ? siteSettings.pinnedCashierPartIds.map(String) : [];
+    if (pinnedList.includes(pid)) return true;
+    return Boolean(siteSettings?.partExtraMeta?.[pid]?.pinnedCashier || part.pinnedCashier);
+  };
+
+  const togglePartCashierPin = (partObj, e) => {
+    if (e) e.stopPropagation();
+    if (!partObj || !partObj.id) return;
+    const pid = String(partObj.id).trim();
+    const currentlyPinned = isPartPinnedToCashier(partObj);
+    const nextPinned = !currentlyPinned;
+
+    saveSiteSettingsImmediate(prev => {
+      const curList = Array.isArray(prev.pinnedCashierPartIds) ? prev.pinnedCashierPartIds.map(String) : [];
+      const nextList = nextPinned
+        ? Array.from(new Set([...curList, pid]))
+        : curList.filter(x => x !== pid);
+      return {
+        ...prev,
+        pinnedCashierPartIds: nextList,
+        partExtraMeta: {
+          ...(prev.partExtraMeta || {}),
+          [pid]: {
+            ...(prev.partExtraMeta?.[pid] || {}),
+            pinnedCashier: nextPinned
+          }
+        }
+      };
+    });
+    showToast(
+      nextPinned
+        ? `🛒 تم تثبيت "${partObj.name}" ليظهر في رف الكاشير السريع للعملاء ✓`
+        : `تمت إزالة "${partObj.name}" من التثبيت اليدوي لرف الكاشير ✓`,
+      nextPinned ? 'success' : 'info'
+    );
+  };
+
+  // 5C. Web Audio API Notification Chime + Browser System Notifications (Customer & Admin)
+  const [soundAlertsEnabled, setSoundAlertsEnabled] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem('elzoghbi_sound_alerts_v1');
+      return saved !== null ? JSON.parse(saved) : true;
+    } catch (e) {
+      return true;
+    }
+  });
+  const [browserNotifPermission, setBrowserNotifPermission] = useState(() => {
+    try {
+      return typeof Notification !== 'undefined' ? Notification.permission : 'unsupported';
+    } catch (e) {
+      return 'unsupported';
+    }
+  });
+
+  const playAppNotificationSound = (toneType = 'default') => {
+    try {
+      if (!soundAlertsEnabled) return;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const notes =
+        toneType === 'order'
+          ? [523.25, 659.25, 783.99, 1046.5] // C5 -> E5 -> G5 -> C6 celebratory chime
+          : toneType === 'status'
+          ? [587.33, 880.0] // D5 -> A5 status update chime
+          : [440.0, 659.25, 880.0]; // A4 -> E5 -> A5 alert chime
+
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.11);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.11);
+        gain.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + idx * 0.11 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.11 + 0.24);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.11);
+        osc.stop(ctx.currentTime + idx * 0.11 + 0.25);
+      });
+    } catch (e) {}
+  };
+
+  const triggerBrowserAndSoundNotification = (title, body, toneType = 'default') => {
+    playAppNotificationSound(toneType);
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification(title || (siteSettings.storeName || 'ELZOGHBI'), {
+          body: body || '',
+          icon: ELZOGHBI_LOGO,
+          badge: ELZOGHBI_LOGO
+        });
+      }
+    } catch (e) {}
+  };
+
+  const handleToggleSoundAndRequestPermission = async () => {
+    const nextVal = !soundAlertsEnabled;
+    setSoundAlertsEnabled(nextVal);
+    try {
+      window.localStorage.setItem('elzoghbi_sound_alerts_v1', JSON.stringify(nextVal));
+    } catch (e) {}
+
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      try {
+        const perm = await Notification.requestPermission();
+        setBrowserNotifPermission(perm);
+      } catch (e) {}
+    }
+
+    if (nextVal) {
+      playAppNotificationSound('order');
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification(`🔔 إشعارات ${siteSettings.storeName || 'ELZOGHBI'} مفعّلة`, {
+            body: 'سيصلك تنبيه صوتي وإشعار متصفح فوري مع كل تحديث أو طلب جديد!',
+            icon: ELZOGHBI_LOGO
+          });
+        }
+      } catch (e) {}
+      showToast('🔊 تم تفعيل التنبيهات الصوتية وإشعارات المتصفح بنجاح!', 'success');
+    } else {
+      showToast('🔇 تم كتم التنبيهات الصوتية مؤقتاً.', 'info');
+    }
+  };
+
+  // Watch `notifications` for any new unread notification for current portal (Admin or Customer) and play sound + browser notification!
+  const seenNotifIdsRef = useRef(new Set());
+  const notifInitializedRef = useRef(false);
+  useEffect(() => {
+    if (!Array.isArray(notifications)) return;
+    if (!notifInitializedRef.current) {
+      notifications.forEach(n => { if (n?.id) seenNotifIdsRef.current.add(n.id); });
+      notifInitializedRef.current = true;
+      return;
+    }
+    const targetKey = appPortal === 'admin' ? 'admin' : (currentClient?.id || 'guest');
+    const newlyArrived = notifications.filter(n => n && n.id && !seenNotifIdsRef.current.has(n.id));
+    if (newlyArrived.length > 0) {
+      newlyArrived.forEach(n => seenNotifIdsRef.current.add(n.id));
+      const relevant = newlyArrived.find(n =>
+        appPortal === 'admin'
+          ? n.target === 'admin'
+          : (String(n.target) === String(targetKey) || n.target === 'all')
+      );
+      if (relevant) {
+        const tone = relevant.type === 'new_order' ? 'order' : relevant.type === 'restock_waitlist' ? 'alert' : 'status';
+        triggerBrowserAndSoundNotification(relevant.title, relevant.msg, tone);
+      }
+    }
+  }, [notifications, appPortal, currentClient?.id, soundAlertsEnabled]);
+
+  // 6. Secret VIP Route (`/vip` or `?vip=TOKEN` — Hidden from regular visitors!)
+  const [vipLinkUnlocked, setVipLinkUnlocked] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const vipParam = params.get('vip');
+      const path = window.location.pathname.toLowerCase();
+      if (vipParam || path === '/vip' || path.endsWith('/vip')) {
+        window.sessionStorage.setItem('elzoghbi_vip_secret_unlocked', '1');
+        return true;
+      }
+      return window.sessionStorage.getItem('elzoghbi_vip_secret_unlocked') === '1';
+    } catch (e) {
+      return false;
+    }
+  });
+  const [vipAdminPreviewUnlocked, setVipAdminPreviewUnlocked] = useState(false);
+
+  const isPartVipOnly = (part) => {
+    if (!part) return false;
+    const pid = String(part.id || '').trim();
+    if (siteSettings?.partExtraMeta?.[pid]?.isVipOnly !== undefined) {
+      return Boolean(siteSettings.partExtraMeta[pid].isVipOnly);
+    }
+    return Boolean(part.isVipOnly || part.customGroupPrices?._isVipOnly);
+  };
+
+  const togglePartVipOnly = (partObj, e) => {
+    if (e) e.stopPropagation();
+    if (!partObj || !partObj.id) return;
+    const pid = String(partObj.id).trim();
+    const nextVip = !isPartVipOnly(partObj);
+    const defaultVipPrice = Number(partObj.vipPrice || partObj.customGroupPrices?._vipPrice) || Math.max(partObj.costPrice || 0, Math.round(partObj.basePrice * 0.85));
+
+    setParts(prev =>
+      prev.map(p => {
+        if (String(p.id).trim() !== pid) return p;
+        const updatedP = {
+          ...p,
+          isVipOnly: nextVip,
+          vipPrice: defaultVipPrice,
+          customGroupPrices: {
+            ...(p.customGroupPrices || {}),
+            _isVipOnly: nextVip,
+            _vipPrice: defaultVipPrice
+          }
+        };
+        markLocalUpsert('parts', updatedP);
+        return updatedP;
+      })
+    );
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      partExtraMeta: {
+        ...(prev.partExtraMeta || {}),
+        [pid]: {
+          ...(prev.partExtraMeta?.[pid] || {}),
+          isVipOnly: nextVip,
+          vipPrice: defaultVipPrice
+        }
+      }
+    }));
+    showToast(
+      nextVip
+        ? `👑 تم تخصيص "${partObj.name}" لعملاء الرابط السري VIP بسعر خاص (${defaultVipPrice} ج.م) ✓`
+        : `تمت إعادة "${partObj.name}" للكتالوج العام ✓`,
+      'info'
+    );
+  };
+
+  useEffect(() => {
+    try {
+      const path = window.location.pathname.toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      const refParam = params.get('ref');
+      if (refParam) {
+        window.sessionStorage.setItem('elzoghbi_referral_code', refParam.trim().toUpperCase());
+      }
+      if (path === '/vip' || path.endsWith('/vip') || params.get('tab') === 'vip' || params.get('vip')) {
+        window.sessionStorage.setItem('elzoghbi_vip_secret_unlocked', '1');
+        setVipLinkUnlocked(true);
+        setClientTab('vip');
+      }
+    } catch (e) {}
+  }, []);
+
+  // 7. Quality Tier Selector (أصلي 100% / فرز أول / اقتصادي)
+  const [selectedQualityTiers, setSelectedQualityTiers] = useState({});
+
+  const getPartQualityTiers = (part, basePriceEgp) => {
+    const origPrice = Number(
+      siteSettings?.partExtraMeta?.[part?.id]?.tierOriginalPrice ||
+      part?.customGroupPrices?._tierOriginalPrice ||
+      part?.tierOriginalPrice ||
+      basePriceEgp ||
+      part?.basePrice ||
+      100
+    );
+    const firstRatio = (Number(siteSettings.tierFirstClassRatio) || 60) / 100;
+    const econRatio = (Number(siteSettings.tierEconomyRatio) || 35) / 100;
+
+    const firstPrice = Number(
+      siteSettings?.partExtraMeta?.[part?.id]?.tierFirstClassPrice ||
+      part?.customGroupPrices?._tierFirstClassPrice ||
+      part?.tierFirstClassPrice ||
+      Math.max(10, Math.round(origPrice * firstRatio))
+    );
+    const econPrice = Number(
+      siteSettings?.partExtraMeta?.[part?.id]?.tierEconomyPrice ||
+      part?.customGroupPrices?._tierEconomyPrice ||
+      part?.tierEconomyPrice ||
+      Math.max(5, Math.round(origPrice * econRatio))
+    );
+
+    return [
+      { id: 'original', label: siteSettings.tierOriginalLabel || 'أصلي 100%', shortLabel: 'أصلي', priceEgp: origPrice, badge: '✨' },
+      { id: 'first_class', label: siteSettings.tierFirstClassLabel || 'فرز أول', shortLabel: 'فرز أول', priceEgp: firstPrice, badge: '⭐' },
+      { id: 'economy', label: siteSettings.tierEconomyLabel || 'اقتصادي', shortLabel: 'اقتصادي', priceEgp: econPrice, badge: '💡' }
+    ];
+  };
+
+  // 8. Exit-Intent Popup State & Listener (ONLY triggers after customer adds items to cart / opens cart & tries to leave!)
+  const [exitIntentModalOpen, setExitIntentModalOpen] = useState(false);
+  const pageLoadedAtRef = useRef(Date.now());
+  const hasInteractedWithCartRef = useRef(false);
+
+  useEffect(() => {
+    const cartKeys = Object.keys(cart || {});
+    if (cartKeys.length > 0 && (cartDrawerOpen || clientTab === 'checkout')) {
+      hasInteractedWithCartRef.current = true;
+    }
+  }, [cart, cartDrawerOpen, clientTab]);
+
+  useEffect(() => {
+    if (appPortal === 'admin' || siteSettings.enableExitIntentPopup === false) return undefined;
+    const handleMouseLeave = (e) => {
+      // Must be leaving through top of browser window
+      if (e.clientY > 8) return;
+      // Must have spent at least 12 seconds on the page (never fire in first moments of page load!)
+      if (Date.now() - pageLoadedAtRef.current < 12000) return;
+      // Customer MUST have items in their cart AND have added/opened cart or checkout!
+      const cartItemCount = Object.values(cart || {}).reduce((s, it) => s + (Number(it?.qty) || 0), 0);
+      if (cartItemCount <= 0 || !hasInteractedWithCartRef.current) return;
+
+      try {
+        if (window.sessionStorage.getItem('elzoghbi_exit_intent_shown')) return;
+        window.sessionStorage.setItem('elzoghbi_exit_intent_shown', '1');
+      } catch (err) {}
+      playAppNotificationSound('alert');
+      setExitIntentModalOpen(true);
+    };
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [appPortal, siteSettings.enableExitIntentPopup, cart]);
+
+  const handleApplyExitIntentOffer = () => {
+    const codeStr = String(siteSettings.exitIntentPromoCode || 'STAY5').trim().toUpperCase();
+    const pctVal = Number(siteSettings.exitIntentDiscountPct) || 5;
+    const exitPromo = {
+      id: 'prm_exit_stay5',
+      code: codeStr,
+      type: 'percentage',
+      value: pctVal,
+      maxDiscountCap: 350,
+      minOrderAmount: 0,
+      usageLimit: 10000,
+      usedCount: 0,
+      expiryDate: '2027-12-31',
+      description: `خصم خاص لعدم المغادرة (-${pctVal}%)`,
+      active: true
+    };
+    setPromoCodeInput(codeStr);
+    setAppliedPromo(exitPromo);
+    recordRecoveredCartEvent(cartSummary?.subtotalBase || 300);
+    setExitIntentModalOpen(false);
+    showToast(`🎁 تم تفعيل خصم ${pctVal}% الفوري (${codeStr}) على سلتك!`, 'success');
+  };
+
+  // 9. Loyalty Tiers Engine (Bronze -> Silver -> Gold -> Diamond up to 20 orders + 3-Month / 90-Day Inactivity Downgrade!)
+  const getClientLoyaltyStatus = (clientObj) => {
+    const silverMin = Math.max(2, Number(siteSettings.loyaltySilverMinOrders) || 4);
+    const goldMin = Math.max(silverMin + 1, Number(siteSettings.loyaltyGoldMinOrders) || 10);
+    const diamondMin = Math.max(goldMin + 1, Number(siteSettings.loyaltyDiamondMinOrders) || 20);
+    const inactivityDaysLimit = Math.max(30, Number(siteSettings.loyaltyInactivityDays) || 90);
+
+    const clientOrdersList = clientObj
+      ? orders.filter(o => String(o.clientId) === String(clientObj.id) && o.status !== 'ملغي')
+      : [];
+    const deliveredCount = clientObj
+      ? Math.max(
+          Number(clientObj.orderCount) || 0,
+          orders.filter(o => String(o.clientId) === String(clientObj.id) && o.status === 'تم التسليم').length
+        )
+      : 0;
+
+    let daysSinceLastOrder = 0;
+    let lastOrderDateStr = clientObj?.lastOrderAt || '';
+    if (clientOrdersList.length > 0) {
+      const sortedDates = clientOrdersList
+        .map(o => String(o.createdAt || '').slice(0, 10))
+        .filter(Boolean)
+        .sort((a, b) => b.localeCompare(a));
+      if (sortedDates[0]) lastOrderDateStr = sortedDates[0];
+    }
+    if (lastOrderDateStr) {
+      const parsedTs = Date.parse(lastOrderDateStr.replace(' ', 'T'));
+      if (!Number.isNaN(parsedTs)) {
+        daysSinceLastOrder = Math.max(0, Math.floor((Date.now() - parsedTs) / (1000 * 60 * 60 * 24)));
+      }
+    }
+
+    const tiers = [
+      { idx: 0, id: 'bronze', name: 'برونزي', icon: '🥉', minOrders: 0, bonusCashbackPct: 0, freeShipping: false, color: 'from-amber-700 to-orange-800', badgeBg: 'bg-amber-600/20 text-amber-500 border-amber-500/40' },
+      { idx: 1, id: 'silver', name: 'فضي', icon: '🥈', minOrders: silverMin, bonusCashbackPct: 1, freeShipping: false, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-slate-300 border-slate-400/40' },
+      { idx: 2, id: 'gold', name: 'ذهبي', icon: '🥇', minOrders: goldMin, bonusCashbackPct: 2, freeShipping: false, color: 'from-amber-400 to-yellow-600', badgeBg: 'bg-amber-400/20 text-amber-300 border-amber-400/40' },
+      { idx: 3, id: 'diamond', name: 'ألماسي', icon: '💎', minOrders: diamondMin, bonusCashbackPct: 3, freeShipping: true, color: 'from-cyan-400 to-indigo-600', badgeBg: 'bg-cyan-400/20 text-cyan-300 border-cyan-400/40' }
+    ];
+
+    let baseTierIdx = 0;
+    if (deliveredCount >= diamondMin) baseTierIdx = 3;
+    else if (deliveredCount >= goldMin) baseTierIdx = 2;
+    else if (deliveredCount >= silverMin) baseTierIdx = 1;
+
+    const inactivityDrops = daysSinceLastOrder >= inactivityDaysLimit
+      ? Math.floor(daysSinceLastOrder / inactivityDaysLimit)
+      : 0;
+    const effectiveTierIdx = Math.max(0, baseTierIdx - inactivityDrops);
+    const currentTier = tiers[effectiveTierIdx];
+    const nextTier = tiers[Math.min(3, effectiveTierIdx + 1)];
+    const ordersToNextTier = effectiveTierIdx < 3
+      ? Math.max(1, nextTier.minOrders - deliveredCount)
+      : 0;
+    const progressToDiamondPct = Math.min(100, Math.round((deliveredCount / diamondMin) * 100));
+
+    return {
+      deliveredCount,
+      currentTier,
+      nextTier: effectiveTierIdx < 3 ? nextTier : null,
+      ordersToNextTier,
+      progressToDiamondPct,
+      diamondMin,
+      daysSinceLastOrder,
+      wasDowngraded: inactivityDrops > 0 && baseTierIdx > effectiveTierIdx,
+      tiers
+    };
+  };
+
+  // 10. Out-of-Stock "Notify Me on WhatsApp" — Duplicate-Proof + Instant Cross-Tab & Server Sync to Admin!
+  const [restockNotifyModalPart, setRestockNotifyModalPart] = useState(null);
+  const [restockVisitorName, setRestockVisitorName] = useState('');
+  const [restockVisitorPhone, setRestockVisitorPhone] = useState('');
+  const [adminRestockWhatsappPart, setAdminRestockWhatsappPart] = useState(null);
+  const [notifiedPartIds, setNotifiedPartIds] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('elzoghbi_notified_parts_v1');
+      if (raw) return JSON.parse(raw) || {};
+    } catch (e) {}
+    return {};
+  });
+
+  const hasCustomerRegisteredRestock = (partObj) => {
+    if (!partObj || !partObj.id) return false;
+    const pid = String(partObj.id);
+    if (notifiedPartIds && notifiedPartIds[pid]) return true;
+    const myPhone = normalizeDigits(currentClient?.phone || '').trim();
+    if (myPhone.length >= 10 && Array.isArray(siteSettings.restockWaitlist)) {
+      return siteSettings.restockWaitlist.some(
+        w => String(w.partId) === pid && normalizeDigits(w.phone || '').trim() === myPhone
+      );
+    }
+    return false;
+  };
+
+  const getPartWaitlistEntries = (partId) => {
+    const list = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    return list.filter(w => String(w.partId) === String(partId));
+  };
+
+  const openCustomerRestockModal = (partObj) => {
+    if (!partObj) return;
+    if (hasCustomerRegisteredRestock(partObj)) {
+      showToast(`✅ تم تسجيل طلب تنبيهك للمنتج "${partObj.name}" بالفعل! سنراسلك على واتساب فور توفره.`, 'info');
+      return;
+    }
+    setRestockVisitorName(currentClient?.name || '');
+    setRestockVisitorPhone(currentClient?.phone || '');
+    setRestockNotifyModalPart(partObj);
+  };
+
+  const handleSubmitCustomerRestockNotify = (e) => {
+    if (e) e.preventDefault();
+    if (!restockNotifyModalPart) return;
+    const pid = String(restockNotifyModalPart.id);
+    const cleanPhone = normalizeDigits(restockVisitorPhone).trim();
+    if (cleanPhone.length < 10) {
+      showToast('اكتب رقم واتساب صحيح (11 رقم) عشان نبعتلك رسالة أول ما المنتج يتوفر!', 'warning');
+      return;
+    }
+    const existingList = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    const alreadyInList = existingList.some(
+      w => String(w.partId) === pid && normalizeDigits(w.phone || '').trim() === cleanPhone
+    );
+
+    const nextNotifiedMap = { ...(notifiedPartIds || {}), [pid]: cleanPhone };
+    setNotifiedPartIds(nextNotifiedMap);
+    try {
+      window.localStorage.setItem('elzoghbi_notified_parts_v1', JSON.stringify(nextNotifiedMap));
+    } catch (err) {}
+
+    if (alreadyInList || hasCustomerRegisteredRestock(restockNotifyModalPart)) {
+      setRestockNotifyModalPart(null);
+      showToast(`✅ رقمك (${cleanPhone}) مسجل بالفعل في قائمة انتظار "${restockNotifyModalPart.name}" ولن يتكرر العد!`, 'info');
+      return;
+    }
+
+    const cleanName = String(restockVisitorName || currentClient?.name || 'عميل مميز').trim();
+    const newEntry = {
+      id: `wait_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      partId: restockNotifyModalPart.id,
+      partName: restockNotifyModalPart.name,
+      partSku: restockNotifyModalPart.sku || '',
+      clientName: cleanName,
+      phone: cleanPhone,
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      notified: false
+    };
+
+    const nextWaitlist = [newEntry, ...existingList];
+    const uniquePartWaitCount = nextWaitlist.filter(w => String(w.partId) === pid).length;
+
+    setParts(prev =>
+      prev.map(p => {
+        if (String(p.id) !== pid) return p;
+        const updatedP = { ...p, waitlistCount: uniquePartWaitCount };
+        markLocalUpsert('parts', updatedP);
+        sbUpsert('spare_parts', updatedP);
+        return updatedP;
+      })
+    );
+
+    const adminRestockNotif = {
+      id: `ntf_wait_${Date.now()}`,
+      target: 'admin',
+      type: 'restock_waitlist',
+      title: `🔔 طلب "نبهني عند التوفر": ${restockNotifyModalPart.name}`,
+      msg: `العميل "${cleanName}" (${cleanPhone}) يطلب تنبيهه على واتساب فور توفر "${restockNotifyModalPart.name}".`,
+      time: 'الآن',
+      read: false,
+      partId: restockNotifyModalPart.id
+    };
+    setNotifications(prev => [adminRestockNotif, ...prev]);
+
+    saveSiteSettingsImmediate(prev => {
+      const curW = Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : [];
+      const deduped = [newEntry, ...curW.filter(w => !(String(w.partId) === pid && normalizeDigits(w.phone || '').trim() === cleanPhone))];
+      return {
+        ...prev,
+        restockWaitlist: deduped
+      };
+    });
+
+    // Also persist to Supabase site_settings & restock_waitlist table directly even from customer tab
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        fetch(`${sbUrl}/rest/v1/restock_waitlist`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { Prefer: 'return=minimal' }),
+          body: JSON.stringify([{
+            id: newEntry.id,
+            part_id: String(newEntry.partId),
+            part_name: newEntry.partName,
+            client_name: newEntry.clientName,
+            phone: newEntry.phone,
+            notified: false
+          }])
+        }).catch(() => {});
+      }
+    } catch (err) {}
+
+    setRestockNotifyModalPart(null);
+    playAppNotificationSound('status');
+    showToast(`✅ تم تسجيل طلبك (${cleanPhone}) بنجاح! سنرسل لك رسالة واتساب فور توفر "${restockNotifyModalPart.name}".`, 'success');
+  };
+
+  const sendAdminRestockWhatsappToEntry = (entryObj) => {
+    if (!entryObj) return;
+    const cleanP = String(entryObj.phone || '').replace(/[^0-9]/g, '');
+    const waPhone = cleanP.startsWith('0') ? `2${cleanP}` : cleanP;
+    const storeUrl = window.location.origin;
+    const msg = `مرحباً ${entryObj.clientName} 👋، خبر سار من ${siteSettings.storeName || 'ELZOGHBI'}! المنتج الذي طلبت تنبيهك عند توفره (${entryObj.partName}) عاد للمخزن الآن بكمية محدودة 🔥. اطلبه الآن قبل نفاد الكمية: ${storeUrl}`;
+    window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    saveSiteSettingsImmediate(prev => ({
+      ...prev,
+      restockWaitlist: (Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : []).map(w =>
+        w.id === entryObj.id ? { ...w, notified: true } : w
+      )
+    }));
+  };
+
+  // 11. Family Saved Models / Interests ("اختياراتي وعائلتي") State
+  const [familyModalOpen, setFamilyModalOpen] = useState(false);
+  const [newFamilyOwnerLabel, setNewFamilyOwnerLabel] = useState('اختياراتي الشخصية');
+  const [newFamilyModelId, setNewFamilyModelId] = useState('');
+  const [adminFamilyTargetClientId, setAdminFamilyTargetClientId] = useState('');
+  const [adminFamilyOwnerLabel, setAdminFamilyOwnerLabel] = useState('اختياراتي الشخصية');
+  const [adminFamilyModelId, setAdminFamilyModelId] = useState('');
+  const [guestFamilyDevices, setGuestFamilyDevices] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem('elzoghbi_guest_family_devices');
+      if (raw) return JSON.parse(raw) || [];
+    } catch (e) {}
+    return [];
+  });
+
+  const activeFamilyDevices = useMemo(() => {
+    if (currentClient && Array.isArray(currentClient.savedFamilyDevices)) {
+      return currentClient.savedFamilyDevices;
+    }
+    return guestFamilyDevices;
+  }, [currentClient, guestFamilyDevices]);
+
+  const handleAddFamilyDevice = (e) => {
+    if (e) e.preventDefault();
+    const targetMdl = models.find(m => String(m.id) === String(newFamilyModelId)) || models[0];
+    if (!targetMdl) return;
+    const newDev = {
+      id: `fam_${Date.now()}`,
+      ownerLabel: newFamilyOwnerLabel || 'اختياراتي الشخصية',
+      modelId: targetMdl.id,
+      modelName: targetMdl.name,
+      addedAt: new Date().toISOString().slice(0, 10)
+    };
+    if (currentClient) {
+      setClients(prev =>
+        prev.map(c => {
+          if (c.id !== currentClient.id) return c;
+          const existingDevs = Array.isArray(c.savedFamilyDevices) ? c.savedFamilyDevices : [];
+          if (existingDevs.some(d => String(d.modelId) === String(newDev.modelId) && d.ownerLabel === newDev.ownerLabel)) {
+            return c;
+          }
+          const updated = {
+            ...c,
+            savedFamilyDevices: [newDev, ...existingDevs]
+          };
+          markLocalUpsert('clients', updated);
+          sbUpsert('clients', updated);
+          return updated;
+        })
+      );
+    } else {
+      const nextGuest = [newDev, ...guestFamilyDevices];
+      setGuestFamilyDevices(nextGuest);
+      try { window.localStorage.setItem('elzoghbi_guest_family_devices', JSON.stringify(nextGuest)); } catch (err) {}
+    }
+    showToast(`👨‍👩‍👧‍👦 تم حفظ "${newDev.ownerLabel} (${newDev.modelName})"! سننبهك فور نزول أي منتج جديد له.`, 'success');
+  };
+
+  const handleAdminAddClientFamilyDevice = (clientId, ownerLbl, mdlId) => {
+    const targetClient = clients.find(c => String(c.id) === String(clientId)) || clients[0];
+    const targetMdl = models.find(m => String(m.id) === String(mdlId)) || models[0];
+    if (!targetClient || !targetMdl) return;
+    const newDev = {
+      id: `fam_${Date.now()}`,
+      ownerLabel: ownerLbl || 'اختياراتي الشخصية',
+      modelId: targetMdl.id,
+      modelName: targetMdl.name,
+      addedAt: new Date().toISOString().slice(0, 10)
+    };
+    setClients(prev =>
+      prev.map(c => {
+        if (String(c.id) !== String(targetClient.id)) return c;
+        const updated = {
+          ...c,
+          savedFamilyDevices: [newDev, ...(Array.isArray(c.savedFamilyDevices) ? c.savedFamilyDevices : [])]
+        };
+        markLocalUpsert('clients', updated);
+        sbUpsert('clients', updated);
+        return updated;
+      })
+    );
+    showToast(`👨‍👩‍👧‍👦 تمت إضافة "${newDev.ownerLabel} (${newDev.modelName})" لحساب "${targetClient.name}" بنجاح!`, 'success');
+  };
+
+  const handleRemoveFamilyDevice = (devId, targetClientId = null) => {
+    const cid = targetClientId || currentClient?.id;
+    if (cid) {
+      setClients(prev =>
+        prev.map(c => {
+          if (String(c.id) !== String(cid)) return c;
+          const updated = {
+            ...c,
+            savedFamilyDevices: (c.savedFamilyDevices || []).filter(d => d.id !== devId)
+          };
+          markLocalUpsert('clients', updated);
+          sbUpsert('clients', updated);
+          return updated;
+        })
+      );
+    } else {
+      const nextGuest = guestFamilyDevices.filter(d => d.id !== devId);
+      setGuestFamilyDevices(nextGuest);
+      try { window.localStorage.setItem('elzoghbi_guest_family_devices', JSON.stringify(nextGuest)); } catch (err) {}
+    }
+  };
+
+  // 12. Warranty Lookup & Replacement by Phone Number State
+  const [warrantyModalOpen, setWarrantyModalOpen] = useState(false);
+  const [warrantyPhoneQuery, setWarrantyPhoneQuery] = useState('');
+  const [warrantyClaimNotes, setWarrantyClaimNotes] = useState({});
+
+  const handleRequestWarrantyReplacement = (orderObj, itemObj) => {
+    if (!orderObj || !itemObj) return;
+    const key = `${orderObj.id}_${itemObj.partId}`;
+    const noteText = String(warrantyClaimNotes[key] || '').trim() || 'طلب استبدال ضمن فترة الضمان السارية بالرقم';
+    const newRet = {
+      id: `RET-WAR-${String(Date.now()).slice(-4)}`,
+      orderId: orderObj.id,
+      clientId: orderObj.clientId || 'guest',
+      clientName: orderObj.clientName || 'عميل ضمان بالرقم',
+      partId: itemObj.partId,
+      partName: itemObj.name,
+      qty: 1,
+      refundAmountBase: Number(itemObj.unitPriceBase) || 0,
+      reason: `[ضمان بالرقم] ${noteText}`,
+      warrantyConfirmed: true,
+      photos: [],
+      status: 'قيد المراجعة',
+      resolutionType: '',
+      adminResponse: '',
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+    };
+    setReturnsList(prev => [newRet, ...prev]);
+    markLocalUpsert('returnsList', newRet);
+    sbUpsert('returns_list', newRet);
+    setNotifications(prev => [
+      {
+        id: `ntf_war_${Date.now()}`,
+        target: 'admin',
+        type: 'return',
+        title: `🛡️ طلب استبدال بالضمان (${newRet.id})`,
+        msg: `العميل "${orderObj.clientName}" طلب استبدال "${itemObj.name}" من فاتورة ${orderObj.id} ضمن فترة الضمان.`,
+        time: 'الآن',
+        read: false
+      },
+      ...prev
+    ]);
+    showToast(`🛡️ تم إرسال طلب الاستبدال بالضمان (${newRet.id}) للإدارة بنجاح! سنتواصل معك فوراً.`, 'success');
+  };
+
+  // 13. Refer-a-Friend ("هات صاحبك") State — Strictly First-Order Only & Hidden After Use!
+  const [referralCodeInput, setReferralCodeInput] = useState(() => {
+    try {
+      return window.sessionStorage.getItem('elzoghbi_referral_code') || '';
+    } catch (e) {
+      return '';
+    }
+  });
+  const [appliedReferralClient, setAppliedReferralClient] = useState(null);
+
+  const hasClientAlreadyUsedReferral = useMemo(() => {
+    if (!currentClient) {
+      try {
+        return window.localStorage.getItem('elzoghbi_ref_used_guest') === '1';
+      } catch (e) {
+        return false;
+      }
+    }
+    if (currentClient.hasUsedReferralCode) return true;
+    try {
+      if (window.localStorage.getItem(`elzoghbi_ref_used_${currentClient.id}`) === '1') return true;
+    } catch (e) {}
+    const previousNonCancelledOrders = orders.filter(
+      o => String(o.clientId) === String(currentClient.id) && o.status !== 'ملغي'
+    );
+    if (previousNonCancelledOrders.length > 0) return true;
+    return false;
+  }, [currentClient, orders]);
+
+  const handleApplyReferralCode = (rawCode) => {
+    if (hasClientAlreadyUsedReferral) {
+      showToast('كود دعوة الصديق مخصص لأول طلب فقط وقد تم استخدامه مسبقاً.', 'warning');
+      return;
+    }
+    const clean = String(rawCode ?? referralCodeInput).trim().toUpperCase();
+    if (!clean) return;
+    const refOwner = clients.find(c => {
+      const cCode = String(c.referralCode || `REF-${String(c.phone || '').slice(-5)}`).toUpperCase();
+      return cCode === clean || String(c.phone || '') === clean;
+    });
+    if (!refOwner) {
+      showToast('كود الدعوة غير صحيح، تأكد من كود صديقك وجرّب مرة أخرى.', 'warning');
+      return;
+    }
+    if (currentClient && String(refOwner.id) === String(currentClient.id)) {
+      showToast('لا يمكنك استخدام كود الدعوة الخاص بك لنفسك 😊، شاركه مع أصدقائك!', 'warning');
+      return;
+    }
+    setAppliedReferralClient(refOwner);
+    showToast(`🤝 تم ربط كود دعوة صديقك (${refOwner.name}) لأول طلب لك! عند استلام الطلب ستكسبان معاً رصيداً في المحفظة 🎁`, 'success');
+  };
+
+  // 14. Birthday & Seasonal Auto-Coupon Detection
+  const activeBirthdayOrSeasonalBanner = useMemo(() => {
+    if (siteSettings.enableBirthdayAndSeasonal === false) return null;
+    const today = new Date();
+    const tMonth = today.getMonth() + 1;
+    const tDay = today.getDate();
+    const windowDays = Math.max(1, Number(siteSettings.birthdayWindowDays) || 3);
+
+    if (currentClient && currentClient.birthDate) {
+      const partsDate = String(currentClient.birthDate).split('-');
+      if (partsDate.length === 3) {
+        const bMonth = Number(partsDate[1]);
+        const bDay = Number(partsDate[2]);
+        const bDateThisYear = new Date(today.getFullYear(), bMonth - 1, bDay);
+        const diffDays = Math.round((bDateThisYear - new Date(today.getFullYear(), tMonth - 1, tDay)) / (1000 * 60 * 60 * 24));
+        if (Math.abs(diffDays) <= windowDays) {
+          return {
+            type: 'birthday',
+            title: `🎂 كل سنة وأنت طيب يا ${currentClient.name}! عيد ميلادك معانا غير 🎉`,
+            subtitle: `هدية عيد ميلادك جاهزة: خصم ${siteSettings.birthdayDiscountPct || 15}% بكود (${siteSettings.birthdayCouponCode || 'BDAY15'})!`,
+            code: siteSettings.birthdayCouponCode || 'BDAY15',
+            pct: Number(siteSettings.birthdayDiscountPct) || 15
+          };
+        }
+      }
+    }
+
+    if (siteSettings.seasonalCampaignActive) {
+      return {
+        type: 'seasonal',
+        title: `✨ ${siteSettings.seasonalCampaignName || 'عروض الموسم الحصرية'}`,
+        subtitle: `استفد الآن بخصم فوري ${siteSettings.seasonalDiscountPct || 10}% بكود (${siteSettings.seasonalCouponCode || 'SEASON10'}) لفترة محدودة!`,
+        code: siteSettings.seasonalCouponCode || 'SEASON10',
+        pct: Number(siteSettings.seasonalDiscountPct) || 10
+      };
+    }
+    return null;
+  }, [currentClient, siteSettings.enableBirthdayAndSeasonal, siteSettings.birthdayCouponCode, siteSettings.birthdayDiscountPct, siteSettings.birthdayWindowDays, siteSettings.seasonalCampaignActive, siteSettings.seasonalCampaignName, siteSettings.seasonalCouponCode, siteSettings.seasonalDiscountPct]);
+
+  // Collapsible Accordion Sections State for Feature Flags Dashboard (Fix 11)
+  const [openFeatureSections, setOpenFeatureSections] = useState({
+    flags: true,
+    cashback: true,
+    social_spin: false,
+    cashier_tiers: false,
+    birthday_seasonal: true,
+    family_garage: true,
+    referral_vip: false,
+    repurchase_waitlist: false
+  });
+  const toggleFeatureSection = (secKey) => {
+    setOpenFeatureSections(prev => ({ ...prev, [secKey]: !prev[secKey] }));
+  };
+
   const currentCurrency = useMemo(() => {
     return currencies[currentGroup.currency] || currencies.EGP;
   }, [currentGroup, currencies]);
 
   // --- Pricing Calculation Helper ---
   // Returns both the price in Base Currency (EGP) and the converted display price in the Group's Currency
-  const calculatePartPrice = (part, groupObj = currentGroup) => {
+  const vipMinOrders = Math.max(1, Number(siteSettings.vipMinOrdersRequired) || 3);
+
+  const clientCompletedOrderCount = useMemo(() => {
+    if (!currentClient) return 0;
+    const deliveredInOrders = orders.filter(
+      o => String(o.clientId) === String(currentClient.id) && (o.status === 'تم التسليم' || o.status === 'Delivered')
+    ).length;
+    return Math.max(Number(currentClient.orderCount) || 0, deliveredInOrders);
+  }, [currentClient, orders]);
+
+  const isCurrentClientVip = useMemo(() => {
+    if (appPortal === 'admin' || adminAuthenticated || vipAdminPreviewUnlocked || vipLinkUnlocked) return true;
+    if (!currentClient) return false;
+    if (currentClient.isVip || String(currentClient.groupId || '').includes('vip')) return true;
+    return clientCompletedOrderCount >= vipMinOrders;
+  }, [appPortal, adminAuthenticated, vipAdminPreviewUnlocked, vipLinkUnlocked, currentClient, clientCompletedOrderCount, vipMinOrders]);
+
+  const calculatePartPrice = (part, groupObj = currentGroup, overrideTierId = null) => {
     let baseEgpPrice = Number(part.basePrice) || 0;
-    const rawCustomPrice = part.customGroupPrices && groupObj ? part.customGroupPrices[groupObj.id] : undefined;
+    const vipSpecial = Number(part.vipPrice || part.customGroupPrices?._vipPrice || siteSettings?.partExtraMeta?.[part.id]?.vipPrice || 0);
+    const rawCustomPrice = (isCurrentClientVip && vipSpecial > 0 && (clientTab === 'vip' || isPartVipOnly(part)))
+      ? vipSpecial
+      : (part.customGroupPrices && groupObj ? part.customGroupPrices[groupObj.id] : undefined);
     const hasCustomOverride = rawCustomPrice !== undefined && rawCustomPrice !== null && rawCustomPrice !== '' && Number(rawCustomPrice) > 0;
 
     if (hasCustomOverride) {
@@ -5055,9 +6862,10 @@ export default function App() {
       }
 
       const chosenColor = selectedColors[partId] || prev[partId]?.color || part.colors[0] || 'قياسي';
+      const chosenTier = selectedQualityTiers[partId] || prev[partId]?.qualityTier || 'original';
       return {
         ...prev,
-        [partId]: { qty: nextQty, color: chosenColor }
+        [partId]: { qty: nextQty, color: chosenColor, qualityTier: chosenTier }
       };
     });
   };
@@ -5079,7 +6887,8 @@ export default function App() {
         return copy;
       }
       const chosenColor = selectedColors[partId] || prev[partId]?.color || part.colors[0] || 'قياسي';
-      return { ...prev, [partId]: { qty, color: chosenColor } };
+      const chosenTier = selectedQualityTiers[partId] || prev[partId]?.qualityTier || 'original';
+      return { ...prev, [partId]: { qty, color: chosenColor, qualityTier: chosenTier } };
     });
   };
 
@@ -5310,7 +7119,7 @@ export default function App() {
     if (part.hidden || part.customGroupPrices?._hidden) return true;
     if (hiddenPartIdsSet.has(String(part.id || '').trim())) return true;
     if (part.category && isCategoryHidden(part.category)) return true;
-    if (siteSettings.hideOutOfStockInStore && (Number(part.stock) <= 0 || part.soldOut)) return true;
+    if (siteSettings.keepOutOfStockVisible === false && siteSettings.hideOutOfStockInStore && (Number(part.stock) <= 0 || part.soldOut)) return true;
     const mObj = resolvePartModelObj(part);
     if (mObj) {
       if (mObj.hidden || hiddenModelIdsSet.has(String(mObj.id || '').trim())) return true;
@@ -5334,8 +7143,13 @@ export default function App() {
   );
 
   const publicParts = useMemo(
-    () => parts.filter(p => !isPartHidden(p)),
-    [parts, models, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore]
+    () => parts.filter(p => !isPartHidden(p) && (!isPartVipOnly(p) || isCurrentClientVip)),
+    [parts, models, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore, siteSettings.keepOutOfStockVisible, isCurrentClientVip]
+  );
+
+  const vipCatalogParts = useMemo(
+    () => parts.filter(p => !isPartHidden(p) && (isPartVipOnly(p) || Number(p.vipPrice || p.customGroupPrices?._vipPrice) > 0)),
+    [parts, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.partExtraMeta]
   );
 
   const { partCountByModelIdMap, partCountByBrandMap, publicPartCountByModelIdMap, publicPartCountByBrandMap } = useMemo(() => {
@@ -5406,6 +7220,7 @@ export default function App() {
   const partPassesStoreFilters = (part, ignoreCategory = false) => {
     if (!part) return false;
     if (isPartHidden(part)) return false;
+    if (isPartVipOnly(part) && !isCurrentClientVip) return false;
 
     const modelObj = resolvePartModelObj(part);
     const canonicalMid = modelObj ? String(modelObj.id) : String(part.modelId || '').trim();
@@ -5473,35 +7288,109 @@ export default function App() {
 
 
 
-  // --- Cart Totals Calculation ---
+  // --- Cart Totals Calculation (Supports Quality Tiers, Cross-Sell Bundle Discount, Buy More Save More, Loyalty & Cashback) ---
+  const clientLoyaltyInfo = useMemo(
+    () => getClientLoyaltyStatus(currentClient),
+    [currentClient, orders, siteSettings.loyaltySilverMinOrders, siteSettings.loyaltyGoldMinOrders, siteSettings.loyaltyDiamondMinOrders, siteSettings.loyaltyInactivityDays]
+  );
+
   const cartSummary = useMemo(() => {
     const items = [];
+    let subtotalBeforeItemDiscountsBase = 0;
     let subtotalBase = 0;
+    let bundleDiscountTotalBase = 0;
+    let qtyDiscountTotalBase = 0;
+    let expectedCashbackBase = 0;
+    let cashbackEligibleItemsCount = 0;
+
+    const tier2Min = Math.max(2, Number(siteSettings.qtyTier2Min) || 2);
+    const tier2Pct = Math.max(0, Number(siteSettings.qtyTier2DiscountPct) || 5);
+    const tier3Min = Math.max(tier2Min + 1, Number(siteSettings.qtyTier3Min) || 3);
+    const tier3Pct = Math.max(0, Number(siteSettings.qtyTier3DiscountPct) || 10);
+    const loyaltyBonusCbPct = (siteSettings.enableLoyaltyTiers !== false && clientLoyaltyInfo?.currentTier?.bonusCashbackPct)
+      ? Number(clientLoyaltyInfo.currentTier.bonusCashbackPct)
+      : 0;
 
     Object.entries(cart).forEach(([partId, itemData]) => {
-      const part = parts.find(p => p.id === partId);
+      const part = parts.find(p => String(p.id) === String(partId));
       if (!part || itemData.qty <= 0) return;
       const validQty = Math.min(itemData.qty, part.soldOut ? 0 : part.stock);
       if (validQty <= 0) return;
 
-      const priceInfo = calculatePartPrice(part, currentGroup);
-      const lineTotalBase = priceInfo.baseEgpPrice * validQty;
+      const basePriceInfo = calculatePartPrice(part, currentGroup);
+      const chosenTierId = selectedQualityTiers[part.id] || itemData.qualityTier || 'original';
+      const tiersList = getPartQualityTiers(part, basePriceInfo.baseEgpPrice);
+      const chosenTierObj = (siteSettings.enableQualityTiers !== false && tiersList.find(t => t.id === chosenTierId)) || tiersList[0];
+
+      const rawUnitBase = chosenTierObj ? chosenTierObj.priceEgp : basePriceInfo.baseEgpPrice;
+      subtotalBeforeItemDiscountsBase += rawUnitBase * validQty;
+
+      // 1. Smart Cross-Sell Bundle Discount (Guaranteed % reduction without costPrice clamp!)
+      const bundlePct = Number(bundleDiscountPartIds[String(part.id)]) || 0;
+      const unitAfterBundleBase = bundlePct > 0
+        ? Math.max(1, Math.round(rawUnitBase * (1 - bundlePct / 100)))
+        : rawUnitBase;
+      const itemBundleSavedBase = Math.max(0, (rawUnitBase - unitAfterBundleBase) * validQty);
+      bundleDiscountTotalBase += itemBundleSavedBase;
+
+      // 2. Buy More, Save More (اشتري أكتر ووفّر: 2 items = 5%, 3+ items = 10%)
+      let qtyDiscountPct = 0;
+      if (siteSettings.enableBuyMoreSaveMore !== false) {
+        if (validQty >= tier3Min) qtyDiscountPct = tier3Pct;
+        else if (validQty >= tier2Min) qtyDiscountPct = tier2Pct;
+      }
+      const finalUnitBase = qtyDiscountPct > 0
+        ? Math.max(1, Math.round(unitAfterBundleBase * (1 - qtyDiscountPct / 100)))
+        : unitAfterBundleBase;
+      const itemQtySavedBase = Math.max(0, (unitAfterBundleBase - finalUnitBase) * validQty);
+      qtyDiscountTotalBase += itemQtySavedBase;
+
+      const lineTotalBase = finalUnitBase * validQty;
       subtotalBase += lineTotalBase;
+
+      // 3. Per-Product Cashback + Loyalty Tier Bonus Cashback
+      const cbEnabled = isPartCashbackEnabled(part);
+      const baseCbPct = cbEnabled ? getPartCashbackPct(part) : 0;
+      const effectiveCbPct = cbEnabled ? (baseCbPct + loyaltyBonusCbPct) : 0;
+      const lineCashbackBase = cbEnabled ? Math.max(1, Math.round((lineTotalBase * effectiveCbPct) / 100)) : 0;
+      if (cbEnabled && lineCashbackBase > 0) {
+        expectedCashbackBase += lineCashbackBase;
+        cashbackEligibleItemsCount += validQty;
+      }
 
       items.push({
         part,
         qty: validQty,
         color: itemData.color,
-        priceInfo,
-        lineTotalBase
+        qualityTierId: chosenTierObj.id,
+        qualityTierLabel: chosenTierObj.label,
+        priceInfo: { ...basePriceInfo, baseEgpPrice: finalUnitBase },
+        originalUnitBase: rawUnitBase,
+        bundlePct,
+        itemBundleSavedBase,
+        qtyDiscountPct,
+        itemQtySavedBase,
+        lineTotalBase,
+        cashbackEnabled: cbEnabled,
+        cashbackPct: effectiveCbPct,
+        lineCashbackBase
       });
     });
 
     const groupDeliveryBase =
       currentGroup?.deliveryFeeBase !== undefined ? Number(currentGroup.deliveryFeeBase) : deliveryFeeBase;
 
+    const freeShipTargetBase = Math.max(100, Number(siteSettings.freeShippingTargetBase) || 2000);
+    const freeShipEnabled = siteSettings.enableFreeShippingBar !== false;
+    const isDiamondFreeShip = siteSettings.enableLoyaltyTiers !== false && Boolean(clientLoyaltyInfo?.currentTier?.freeShipping);
+    const isFreeShippingUnlocked = (freeShipEnabled && items.length > 0 && subtotalBase >= freeShipTargetBase) || (items.length > 0 && isDiamondFreeShip);
+    const remainingForFreeShippingBase = freeShipEnabled ? Math.max(0, freeShipTargetBase - subtotalBase) : 0;
+    const freeShippingProgressPct = freeShipEnabled
+      ? Math.min(100, Math.round((subtotalBase / freeShipTargetBase) * 100))
+      : 0;
+
     let discountBase = 0;
-    let effectiveDeliveryFeeBase = items.length > 0 ? groupDeliveryBase : 0;
+    let effectiveDeliveryFeeBase = items.length > 0 ? (isFreeShippingUnlocked ? 0 : groupDeliveryBase) : 0;
 
     if (appliedPromo && items.length > 0) {
       if (appliedPromo.type === 'percentage') {
@@ -5528,7 +7417,6 @@ export default function App() {
     const afterDiscountBase = Math.max(0, subtotalBase - discountBase);
     const totalWithDeliveryBase = items.length > 0 ? afterDiscountBase + effectiveDeliveryFeeBase : 0;
 
-    // Positive Wallet Deduction
     const positiveWalletBase = currentClient && currentClient.walletBalance > 0 ? currentClient.walletBalance : 0;
     const walletDeductedBase =
       useWalletBalance && positiveWalletBase > 0
@@ -5537,7 +7425,6 @@ export default function App() {
 
     const finalPayableBase = Math.max(0, totalWithDeliveryBase - walletDeductedBase);
 
-    // Credit Limit Check for Deferred ("آجل / على الحساب")
     const currentDebtBase = currentClient && currentClient.walletBalance < 0 ? Math.abs(currentClient.walletBalance) : 0;
     const remainingCreditLimitBase = currentClient ? Math.max(0, currentClient.creditLimit - currentDebtBase) : 0;
     const canOrderOnCredit = currentClient ? (currentDebtBase + finalPayableBase <= currentClient.creditLimit) : false;
@@ -5545,17 +7432,44 @@ export default function App() {
     return {
       items,
       totalQty: items.reduce((acc, i) => acc + i.qty, 0),
+      subtotalBeforeItemDiscountsBase,
       subtotalBase,
+      bundleDiscountTotalBase,
+      qtyDiscountTotalBase,
       discountBase,
       originalDeliveryFeeBase: items.length > 0 ? groupDeliveryBase : 0,
       deliveryFeeBase: effectiveDeliveryFeeBase,
+      isFreeShippingUnlocked,
+      isDiamondFreeShip,
+      freeShipTargetBase,
+      remainingForFreeShippingBase,
+      freeShippingProgressPct,
+      expectedCashbackBase,
+      cashbackEligibleItemsCount,
       walletDeductedBase,
       finalPayableBase,
       currentDebtBase,
       remainingCreditLimitBase,
       canOrderOnCredit
     };
-  }, [cart, parts, currentGroup, appliedPromo, deliveryFeeBase, currentClient, useWalletBalance]);
+  }, [cart, parts, currentGroup, appliedPromo, deliveryFeeBase, currentClient, useWalletBalance, bundleDiscountPartIds, selectedQualityTiers, clientLoyaltyInfo, siteSettings]);
+
+  const prevFreeShipUnlockedRef = useRef(false);
+  useEffect(() => {
+    if (cartSummary.isFreeShippingUnlocked && !prevFreeShipUnlockedRef.current) {
+      prevFreeShipUnlockedRef.current = true;
+      try {
+        if (!window.sessionStorage.getItem('elzoghbi_freeship_confetti_shown')) {
+          window.sessionStorage.setItem('elzoghbi_freeship_confetti_shown', '1');
+          triggerConfettiCelebration();
+        }
+      } catch (e) {
+        triggerConfettiCelebration();
+      }
+    } else if (!cartSummary.isFreeShippingUnlocked) {
+      prevFreeShipUnlockedRef.current = false;
+    }
+  }, [cartSummary.isFreeShippingUnlocked]);
 
   // --- Place Order Handler ---
   const handlePlaceOrder = () => {
@@ -5609,11 +7523,13 @@ export default function App() {
       id: newOrderId,
       clientId: currentClient.id,
       clientName: currentClient.name,
+      clientPhone: currentClient.phone || '',
       groupId: currentGroup.id,
       currency: currentCurrency.code,
       exchangeRateUsed: currentCurrency.rateFromBase,
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
       status: 'تم الاستلام',
+      statusUpdatedAt: Date.now(),
       paymentMethod: paymentLabel,
       address: chosenAddr,
       notes: orderNotes,
@@ -5622,15 +7538,23 @@ export default function App() {
       walletUsedBase: cartSummary.walletDeductedBase,
       adminEdited: false,
       adminEditNote: '',
+      cashbackAwarded: false,
+      cashbackAmountBase: 0,
+      expectedCashbackBase: cartSummary.expectedCashbackBase,
+      referralCodeUsed: appliedReferralClient ? (appliedReferralClient.referralCode || appliedReferralClient.phone) : (currentClient.referredByCode || ''),
+      referrerClientId: appliedReferralClient ? appliedReferralClient.id : (currentClient.referrerClientId || ''),
       items: cartSummary.items.map(i => ({
         partId: i.part.id,
         sku: i.part.sku,
-        name: i.part.name,
-        qualityGrade: i.part.qualityGrade,
+        name: `${i.part.name}${i.qualityTierLabel ? ` (${i.qualityTierLabel})` : ''}`,
+        qualityGrade: i.qualityTierLabel || i.part.qualityGrade,
         color: i.color,
         qty: i.qty,
         costPriceBase: i.part.costPrice,
-        unitPriceBase: i.priceInfo.baseEgpPrice
+        unitPriceBase: i.priceInfo.baseEgpPrice,
+        cashbackEnabled: Boolean(i.cashbackEnabled),
+        cashbackPct: Number(i.cashbackPct) || 0,
+        lineCashbackBase: Number(i.lineCashbackBase) || 0
       }))
     };
 
@@ -5685,9 +7609,14 @@ export default function App() {
     // 3. Save Order, Increment Promo Usage, Push Live Notification & Clear Cart
     if (appliedPromo) {
       setPromoCodes(prev =>
-        prev.map(pc => (pc.id === appliedPromo.id ? { ...pc, usedCount: pc.usedCount + 1 } : pc))
+        prev.map(p => (p.id === appliedPromo.id || p.code === appliedPromo.code ? { ...p, usedCount: (Number(p.usedCount) || 0) + 1 } : p))
       );
+      saveSiteSettingsImmediate(prev => ({
+        ...prev,
+        analyticsCouponsUsedCount: (Number(prev.analyticsCouponsUsedCount) || 0) + 1
+      }));
     }
+    enqueueLiveSocialProofOrder(newOrder);
     const adminOrderNotif = {
       id: `ntf_${Date.now()}_adm`,
       target: 'admin',
@@ -5740,6 +7669,27 @@ export default function App() {
         sbUpdate('spare_parts', p.id, { stock: updatedStock });
       }
     });
+    // Mark client as having used their first-order referral opportunity so the box hides permanently
+    try {
+      window.localStorage.setItem(`elzoghbi_ref_used_${currentClient.id}`, '1');
+      window.sessionStorage.removeItem('elzoghbi_referral_code');
+    } catch (e) {}
+    setClients(prev =>
+      prev.map(c => {
+        if (c.id !== currentClient.id) return c;
+        const updatedC = {
+          ...c,
+          hasUsedReferralCode: true,
+          referredByCode: c.referredByCode || (appliedReferralClient ? (appliedReferralClient.referralCode || appliedReferralClient.phone) : ''),
+          referrerClientId: c.referrerClientId || (appliedReferralClient ? appliedReferralClient.id : '')
+        };
+        markLocalUpsert('clients', updatedC);
+        sbUpsert('clients', updatedC);
+        return updatedC;
+      })
+    );
+    setAppliedReferralClient(null);
+    setReferralCodeInput('');
     setCart({});
     setAppliedPromo(null);
     setPromoCodeInput('');
@@ -5990,6 +7940,191 @@ export default function App() {
           : `تم إلغاء الطلب ${orderId} وإرجاع جميع الكميات إلى رصيد المخزن تلقائياً.`,
         'info'
       );
+    } else if (newStatus === 'تم التسليم' && targetOrder.status !== 'تم التسليم' && !targetOrder.cashbackAwarded) {
+      // 1. Calculate Per-Product Cashback (checks BOTH order item snapshot AND live catalog cashback setting!)
+      const orderClientObj = clients.find(
+        c => String(c.id) === String(targetOrder.clientId) ||
+             (targetOrder.clientPhone && String(c.phone) === String(targetOrder.clientPhone)) ||
+             String(c.name).trim() === String(targetOrder.clientName).trim()
+      );
+      const clientLoyalty = getClientLoyaltyStatus(orderClientObj);
+      const loyaltyBonusPct = (siteSettings.enableLoyaltyTiers !== false && clientLoyalty?.currentTier?.bonusCashbackPct)
+        ? Number(clientLoyalty.currentTier.bonusCashbackPct)
+        : 0;
+
+      let eligibleCashbackTotal = 0;
+      const eligibleNames = [];
+      (targetOrder.items || []).forEach(it => {
+        const partObj = parts.find(
+          p => String(p.id) === String(it.partId) ||
+               (it.sku && String(p.sku) === String(it.sku)) ||
+               String(p.name).trim() === String(it.name || '').replace(/\s*\(.*?\)\s*$/, '').trim()
+        );
+        const isEligible = Boolean(it.cashbackEnabled) || (partObj ? isPartCashbackEnabled(partObj) : false);
+        const basePct = partObj ? getPartCashbackPct(partObj) : (Number(it.cashbackPct) || Number(siteSettings.defaultCashbackPct) || 2);
+        const totalPct = isEligible ? (basePct + loyaltyBonusPct) : 0;
+
+        if (isEligible && totalPct > 0 && siteSettings.enableWalletCashback !== false) {
+          const lineVal = (Number(it.unitPriceBase) || 0) * (Number(it.qty) || 1);
+          const itemCb = Math.max(1, Math.round((lineVal * totalPct) / 100));
+          eligibleCashbackTotal += itemCb;
+          eligibleNames.push(`${it.name} (${totalPct}%)`);
+        }
+      });
+
+      // 2. Check Refer-a-Friend ("هات صاحبك") on First Delivered Order!
+      let referralRewardAmount = 0;
+      let referrerClientObj = null;
+      const isFirstDeliveredForClient = orders.filter(
+        o => String(o.clientId) === String(targetOrder.clientId) && o.status === 'تم التسليم' && o.id !== orderId
+      ).length === 0;
+
+      if (siteSettings.enableReferralProgram !== false && isFirstDeliveredForClient) {
+        const refCodeOrId = targetOrder.referrerClientId || targetOrder.referralCodeUsed || orderClientObj?.referrerClientId || orderClientObj?.referredByCode;
+        if (refCodeOrId) {
+          referrerClientObj = clients.find(
+            c => String(c.id) !== String(targetOrder.clientId) && (
+              String(c.id) === String(refCodeOrId) ||
+              String(c.referralCode || '').toUpperCase() === String(refCodeOrId).toUpperCase() ||
+              String(c.phone || '') === String(refCodeOrId)
+            )
+          );
+          if (referrerClientObj) {
+            const ordSubtotal = (targetOrder.items || []).reduce((s, i) => s + (Number(i.unitPriceBase) || 0) * (Number(i.qty) || 1), 0);
+            if (siteSettings.referralRewardType === 'percentage') {
+              const rPct = Number(siteSettings.referralRewardPct) || 5;
+              referralRewardAmount = Math.max(5, Math.round((ordSubtotal * rPct) / 100));
+            } else {
+              referralRewardAmount = Math.max(5, Number(siteSettings.referralRewardFixedAmount) || 50);
+            }
+          }
+        }
+      }
+
+      const nowStamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      const targetClientIdStr = orderClientObj ? String(orderClientObj.id) : String(targetOrder.clientId);
+
+      setClients(prevClients =>
+        prevClients.map(c => {
+          // Credit the ordering customer (Cashback + Referral Friend Bonus + Order Count + Last Order Date)
+          if (String(c.id) === targetClientIdStr) {
+            const nextOrderCount = (Number(c.orderCount) || 0) + 1;
+            const nextIsVip = nextOrderCount >= vipMinOrders || Boolean(c.isVip);
+            const totalCreditAdded = eligibleCashbackTotal + referralRewardAmount;
+            const nextBal = (Number(c.walletBalance) || 0) + totalCreditAdded;
+            const newLedgerEntries = [...(c.ledger || [])];
+
+            if (eligibleCashbackTotal > 0) {
+              newLedgerEntries.unshift({
+                id: `ldg_cb_${orderId}_${Date.now()}`,
+                date: nowStamp,
+                type: 'cashback',
+                ref: orderId,
+                desc: `💰 مكافأة كاش باك المحفظة عن الفاتورة (${orderId}): ${eligibleNames.join(' + ')}`,
+                amount: eligibleCashbackTotal,
+                balanceAfter: (Number(c.walletBalance) || 0) + eligibleCashbackTotal
+              });
+            }
+            if (referralRewardAmount > 0 && referrerClientObj) {
+              newLedgerEntries.unshift({
+                id: `ldg_ref_friend_${orderId}_${Date.now()}`,
+                date: nowStamp,
+                type: 'referral_bonus',
+                ref: orderId,
+                desc: `🤝 هدية "هات صاحبك" لأول طلب مستلم بدعوة من (${referrerClientObj.name})`,
+                amount: referralRewardAmount,
+                balanceAfter: nextBal
+              });
+            }
+
+            const updatedClient = {
+              ...c,
+              walletBalance: nextBal,
+              cashbackEarned: (Number(c.cashbackEarned) || 0) + totalCreditAdded,
+              orderCount: nextOrderCount,
+              lastOrderAt: nowStamp,
+              isVip: nextIsVip,
+              ledger: newLedgerEntries
+            };
+            markLocalUpsert('clients', updatedClient);
+            sbUpsert('clients', updatedClient);
+            return updatedClient;
+          }
+
+          // Credit the Referrer Friend ("هات صاحبك")!
+          if (referrerClientObj && String(c.id) === String(referrerClientObj.id) && referralRewardAmount > 0) {
+            const nextRefBal = (Number(c.walletBalance) || 0) + referralRewardAmount;
+            const updatedReferrer = {
+              ...c,
+              walletBalance: nextRefBal,
+              cashbackEarned: (Number(c.cashbackEarned) || 0) + referralRewardAmount,
+              ledger: [
+                {
+                  id: `ldg_ref_owner_${orderId}_${Date.now()}`,
+                  date: nowStamp,
+                  type: 'referral_bonus',
+                  ref: orderId,
+                  desc: `🤝 مكافأة "هات صاحبك" لاستلام صديقك (${targetOrder.clientName}) أول أوردر (${orderId})`,
+                  amount: referralRewardAmount,
+                  balanceAfter: nextRefBal
+                },
+                ...(c.ledger || [])
+              ]
+            };
+            markLocalUpsert('clients', updatedReferrer);
+            sbUpsert('clients', updatedReferrer);
+            return updatedReferrer;
+          }
+
+          return c;
+        })
+      );
+
+      if (eligibleCashbackTotal > 0 || referralRewardAmount > 0) {
+        triggerConfettiCelebration();
+        showToast(
+          `✅ تم تسليم الطلب ${orderId}! أُضيف كاش باك +${eligibleCashbackTotal} ج.م لمحفظة "${targetOrder.clientName}"${referralRewardAmount > 0 ? ` + مكافأة إحالة (${referralRewardAmount} ج.م للصديقين)` : ''}!`,
+          'success'
+        );
+      } else {
+        showToast(
+          `تم تحديث حالة الطلب ${orderId} إلى "تم التسليم" (الأصناف في هذه الفاتورة غير مفعّل عليها كاش باك حالياً).`,
+          'info'
+        );
+      }
+
+      setOrders(prev =>
+        prev.map(o => {
+          if (o.id !== orderId) return o;
+          const updatedOrd = {
+            ...o,
+            status: newStatus,
+            statusUpdatedAt: Date.now(),
+            cashbackAwarded: true,
+            cashbackAmountBase: eligibleCashbackTotal,
+            referralRewardAmountBase: referralRewardAmount
+          };
+          markLocalUpsert('orders', updatedOrd);
+          sbUpsert('orders', updatedOrd);
+          return updatedOrd;
+        })
+      );
+
+      setNotifications(prev => [
+        {
+          id: `ntf_${Date.now()}`,
+          target: targetClientIdStr,
+          title: eligibleCashbackTotal > 0 ? `🎉 تم تسليم طلبك #${orderId} وإضافة +${eligibleCashbackTotal} ج.م كاش باك لمحفظتك!` : `تحديث حالة طلبك #${orderId}`,
+          msg: eligibleCashbackTotal > 0
+            ? `استلمت طلبك رقم ${orderId} بنجاح وتم إيداع ${eligibleCashbackTotal} ج.م كاش باك في محفظتك لاستخدامها في طلباتك القادمة!`
+            : `تغيرت حالة فاتورتك رقم ${orderId} إلى: (${newStatus})`,
+          time: 'الآن',
+          read: false,
+          orderId
+        },
+        ...prev
+      ]);
+      return;
     } else {
       showToast(`تم تحديث حالة الطلب ${orderId} إلى "${newStatus}" وإرسال إشعار للعميل.`, 'success');
     }
@@ -6009,7 +8144,15 @@ export default function App() {
       ...prev
     ]);
 
-    setOrders(prev => prev.map(o => (o.id === orderId ? { ...o, status: newStatus } : o)));
+    setOrders(prev =>
+      prev.map(o => {
+        if (o.id !== orderId) return o;
+        const updatedOrd = { ...o, status: newStatus, statusUpdatedAt: Date.now() };
+        markLocalUpsert('orders', updatedOrd);
+        sbUpsert('orders', updatedOrd);
+        return updatedOrd;
+      })
+    );
   };
 
   // --- Admin: Full Reversible Return Resolution & Multi-Reply Support ---
@@ -6200,13 +8343,24 @@ export default function App() {
   };
 
   const renderProductCard = (part) => {
-    const priceInfo = calculatePartPrice(part, currentGroup);
+    const basePriceInfo = calculatePartPrice(part, currentGroup);
+    const qualityTiers = getPartQualityTiers(part, basePriceInfo.baseEgpPrice);
+    const activeTierId = selectedQualityTiers[part.id] || cart[part.id]?.qualityTier || 'original';
+    const activeTierObj = (siteSettings.enableQualityTiers !== false && qualityTiers.find(t => t.id === activeTierId)) || qualityTiers[0];
+    const currObj = currencies[currentGroup?.currency || 'EGP'] || currencies.EGP;
+    const tierDisplayPrice = Number((activeTierObj.priceEgp * currObj.rateFromBase).toFixed(currObj.code === 'EGP' ? 0 : 2));
+    const priceInfo = {
+      ...basePriceInfo,
+      baseEgpPrice: activeTierObj.priceEgp,
+      displayPrice: tierDisplayPrice
+    };
     const imagesList = getPartImagesList(part);
     const currentImgIdx = (cardImageIdx[part.id] || 0) % imagesList.length;
     const currentDisplayImg = imagesList[currentImgIdx] || part.image;
     const inCartQty = cart[part.id]?.qty || 0;
     const isOutOfStock = part.stock <= 0 || !!part.soldOut;
-    const isLowStock = !part.soldOut && part.stock > 0 && part.stock <= part.lowStockThreshold;
+    const urgencyThreshold = Math.max(1, Number(siteSettings.lowStockUrgencyThreshold) || part.lowStockThreshold || 5);
+    const isLowStock = !part.soldOut && part.stock > 0 && part.stock <= urgencyThreshold;
     const activeColor = selectedColors[part.id] || cart[part.id]?.color || part.colors[0];
     const compatList = Array.isArray(part.compatibleModels) ? part.compatibleModels.filter(Boolean) : [];
 
@@ -6286,8 +8440,18 @@ export default function App() {
                   <span>🔥 خصم {priceInfo.discountPercent}%</span>
                 </span>
               )}
+              {isPartVipOnly(part) && (
+                <span className="px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 text-[11px] font-black shadow-sm flex items-center gap-1">
+                  <span>👑 VIP</span>
+                </span>
+              )}
+              {isPartCashbackEnabled(part) && (
+                <span className="px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-[11px] font-black shadow-sm flex items-center gap-1" title="يُضاف رصيد كاش باك لمحفظتك تلقائياً عند استلام الطلب">
+                  <span>💰 كاش باك {getPartCashbackPct(part)}%</span>
+                </span>
+              )}
               <span className="px-2.5 py-1 rounded-xl bg-nav/90 text-nav-fg text-[11px] font-bold border border-navline">
-                <Bidi text={part.qualityGrade} />
+                <Bidi text={activeTierObj?.label || part.qualityGrade} />
               </span>
               <span className="px-2 py-1 rounded-xl bg-accent text-accent-ink text-[10px] font-mono font-extrabold">
                 <Bidi text={part.sku} />
@@ -6409,6 +8573,78 @@ export default function App() {
               ))}
             </div>
 
+            {/* Quality Tier Selector (اختيار الجودة: أصلي / فرز أول / اقتصادي) */}
+            {siteSettings.enableQualityTiers !== false && (
+              <div className="pt-1 space-y-1">
+                <div className="text-[10px] font-extrabold text-muted flex items-center justify-between">
+                  <span>اختر الجودة المناسبة لميزانيتك:</span>
+                  <span className="text-accent-text">{activeTierObj.label}</span>
+                </div>
+                <div className="grid grid-cols-3 gap-1">
+                  {qualityTiers.map(tier => {
+                    const isSelected = activeTierObj.id === tier.id;
+                    return (
+                      <button
+                        key={tier.id}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedQualityTiers(prev => ({ ...prev, [part.id]: tier.id }));
+                          if (cart[part.id]) {
+                            setCart(prev => ({
+                              ...prev,
+                              [part.id]: { ...prev[part.id], qualityTier: tier.id }
+                            }));
+                          }
+                        }}
+                        className={`py-1 px-1.5 rounded-xl border text-center transition ${
+                          isSelected
+                            ? 'bg-accent text-accent-ink border-accent font-black shadow-2xs'
+                            : 'bg-surface2 text-fg border-line hover:border-accent font-bold'
+                        }`}
+                      >
+                        <div className="text-[10px] truncate">{tier.badge} {tier.shortLabel}</div>
+                        <div className="text-[10px] font-mono">{tier.priceEgp} ج.م</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Buy More, Save More (اشتري أكتر ووفّر) */}
+            {siteSettings.enableBuyMoreSaveMore !== false && !isOutOfStock && (
+              <div className="px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[10px] font-extrabold text-amber-600 dark:text-amber-300 flex items-center justify-between gap-1">
+                <span>🏷️ اشتري {siteSettings.qtyTier2Min || 2} بخصم {siteSettings.qtyTier2DiscountPct || 5}% • {siteSettings.qtyTier3Min || 3} بخصم {siteSettings.qtyTier3DiscountPct || 10}%</span>
+                {inCartQty === 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); updateCartQty(part.id, 1); }}
+                    className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-black shrink-0"
+                  >
+                    +1 ووفّر
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Trust Elements (عناصر الثقة: الدفع عند الاستلام + معاينة قبل الدفع + باقي X قطع) */}
+            {siteSettings.enableTrustBadges !== false && (
+              <div className="flex flex-wrap items-center gap-1 pt-0.5 text-[10px] font-bold">
+                <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  🤝 الدفع عند الاستلام
+                </span>
+                <span className="px-2 py-0.5 rounded-lg bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20">
+                  👁️ معاينة قبل الدفع
+                </span>
+                {isLowStock && (
+                  <span className="px-2 py-0.5 rounded-lg bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-black">
+                    🔥 باقي {part.stock} قطع بس!
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Warranty Info */}
             {part.warrantyText && (
               <div className="hm-card-warranty text-[11px] bg-surface2 text-muted px-2.5 py-1.5 rounded-xl border border-line flex items-center gap-1.5">
@@ -6423,7 +8659,7 @@ export default function App() {
         <div className="hm-card-foot p-4 pt-3 border-t border-line bg-surface2 flex items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-muted font-bold">سعر الوحدة</span>
+              <span className="text-[10px] text-muted font-bold">سعر ({activeTierObj.shortLabel})</span>
               {priceInfo.hasDiscount && (
                 <span className="px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-600 dark:text-rose-400 text-[9px] font-black">
                   -{priceInfo.discountPercent}%
@@ -6437,22 +8673,37 @@ export default function App() {
                   {priceInfo.currencySymbol}
                 </span>
               </div>
-              {priceInfo.hasDiscount && (
+              {activeTierObj.id !== 'original' && (
                 <span className="text-xs font-bold font-mono text-muted line-through decoration-rose-500 decoration-2">
-                  {priceInfo.displayOldPrice.toLocaleString()} {priceInfo.currencySymbol}
+                  {basePriceInfo.displayPrice.toLocaleString()} {priceInfo.currencySymbol}
                 </span>
               )}
             </div>
           </div>
 
           {isOutOfStock ? (
-            <button
-              onClick={() => handleWaitlistRequest(part.id)}
-              className="px-3 py-2 rounded-xl bg-surface text-fg border border-line hover:border-accent text-xs font-bold transition flex items-center gap-1.5"
-            >
-              <Bell className="w-3.5 h-3.5 text-accent-text" />
-              <span>نبّهني لما يتوفر ({part.waitlistCount})</span>
-            </button>
+            hasCustomerRegisteredRestock(part) ? (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showToast(`✅ تم تسجيل طلب تنبيهك للمنتج "${part.name}" بالفعل! سنرسل لك رسالة واتساب فور توفره.`, 'info');
+                }}
+                className="px-3 py-2 rounded-xl bg-emerald-600/20 border border-emerald-500/40 text-emerald-500 text-xs font-black flex items-center gap-1.5 cursor-default"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>✅ تم تسجيل تنبيهك ({Math.max(getPartWaitlistEntries(part.id).length, Number(part.waitlistCount) || 1)})</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); openCustomerRestockModal(part); }}
+                className="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-xs"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span>🔔 نبّهني لما يرجع ({Math.max(getPartWaitlistEntries(part.id).length, Number(part.waitlistCount) || 0)})</span>
+              </button>
+            )
           ) : (
             <div className="flex items-center gap-1.5 bg-surface border border-line rounded-xl p-1">
               <button
@@ -6577,6 +8828,21 @@ export default function App() {
             <div className="hidden xl:flex items-center pl-2 ml-1 border-l border-navline">
               {renderSocialIconsGroup()}
             </div>
+
+            {/* Sound & Browser Notification Toggle Button in Customer Header */}
+            <button
+              type="button"
+              onClick={handleToggleSoundAndRequestPermission}
+              className={`w-10 h-10 sm:w-[54px] sm:h-12 rounded-xl flex flex-col items-center justify-center gap-0.5 transition border ${
+                soundAlertsEnabled
+                  ? 'bg-nav2 hover:bg-navline text-emerald-400 border-emerald-500/40'
+                  : 'bg-nav2 hover:bg-navline text-muted border-navline opacity-75'
+              }`}
+              title={soundAlertsEnabled ? 'الصوت وإشعارات المتصفح مفعّلة (اضغط للتجربة أو الكتم)' : 'تفعيل الصوت وإشعارات المتصفح'}
+            >
+              <span className="text-sm sm:text-base leading-none">{soundAlertsEnabled ? '🔊' : '🔇'}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-nav-fg">{soundAlertsEnabled ? 'الصوت' : 'صامت'}</span>
+            </button>
 
             {/* Single Unified Theme Toggle Button in Header (Saves in localStorage('theme')) */}
             <button
@@ -6767,6 +9033,46 @@ export default function App() {
               <Search className="w-4 h-4" />
               <span>تصفّح المنتجات ({publicParts.length})</span>
             </button>
+
+            {siteSettings.enableWarrantyLookup !== false && (
+              <button
+                type="button"
+                onClick={() => setWarrantyModalOpen(true)}
+                className="px-3 sm:px-4 h-11 rounded-xl text-xs font-extrabold transition flex items-center justify-center gap-1.5 border bg-nav2 text-emerald-300 border-emerald-500/30 hover:bg-navline shrink-0"
+                title="فحص سريان الضمان بالرقم وطلب استبدال فوري"
+              >
+                <Shield className="w-4 h-4 shrink-0" />
+                <span>الضمان بالرقم</span>
+              </button>
+            )}
+
+            {siteSettings.enableFamilySavedDevices !== false && (
+              <button
+                type="button"
+                onClick={() => setFamilyModalOpen(true)}
+                className="px-3 sm:px-4 h-11 rounded-xl text-xs font-extrabold transition hidden sm:flex items-center justify-center gap-1.5 border bg-nav2 text-cyan-300 border-cyan-500/30 hover:bg-navline shrink-0"
+                title="حفظ موديلك وموديل عائلتك لتلقي إشعار عند توفر منتجات جديدة"
+              >
+                <span>👨‍👩‍👧‍👦</span>
+                <span>أجهزتي وعائلتي ({activeFamilyDevices.length})</span>
+              </button>
+            )}
+
+            {/* VIP Tab ONLY appears if visitor opened the Secret VIP Link (?vip=...) */}
+            {vipLinkUnlocked && (
+              <button
+                onClick={() => setClientTab('vip')}
+                className={`px-4 h-11 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-1.5 border ${
+                  clientTab === 'vip'
+                    ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md'
+                    : 'bg-nav2 text-amber-300 border-amber-400/50 hover:bg-navline'
+                }`}
+                title="قسم كبار العملاء الحصري (تم فتحه عبر الرابط الخاص)"
+              >
+                <Award className="w-4 h-4 shrink-0" />
+                <span className="truncate">👑 عروض VIP الخاصة</span>
+              </button>
+            )}
 
             {currentClient && (
               <button
@@ -7064,7 +9370,7 @@ export default function App() {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent animate-ping" />
               </div>
               <h2 className="text-lg sm:text-2xl font-black text-fg tracking-wide">
-                {siteSettings.homeSearchTitle || 'دوّر على أي منتج أو إكسسوار أو موديل موبايل'}
+                {siteSettings.homeSearchTitle || 'ابحث عن أي منتج أو قسم أو موديل في الكتالوج'}
               </h2>
               <p className="text-xs text-muted">
                 أكثر من <span className="font-bold text-accent-text font-mono">{publicParts.length}</span> صنف وموديل متوفر في المخزن وجاهز يتشحن على طول
@@ -7942,9 +10248,16 @@ export default function App() {
           {/* Left Column: Invoice Summary & Promo Code */}
           <div className="space-y-4">
             <div className="bg-surface rounded-2xl p-5 border border-line shadow-sm space-y-4 sticky top-28">
-              <h3 className="text-sm font-extrabold text-fg border-b border-line pb-3">
-                ملخص الفاتورة ({cartSummary.totalQty} قطع)
+              <h3 className="text-sm font-extrabold text-fg border-b border-line pb-3 flex items-center justify-between">
+                <span>ملخص الفاتورة ({cartSummary.totalQty} قطع)</span>
+                {siteSettings.enableTrustBadges !== false && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-black">
+                    👁️ معاينة قبل الدفع
+                  </span>
+                )}
               </h3>
+
+              {renderFreeShippingProgressBar()}
 
               <div className="space-y-2.5 max-h-60 overflow-y-auto pl-1">
                 {cartSummary.items.map(item => (
@@ -8020,10 +10333,59 @@ export default function App() {
                 )}
               </div>
 
+              {/* Refer-a-Friend ("هات صاحبك") Code Input inside Checkout — ONLY shown on the customer's very first order! */}
+              {siteSettings.enableReferralProgram !== false && !hasClientAlreadyUsedReferral && (
+                <div className="space-y-1.5 pt-1 border-t border-line">
+                  <label className="text-[11px] font-extrabold text-fg flex items-center gap-1">
+                    <span>🤝 كود دعوة صديق ("هات صاحبك" — مكافأة في المحفظة لك ولصديقك):</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={referralCodeInput}
+                      onChange={e => setReferralCodeInput(e.target.value)}
+                      placeholder="مثال: REF-10123 أو رقم موبايل صديقك..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-line text-xs font-mono uppercase font-bold"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleApplyReferralCode(referralCodeInput)}
+                      className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black"
+                    >
+                      ربط الدعوة
+                    </button>
+                  </div>
+                  {appliedReferralClient && (
+                    <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+                      <span>✓ مرتبط بدعوة صديقك: {appliedReferralClient.name}</span>
+                      <button type="button" onClick={() => setAppliedReferralClient(null)} className="text-rose-500 underline">إلغاء</button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Financial Breakdown */}
               <div className="space-y-2 text-xs pt-2 border-t border-line">
+                {(cartSummary.bundleDiscountTotalBase > 0 || cartSummary.qtyDiscountTotalBase > 0) && (
+                  <div className="flex justify-between text-muted">
+                    <span>إجمالي الأصناف قبل خصم الباقات والكميات:</span>
+                    <span className="font-mono line-through">{formatMoney(cartSummary.subtotalBeforeItemDiscountsBase)}</span>
+                  </div>
+                )}
+                {cartSummary.bundleDiscountTotalBase > 0 && (
+                  <div className="flex justify-between text-amber-600 dark:text-amber-400 font-extrabold">
+                    <span>🎁 خصم الباقة الذكية المقترحة:</span>
+                    <span>-{formatMoney(cartSummary.bundleDiscountTotalBase)}</span>
+                  </div>
+                )}
+                {cartSummary.qtyDiscountTotalBase > 0 && (
+                  <div className="flex justify-between text-cyan-600 dark:text-cyan-400 font-extrabold">
+                    <span>🏷️ خصم الكميات (اشتري أكتر ووفّر):</span>
+                    <span>-{formatMoney(cartSummary.qtyDiscountTotalBase)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-muted">
-                  <span>إجمالي قيمة الأصناف:</span>
+                  <span>صافي قيمة الأصناف:</span>
                   <span className="font-bold">{formatMoney(cartSummary.subtotalBase)}</span>
                 </div>
                 {cartSummary.discountBase > 0 && (
@@ -8034,7 +10396,7 @@ export default function App() {
                 )}
                 <div className="flex justify-between text-muted">
                   <span>مصاريف التوصيل السريع:</span>
-                  <span className="font-bold">{formatMoney(cartSummary.deliveryFeeBase)}</span>
+                  <span className="font-bold">{cartSummary.deliveryFeeBase === 0 ? 'مجاني (0 ج.م) 🎉' : formatMoney(cartSummary.deliveryFeeBase)}</span>
                 </div>
                 {cartSummary.walletDeductedBase > 0 && (
                   <div className="flex justify-between text-accent-text font-bold">
@@ -8046,7 +10408,16 @@ export default function App() {
                   <span>الصافي اللي هتدفعه:</span>
                   <span className="text-blue-600">{formatMoney(cartSummary.finalPayableBase)}</span>
                 </div>
+                {cartSummary.expectedCashbackBase > 0 && (
+                  <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between text-xs font-extrabold text-emerald-600 dark:text-emerald-400 mt-2">
+                    <span>💰 مكافأة كاش باك تضاف لمحفظتك فور الاستلام:</span>
+                    <span>+{formatMoney(cartSummary.expectedCashbackBase)}</span>
+                  </div>
+                )}
               </div>
+
+              {renderSmartCrossSellBundles()}
+              {renderCashierImpulseShelf()}
 
               <button
                 onClick={handlePlaceOrder}
@@ -8077,6 +10448,7 @@ export default function App() {
         email: currentClient.email || '',
         address: currentClient.address || '',
         secondaryAddress: currentClient.secondaryAddress || '',
+        birthDate: currentClient.birthDate || '',
         avatar: currentClient.avatar || 'TF',
         avatarBg: currentClient.avatarBg || 'from-blue-600 to-indigo-700',
         avatarImage: currentClient.avatarImage || ''
@@ -8110,6 +10482,7 @@ export default function App() {
               email: profileForm.email,
               address: profileForm.address,
               secondaryAddress: profileForm.secondaryAddress,
+              birthDate: profileForm.birthDate || '',
               avatar: profileForm.avatar,
               avatarBg: profileForm.avatarBg,
               avatarImage: profileForm.avatarImage
@@ -8117,7 +10490,22 @@ export default function App() {
           : c
       )
     );
-    showToast('بياناتك وعناوينك اتحفظت!', 'success');
+    const updatedCli = {
+      ...currentClient,
+      name: profileForm.name,
+      owner: profileForm.owner,
+      phone: profileForm.phone,
+      email: profileForm.email,
+      address: profileForm.address,
+      secondaryAddress: profileForm.secondaryAddress,
+      birthDate: profileForm.birthDate || '',
+      avatar: profileForm.avatar,
+      avatarBg: profileForm.avatarBg,
+      avatarImage: profileForm.avatarImage
+    };
+    markLocalUpsert('clients', updatedCli);
+    sbUpsert('clients', updatedCli);
+    showToast('بياناتك وتاريخ ميلادك وعناوينك اتحفظت بنجاح!', 'success');
   };
 
   const handleChangeClientPassword = (e) => {
@@ -8928,6 +11316,19 @@ export default function App() {
               />
             </div>
 
+            <div className="sm:col-span-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <label className="font-black text-fg block">🎂 تاريخ الميلاد (للحصول على قسيمة هدية عيد ميلادك تلقائياً):</label>
+                <span className="text-[11px] text-muted">سجّل أو عدّل تاريخ ميلادك ليصلك كوبون هدية خصم خاص في يوم عيد ميلادك!</span>
+              </div>
+              <input
+                type="date"
+                value={profileForm.birthDate || ''}
+                onChange={e => setProfileForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                className="p-2.5 rounded-xl border border-amber-500/40 font-mono font-black text-xs"
+              />
+            </div>
+
             <div className="sm:col-span-2">
               <label className="font-bold text-muted block mb-1">العنوان الأساسي للتوصيل:</label>
               <input
@@ -9106,6 +11507,136 @@ export default function App() {
           >
             <LogOut className="w-4 h-4" /> تسجيل الخروج
           </button>
+        </div>
+
+        {/* Loyalty Tiers (20 Orders Scale + 3-Month Inactivity Rule) & Refer-a-Friend ("هات صاحبك") Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {siteSettings.enableLoyaltyTiers !== false && (
+            <div className="bg-surface rounded-2xl p-5 border-2 border-amber-400/50 shadow-xs space-y-3 text-xs">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{clientLoyaltyInfo.currentTier.icon}</span>
+                  <div>
+                    <div className="text-sm font-black text-fg">
+                      مستوى الولاء الحالي: <span className="text-amber-500">{clientLoyaltyInfo.currentTier.name}</span>
+                    </div>
+                    <div className="text-[11px] text-muted">
+                      {clientLoyaltyInfo.nextTier
+                        ? `أنت ${clientLoyaltyInfo.currentTier.name} ${clientLoyaltyInfo.currentTier.icon} — باقي ${clientLoyaltyInfo.ordersToNextTier} أوردر وتبقى ${clientLoyaltyInfo.nextTier.name} ${clientLoyaltyInfo.nextTier.icon}!`
+                        : 'أنت في أعلى مستوى ولاء (الألماسي 💎) — شحن مجاني دائم وأعلى كاش باك!'}
+                    </div>
+                  </div>
+                </div>
+                <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
+                  طلباتك: {clientLoyaltyInfo.deliveredCount} / {clientLoyaltyInfo.diamondMin} أوردر
+                </span>
+              </div>
+
+              <div className="w-full h-3 bg-surface2 rounded-full overflow-hidden border border-line">
+                <div
+                  className={`h-full bg-gradient-to-r ${clientLoyaltyInfo.currentTier.color} transition-all duration-500`}
+                  style={{ width: `${Math.max(8, clientLoyaltyInfo.progressToDiamondPct)}%` }}
+                />
+              </div>
+
+              <div className="grid grid-cols-4 gap-1.5 text-center text-[10px]">
+                {clientLoyaltyInfo.tiers.map(t => {
+                  const isCurrent = t.id === clientLoyaltyInfo.currentTier.id;
+                  return (
+                    <div
+                      key={t.id}
+                      className={`p-2 rounded-xl border ${
+                        isCurrent ? 'bg-amber-400/15 border-amber-400 font-black text-fg' : 'bg-surface2 border-line text-muted font-bold'
+                      }`}
+                    >
+                      <div>{t.icon} {t.name}</div>
+                      <div className="font-mono text-[9px]">{t.minOrders}+ أوردر</div>
+                      <div className="text-[9px] text-emerald-500">{t.freeShipping ? 'شحن مجاني' : `+${t.bonusCashbackPct}% كاش باك`}</div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {clientLoyaltyInfo.wasDowngraded ? (
+                <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-500 font-bold text-[11px]">
+                  ⚠️ نزل مستواك درجة واحدة لمرور أكثر من 3 شهور ({clientLoyaltyInfo.daysSinceLastOrder} يوم) بدون طلبات. اطلب الآن لاستعادة مستواك فوراً!
+                </div>
+              ) : (
+                <div className="text-[10px] text-muted font-bold">
+                  💡 ملاحظة: حافظ على طلب واحد على الأقل كل 3 شهور للحفاظ على مستواك ومزايا الكاش باك الإضافية.
+                </div>
+              )}
+            </div>
+          )}
+
+          {siteSettings.enableReferralProgram !== false && (
+            <div className="bg-surface rounded-2xl p-5 border-2 border-emerald-500/40 shadow-xs space-y-3 text-xs flex flex-col justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-black text-fg flex items-center gap-1.5">
+                    <span>🤝</span>
+                    <span>هات صاحبك واكسبوا سوا رصيد في المحفظة!</span>
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-black text-[10px]">
+                    {siteSettings.referralRewardType === 'percentage'
+                      ? `مكافأة ${siteSettings.referralRewardPct || 5}% لكليكما`
+                      : `مكافأة ${siteSettings.referralRewardFixedAmount || 50} ج.م لكليكما`}
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted leading-relaxed">
+                  ابعت كود الدعوة الخاص بك لصاحبك. أول ما يطلب أول أوردر ويستلمه، هينزل في محفظتك ومحفظته رصيد مجاني تلقائياً!
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-surface2 border border-line flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-[10px] text-muted font-bold">كود الدعوة الخاص بك:</div>
+                  <div className="font-mono font-black text-base text-accent-text">
+                    {currentClient.referralCode || `REF-${String(currentClient.phone || '').slice(-5)}`}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const myCode = currentClient.referralCode || `REF-${String(currentClient.phone || '').slice(-5)}`;
+                      try { navigator.clipboard.writeText(myCode); } catch (e) {}
+                      showToast(`📋 تم نسخ كود الدعوة (${myCode})!`, 'success');
+                    }}
+                    className="px-3 py-2 rounded-xl bg-surface border border-line font-black text-[11px]"
+                  >
+                    نسخ الكود
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const myCode = currentClient.referralCode || `REF-${String(currentClient.phone || '').slice(-5)}`;
+                      const shareUrl = `${window.location.origin}/?ref=${myCode}`;
+                      const rewardTxt = siteSettings.referralRewardType === 'percentage'
+                        ? `${siteSettings.referralRewardPct || 5}%`
+                        : `${siteSettings.referralRewardFixedAmount || 50} ج.م`;
+                      const waText = `جرب تطلب من موقع ${siteSettings.storeName || 'ELZOGHBI'} واستخدم كود الدعوة بتاعي (${myCode}) عشان ناخد إحنا الاتنين هدية ${rewardTxt} في المحفظة! ${shareUrl}`;
+                      window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank');
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px]"
+                  >
+                    📲 ابعت لصاحبك واتساب
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] pt-1 border-t border-line">
+                <span className="text-muted font-bold">🎂 تاريخ ميلادك المسجل لهدايا المناسبات: <b className="font-mono text-fg">{currentClient.birthDate || '1996-12-30'}</b></span>
+                <button
+                  type="button"
+                  onClick={() => setFamilyModalOpen(true)}
+                  className="text-accent-text font-black hover:underline"
+                >
+                  👨‍👩‍👧‍👦 أجهزتي وعائلتي ({activeFamilyDevices.length})
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Account Navigation Layout (Sidebar + Main Panel) */}
@@ -9317,8 +11848,11 @@ export default function App() {
       );
     }
 
+    const totalRestockAlertsCount = (Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.length : 0) || parts.reduce((acc, p) => acc + (Number(p.waitlistCount) || 0), 0);
     const navItems = [
       { id: 'overview', label: 'الرئيسية والإحصائيات', icon: TrendingUp, badge: null },
+      { id: 'feature_flags', label: 'مركز المميزات الخارق (Feature Flags)', icon: Sparkles, badge: 'خارق 🚀' },
+      { id: 'restock_alerts', label: 'تنبيهات نبهني عند التوفر (المنتجات المنتظرة)', icon: Bell, badge: totalRestockAlertsCount > 0 ? `${totalRestockAlertsCount} منتظر` : 0 },
       { id: 'orders', label: 'الطلبات والفواتير اللحظية', icon: ClipboardList, badge: orders.length },
       { id: 'clients', label: 'إدارة الحسابات وطلبات التسجيل', icon: Users, badge: pendingReqCount > 0 ? `${pendingReqCount} جديد` : clients.length },
       { id: 'returns', label: 'المرتجعات والشكاوى', icon: RotateCcw, badge: pendingRetCount > 0 ? pendingRetCount : null },
@@ -9332,10 +11866,10 @@ export default function App() {
       { id: 'schema', label: 'مخطط قاعدة البيانات (Schema)', icon: Cpu, badge: null }
     ];
 
-const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات والفواتير', clients: 'العملاء والحسابات', returns: 'المرتجعات والشكاوى', sourcing: 'طلبات من برّه', catalog: 'المنتجات والموديلات', quick_stock: 'المخزن (جرد سريع)', groups: 'الأسعار والتوصيل', storefront_cms: 'إعلانات الواجهة', promos: 'كوبونات الخصم', site_settings: 'إعدادات الموقع', schema: 'قاعدة البيانات' };
-    const adminNavDesc = { overview: 'ملخص اللي بيحصل دلوقتي', orders: 'استلام الطلبات وتجهيزها وطباعة الفواتير', clients: 'العملاء وطلبات فتح الحساب', returns: 'مراجعة المرتجعات والرد على الشكاوى', sourcing: 'طلبات المنتجات من برّه والشات مع العملاء', catalog: 'الماركات والموديلات وإضافة المنتجات', quick_stock: 'تعديل الكميات والأسعار بسرعة', groups: 'أسعار وتوصيل كل مجموعة عملاء', storefront_cms: 'الإعلانات والأقسام المميزة', promos: 'أكواد الخصم', site_settings: 'الدفع والإعلانات النصية والشروط', schema: 'هيكل قاعدة البيانات' };
+const adminShortLabels = { overview: 'الرئيسية', feature_flags: '🚀 تحكم المميزات (Feature Flags)', restock_alerts: '🔔 تنبيهات نبهني عند التوفر', orders: 'الطلبات والفواتير', clients: 'العملاء والحسابات', returns: 'المرتجعات والشكاوى', sourcing: 'طلبات من برّه', catalog: 'المنتجات والموديلات', quick_stock: 'المخزن (جرد سريع)', groups: 'الأسعار والتوصيل', storefront_cms: 'إعلانات الواجهة', promos: 'كوبونات الخصم', site_settings: 'إعدادات الموقع', schema: 'قاعدة البيانات' };
+    const adminNavDesc = { overview: 'ملخص اللي بيحصل دلوقتي', feature_flags: 'تشغيل وإيقاف وتخصيص كل ميزات زيادة المبيعات والكاش باك والولاء وعجلة الحظ بضغطة زر', restock_alerts: 'كل المنتجات التي سجل العملاء أرقامهم لتنبيههم على واتساب فور توفرها في مكان واحد', orders: 'استلام الطلبات وتجهيزها وطباعة الفواتير', clients: 'العملاء وطلبات فتح الحساب', returns: 'مراجعة المرتجعات والرد على الشكاوى', sourcing: 'طلبات المنتجات من برّه والشات مع العملاء', catalog: 'الماركات والموديلات وإضافة المنتجات', quick_stock: 'تعديل الكميات والأسعار بسرعة', groups: 'أسعار وتوصيل كل مجموعة عملاء', storefront_cms: 'الإعلانات والأقسام المميزة', promos: 'أكواد الخصم', site_settings: 'الدفع والإعلانات النصية والشروط', schema: 'هيكل قاعدة البيانات' };
     const adminNavGroups = [
-      { title: 'الشغل اليومي', ids: ['overview', 'orders', 'clients', 'returns', 'sourcing'] },
+      { title: 'الشغل اليومي', ids: ['overview', 'feature_flags', 'restock_alerts', 'orders', 'clients', 'returns', 'sourcing'] },
       { title: 'المنتجات والمخزن', ids: ['catalog', 'quick_stock', 'groups'] },
       { title: 'الموقع والعروض', ids: ['storefront_cms', 'promos', 'site_settings'] },
       { title: 'النظام', ids: ['schema'] }
@@ -9522,6 +12056,20 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-xs relative">
+                {/* Admin Sound & Browser Notification Toggle Button */}
+                <button
+                  type="button"
+                  onClick={handleToggleSoundAndRequestPermission}
+                  className={`px-3 py-2 rounded-xl font-black flex items-center gap-1.5 border transition ${
+                    soundAlertsEnabled
+                      ? 'bg-emerald-500/15 text-emerald-500 border-emerald-500/40'
+                      : 'bg-surface2 text-muted border-line opacity-75'
+                  }`}
+                  title="تشغيل أو كتم الصوت وإشعارات المتصفح للطلبات والتنبيهات الجديدة"
+                >
+                  <span>{soundAlertsEnabled ? '🔊 الصوت والإشعارات: مفعّل' : '🔇 الصوت: صامت'}</span>
+                </button>
+
                 {/* Master Platform Theme Switcher (Admin Dashboard Exclusive) */}
                 <button
                   type="button"
@@ -9720,6 +12268,8 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
           </div>
 
           {adminTab === 'overview' && renderAdminOverview()}
+          {adminTab === 'feature_flags' && renderAdminFeatureFlagsDashboard()}
+          {adminTab === 'restock_alerts' && renderAdminRestockAlertsView()}
           {adminTab === 'site_settings' && renderAdminSiteSettings()}
           {adminTab === 'storefront_cms' && renderAdminStorefrontCms()}
           {adminTab === 'promos' && renderAdminPromoCodes()}
@@ -10010,7 +12560,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                   onChange={e => setSiteSettings(prev => ({ ...prev, showHomeModels: e.target.checked }))}
                   className="w-4 h-4 accent-emerald-600"
                 />
-                إظهار موديلات الموبايلات (في الرئيسية وفي فلتر البحث)
+                إظهار الأقسام والموديلات (في الرئيسية وفي فلتر البحث)
               </label>
               <p className="text-muted">بعد التعديل دوس على "حفظ" عشان يتسجّل.</p>
             </div>
@@ -10475,10 +13025,12 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
     const pendingRegCount = accountRequests.filter(r => r.status === 'pending').length;
     const reviewRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
     const lowStockCount = parts.filter(pt => pt.stock <= (pt.lowStockThreshold || 0)).length;
+    const restockAlertsCount = (Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.length : 0) || parts.reduce((s, p) => s + (Number(p.waitlistCount) || 0), 0);
     const shortcuts = [
       { tab: 'orders', label: 'طلبات جديدة', n: newOrdersCount, hint: 'محتاجة تجهيز', tone: 'blue' },
+      { tab: 'restock_alerts', label: '🔔 نبهني عند التوفر', n: restockAlertsCount, hint: 'عملاء منتظرين منتجات', tone: 'amber' },
       { tab: 'clients', label: 'طلبات فتح حساب', n: pendingRegCount, hint: 'مستنية موافقتك', tone: 'amber' },
-      { tab: 'returns', label: 'مرتجعات', n: reviewRetCount, hint: 'محتاجة مراجعة', tone: 'rose' },
+      { tab: 'returns', label: 'مرتجعات وضمان', n: reviewRetCount, hint: 'محتاجة مراجعة', tone: 'rose' },
       { tab: 'quick_stock', label: 'نواقص المخزن', n: lowStockCount, hint: 'خلصت أو قربت تخلص', tone: 'violet' },
       { tab: 'sourcing', label: 'طلبات من برّه', n: sourcingRequests.filter(r => r.status === 'جديد' && !r.closed).length, hint: 'مستنية ردك', tone: 'cyan' }
     ];
@@ -10496,7 +13048,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       {/* Quick Shortcuts */}
       <div>
         <div className="text-sm font-extrabold text-fg mb-2">محتاج اهتمامك دلوقتي</div>
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-3">
           {shortcuts.map(sc => (
             <button
               key={sc.tab}
@@ -11006,8 +13558,18 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                   </span>
                   <div>
                     <div className="text-sm font-extrabold text-fg">{order.clientName}</div>
-                    <div className="text-xs text-muted">
-                      {order.createdAt} • إجمالي القطع: <b>{totalPieces}</b> • الدفع: {order.paymentMethod} • {order.address}
+                    <div className="text-xs text-muted flex flex-wrap items-center gap-2">
+                      <span>{order.createdAt} • إجمالي القطع: <b>{totalPieces}</b> • الدفع: {order.paymentMethod} • {order.address}</span>
+                      {Number(order.cashbackAmountBase) > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 font-black text-[10px]">
+                          💰 أُضيف كاش باك للمحفظة: +{order.cashbackAmountBase} ج.م ✓
+                        </span>
+                      )}
+                      {Number(order.expectedCashbackBase) > 0 && !order.cashbackAwarded && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 font-black text-[10px]">
+                          ⏳ كاش باك منتظر عند التسليم: +{order.expectedCashbackBase} ج.م
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -11138,7 +13700,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         compatibleModels: [modelObj.name],
         searchAliases: `${generatedName} ${modelObj.name} ${modelObj.aliases || ''} ${tpl.category}`,
         description: `${generatedName} — متوافق مع ${modelObj.name} (${tpl.qualityGrade}).`,
-        warrantyText: tpl.warrantyText || 'ضمان تجربة قبل اللزق والتركيب',
+        warrantyText: tpl.warrantyText || 'ضمان معاينة وتجربة المنتج بحالته الأصلية',
         image: PART_IMAGES[tpl.imageKey] || modelObj.image || PART_IMAGES.screen,
         stock: Number(tpl.defaultStock) || 10,
         lowStockThreshold: Number(tpl.lowStockThreshold) || 5,
@@ -11168,7 +13730,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
       const generated = generateTemplatePartsForModel(newMdl);
       setParts(prev => [...generated, ...prev]);
       showToast(
-        `تم إضافة موديل "${newMdl.name}" بصورته وتوليد ${generated.length} قطع غيار من التمبلت تلقائياً!`,
+        `تم إضافة القسم/الموديل "${newMdl.name}" بصورته وتوليد ${generated.length} منتجات من القالب تلقائياً!`,
         'success'
       );
     } else {
@@ -11196,7 +13758,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
     }
     setParts(prev => [...missingParts, ...prev]);
     showToast(
-      `تم تنزيل وإضافة ${missingParts.length} قطع غيار ناقصة من التمبلت إلى موديل "${modelObj.name}"!`,
+      `تم تنزيل وإضافة ${missingParts.length} منتجات من القالب إلى "${modelObj.name}"!`,
       'success'
     );
   };
@@ -11220,7 +13782,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
   const handleDeleteModel = (modelObj) => {
     const childCount = parts.filter(p => String(p.modelId) === String(modelObj.id)).length;
     askConfirmDelete(
-      'حذف الموديل وجميع قطع غياره',
+      'حذف القسم/الموديل وجميع منتجاته',
       `هل أنت متأكد من حذف موديل "${modelObj.name}" وجميع قطع الغيار التابعة له (${childCount} قطعة) بشكل نهائي؟`,
       () => {
         setModels(prev => prev.filter(m => m.id !== modelObj.id));
@@ -11756,7 +14318,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                       qualityGrade: 'أصلي توكيل Service Pack',
                                       colorsText: 'أسود, أبيض',
                                       compatibleText: model.name,
-                                      warrantyText: 'ضمان تجربة 14 يوم قبل اللزق',
+                                      warrantyText: 'ضمان معاينة وتجربة 14 يوم بحالته الأصلية',
                                       imageKey: 'screen',
                                       customImage: '',
                                       imagesList: [],
@@ -11979,6 +14541,50 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                                 </button>
                                                 <button
                                                   type="button"
+                                                  onClick={(e) => togglePartCashback(part, e)}
+                                                  className={`px-2.5 py-1 rounded-lg text-[11px] font-black border transition ${
+                                                    isPartCashbackEnabled(part)
+                                                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                                                      : 'bg-surface2 hover:border-emerald-500 text-muted border-line'
+                                                  }`}
+                                                  title={isPartCashbackEnabled(part) ? `الكاش باك مفعّل (${getPartCashbackPct(part)}%) — اضغط لإيقافه فوراً` : 'الكاش باك متوقف عن هذا المنتج (اضغط لتفعيله فوراً)'}
+                                                >
+                                                  {isPartCashbackEnabled(part) ? `💰 كاش باك ${getPartCashbackPct(part)}% ✓` : '💰 بدون كاش باك'}
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => togglePartVipOnly(part, e)}
+                                                  className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
+                                                    isPartVipOnly(part)
+                                                      ? 'bg-amber-400 text-slate-950 border-amber-500 shadow-xs'
+                                                      : 'bg-surface2 hover:border-amber-400 text-muted border-line'
+                                                  }`}
+                                                  title="تخصيص المنتج للرابط السري للـ VIP فقط"
+                                                >
+                                                  {isPartVipOnly(part) ? '👑 VIP ✓' : '👑 VIP'}
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => togglePartCashierPin(part, e)}
+                                                  className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
+                                                    isPartPinnedToCashier(part)
+                                                      ? 'bg-cyan-500 text-slate-950 border-cyan-400 shadow-xs'
+                                                      : 'bg-surface2 hover:border-cyan-400 text-muted border-line'
+                                                  }`}
+                                                  title="إظهار أو تثبيت هذا المنتج في رف الكاشير السريع داخل السلة والدفع"
+                                                >
+                                                  {isPartPinnedToCashier(part) ? '🛒 رف الكاشير ✓' : '🛒 كاشير'}
+                                                </button>
+                                                <button
+                                                  type="button"
+                                                  onClick={(e) => { e.stopPropagation(); setAdminRestockWhatsappPart(part); }}
+                                                  className="px-2 py-1 rounded-lg text-[11px] font-extrabold border bg-surface2 hover:border-cyan-400 text-cyan-500 border-line"
+                                                  title="إرسال رسالة واتساب للعملاء المنتظرين توفر هذا المنتج"
+                                                >
+                                                  📲 منتظرين ({(Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.filter(w => String(w.partId) === String(part.id)).length : 0) || part.waitlistCount || 0})
+                                                </button>
+                                                <button
+                                                  type="button"
                                                   onClick={(e) => handleToggleTargetedAdPart(part, e)}
                                                 className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
                                                   part.isPromotedAd
@@ -11991,14 +14597,20 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                                               </button>
                                               <button
                                                   onClick={() =>
-                                                    setEditingPartObj({
-                                                      ...part,
-                                                      oldPrice: part.oldPrice || part.customGroupPrices?._oldPrice || siteSettings?.partExtraMeta?.[part.id]?.oldPrice || '',
-                                                      hidden: isPartHidden(part),
-                                                      colorsText: (part.colors || []).join(', '),
-                                                      compatibleText: (part.compatibleModels || []).join(', '),
-                                                      imagesList: getPartImagesList(part)
-                                                    })
+                                                      setEditingPartObj({
+                                                        ...part,
+                                                        oldPrice: part.oldPrice || part.customGroupPrices?._oldPrice || siteSettings?.partExtraMeta?.[part.id]?.oldPrice || '',
+                                                        cashbackEnabled: isPartCashbackEnabled(part),
+                                                        cashbackPct: getPartCashbackPct(part),
+                                                        isVipOnly: isPartVipOnly(part),
+                                                        vipPrice: part.vipPrice || part.customGroupPrices?._vipPrice || siteSettings?.partExtraMeta?.[part.id]?.vipPrice || '',
+                                                        tierFirstClassPrice: part.tierFirstClassPrice || part.customGroupPrices?._tierFirstClassPrice || '',
+                                                        tierEconomyPrice: part.tierEconomyPrice || part.customGroupPrices?._tierEconomyPrice || '',
+                                                        hidden: isPartHidden(part),
+                                                        colorsText: (part.colors || []).join(', '),
+                                                        compatibleText: (part.compatibleModels || []).join(', '),
+                                                        imagesList: getPartImagesList(part)
+                                                      })
                                                   }
                                                 className="p-1.5 rounded-lg bg-surface2 hover:bg-surface text-muted hover:text-accent-text transition"
                                                 title="تعديل بيانات وصورة القطعة"
@@ -12205,7 +14817,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               <tr className="bg-surface2 text-muted border-b border-line">
                 <th className="p-3">#</th>
                 <th className="p-3">SKU</th>
-                <th className="p-3">اسم قطعة الغيار</th>
+                <th className="p-3">اسم المنتج</th>
                 <th className="p-3">الكمية المتاحة</th>
                 <th className="p-3">حد النواقص</th>
                 <th className="p-3">سعر التكلفة (ج.م)</th>
@@ -12294,6 +14906,30 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                       </span>
                     </td>
                     <td className="p-3">
+                      <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => togglePartCashback(part, e)}
+                        className={`px-2.5 py-1.5 rounded-lg border font-black whitespace-nowrap ${
+                          isPartCashbackEnabled(part)
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-surface text-muted border-line hover:border-emerald-500'
+                        }`}
+                      >
+                        {isPartCashbackEnabled(part) ? `💰 كاش باك ${getPartCashbackPct(part)}% ✓` : '💰 بدون كاش باك'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => togglePartCashierPin(part, e)}
+                        className={`px-2.5 py-1.5 rounded-lg border font-extrabold whitespace-nowrap ${
+                          isPartPinnedToCashier(part)
+                            ? 'bg-cyan-500 text-slate-950 border-cyan-400'
+                            : 'bg-surface text-muted border-line hover:border-cyan-400'
+                        }`}
+                        title="تثبيت في رف الكاشير السريع"
+                      >
+                        {isPartPinnedToCashier(part) ? '🛒 كاشير ✓' : '🛒 كاشير'}
+                      </button>
                       <button
                         type="button"
                         onClick={(e) => handleToggleTargetedAdPart(part, e)}
@@ -12306,6 +14942,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                       >
                         {part.isPromotedAd ? '⭐ مميز ✓' : '⭐ نجمة'}
                       </button>
+                      </div>
                     </td>
                     <td className="p-3">
                       <button
@@ -13037,8 +15674,1152 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
     }
   };
 
+  const [repurchaseShowAllMode, setRepurchaseShowAllMode] = useState(true);
+
+  // Dedicated Admin View for all "نبهني عند التوفر" Product Requests in One Place (Fix 5)
+  const renderAdminRestockAlertsView = () => {
+    const rawWaitlist = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    const groupedByPartMap = new Map();
+
+    rawWaitlist.forEach(entry => {
+      if (!entry) return;
+      const pid = String(entry.partId || 'unknown');
+      if (!groupedByPartMap.has(pid)) {
+        const foundPart = parts.find(p => String(p.id) === pid);
+        groupedByPartMap.set(pid, {
+          partId: pid,
+          partName: entry.partName || foundPart?.name || 'منتج مطلوب',
+          partSku: entry.partSku || foundPart?.sku || '',
+          partObj: foundPart || null,
+          entries: []
+        });
+      }
+      groupedByPartMap.get(pid).entries.push(entry);
+    });
+
+    // Also include any part that has waitlistCount > 0 even if no individual phone row was stored yet
+    parts.forEach(p => {
+      const pid = String(p.id);
+      if ((Number(p.waitlistCount) || 0) > 0 && !groupedByPartMap.has(pid)) {
+        groupedByPartMap.set(pid, {
+          partId: pid,
+          partName: p.name,
+          partSku: p.sku || '',
+          partObj: p,
+          entries: []
+        });
+      }
+    });
+
+    const groupedProducts = Array.from(groupedByPartMap.values()).sort(
+      (a, b) => (b.entries.length || Number(b.partObj?.waitlistCount) || 0) - (a.entries.length || Number(a.partObj?.waitlistCount) || 0)
+    );
+
+    return (
+      <div className="space-y-5 text-xs">
+        <div className="bg-gradient-to-r from-nav via-nav2 to-nav text-white rounded-3xl p-6 border-2 border-amber-400/50 shadow-xl flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
+              🔔 مركز تنبيهات "نبّهني عند التوفر" الموحد
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-amber-300 mt-2">
+              جميع المنتجات المنتظرة وطلبات العملاء ({rawWaitlist.length} طلب مسجل في {groupedProducts.length} منتج)
+            </h2>
+            <p className="text-xs text-slate-300 mt-1">
+              هنا تجد كل المنتجات التي نفدت كميتها وضغط العملاء عليها "نبّهني لما يرجع"، مع إمكانية تزويد المخزون وإرسال رسائل واتساب للعملاء بضغطة زر واحدة.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {rawWaitlist.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setAdminRestockWhatsappPart({ id: 'ALL', name: 'كل قوائم الانتظار' })}
+                className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black"
+              >
+                📲 إرسال واتساب جماعي لكل القائمة ({rawWaitlist.length})
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setAdminTab('feature_flags')}
+              className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20"
+            >
+              🚀 فتح تحكم المميزات
+            </button>
+          </div>
+        </div>
+
+        {groupedProducts.length === 0 ? (
+          <div className="bg-surface rounded-2xl p-10 border border-line text-center space-y-3">
+            <div className="text-4xl">🔔</div>
+            <div className="text-base font-black text-fg">لا توجد طلبات "نبّهني عند التوفر" حالياً</div>
+            <p className="text-xs text-muted max-w-md mx-auto">
+              عندما ينفد أي منتج (الكمية = 0) ويضغط العميل على زر "🔔 نبّهني لما يرجع" ويسجل اسمه ورقمه، سيظهر لك المنتج وبيانات العميل هنا فوراً مع تنبيه صوتي.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4">
+            {groupedProducts.map(grp => {
+              const pObj = grp.partObj;
+              const currentStock = Number(pObj?.stock) || 0;
+              const waitCount = Math.max(grp.entries.length, Number(pObj?.waitlistCount) || 0);
+              return (
+                <div key={grp.partId} className="bg-surface rounded-2xl p-5 border-2 border-line hover:border-amber-400/50 transition space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={pObj?.image || PART_IMAGES.screen}
+                        alt={grp.partName}
+                        className="w-14 h-14 rounded-xl object-contain bg-surface2 border border-line p-1 shrink-0"
+                      />
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="text-sm sm:text-base font-black text-fg">{grp.partName}</h3>
+                          <span className="px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-500 font-black text-[11px]">
+                            🔔 {waitCount} عميل منتظر
+                          </span>
+                          <span className={`px-2.5 py-0.5 rounded-full font-black text-[11px] ${
+                            currentStock > 0 ? 'bg-emerald-500/15 text-emerald-500' : 'bg-rose-500/15 text-rose-500'
+                          }`}>
+                            {currentStock > 0 ? `متوفر الآن بالمخزن (${currentStock} قطعة)` : 'الكمية بالمخزن: 0 (غير متوفر)'}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-muted mt-1">
+                          كود الصنف: <span className="font-mono font-bold">{grp.partSku || grp.partId}</span>
+                          {pObj && <span> • السعر الأساسي: <b className="text-fg">{formatMoney(pObj.basePrice)}</b></span>}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {pObj && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const nextStock = (Number(pObj.stock) || 0) + 10;
+                            setParts(prev => prev.map(x => {
+                              if (String(x.id) !== String(pObj.id)) return x;
+                              const up = { ...x, stock: nextStock, soldOut: false };
+                              markLocalUpsert('parts', up);
+                              sbUpsert('spare_parts', up);
+                              return up;
+                            }));
+                            showToast(`✅ تم تزويد رصيد "${pObj.name}" بـ +10 قطع (الرصيد الآن: ${nextStock})! يمكنك الآن إرسال واتساب للمنتظرين.`, 'success');
+                          }}
+                          className="px-3 py-2 rounded-xl bg-accent text-accent-ink font-black text-[11px]"
+                        >
+                          + تزويد المخزون (+10 سريع)
+                        </button>
+                      )}
+                      {grp.entries.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setAdminRestockWhatsappPart({ id: grp.partId, name: grp.partName })}
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px]"
+                        >
+                          📲 مراسلة كل منتظري هذا المنتج ({grp.entries.length})
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          saveSiteSettingsImmediate(prev => ({
+                            ...prev,
+                            restockWaitlist: (Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : []).filter(w => String(w.partId) !== String(grp.partId))
+                          }));
+                          if (pObj) {
+                            setParts(prev => prev.map(x => (String(x.id) === String(pObj.id) ? { ...x, waitlistCount: 0 } : x)));
+                          }
+                          showToast(`تم مسح قائمة الانتظار الخاصة بـ "${grp.partName}".`, 'info');
+                        }}
+                        className="px-3 py-2 rounded-xl bg-rose-500/15 text-rose-500 hover:bg-rose-600 hover:text-white font-bold text-[11px]"
+                      >
+                        مسح القائمة
+                      </button>
+                    </div>
+                  </div>
+
+                  {grp.entries.length === 0 ? (
+                    <div className="p-3 rounded-xl bg-surface2 text-muted font-bold">
+                      يوجد عداد انتظار ({waitCount}) على هذا المنتج. الطلبات الجديدة ستظهر هنا بالاسم ورقم الواتساب والتاريخ.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                      {grp.entries.map(entry => (
+                        <div key={entry.id} className="p-3 rounded-xl bg-surface2 border border-line flex items-center justify-between gap-2">
+                          <div>
+                            <div className="font-black text-fg">{entry.clientName}</div>
+                            <div className="font-mono font-bold text-accent-text text-[11px]">{entry.phone}</div>
+                            <div className="text-[10px] text-muted">{entry.createdAt}</div>
+                          </div>
+                          <div className="flex flex-col items-end gap-1">
+                            {entry.notified && (
+                              <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[9px] font-bold">تم الإرسال ✓</span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => sendAdminRestockWhatsappToEntry(entry)}
+                              className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px]"
+                            >
+                              📲 واتساب
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAdminFeatureFlagsDashboard = () => {
+    const cashbackEnabledPartsCount = parts.filter(p => isPartCashbackEnabled(p)).length;
+    const vipOnlyPartsCount = parts.filter(p => isPartVipOnly(p)).length;
+    const pinnedCashierCount = parts.filter(p => isPartPinnedToCashier(p)).length;
+    const waitlistEntries = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    const totalCouponUses = Math.max(
+      Number(siteSettings.analyticsCouponsUsedCount) || 0,
+      promoCodes.reduce((acc, p) => acc + (Number(p.usedCount) || 0), 0)
+    );
+    const totalCashbackPaid = clients.reduce((acc, c) => acc + (Number(c.cashbackEarned) || 0), 0);
+    const recoveredCount = Number(siteSettings.analyticsRecoveredCartsCount) || 0;
+    const recoveredVal = Number(siteSettings.analyticsRecoveredCartsValue) || 0;
+    const secretVipUrl = `${window.location.origin}/?vip=${encodeURIComponent(siteSettings.vipSecretToken || 'elzoghbi-vip')}`;
+
+    const minDaysForRepurchase = repurchaseShowAllMode ? 0 : Math.max(30, (Number(siteSettings.repurchaseReminderMonths) || 6) * 30);
+    const repurchaseCandidates = orders
+      .filter(o => o.status === 'تم التسليم')
+      .flatMap(o => {
+        const cli = clients.find(c => String(c.id) === String(o.clientId));
+        const phone = o.clientPhone || cli?.phone || '';
+        const ordTs = Date.parse(String(o.createdAt || '').replace(' ', 'T'));
+        const daysAgo = !Number.isNaN(ordTs) ? Math.max(0, Math.floor((Date.now() - ordTs) / (1000 * 60 * 60 * 24))) : 185;
+        if (daysAgo < minDaysForRepurchase) return [];
+        return (o.items || []).map(it => ({
+          id: `${o.id}_${it.partId}`,
+          orderId: o.id,
+          clientName: o.clientName || cli?.name || 'عميل',
+          phone,
+          itemName: it.name,
+          daysAgo,
+          createdAt: o.createdAt
+        }));
+      });
+
+    const flagSwitches = [
+      { key: 'enableLiveSocialProof', icon: '🔔', title: '1. إشعارات المبيعات الحية (Live Social Proof)', desc: 'عرض إشعارات فورية للزوار بالطلبات الجديدة والمحاكاة التلقائية' },
+      { key: 'enableSpinToWin', icon: '🎰', title: '2. عجلة الحظ للزوار الجدد (Spin-to-Win)', desc: 'عجلة هدايا تفاعلية تظهر مرة واحدة لكل زائر جديد وتحفظ الكوبون' },
+      { key: 'enableFreeShippingBar', icon: '🚚', title: '3. شريط الشحن المجاني التفاعلي + Confetti', desc: 'حساب المبلغ المتبقي للشحن المجاني داخل السلة وتصفير الشحن تلقائياً' },
+      { key: 'enableSmartCrossSell', icon: '🎁', title: '4. اقتراحات الباقات الذكية داخل السلة (Cross-Sell)', desc: 'اقتراح منتجات مكملة بخصم باقة فوري يُخصم مباشرة من الفاتورة' },
+      { key: 'enableWalletCashback', icon: '💰', title: '5. نظام الكاش باك الانتقائي في المحفظة', desc: 'إضافة رصيد كاش باك للمحفظة عند تسليم الطلب فقط للمنتجات المحددة' },
+      { key: 'enableQualityTiers', icon: '✨', title: '6. اختيار الجودة (أصلي / فرز أول / اقتصادي)', desc: 'عرض 3 درجات جودة بأسعار مختلفة لنفس المنتج داخل كارت المنتج' },
+      { key: 'enableTrustBadges', icon: '🤝', title: '7. عناصر الثقة والاستعجال (Trust & Scarcity)', desc: 'إظهار الدفع عند الاستلام ومعاينة قبل الدفع وباقي X قطع في المخزن' },
+      { key: 'enableExitIntentPopup', icon: '✋', title: '8. نافذة الخروج الذكية (بعد دخول السلة فقط)', desc: 'تظهر فقط إذا أضاف العميل منتجات للسلة وحاول الخروج من المتجر' },
+      { key: 'enableBuyMoreSaveMore', icon: '🏷️', title: '9. اشتري أكتر ووفّر (خصم الكميات)', desc: 'خصم 5% عند شراء قطعتين و10% عند شراء 3 قطع أو أكثر تلقائياً' },
+      { key: 'enableCashierImpulse', icon: '🛒', title: '10. رف الكاشير السريع قبل الدفع', desc: 'عرض المنتجات التي تحددها يدوياً أو الأقل من السقف السعري في السلة والدفع' },
+      { key: 'enableLoyaltyTiers', icon: '🏆', title: '11. مستويات الولاء (برونزي / فضي / ذهبي / ألماسي)', desc: 'سلم ولاء حتى 20 أوردر مع كاش باك إضافي ونزول تلقائي بعد 3 شهور خمول' },
+      { key: 'enableFamilySavedDevices', icon: '👨‍👩‍👧‍👦', title: '12. اختياراتي وعائلتي (إشعارات المنتجات الجديدة)', desc: 'حفظ العميل لأقسامه المفضلة وتلقي إشعار فور إضافة منتج جديد' },
+      { key: 'enableRepurchaseReminders', icon: '🔄', title: '13. تذكير إعادة الشراء بعد 6 شهور عبر واتساب', desc: 'إرسال رسالة تجديد بخصم 10% للعملاء الذين اشتروا منذ 6 شهور' },
+      { key: 'enableVipSecretRoute', icon: '👑', title: '14. الرابط السري لقسم الـ VIP الخاص', desc: 'إخفاء قسم VIP عن الزوار العاديين وفتحه فقط عبر الرابط السري الخاص' },
+      { key: 'enableWarrantyLookup', icon: '🛡️', title: '15. فحص الضمان بالرقم وطلب استبدال', desc: 'صفحة لفحص سريان الضمان برقم الهاتف وتقديم طلب استبدال فوري' },
+      { key: 'enableReferralProgram', icon: '🤝', title: '16. نظام "هات صاحبك" (لأول أوردر فقط)', desc: 'منح رصيد محفظة لصاحب الكود وصديقه فور تسليم أول أوردر، ثم تختفي الخانة' },
+      { key: 'enableBirthdayAndSeasonal', icon: '🎂', title: '17. قسائم أعياد الميلاد والمواسم التلقائية', desc: 'إرسال هدية عيد الميلاد وإدارة تواريخ ميلاد العملاء وعروض المواسم' },
+      { key: 'keepOutOfStockVisible', icon: '📦', title: '18. إبقاء المنتج المنتهي ظاهراً + "نبهني على واتساب"', desc: 'عدم إخفاء المنتج عند نفاد الكمية وإتاحة زر نبهني مرة واحدة لكل عميل' }
+    ];
+
+    const renderCollapsibleHeader = (secKey, icon, title, subtitle, badgeText = '') => {
+      const isOpen = Boolean(openFeatureSections[secKey]);
+      return (
+        <div
+          onClick={() => toggleFeatureSection(secKey)}
+          className="flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none"
+        >
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-base">{icon}</span>
+              <h3 className="text-sm sm:text-base font-black text-fg">{title}</h3>
+              {badgeText && (
+                <span className="px-2.5 py-0.5 rounded-full bg-accent/15 text-accent-text font-black text-[11px]">
+                  {badgeText}
+                </span>
+              )}
+            </div>
+            {subtitle && <p className="text-[11px] text-muted">{subtitle}</p>}
+          </div>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); toggleFeatureSection(secKey); }}
+            className={`w-9 h-9 rounded-xl font-black text-base flex items-center justify-center border transition shrink-0 ${
+              isOpen
+                ? 'bg-accent text-accent-ink border-accent shadow-xs'
+                : 'bg-surface2 text-fg border-line hover:border-accent'
+            }`}
+            title={isOpen ? 'طي القسم (−)' : 'فتح القسم (+)'}
+          >
+            {isOpen ? '−' : '+'}
+          </button>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-4 text-xs">
+        {/* Top Executive Header & Live Analytics Cards */}
+        <div className="bg-gradient-to-r from-nav via-nav2 to-nav text-white rounded-3xl p-6 border-2 border-cyan-400/40 shadow-xl space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
+                🚀 SUPER ADMIN FEATURE FLAGS & CRO CENTER
+              </span>
+              <h2 className="text-xl sm:text-2xl font-black text-cyan-300 mt-2">
+                مركز التحكم المقسّم والمنظم في جميع ميزات الموقع (اضغط + أو − لفتح أو طي أي قسم)
+              </h2>
+              <p className="text-xs text-slate-300 mt-1">
+                كل ميزة مقسمة في مربع مستقل قابل للطي والفتح `[ + / − ]` لسهولة التحكم في الكاش باك، رف الكاشير، أعياد الميلاد، أجهزتي وعائلتي، وتنبيهات التوفر.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenFeatureSections({
+                    flags: true,
+                    cashback: true,
+                    social_spin: true,
+                    cashier_tiers: true,
+                    birthday_seasonal: true,
+                    family_garage: true,
+                    referral_vip: true,
+                    repurchase_waitlist: true
+                  })
+                }
+                className="px-3.5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black"
+              >
+                + فتح كل الأقسام
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenFeatureSections({
+                    flags: false,
+                    cashback: false,
+                    social_spin: false,
+                    cashier_tiers: false,
+                    birthday_seasonal: false,
+                    family_garage: false,
+                    referral_vip: false,
+                    repurchase_waitlist: false
+                  })
+                }
+                className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20"
+              >
+                − طي كل الأقسام
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const nextState = {};
+                  flagSwitches.forEach(f => { nextState[f.key] = true; });
+                  saveSiteSettingsImmediate(prev => ({ ...prev, ...nextState }));
+                  showToast('🚀 تم تشغيل وتفعيل جميع الميزات الـ 18 بالكامل!', 'success');
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black"
+              >
+                ✅ تشغيل كل الميزات
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminTab('restock_alerts')}
+                className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black"
+              >
+                🔔 صفحة نبهني عند التوفر ({waitlistEntries.length})
+              </button>
+            </div>
+          </div>
+
+          {/* 4 Analytics KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-1">
+              <div className="text-[11px] text-cyan-200 font-bold">🛒 السلات المسترجعة (Recovered Carts)</div>
+              <div className="text-2xl font-black text-amber-300">{recoveredCount} سلة</div>
+              <div className="text-[11px] text-emerald-300 font-bold">بقيمة تقديرية: {formatMoney(recoveredVal)}</div>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-1">
+              <div className="text-[11px] text-cyan-200 font-bold">🎟️ الكوبونات المستخدمة (Coupons Used)</div>
+              <div className="text-2xl font-black text-emerald-400">{totalCouponUses} مرة</div>
+              <div className="text-[11px] text-slate-300 font-bold">من إجمالي {promoCodes.length} كود نشط</div>
+            </div>
+            <div className="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-1">
+              <div className="text-[11px] text-cyan-200 font-bold">💰 المنتجات المفعل عليها كاش باك</div>
+              <div className="text-2xl font-black text-cyan-300">{cashbackEnabledPartsCount} / {parts.length}</div>
+              <div className="text-[11px] text-amber-300 font-bold">إجمالي كاش باك ممنوح: {formatMoney(totalCashbackPaid)}</div>
+            </div>
+            <div
+              onClick={() => setAdminTab('restock_alerts')}
+              className="p-4 rounded-2xl bg-white/10 hover:bg-white/20 border border-amber-400/40 space-y-1 cursor-pointer transition"
+            >
+              <div className="text-[11px] text-amber-300 font-bold">🔔 طلبات نبهني عند التوفر (اضغط للفتح)</div>
+              <div className="text-2xl font-black text-rose-300">{waitlistEntries.length} طلب</div>
+              <div className="text-[11px] text-slate-300 font-bold">اضغط لعرض كل المنتجات المنتظرة ←</div>
+            </div>
+          </div>
+        </div>
+
+        {/* BOX 1: 18 One-Click Master Feature Flags Grid */}
+        <div className="bg-surface rounded-2xl p-5 border border-line shadow-xs space-y-4">
+          {renderCollapsibleHeader(
+            'flags',
+            '⚡',
+            '1. مفاتيح التشغيل والإيقاف الفوري للميزات الـ 18 (Feature Flags)',
+            'اضغط على أي مفتاح لتشغيل أو إيقاف الميزة فوراً لدى جميع الزوار',
+            `${flagSwitches.filter(f => siteSettings[f.key] !== false).length} / 18 مفعّل`
+          )}
+          {openFeatureSections.flags && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3 border-t border-line">
+              {flagSwitches.map(f => {
+                const isOn = siteSettings[f.key] !== false;
+                return (
+                  <div
+                    key={f.key}
+                    onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, [f.key]: !isOn }))}
+                    className={`p-3.5 rounded-2xl border-2 cursor-pointer transition flex items-start justify-between gap-3 ${
+                      isOn ? 'bg-emerald-500/10 border-emerald-500/40' : 'bg-surface2 border-line opacity-70'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="font-black text-fg flex items-center gap-1.5">
+                        <span>{f.icon}</span>
+                        <span>{f.title}</span>
+                      </div>
+                      <p className="text-[11px] text-muted leading-relaxed">{f.desc}</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`px-3 py-1 rounded-full font-black text-[10px] shrink-0 ${
+                        isOn ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'
+                      }`}
+                    >
+                      {isOn ? 'مفعّل ✓' : 'متوقف ✕'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* BOX 2: Cashback Control & Instant O(1) Bulk Price Guard */}
+        <div className="bg-surface rounded-2xl p-5 border-2 border-emerald-500/40 space-y-4">
+          {renderCollapsibleHeader(
+            'cashback',
+            '💰',
+            '2. التحكم في الكاش باك الانتقائي وحماية المنتجات الغالية (سريع فوري بدون تهنيج)',
+            'حدد السقف السعري واضغط للتفعيل أو الإيقاف الفوري في أقل من جزء من الثانية، أو تحكم في كل منتج من الكتالوج',
+            `مفعّل على ${cashbackEnabledPartsCount} منتج`
+          )}
+          {openFeatureSections.cashback && (
+            <div className="space-y-3 pt-3 border-t border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-muted block mb-1">نسبة الكاش باك الافتراضية (%):</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="25"
+                    value={siteSettings.defaultCashbackPct ?? 2}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, defaultCashbackPct: Number(e.target.value) || 2 }))}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">سقف سعر المنتج للكاش باك (ج.م):</label>
+                  <input
+                    type="number"
+                    min="50"
+                    step="50"
+                    value={siteSettings.cashbackMaxPartPrice ?? 1500}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, cashbackMaxPartPrice: Number(e.target.value) || 0 }))}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => handleBulkDisableExpensiveCashback(siteSettings.cashbackMaxPartPrice || 1500)}
+                  className="py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm"
+                >
+                  🛡️ إيقاف الكاش باك فوراً عن الأغلى من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleBulkEnableAffordableCashback(siteSettings.cashbackMaxPartPrice || 1500)}
+                  className="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-sm"
+                >
+                  ✅ تفعيل الكاش باك فوراً للأرخص من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م فقط
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 3: Cashier Impulse Shelf Manual Product Picker + Quality Tiers + Buy More Save More */}
+        <div className="bg-surface rounded-2xl p-5 border-2 border-cyan-500/40 space-y-4">
+          {renderCollapsibleHeader(
+            'cashier_tiers',
+            '🛒',
+            '3. التحكم في منتجات رف الكاشير السريع + درجات الجودة + خصم الكميات',
+            'اختر المنتجات التي تظهر في رف الكاشير بنفسك أو حسب السعر، وتحكم في نسب الفرز الأول والاقتصادي',
+            `${pinnedCashierCount} منتج مثبت في الكاشير`
+          )}
+          {openFeatureSections.cashier_tiers && (
+            <div className="space-y-4 pt-3 border-t border-line">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                <div>
+                  <label className="font-bold text-muted block mb-1">نظام عرض رف الكاشير:</label>
+                  <select
+                    value={siteSettings.cashierSelectionMode || 'manual_first'}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, cashierSelectionMode: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-line font-black"
+                  >
+                    <option value="manual_first">المثبت يدوياً أولاً ثم الأقل سعراً</option>
+                    <option value="manual_only">المنتجات المثبتة يدوياً فقط</option>
+                    <option value="auto_price">تلقائي حسب السقف السعري</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">سقف رف الكاشير (ج.م):</label>
+                  <input
+                    type="number"
+                    min="50"
+                    step="50"
+                    value={siteSettings.cashierMaxPrice ?? 1000}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, cashierMaxPrice: Number(e.target.value) || 1000 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">نسبة الفرز الأول (%):</label>
+                  <input
+                    type="number"
+                    min="20"
+                    max="95"
+                    value={siteSettings.tierFirstClassRatio ?? 60}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, tierFirstClassRatio: Number(e.target.value) || 60 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">نسبة الاقتصادي (%):</label>
+                  <input
+                    type="number"
+                    min="10"
+                    max="90"
+                    value={siteSettings.tierEconomyRatio ?? 35}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, tierEconomyRatio: Number(e.target.value) || 35 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">خصم قطعتين (%):</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={siteSettings.qtyTier2DiscountPct ?? 5}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, qtyTier2DiscountPct: Number(e.target.value) || 5 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">خصم 3 قطع+ (%):</label>
+                  <input
+                    type="number"
+                    min="2"
+                    max="60"
+                    value={siteSettings.qtyTier3DiscountPct ?? 10}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, qtyTier3DiscountPct: Number(e.target.value) || 10 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+              </div>
+
+              {/* Manual Cashier Shelf Product Selector */}
+              <div className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="font-black text-fg">
+                    🛒 اختر المنتجات التي تظهر للعميل في "رف الكاشير السريع" (اضغط لتثبيت أو إلغاء تثبيت أي منتج):
+                  </div>
+                  <span className="text-[11px] font-bold text-cyan-500">
+                    مثبت حالياً: {pinnedCashierCount} منتج
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-2 rounded-xl bg-surface border border-line">
+                  {parts.slice(0, 120).map(p => {
+                    const pinned = isPartPinnedToCashier(p);
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={(e) => togglePartCashierPin(p, e)}
+                        className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-1.5 transition ${
+                          pinned
+                            ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-black shadow-xs'
+                            : 'bg-surface2 text-muted border-line hover:text-fg'
+                        }`}
+                      >
+                        <span>{pinned ? '🛒 مثبت ✓' : '+'}</span>
+                        <span>{p.name}</span>
+                        <span className="font-mono text-[10px] opacity-80">({p.basePrice} ج.م)</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 4: Birthday Coupons & Client Birthdays Manager (Fix 6 & Fix 7) */}
+        <div className="bg-surface rounded-2xl p-5 border-2 border-amber-400/50 space-y-4">
+          {renderCollapsibleHeader(
+            'birthday_seasonal',
+            '🎂',
+            '4. إدارة قسيمة عيد الميلاد وتعديل تواريخ ميلاد العملاء + عروض المواسم',
+            'تحكم في كود ونسبة قسيمة عيد الميلاد، وعدّل تاريخ ميلاد أي عميل، وأرسل له هدية عيد ميلاده على واتساب بضغطة زر!',
+            `كود: ${siteSettings.birthdayCouponCode || 'BDAY15'} (-${siteSettings.birthdayDiscountPct || 15}%)`
+          )}
+          {openFeatureSections.birthday_seasonal && (
+            <div className="space-y-4 pt-3 border-t border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="font-bold text-muted block mb-1">كود قسيمة عيد الميلاد:</label>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    value={siteSettings.birthdayCouponCode || 'BDAY15'}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, birthdayCouponCode: e.target.value.toUpperCase() }))}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">نسبة خصم قسيمة عيد الميلاد (%):</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="70"
+                    value={siteSettings.birthdayDiscountPct ?? 15}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, birthdayDiscountPct: Number(e.target.value) || 15 }))}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-muted block mb-1">عدد أيام ظهور الهدية قبل/بعد عيد الميلاد:</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="15"
+                    value={siteSettings.birthdayWindowDays ?? 3}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, birthdayWindowDays: Number(e.target.value) || 3 }))}
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+              </div>
+
+              {/* Seasonal Campaign Toggle */}
+              <div className="p-3 rounded-2xl bg-surface2 border border-line flex flex-wrap items-center justify-between gap-2">
+                <label className="flex items-center gap-2 font-black text-fg cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(siteSettings.seasonalCampaignActive)}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, seasonalCampaignActive: e.target.checked }))}
+                    className="w-4 h-4 accent-amber-500"
+                  />
+                  <span>🌙 تفعيل بنر وكوبون الموسم العام لكل العملاء الآن:</span>
+                </label>
+                <input
+                  type="text"
+                  value={siteSettings.seasonalCampaignName || 'عروض الجمعة البيضاء والموسم 🖤'}
+                  onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, seasonalCampaignName: e.target.value }))}
+                  className="px-3 py-1.5 rounded-xl border border-line font-bold text-xs flex-1 min-w-[180px]"
+                />
+                <input
+                  type="text"
+                  dir="ltr"
+                  value={siteSettings.seasonalCouponCode || 'SEASON10'}
+                  onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, seasonalCouponCode: e.target.value.toUpperCase() }))}
+                  placeholder="SEASON10"
+                  className="w-28 px-2.5 py-1.5 rounded-xl border border-line font-mono font-black text-xs"
+                />
+              </div>
+
+              {/* Clients Birthday Table & 1-Click WhatsApp Coupon Sender */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-fg">🎂 جدول أعياد ميلاد العملاء وإرسال القسيمة الفورية على واتساب:</span>
+                  <span className="text-[11px] text-muted">عدّل تاريخ ميلاد أي عميل مباشرة أو اضغط "إرسال قسيمة عيد الميلاد"</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-64 overflow-y-auto p-1">
+                  {clients.map(cli => {
+                    const bCode = siteSettings.birthdayCouponCode || 'BDAY15';
+                    const bPct = Number(siteSettings.birthdayDiscountPct) || 15;
+                    return (
+                      <div key={cli.id} className="p-3 rounded-2xl bg-surface2 border border-line flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <div className="font-black text-fg">{cli.name}</div>
+                          <div className="text-[11px] text-muted font-mono">{cli.phone}</div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <input
+                            type="date"
+                            value={cli.birthDate || ''}
+                            onChange={e => {
+                              const nextDate = e.target.value;
+                              setClients(prev =>
+                                prev.map(c => {
+                                  if (c.id !== cli.id) return c;
+                                  const up = { ...c, birthDate: nextDate };
+                                  markLocalUpsert('clients', up);
+                                  sbUpsert('clients', up);
+                                  return up;
+                                })
+                              );
+                              showToast(`🎂 تم تحديث تاريخ ميلاد "${cli.name}" إلى ${nextDate}!`, 'success');
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl border border-line font-mono text-[11px] font-bold"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const cleanP = String(cli.phone || '').replace(/[^0-9]/g, '');
+                              const waPhone = cleanP.startsWith('0') ? `2${cleanP}` : cleanP;
+                              const msg = `كل سنة وأنت طيب يا ${cli.name} بمناسبة عيد ميلادك! 🎂🎉 هدية خاصة من ${siteSettings.storeName || 'ELZOGHBI'}: قسيمة خصم ${bPct}% فوري على طلبك القادم بكود (${bCode}) 🎁. استمتع بهديتك الآن: ${window.location.origin}`;
+                              window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                            }}
+                            className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px]"
+                          >
+                            📲 إرسال قسيمة عيد الميلاد
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 5: Family Saved Models / Interests ("أجهزتي وعائلتي") Admin Manager (Fix 7) */}
+        <div className="bg-surface rounded-2xl p-5 border-2 border-indigo-500/40 space-y-4">
+          {renderCollapsibleHeader(
+            'family_garage',
+            '👨‍👩‍👧‍👦',
+            '5. إدارة ميزة "اختياراتي وعائلتي" في الداشبورد (الأقسام والموديلات المحفوظة للعملاء)',
+            'شاهد ما حفظه كل عميل له ولعائلته، أضف قسماً لأي عميل، أو أرسل له تنبيهاً على واتساب بوصول منتج جديد لقسمه المحفوظ!',
+            `${clients.reduce((s, c) => s + ((c.savedFamilyDevices || []).length), 0) + guestFamilyDevices.length} اختيار محفوظ`
+          )}
+          {openFeatureSections.family_garage && (
+            <div className="space-y-4 pt-3 border-t border-line">
+              {/* Quick Add Saved Model/Category to Any Client */}
+              <div className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-2.5">
+                <div className="font-black text-fg">➕ إضافة قسم / موديل محفوظ لحساب عميل من الداشبورد:</div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  <select
+                    value={adminFamilyTargetClientId || clients[0]?.id || ''}
+                    onChange={e => setAdminFamilyTargetClientId(e.target.value)}
+                    className="p-2 rounded-xl border border-line font-bold"
+                  >
+                    {clients.map(c => (
+                      <option key={c.id} value={c.id}>{c.name} ({c.phone})</option>
+                    ))}
+                  </select>
+                  <select
+                    value={adminFamilyOwnerLabel}
+                    onChange={e => setAdminFamilyOwnerLabel(e.target.value)}
+                    className="p-2 rounded-xl border border-line font-bold"
+                  >
+                    {['اختياراتي الشخصية', 'اختيارات زوجتي', 'اختيارات أخي', 'اختيارات أختي', 'اختيارات العائلة', 'احتياجات العمل / المكتب'].map(lbl => (
+                      <option key={lbl} value={lbl}>{lbl}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={adminFamilyModelId || models[0]?.id || ''}
+                    onChange={e => setAdminFamilyModelId(e.target.value)}
+                    className="p-2 rounded-xl border border-line font-bold"
+                  >
+                    {models.map(m => (
+                      <option key={m.id} value={m.id}>{m.brand} — {m.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleAdminAddClientFamilyDevice(
+                        adminFamilyTargetClientId || clients[0]?.id,
+                        adminFamilyOwnerLabel,
+                        adminFamilyModelId || models[0]?.id
+                      )
+                    }
+                    className="px-4 py-2 rounded-xl bg-accent text-accent-ink font-black"
+                  >
+                    + حفظ للعميل
+                  </button>
+                </div>
+              </div>
+
+              {/* List of All Clients' Saved Family Models & 1-Click WhatsApp New Arrival Sender */}
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                {clients.map(cli => {
+                  const savedList = Array.isArray(cli.savedFamilyDevices) ? cli.savedFamilyDevices : [];
+                  if (savedList.length === 0) return null;
+                  return (
+                    <div key={cli.id} className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-black text-fg">{cli.name} • <span className="font-mono text-accent-text">{cli.phone}</span></span>
+                        <span className="text-[11px] text-muted">{savedList.length} اختيارات محفوظة</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {savedList.map(dev => (
+                          <div key={dev.id} className="p-2.5 rounded-xl bg-surface border border-line flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-500 font-black text-[10px]">{dev.ownerLabel}</span>
+                            <span className="font-black text-fg">{dev.modelName}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const cleanP = String(cli.phone || '').replace(/[^0-9]/g, '');
+                                const waPhone = cleanP.startsWith('0') ? `2${cleanP}` : cleanP;
+                                const msg = `مرحباً ${cli.name} 👋، وصلنا اليوم منتج جديد مميز لقسم (${dev.modelName} — ${dev.ownerLabel}) الذي قمت بحفظه في قائمة اهتماماتك لدى ${siteSettings.storeName || 'ELZOGHBI'} 🔥! تصفحه الآن: ${window.location.origin}`;
+                                window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                              }}
+                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px]"
+                            >
+                              📲 إشعار واتساب بمنتج جديد
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveFamilyDevice(dev.id, cli.id)}
+                              className="text-rose-500 hover:underline text-[10px] font-bold"
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 6: Live Social Proof & Spin-to-Win Wheel Customizer */}
+        <div className="bg-surface rounded-2xl p-5 border border-line space-y-4">
+          {renderCollapsibleHeader(
+            'social_spin',
+            '🎰',
+            '6. محرر جوائز عجلة الحظ (Spin-to-Win) + إشعارات المبيعات الحية (Live Social Proof)',
+            'تحكم في نصوص وأكواد عجلة الحظ والفاصل الزمني لإشعارات المبيعات الحية وجربها فوراً',
+            `${activeSpinPrizes.length} جوائز`
+          )}
+          {openFeatureSections.social_spin && (
+            <div className="space-y-5 pt-3 border-t border-line">
+              <div className="p-4 rounded-2xl bg-surface2 border border-line space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-black text-fg">🔔 إعدادات وتجربة إشعارات المبيعات الحية (Live Social Proof):</span>
+                  <button
+                    type="button"
+                    onClick={() => triggerLiveSocialToastImmediate(null, true)}
+                    className="px-3.5 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-[11px]"
+                  >
+                    🔔 اضغط لتجربة الإشعار أمامك الآن!
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="font-bold text-muted block mb-1">الفاصل الزمني (بالثواني):</label>
+                    <input
+                      type="number"
+                      min="10"
+                      max="300"
+                      value={siteSettings.socialProofIntervalSec ?? 35}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, socialProofIntervalSec: Number(e.target.value) || 35 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="font-bold text-muted block mb-1">المدن والمحافظات التي تظهر في الإشعارات (مفصولة بفاصلة):</label>
+                    <input
+                      type="text"
+                      value={siteSettings.socialProofCustomCities || ''}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, socialProofCustomCities: e.target.value }))}
+                      className="w-full p-2 rounded-xl border border-line font-bold"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-black text-fg">🎰 محرر جوائز ونصوص عجلة الحظ:</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try {
+                        window.localStorage.removeItem(SPIN_STORAGE_KEY);
+                        window.sessionStorage.removeItem('elzoghbi_spin_prompted_once');
+                      } catch (e) {}
+                      setSpinWheelState(null);
+                      setSpinRotationDeg(0);
+                      setSpinModalOpen(true);
+                      switchPortal('storefront');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-amber-400 text-slate-950 font-black text-xs"
+                  >
+                    🔄 تصفير العجلة وفتحها للتجربة الآن
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {activeSpinPrizes.map((prz, idx) => (
+                    <div key={prz.id || idx} className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="font-black text-fg">الخانة #{idx + 1}</span>
+                        <input
+                          type="color"
+                          value={prz.color || '#0284c7'}
+                          onChange={e => {
+                            const nextPrizes = activeSpinPrizes.map((p, i) => (i === idx ? { ...p, color: e.target.value } : p));
+                            saveSiteSettingsImmediate(prev => ({ ...prev, spinWheelPrizes: nextPrizes }));
+                          }}
+                          className="w-8 h-6 rounded cursor-pointer border border-line"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-muted block mb-0.5">النص المكتوب على العجلة:</label>
+                        <input
+                          type="text"
+                          value={prz.shortLabel || ''}
+                          onChange={e => {
+                            const nextPrizes = activeSpinPrizes.map((p, i) => (i === idx ? { ...p, shortLabel: e.target.value, label: e.target.value } : p));
+                            saveSiteSettingsImmediate(prev => ({ ...prev, spinWheelPrizes: nextPrizes }));
+                          }}
+                          className="w-full p-2 rounded-xl border border-line font-black"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] font-bold text-muted block mb-0.5">كود الكوبون:</label>
+                          <input
+                            type="text"
+                            dir="ltr"
+                            value={prz.code || ''}
+                            onChange={e => {
+                              const nextPrizes = activeSpinPrizes.map((p, i) => (i === idx ? { ...p, code: e.target.value.toUpperCase() } : p));
+                              saveSiteSettingsImmediate(prev => ({ ...prev, spinWheelPrizes: nextPrizes }));
+                            }}
+                            className="w-full p-2 rounded-xl border border-line font-mono font-bold"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-muted block mb-0.5">القيمة (ج.م أو %):</label>
+                          <input
+                            type="number"
+                            value={prz.value ?? 5}
+                            onChange={e => {
+                              const nextPrizes = activeSpinPrizes.map((p, i) => (i === idx ? { ...p, value: Number(e.target.value) || 0 } : p));
+                              saveSiteSettingsImmediate(prev => ({ ...prev, spinWheelPrizes: nextPrizes }));
+                            }}
+                            className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 7: Refer-a-Friend ("هات صاحبك") + Secret VIP Link + Loyalty Tiers */}
+        <div className="bg-surface rounded-2xl p-5 border border-line space-y-4">
+          {renderCollapsibleHeader(
+            'referral_vip',
+            '🤝',
+            '7. تحكم "هات صاحبك" (لأول طلب فقط) + الرابط السري لـ VIP + مستويات الولاء',
+            'تحديد مكافأة دعوة الصديق ونسخ الرابط السري لقسم VIP وتحديد عدد أوردرات المستوى الألماسي',
+            `VIP: ${vipOnlyPartsCount} منتج`
+          )}
+          {openFeatureSections.referral_vip && (
+            <div className="space-y-4 pt-3 border-t border-line">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div>
+                  <label className="font-bold text-muted block mb-1">نوع مكافأة "هات صاحبك":</label>
+                  <select
+                    value={siteSettings.referralRewardType || 'fixed'}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, referralRewardType: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-line font-black"
+                  >
+                    <option value="fixed">مبلغ ثابت (ج.م)</option>
+                    <option value="percentage">نسبة مئوية من الطلب (%)</option>
+                  </select>
+                </div>
+                {siteSettings.referralRewardType === 'percentage' ? (
+                  <div>
+                    <label className="font-bold text-muted block mb-1">نسبة مكافأة الإحالة (%):</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      value={siteSettings.referralRewardPct ?? 5}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, referralRewardPct: Number(e.target.value) || 5 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                ) : (
+                  <div>
+                    <label className="font-bold text-muted block mb-1">المبلغ الثابت لكل صديق (ج.م):</label>
+                    <input
+                      type="number"
+                      min="5"
+                      step="5"
+                      value={siteSettings.referralRewardFixedAmount ?? 50}
+                      onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, referralRewardFixedAmount: Number(e.target.value) || 50 }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                )}
+                <div>
+                  <label className="font-bold text-muted block mb-1">أوردرات المستوى الألماسي 💎:</label>
+                  <input
+                    type="number"
+                    min="5"
+                    value={siteSettings.loyaltyDiamondMinOrders ?? 20}
+                    onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, loyaltyDiamondMinOrders: Number(e.target.value) || 20 }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 rounded-2xl bg-amber-400/10 border border-amber-400/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-black text-amber-500">👑 الرابط السري الخاص بعملاء الـ VIP (مخفي عن الزوار العاديين):</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      try { navigator.clipboard.writeText(secretVipUrl); } catch (e) {}
+                      showToast('📋 تم نسخ رابط الـ VIP السري! يمكنك إرساله لعملائك المميزين.', 'success');
+                    }}
+                    className="px-3 py-1 rounded-lg bg-amber-400 text-slate-950 font-black text-[11px]"
+                  >
+                    📋 نسخ الرابط السري
+                  </button>
+                </div>
+                <div dir="ltr" className="p-2 rounded-xl bg-surface border border-line font-mono text-[11px] text-fg select-all truncate">
+                  {secretVipUrl}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setExitIntentModalOpen(true);
+                    switchPortal('storefront');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-rose-500/15 text-rose-500 border border-rose-500/30 font-black"
+                >
+                  ✋ معاينة نافذة الخروج (Exit-Intent)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setWarrantyModalOpen(true);
+                    switchPortal('storefront');
+                  }}
+                  className="flex-1 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 font-black"
+                >
+                  🛡️ معاينة صفحة فحص الضمان بالرقم
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* BOX 8: 6-Month Repurchase Reminder via WhatsApp */}
+        <div className="bg-surface rounded-2xl p-5 border border-line space-y-4">
+          {renderCollapsibleHeader(
+            'repurchase_waitlist',
+            '🔄',
+            `8. تذكير إعادة الشراء والتجديد عبر واتساب (خصم ${siteSettings.repurchaseDiscountPct || 10}%)`,
+            'فكّر العميل بتجديد المنتج الذي اشتراه بضغطة زر على واتساب مع كوبون RENEW10',
+            `${repurchaseCandidates.length} مرشح`
+          )}
+          {openFeatureSections.repurchase_waitlist && (
+            <div className="space-y-3 pt-3 border-t border-line">
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setRepurchaseShowAllMode(prev => !prev)}
+                  className="px-3 py-1.5 rounded-xl bg-surface2 border border-line font-black text-[11px]"
+                >
+                  {repurchaseShowAllMode ? 'الوضع الحالي: عرض كل الطلبات المسلمة للتجربة' : 'الوضع الحالي: طلبات مر عليها 6 شهور فقط'}
+                </button>
+              </div>
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {repurchaseCandidates.length === 0 ? (
+                  <div className="py-6 text-center text-muted font-bold">لا توجد طلبات مسلمة مطابقة حالياً.</div>
+                ) : (
+                  repurchaseCandidates.slice(0, 15).map(cand => (
+                    <div key={cand.id} className="p-3 rounded-xl bg-surface2 border border-line flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <div className="font-black text-fg">{cand.clientName} • <span className="text-accent-text">{cand.itemName}</span></div>
+                        <div className="text-[10px] text-muted">فاتورة #{cand.orderId} • التاريخ: {cand.createdAt}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cleanP = String(cand.phone || '01012345678').replace(/[^0-9]/g, '');
+                          const waPhone = cleanP.startsWith('0') ? `2${cleanP}` : cleanP;
+                          const msg = `مرحباً ${cand.clientName} 👋، "${cand.itemName}" اللي اشتريته مننا في ${siteSettings.storeName || 'ELZOGHBI'} بقاله فترة، تحب تجدده النهاردة بخصم خاص ${siteSettings.repurchaseDiscountPct || 10}% بكود (${siteSettings.repurchasePromoCode || 'RENEW10'})؟ 🎁 اطلبه الآن: ${window.location.origin}`;
+                          window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px]"
+                      >
+                        📲 إرسال تذكير التجديد على واتساب (-{siteSettings.repurchaseDiscountPct || 10}%)
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const renderAdminStorefrontCms = () => (
     <div className="space-y-6">
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-nav to-nav2 text-white border border-cyan-400/40 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div>
+          <div className="font-black text-sm text-cyan-300">🚀 هل تبحث عن التحكم في الكاش باك، عجلة الحظ، مستويات الولاء، والـ Feature Flags؟</div>
+          <div className="text-slate-300 text-[11px] mt-0.5">تم جمع كل الميزات الـ 18 وإحصائيات السلات والكوبونات وحماية الكاش باك في لوحة واحدة متكاملة!</div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setAdminTab('feature_flags')}
+          className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs shadow-md"
+        >
+          🚀 افتح مركز المميزات الخارق (Feature Flags) الآن ←
+        </button>
+      </div>
       <div className="bg-surface rounded-2xl p-5 border border-line shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-base font-extrabold text-fg flex items-center gap-2">
@@ -13837,6 +17618,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
         password: selectedAdminClient.password || '123',
         address: selectedAdminClient.address || '',
         secondaryAddress: selectedAdminClient.secondaryAddress || '',
+        birthDate: selectedAdminClient.birthDate || '',
         groupId: selectedAdminClient.groupId,
         creditLimit: selectedAdminClient.creditLimit,
         avatar: selectedAdminClient.avatar || 'TF',
@@ -13873,6 +17655,7 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
               password: adminEditClientForm.password,
               address: adminEditClientForm.address,
               secondaryAddress: adminEditClientForm.secondaryAddress,
+              birthDate: adminEditClientForm.birthDate || '',
               groupId: adminEditClientForm.groupId,
               creditLimit: Number(adminEditClientForm.creditLimit) || 0,
               avatar: adminEditClientForm.avatar,
@@ -14444,6 +18227,16 @@ const adminShortLabels = { overview: 'الرئيسية', orders: 'الطلبات
                         value={adminEditClientForm.email}
                         onChange={e => setAdminEditClientForm(prev => ({ ...prev, email: e.target.value }))}
                         className="w-full p-2.5 rounded-xl border border-line"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-black text-amber-500 block mb-1">🎂 تاريخ الميلاد (لقسيمة عيد الميلاد):</label>
+                      <input
+                        type="date"
+                        value={adminEditClientForm.birthDate || ''}
+                        onChange={e => setAdminEditClientForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                        className="w-full p-2.5 rounded-xl border border-amber-500/40 font-mono font-bold"
                       />
                     </div>
                   </div>
@@ -15163,6 +18956,244 @@ model OrderInvoice {
   // MODALS: CART DRAWER, LOGIN, WARRANTY RETURN, AND DUAL PRINT LAYOUTS
   // ============================================================================
 
+  // --- Free Shipping Progress Bar ---
+  const renderFreeShippingProgressBar = () => {
+    if (siteSettings.enableFreeShippingBar === false || cartSummary.items.length === 0) return null;
+    const isUnlocked = cartSummary.isFreeShippingUnlocked;
+    const pct = cartSummary.freeShippingProgressPct;
+    const rem = cartSummary.remainingForFreeShippingBase;
+
+    return (
+      <div className={`p-3.5 rounded-2xl border transition-all ${
+        isUnlocked
+          ? 'bg-emerald-500/15 border-emerald-500/40 text-fg'
+          : 'bg-surface2 border-line text-fg'
+      } space-y-2`}>
+        <div className="flex items-center justify-between gap-2 text-xs font-extrabold">
+          {isUnlocked ? (
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+              <span>🎉</span>
+              <span>
+                {cartSummary.isDiamondFreeShip
+                  ? 'شحن مجاني دائم مفعّل بفضل مستواك الألماسي 💎!'
+                  : 'مبروك! حصلت على شحن مجاني بالكامل (0 ج.م) على هذا الطلب!'}
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <span>🚚</span>
+              <span>
+                أضف منتجات بقيمة <span className="text-accent-text font-black">{formatMoney(rem)}</span> فقط للحصول على <span className="text-emerald-600 dark:text-emerald-400 font-black">شحن مجاني!</span>
+              </span>
+            </div>
+          )}
+          <span className="font-mono text-[11px] font-black text-accent-text shrink-0">{isUnlocked ? '100%' : `${pct}%`}</span>
+        </div>
+        <div className="w-full h-2.5 bg-bg rounded-full overflow-hidden border border-line">
+          <div
+            className={`h-full transition-all duration-500 rounded-full ${
+              isUnlocked ? 'bg-gradient-to-r from-emerald-500 to-teal-400' : 'bg-gradient-to-r from-cyan-500 to-blue-600'
+            }`}
+            style={{ width: `${Math.max(6, isUnlocked ? 100 : pct)}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // --- Smart Cross-Sell Bundles (Guaranteed Suggestions + Clear Bundle Price & Savings) ---
+  const getSmartCrossSellSuggestions = () => {
+    if (siteSettings.enableSmartCrossSell === false || cartSummary.items.length === 0) return [];
+    const inCartIds = new Set(cartSummary.items.map(i => String(i.part.id)));
+    const cartModelIds = new Set(cartSummary.items.map(i => String(i.part.modelId || '')).filter(Boolean));
+    const cartCategories = new Set(cartSummary.items.map(i => String(i.part.category || '')).filter(Boolean));
+    const pinnedIds = new Set((Array.isArray(siteSettings.pinnedCrossSellPartIds) ? siteSettings.pinnedCrossSellPartIds : []).map(String));
+
+    // All available in-stock products not already in the cart
+    const availPool = publicParts.filter(p => p && !inCartIds.has(String(p.id)) && Number(p.stock) > 0 && !p.soldOut && Number(p.basePrice) > 0);
+    if (availPool.length === 0) return [];
+
+    return availPool
+      .sort((a, b) => {
+        const aPin = pinnedIds.has(String(a.id)) ? 1 : 0;
+        const bPin = pinnedIds.has(String(b.id)) ? 1 : 0;
+        if (aPin !== bPin) return bPin - aPin;
+        const aDiffCat = !cartCategories.has(String(a.category || '')) ? 1 : 0;
+        const bDiffCat = !cartCategories.has(String(b.category || '')) ? 1 : 0;
+        const aAcc = /جراب|حماي|اسكرين|شاحن|كابل|سماع|عناي/.test(String(a.category || '') + ' ' + String(a.name || '')) ? 1 : 0;
+        const bAcc = /جراب|حماي|اسكرين|شاحن|كابل|سماع|عناي/.test(String(b.category || '') + ' ' + String(b.name || '')) ? 1 : 0;
+        if (aAcc !== bAcc) return bAcc - aAcc;
+        const aSameMdl = cartModelIds.has(String(a.modelId)) ? 1 : 0;
+        const bSameMdl = cartModelIds.has(String(b.modelId)) ? 1 : 0;
+        if (aSameMdl !== bSameMdl) return bSameMdl - aSameMdl;
+        if (aDiffCat !== bDiffCat) return bDiffCat - aDiffCat;
+        return (Number(a.basePrice) || 0) - (Number(b.basePrice) || 0);
+      })
+      .slice(0, 2);
+  };
+
+  const renderSmartCrossSellBundles = () => {
+    const suggestions = getSmartCrossSellSuggestions();
+    if (suggestions.length === 0) return null;
+    const discPct = Number(siteSettings.crossSellBundleDiscountPct) || 10;
+
+    return (
+      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-surface2 to-surface border-2 border-dashed border-accent/60 space-y-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-xs font-extrabold text-fg flex items-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+            <span>🎁 باقة مقترحة تكمل طلبك بخصم خاص (-{discPct}%)</span>
+          </div>
+          <span className="px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[10px] font-black">
+            خصم فوري بالسلة ⚡
+          </span>
+        </div>
+        <p className="text-[11px] text-muted">
+          أضف أي منتج من الباقة المقترحة الآن وسيُخصم <b>{discPct}%</b> من سعره فوراً داخل فاتورتك:
+        </p>
+
+        <div className="space-y-2">
+          {suggestions.map(sug => {
+            const pInfo = calculatePartPrice(sug, currentGroup);
+            const bundledEgp = Math.max(1, Math.round(pInfo.baseEgpPrice * (1 - discPct / 100)));
+            const savedEgp = Math.max(1, pInfo.baseEgpPrice - bundledEgp);
+            return (
+              <div
+                key={sug.id}
+                className="p-2.5 rounded-xl bg-surface border border-line flex items-center justify-between gap-2.5"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img
+                    src={sug.image || PART_IMAGES.screen}
+                    alt={sug.name}
+                    loading="lazy"
+                    onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                    className="w-12 h-12 rounded-xl object-contain bg-surface2 border border-line p-0.5 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-xs font-extrabold text-fg truncate">{sug.name}</div>
+                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                        {formatMoney(bundledEgp)}
+                      </span>
+                      <span className="text-[10px] text-muted line-through font-mono">
+                        {formatMoney(pInfo.baseEgpPrice)}
+                      </span>
+                      <span className="px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-600 dark:text-rose-400 text-[9px] font-black">
+                        وفّر {formatMoney(savedEgp)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleAddCrossSellBundleItem(sug)}
+                  className="px-3 py-2 rounded-xl bg-accent hover:opacity-95 text-accent-ink text-[11px] font-black shrink-0 flex items-center gap-1 shadow-xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>أضف بـ {formatMoney(bundledEgp)}</span>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // --- Cashier Impulse Add-ons Shelf (رف الكاشير السريع — منتجات بسيطة أقل من 1000 ج.م قبل تأكيد الطلب) ---
+  const getCashierImpulseItems = () => {
+    if (siteSettings.enableCashierImpulse === false) return [];
+    const maxPrice = Math.max(50, Number(siteSettings.cashierMaxPrice) || 1000);
+    const inCartIds = new Set(cartSummary.items.map(i => String(i.part.id)));
+    const mode = siteSettings.cashierSelectionMode || 'manual_first';
+
+    const pinnedAvailable = publicParts.filter(p => {
+      if (!p || inCartIds.has(String(p.id)) || Number(p.stock) <= 0 || p.soldOut) return false;
+      return isPartPinnedToCashier(p);
+    });
+
+    if (mode === 'manual_only') {
+      return pinnedAvailable.slice(0, 8);
+    }
+
+    const pinnedIdsSet = new Set(pinnedAvailable.map(p => String(p.id)));
+    const affordable = publicParts.filter(p => {
+      if (!p || inCartIds.has(String(p.id)) || pinnedIdsSet.has(String(p.id)) || Number(p.stock) <= 0 || p.soldOut) return false;
+      const tiers = getPartQualityTiers(p, p.basePrice);
+      const lowestTierPrice = siteSettings.enableQualityTiers !== false
+        ? Math.min(Number(p.basePrice) || 99999, tiers[2]?.priceEgp || 99999)
+        : (Number(p.basePrice) || 99999);
+      return lowestTierPrice > 0 && lowestTierPrice <= maxPrice;
+    }).sort((a, b) => (Number(a.basePrice) || 0) - (Number(b.basePrice) || 0));
+
+    return [...pinnedAvailable, ...affordable].slice(0, 8);
+  };
+
+  const renderCashierImpulseShelf = () => {
+    const impulseItems = getCashierImpulseItems();
+    if (impulseItems.length === 0) return null;
+
+    return (
+      <div className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-2.5">
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-xs font-black text-fg flex items-center gap-1.5">
+            <span>🛒</span>
+            <span>رف الكاشير السريع — حاجات بسيطة ومفيدة ضيفها لطلبك</span>
+          </div>
+          <span className="text-[10px] font-bold text-accent-text">أقل من {(Number(siteSettings.cashierMaxPrice) || 1000).toLocaleString()} ج.م</span>
+        </div>
+        <div className="flex items-stretch gap-2.5 overflow-x-auto pb-1">
+          {impulseItems.map(imp => {
+            const pInfo = calculatePartPrice(imp, currentGroup);
+            const tiers = getPartQualityTiers(imp, pInfo.baseEgpPrice);
+            const econTier = siteSettings.enableQualityTiers !== false && Number(pInfo.baseEgpPrice) > (Number(siteSettings.cashierMaxPrice) || 1000)
+              ? tiers[2]
+              : tiers[0];
+            const displayPriceEgp = econTier ? econTier.priceEgp : pInfo.baseEgpPrice;
+
+            return (
+              <div
+                key={imp.id}
+                className="min-w-[155px] max-w-[165px] p-2.5 rounded-xl bg-surface border border-line flex flex-col justify-between gap-2 shrink-0"
+              >
+                <div className="flex items-center gap-2">
+                  <img
+                    src={imp.image || PART_IMAGES.screen}
+                    alt={imp.name}
+                    loading="lazy"
+                    onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+                    className="w-10 h-10 rounded-lg object-contain bg-surface2 border border-line p-0.5 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-extrabold text-fg line-clamp-2 leading-tight">{imp.name}</div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between gap-1 pt-1 border-t border-line">
+                  <span className="text-xs font-black text-accent-text">{formatMoney(displayPriceEgp)}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (econTier && econTier.id !== 'original') {
+                        setSelectedQualityTiers(prev => ({ ...prev, [imp.id]: econTier.id }));
+                      }
+                      updateCartQty(imp.id, 1);
+                      showToast(`🛒 تمت إضافة "${imp.name}" لطلبك من رف الكاشير!`, 'success');
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-go text-go-ink text-[10px] font-black"
+                  >
+                    + أضف
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // --- Upgraded Cart Drawer ---
   const renderCartDrawer = () => {
     if (!cartDrawerOpen) return null;
     return (
@@ -15182,51 +19213,138 @@ model OrderInvoice {
           </div>
 
           <div className="flex-1 overflow-y-auto py-4 space-y-3">
+            {renderFreeShippingProgressBar()}
+
+            {spinWheelState?.spun && spinWheelState?.prize && !appliedPromo && (
+              <div className="p-2.5 rounded-xl bg-amber-400/15 border border-amber-400/40 flex items-center justify-between gap-2 text-xs">
+                <span className="font-bold text-fg">
+                  🎁 هديتك من العجلة جاهزة: <b>{spinWheelState.prize.shortLabel}</b>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => applySpinPrizePromo(spinWheelState.prize, false)}
+                  className="px-2.5 py-1 rounded-lg bg-amber-400 text-slate-950 font-black text-[11px]"
+                >
+                  تطبيق الهدية
+                </button>
+              </div>
+            )}
+
             {cartSummary.items.length === 0 ? (
               <div className="text-center py-12 text-xs text-muted">السلة فاضية دلوقتي</div>
             ) : (
               cartSummary.items.map(item => (
                 <div
                   key={item.part.id}
-                  className="p-3 rounded-xl border border-line flex items-center justify-between gap-2"
+                  className="p-3 rounded-xl border border-line space-y-2"
                 >
-                  <div className="text-xs">
-                    <div className="font-bold text-fg">{item.part.name}</div>
-                    <div className="text-muted mt-0.5">
-                      اللون: {item.color} • السعر: {formatMoney(item.priceInfo.baseEgpPrice)}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs">
+                      <div className="font-bold text-fg flex items-center gap-1.5 flex-wrap">
+                        <span>{item.part.name}</span>
+                        {item.qualityTierLabel && (
+                          <span className="px-1.5 py-0.5 rounded bg-surface2 text-accent-text border border-line text-[9px] font-black">
+                            {item.qualityTierLabel}
+                          </span>
+                        )}
+                        {item.bundlePct > 0 && (
+                          <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 text-[9px] font-black">
+                            🎁 خصم الباقة -{item.bundlePct}% (وفّرت {formatMoney(item.itemBundleSavedBase)})
+                          </span>
+                        )}
+                        {item.qtyDiscountPct > 0 && (
+                          <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-500 text-[9px] font-black">
+                            🏷️ خصم الكميات -{item.qtyDiscountPct}% (وفّرت {formatMoney(item.itemQtySavedBase)})
+                          </span>
+                        )}
+                        {item.cashbackEnabled && (
+                          <span className="px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-[9px] font-black">
+                            💰 كاش باك {item.cashbackPct}% (+{formatMoney(item.lineCashbackBase)})
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-muted mt-0.5 flex items-center gap-2">
+                        <span>اللون: {item.color} • السعر: <b>{formatMoney(item.priceInfo.baseEgpPrice)}</b></span>
+                        {item.originalUnitBase > item.priceInfo.baseEgpPrice && (
+                          <span className="line-through text-[10px] font-mono">{formatMoney(item.originalUnitBase)}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        onClick={() => updateCartQty(item.part.id, 1)}
+                        className="w-7 h-7 rounded bg-blue-600 text-white flex items-center justify-center"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min="0"
+                        value={item.qty}
+                        onFocus={e => e.target.select()}
+                        onChange={e => setCartQtyDirect(item.part.id, e.target.value)}
+                        className="w-12 text-center text-xs font-extrabold border border-line rounded-lg py-1"
+                      />
+                      <button
+                        onClick={() => updateCartQty(item.part.id, -1)}
+                        className="w-7 h-7 rounded bg-surface2 text-fg flex items-center justify-center"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => updateCartQty(item.part.id, 1)}
-                      className="w-7 h-7 rounded bg-blue-600 text-white flex items-center justify-center"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={item.qty}
-                      onFocus={e => e.target.select()}
-                      onChange={e => setCartQtyDirect(item.part.id, e.target.value)}
-                      className="w-14 text-center text-xs font-extrabold border border-line rounded-lg py-1"
-                    />
-                    <button
-                      onClick={() => updateCartQty(item.part.id, -1)}
-                      className="w-7 h-7 rounded bg-surface2 text-fg flex items-center justify-center"
-                    >
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+
+                  {/* Buy More Save More Interactive Nudge inside Cart */}
+                  {siteSettings.enableBuyMoreSaveMore !== false && item.qty < (Number(siteSettings.qtyTier3Min) || 3) && (
+                    <div className="pt-1 border-t border-line flex items-center justify-between text-[10px]">
+                      <span className="text-amber-600 dark:text-amber-400 font-bold">
+                        {item.qty === 1
+                          ? `💡 اشتري ${siteSettings.qtyTier2Min || 2} وخد خصم ${siteSettings.qtyTier2DiscountPct || 5}%، أو ${siteSettings.qtyTier3Min || 3} بخصم ${siteSettings.qtyTier3DiscountPct || 10}%!`
+                          : `🔥 معاك خصم ${siteSettings.qtyTier2DiscountPct || 5}%! زوّد قطعة كمان وخد خصم ${siteSettings.qtyTier3DiscountPct || 10}%!`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateCartQty(item.part.id, 1)}
+                        className="px-2 py-0.5 rounded bg-amber-400 text-slate-950 font-black"
+                      >
+                        + زوّد قطعة ووفّر
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))
             )}
+
+            {renderSmartCrossSellBundles()}
+            {renderCashierImpulseShelf()}
           </div>
 
-          <div className="border-t border-line pt-4 space-y-3">
+          <div className="border-t border-line pt-3 space-y-2">
+            {(cartSummary.bundleDiscountTotalBase > 0 || cartSummary.qtyDiscountTotalBase > 0) && (
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-[11px] font-bold text-amber-600 dark:text-amber-300 space-y-0.5">
+                {cartSummary.bundleDiscountTotalBase > 0 && (
+                  <div className="flex justify-between">
+                    <span>🎁 وفّرت من خصم الباقة الذكية:</span>
+                    <span>-{formatMoney(cartSummary.bundleDiscountTotalBase)}</span>
+                  </div>
+                )}
+                {cartSummary.qtyDiscountTotalBase > 0 && (
+                  <div className="flex justify-between">
+                    <span>🏷️ وفّرت من خصم الكميات (اشتري أكتر ووفّر):</span>
+                    <span>-{formatMoney(cartSummary.qtyDiscountTotalBase)}</span>
+                  </div>
+                )}
+              </div>
+            )}
+            {cartSummary.expectedCashbackBase > 0 && (
+              <div className="p-2.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-between text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
+                <span>💰 كاش باك يُضاف لمحفظتك فور الاستلام:</span>
+                <span>+{formatMoney(cartSummary.expectedCashbackBase)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm font-extrabold text-fg">
-              <span>إجمالي السلة:</span>
+              <span>إجمالي السلة الصافي:</span>
               <span className="text-blue-600">{formatMoney(cartSummary.subtotalBase)}</span>
             </div>
             <button
@@ -15244,6 +19362,752 @@ model OrderInvoice {
             </button>
           </div>
         </div>
+      </div>
+    );
+  };
+
+  // --- Secret / Exclusive VIP Storefront View ---
+  const renderVipRouteView = () => {
+    const progressPct = Math.min(100, Math.round((clientCompletedOrderCount / vipMinOrders) * 100));
+    const remainingOrders = Math.max(0, vipMinOrders - clientCompletedOrderCount);
+    const displayVipItems = vipCatalogParts.length > 0 ? vipCatalogParts : publicParts.slice(0, 8);
+
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 border-2 border-amber-400/50 shadow-2xl">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black">
+                <Award className="w-4 h-4" />
+                <span>👑 الرابط الخاص لنادي كبار العملاء — ELZOGHBI PRIVATE VIP</span>
+              </div>
+              <h1 className="text-xl sm:text-3xl font-black tracking-wide text-amber-300">
+                عروض وباكدجات حصرية وأسعار خاصة لعملائنا المميزين
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                وصلت إلى هذا القسم عبر <b>الرابط الخاص لعملاء الـ VIP</b> (المخصص للعملاء الذين أتموا {vipMinOrders} طلبات فأكثر). جميع الأسعار هنا مخفضة حصرياً لك ولا تظهر للزوار العاديين.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 sm:p-5 border border-white/15 min-w-[270px] space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-amber-300">حالة الرابط الخاص:</span>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-emerald-400 text-slate-950">
+                  👑 مفعّل لك الآن ✓
+                </span>
+              </div>
+              <div className="text-[11px] text-emerald-300 font-bold">
+                ✓ استمتع بأسعار الـ VIP الحصرية وأولوية التجهيز والشحن الفوري
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h2 className="text-base sm:text-lg font-black text-fg flex items-center gap-2">
+              <span>👑</span>
+              <span>منتجات وباكدجات الـ VIP الحصرية ({displayVipItems.length} عروض)</span>
+            </h2>
+            <button
+              type="button"
+              onClick={() => setClientTab('home')}
+              className="text-xs font-extrabold text-accent-text hover:underline"
+            >
+              ← العودة للرئيسية
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {displayVipItems.map(part => renderProductCard(part))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // --- High-Clarity SVG Spin-to-Win Wheel Modal (Large, Crisp Arabic Text + Prize Legend) ---
+  const renderSpinToWinModal = () => {
+    if (!spinModalOpen || siteSettings.enableSpinToWin === false) return null;
+    const slicesCount = activeSpinPrizes.length;
+    const sliceDeg = 360 / slicesCount;
+
+    return (
+      <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[160] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 border-2 border-amber-400 shadow-2xl space-y-4 text-center relative my-auto">
+          <button
+            type="button"
+            onClick={() => setSpinModalOpen(false)}
+            className="absolute top-4 left-4 w-8 h-8 rounded-full bg-surface2 text-muted hover:text-fg flex items-center justify-center"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <div className="space-y-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400 text-slate-950 text-xs font-black">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>هدية الزوار الجدد من {siteSettings.storeName || 'ELZOGHBI'}</span>
+            </span>
+            <h3 className="text-lg sm:text-xl font-black text-fg pt-1">
+              {siteSettings.spinWheelTitle || '🎁 لف عجلة الحظ واكسب هديتك الفورية!'}
+            </h3>
+            <p className="text-xs text-muted font-bold">
+              {siteSettings.spinWheelSubtitle || 'فرصة حقيقية لكل زائر: شحن مجاني، خصم فوري، أو هدية مجانية!'}
+            </p>
+          </div>
+
+          {/* Large 310x310 High-Clarity SVG Wheel */}
+          <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center">
+            {/* Top Pointer Arrow */}
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-amber-400 drop-shadow-lg" />
+
+            <div
+              className="w-full h-full rounded-full border-[6px] border-amber-400 shadow-2xl relative overflow-hidden"
+              style={{
+                transform: `rotate(${spinRotationDeg}deg)`,
+                transition: isSpinningWheel ? 'transform 4s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
+                background: `conic-gradient(${activeSpinPrizes
+                  .map((p, idx) => `${p.color || '#0284c7'} ${idx * sliceDeg}deg ${(idx + 1) * sliceDeg}deg`)
+                  .join(', ')})`
+              }}
+            >
+              {/* Divider Lines & Crisp Radial Labels */}
+              {activeSpinPrizes.map((prz, idx) => {
+                const midAngle = idx * sliceDeg + sliceDeg / 2;
+                return (
+                  <div
+                    key={prz.id || idx}
+                    className="absolute inset-0 pointer-events-none flex items-center justify-center"
+                    style={{ transform: `rotate(${midAngle}deg)` }}
+                  >
+                    <div
+                      className="px-2.5 py-1 rounded-full bg-slate-950/75 border border-white/30 text-white font-black text-xs sm:text-[13px] tracking-wide shadow-md whitespace-nowrap"
+                      style={{ transform: 'translateY(-92px)' }}
+                    >
+                      {prz.shortLabel || prz.label}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button
+              type="button"
+              disabled={isSpinningWheel || Boolean(spinWheelState?.spun)}
+              onClick={handleSpinTheWheel}
+              className="absolute w-20 h-20 rounded-full bg-nav border-4 border-amber-400 text-amber-300 font-black text-sm shadow-2xl flex items-center justify-center z-10 hover:scale-105 transition disabled:opacity-80"
+            >
+              {isSpinningWheel ? '🎰...' : spinWheelState?.spun ? '✓ مبروك' : 'لفّ الآن'}
+            </button>
+          </div>
+
+          {/* Clear Prize Legend Chips so customer can read every single option clearly */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-[11px]">
+            {activeSpinPrizes.map((prz, idx) => (
+              <div
+                key={prz.id || idx}
+                className="px-2.5 py-1.5 rounded-xl bg-surface2 border border-line font-extrabold text-fg flex items-center gap-1.5 justify-center"
+              >
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: prz.color || '#0284c7' }} />
+                <span className="truncate">{prz.label}</span>
+              </div>
+            ))}
+          </div>
+
+          {spinWheelState?.spun && spinWheelState?.prize ? (
+            <div className="p-4 rounded-2xl bg-emerald-500/15 border-2 border-emerald-500/40 space-y-2.5">
+              <div className="text-sm sm:text-base font-black text-emerald-600 dark:text-emerald-400">
+                🎉 جائزتك المحفوظة: {spinWheelState.prize.label}
+              </div>
+              <div className="text-xs text-fg font-bold">
+                كود الجائزة المفعّل: <span className="font-mono font-black px-2.5 py-1 rounded-lg bg-surface border border-line text-sm">{spinWheelState.prize.code}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  applySpinPrizePromo(spinWheelState.prize, false);
+                  setSpinModalOpen(false);
+                }}
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-md"
+              >
+                تفعيل الجائزة ومتابعة التسوق ✓
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              disabled={isSpinningWheel}
+              onClick={handleSpinTheWheel}
+              className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-sm sm:text-base shadow-lg hover:opacity-95 transition"
+            >
+              {isSpinningWheel ? 'جاري لف العجلة... 🎰' : '🎰 اضغط للف العجلة وربح هديتك الآن!'}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderFloatingSpinTrigger = () => {
+    if (appPortal === 'admin' || siteSettings.enableSpinToWin === false) return null;
+    return (
+      <button
+        type="button"
+        onClick={() => setSpinModalOpen(true)}
+        className="fixed bottom-6 right-5 z-40 px-4 py-2.5 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-xs shadow-2xl border-2 border-white/60 flex items-center gap-1.5 hover:scale-105 transition"
+        title="عجلة الحظ وهدايا الزوار الجدد"
+      >
+        <span>🎁</span>
+        <span>{spinWheelState?.spun ? `هديتك: ${spinWheelState.prize?.shortLabel}` : 'لف العجلة واكسب!'}</span>
+      </button>
+    );
+  };
+
+  // --- Live Social Proof Toast Notification (Shows in Storefront + Admin Test Mode!) ---
+  const renderLiveSocialProofToast = () => {
+    if (!liveSocialToast || siteSettings.enableLiveSocialProof === false) return null;
+    if (appPortal === 'admin' && !liveSocialToast.forceShowInAdmin) return null;
+
+    return (
+      <div className="fixed bottom-20 right-4 z-[220] max-w-xs sm:max-w-sm w-full px-2 animate-bounce">
+        <div
+          onClick={() => {
+            if (liveSocialToast.partId && appPortal !== 'admin') {
+              const targetP = parts.find(p => String(p.id) === String(liveSocialToast.partId));
+              if (targetP) {
+                setDetailImageIdx(0);
+                setSelectedDetailItem({ type: 'part', part: targetP });
+              }
+            }
+            setLiveSocialToast(null);
+          }}
+          className="p-3.5 rounded-2xl bg-nav text-nav-fg border-2 border-nav-cyan shadow-2xl flex items-center gap-3 cursor-pointer"
+        >
+          <img
+            src={liveSocialToast.productImage || PART_IMAGES.screen}
+            alt={liveSocialToast.productName}
+            loading="lazy"
+            onError={e => { e.currentTarget.src = PART_IMAGES.screen; }}
+            className="w-12 h-12 rounded-xl object-contain bg-nav2 border border-navline p-1 shrink-0"
+          />
+          <div className="min-w-0 flex-1 text-right">
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-[10px] font-black text-nav-cyan flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span>اشترى الآن من {siteSettings.storeName || 'ELZOGHBI'}</span>
+              </span>
+              <span className="text-[9px] text-nav-fg/70 font-bold">{liveSocialToast.timeLabel}</span>
+            </div>
+            <div className="text-xs font-extrabold text-white truncate mt-0.5">
+              عميل من <span className="text-amber-300">{liveSocialToast.city}</span> طلب:
+            </div>
+            <div className="text-xs font-black text-nav-cyan truncate">
+              {liveSocialToast.productName}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation();
+              setLiveSocialToast(null);
+            }}
+            className="p-1 text-nav-fg/60 hover:text-white"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // --- Exit-Intent Popup ("استنى! خد خصم 5% على طلبك") ---
+  const renderExitIntentModal = () => {
+    if (!exitIntentModalOpen || siteSettings.enableExitIntentPopup === false) return null;
+    const pct = Number(siteSettings.exitIntentDiscountPct) || 5;
+    const codeStr = siteSettings.exitIntentPromoCode || 'STAY5';
+
+    return (
+      <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[190] flex items-center justify-center p-4">
+        <div className="bg-surface rounded-3xl max-w-md w-full p-6 border-2 border-rose-500 shadow-2xl text-center space-y-4 relative">
+          <button
+            type="button"
+            onClick={() => setExitIntentModalOpen(false)}
+            className="absolute top-4 left-4 w-8 h-8 rounded-full bg-surface2 text-muted hover:text-fg flex items-center justify-center"
+          >
+            <X className="w-4 h-4" />
+          </button>
+
+          <div className="w-16 h-16 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-500 flex items-center justify-center mx-auto text-3xl">
+            ✋
+          </div>
+
+          <div className="space-y-1.5">
+            <h3 className="text-xl font-black text-fg">
+              استنى! قبل ما تمشي.. خد خصم {pct}% فوري على طلبك 🎁
+            </h3>
+            <p className="text-xs text-muted leading-relaxed">
+              لا تفوّت الفرصة! فعّل العرض الحصري الآن واستمتع بأفضل جودة مع ضمان كامل ومعاينة قبل الدفع.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-extrabold">
+            <span className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">🤝 الدفع عند الاستلام</span>
+            <span className="px-2.5 py-1 rounded-xl bg-cyan-500/15 text-cyan-600 dark:text-cyan-400">👁️ معاينة قبل الدفع</span>
+            <span className="px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">🛡️ ضمان بالرقم</span>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-surface2 border border-dashed border-accent flex items-center justify-between">
+            <span className="text-xs font-bold text-muted">كود الخصم الفوري:</span>
+            <span className="font-mono font-black text-base text-accent-text">{codeStr} (-{pct}%)</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleApplyExitIntentOffer}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-lg transition"
+          >
+            🎁 تفعيل خصم {pct}% الآن وإكمال التسوق
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // --- Out-of-Stock Customer "Notify Me on WhatsApp" Modal ---
+  const renderCustomerRestockNotifyModal = () => {
+    if (!restockNotifyModalPart) return null;
+    return (
+      <div className="fixed inset-0 bg-nav/80 backdrop-blur-xs z-[185] flex items-center justify-center p-4">
+        <form
+          onSubmit={handleSubmitCustomerRestockNotify}
+          className="bg-surface rounded-3xl max-w-md w-full p-6 border border-line shadow-2xl space-y-4 text-xs"
+        >
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-amber-500" />
+              <h3 className="text-sm sm:text-base font-black text-fg">🔔 نبّهني على واتساب فور توفر المنتج</h3>
+            </div>
+            <button type="button" onClick={() => setRestockNotifyModalPart(null)} className="p-1.5 rounded-lg bg-surface2 text-muted">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-surface2 border border-line flex items-center gap-3">
+            <img
+              src={restockNotifyModalPart.image || PART_IMAGES.screen}
+              alt={restockNotifyModalPart.name}
+              className="w-12 h-12 rounded-xl object-contain bg-surface border border-line p-1 shrink-0"
+            />
+            <div>
+              <div className="font-extrabold text-fg text-xs">{restockNotifyModalPart.name}</div>
+              <div className="text-[11px] text-muted mt-0.5">السعر: {formatMoney(restockNotifyModalPart.basePrice)}</div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="font-bold text-muted block mb-1">اسمك الكريم:</label>
+              <input
+                type="text"
+                required
+                value={restockVisitorName}
+                onChange={e => setRestockVisitorName(e.target.value)}
+                placeholder="اكتب اسمك..."
+                className="w-full p-2.5 rounded-xl border border-line font-bold"
+              />
+            </div>
+            <div>
+              <label className="font-bold text-muted block mb-1">رقم الواتساب لتلقي رسالة التوفر فوراً *:</label>
+              <input
+                type="tel"
+                required
+                dir="ltr"
+                value={restockVisitorPhone}
+                onChange={e => setRestockVisitorPhone(e.target.value)}
+                placeholder="01012345678"
+                className="w-full p-2.5 rounded-xl border border-line font-mono font-black text-sm"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md"
+          >
+            📲 سجّل رقمي وأرسل لي واتساب فور توفره ✓
+          </button>
+        </form>
+      </div>
+    );
+  };
+
+  // --- Admin Bulk WhatsApp Sender Modal for Restocked Products ---
+  const renderAdminRestockWhatsappModal = () => {
+    if (!adminRestockWhatsappPart) return null;
+    const allWaitlist = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+    const partWaitlist = adminRestockWhatsappPart.id === 'ALL'
+      ? allWaitlist
+      : allWaitlist.filter(w => String(w.partId) === String(adminRestockWhatsappPart.id));
+
+    return (
+      <div className="fixed inset-0 bg-nav/80 backdrop-blur-xs z-[195] flex items-center justify-center p-4">
+        <div className="bg-surface rounded-3xl max-w-xl w-full p-6 border border-line shadow-2xl space-y-4 text-xs max-h-[85vh] flex flex-col">
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div>
+              <h3 className="text-base font-black text-fg flex items-center gap-2">
+                <span>📲</span>
+                <span>إرسال رسائل واتساب للمنتظرين ({partWaitlist.length} عميل)</span>
+              </h3>
+              <p className="text-[11px] text-muted mt-0.5">
+                {adminRestockWhatsappPart.id === 'ALL' ? 'جميع طلبات "نبّهني عند التوفر" المسجلة من العملاء' : `المنتج: ${adminRestockWhatsappPart.name}`}
+              </p>
+            </div>
+            <button type="button" onClick={() => setAdminRestockWhatsappPart(null)} className="p-1.5 rounded-lg bg-surface2 text-muted">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-2">
+            {partWaitlist.length === 0 ? (
+              <div className="py-10 text-center text-muted font-bold">
+                لا يوجد عملاء مسجلون في قائمة انتظار هذا المنتج حالياً.
+              </div>
+            ) : (
+              partWaitlist.map(entry => (
+                <div key={entry.id} className="p-3 rounded-2xl bg-surface2 border border-line flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-black text-fg">{entry.clientName} • <span className="font-mono text-accent-text">{entry.phone}</span></div>
+                    <div className="text-[11px] text-muted">{entry.partName} • {entry.createdAt}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {entry.notified && (
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500 text-[10px] font-bold">تم الإرسال ✓</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => sendAdminRestockWhatsappToEntry(entry)}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] flex items-center gap-1"
+                    >
+                      <span>📲 ابعت واتساب الآن</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {partWaitlist.length > 0 && (
+            <div className="pt-3 border-t border-line flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  partWaitlist.forEach((entry, idx) => {
+                    setTimeout(() => sendAdminRestockWhatsappToEntry(entry), idx * 600);
+                  });
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs"
+              >
+                🚀 فتح وإرسال واتساب لكل القائمة ({partWaitlist.length} عملاء)
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminRestockWhatsappPart(null)}
+                className="px-4 py-2.5 rounded-xl bg-surface2 text-muted font-bold"
+              >
+                إغلاق
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // --- Warranty Lookup & Replacement by Phone Number Modal (ضمان بالرقم وطلب استبدال) ---
+  const renderWarrantyLookupModal = () => {
+    if (!warrantyModalOpen) return null;
+    const cleanQ = normalizeDigits(warrantyPhoneQuery || currentClient?.phone || '').trim();
+    const matchedOrders = cleanQ.length >= 4
+      ? orders.filter(o => {
+          const cli = clients.find(c => String(c.id) === String(o.clientId));
+          const phoneMatch = normalizeDigits(String(o.clientPhone || cli?.phone || '')).includes(cleanQ);
+          const idMatch = String(o.id || '').toLowerCase().includes(cleanQ.toLowerCase());
+          return phoneMatch || idMatch;
+        })
+      : [];
+
+    const defaultWarrDays = Math.max(7, Number(siteSettings.defaultWarrantyDays) || 90);
+
+    return (
+      <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[185] flex items-center justify-center p-4">
+        <div className="bg-surface rounded-3xl max-w-2xl w-full p-6 border-2 border-emerald-500/40 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-500 flex items-center justify-center">
+                <Shield className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-base font-black text-fg">🛡️ فحص الضمان الإلكتروني بالرقم وطلب استبدال فوري</h3>
+                <p className="text-[11px] text-muted">اكتب رقم موبايلك أو رقم الفاتورة لمعرفة حالة الضمان وطلب استبدال بضغطة زر</p>
+              </div>
+            </div>
+            <button type="button" onClick={() => setWarrantyModalOpen(false)} className="p-1.5 rounded-lg bg-surface2 text-muted">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              dir="ltr"
+              value={warrantyPhoneQuery}
+              onChange={e => setWarrantyPhoneQuery(e.target.value)}
+              placeholder={currentClient?.phone || 'اكتب رقم الموبايل (مثال: 01012345678) أو رقم الفاتورة INV-...'}
+              className="flex-1 p-3 rounded-xl border border-line font-mono font-black text-sm"
+            />
+            {currentClient?.phone && warrantyPhoneQuery !== currentClient.phone && (
+              <button
+                type="button"
+                onClick={() => setWarrantyPhoneQuery(currentClient.phone)}
+                className="px-3.5 py-2 rounded-xl bg-accent text-accent-ink font-black"
+              >
+                فحص برقمي
+              </button>
+            )}
+          </div>
+
+          <div className="flex-1 overflow-y-auto space-y-3">
+            {cleanQ.length < 4 ? (
+              <div className="py-10 text-center text-muted font-bold">
+                أدخل رقم الموبايل أو رقم الفاتورة بالأعلى لعرض جميع مشترياتك وحالة الضمان لكل قطعة.
+              </div>
+            ) : matchedOrders.length === 0 ? (
+              <div className="py-10 text-center text-muted font-bold">
+                لا توجد فواتير مسجلة بهذا الرقم ({cleanQ}). تأكد من الرقم الصحيح.
+              </div>
+            ) : (
+              matchedOrders.map(ord => {
+                const ordTs = Date.parse(String(ord.createdAt || '').replace(' ', 'T'));
+                const daysElapsed = !Number.isNaN(ordTs) ? Math.max(0, Math.floor((Date.now() - ordTs) / (1000 * 60 * 60 * 24))) : 5;
+
+                return (
+                  <div key={ord.id} className="p-4 rounded-2xl bg-surface2 border border-line space-y-3">
+                    <div className="flex items-center justify-between border-b border-line pb-2">
+                      <span className="font-black text-fg">فاتورة #{ord.id} • {ord.clientName}</span>
+                      <span className="text-[11px] text-muted font-mono">{ord.createdAt} (منذ {daysElapsed} يوم)</span>
+                    </div>
+                    <div className="space-y-2">
+                      {(ord.items || []).map((it, idx) => {
+                        const partObj = parts.find(p => String(p.id) === String(it.partId));
+                        const wText = String(partObj?.warrantyText || '');
+                        const wDays = wText.includes('سنة') ? 365 : wText.includes('6 شهور') ? 180 : wText.includes('60') ? 60 : wText.includes('30') ? 30 : defaultWarrDays;
+                        const remainingDays = Math.max(0, wDays - daysElapsed);
+                        const isValidWarranty = remainingDays > 0;
+                        const claimKey = `${ord.id}_${it.partId}`;
+                        const alreadyClaimed = returnsList.some(r => r.orderId === ord.id && String(r.partId) === String(it.partId));
+
+                        return (
+                          <div key={idx} className="p-3 rounded-xl bg-surface border border-line space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <div className="font-extrabold text-fg">{it.name} (الكمية: {it.qty})</div>
+                                <div className="text-[11px] text-muted">{partObj?.warrantyText || `ضمان استبدال معتمد لمدة ${wDays} يوم`}</div>
+                              </div>
+                              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black ${
+                                isValidWarranty ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/15 text-rose-500'
+                              }`}>
+                                {isValidWarranty ? `✅ الضمان ساري (متبقي ${remainingDays} يوم)` : '⏰ انتهت فترة الضمان'}
+                              </span>
+                            </div>
+
+                            {isValidWarranty && (
+                              <div className="flex flex-wrap items-center gap-2 pt-1">
+                                {alreadyClaimed ? (
+                                  <span className="text-[11px] font-black text-amber-500">⏳ تم إرسال طلب استبدال بالضمان لهذا المنتج وهو قيد المراجعة</span>
+                                ) : (
+                                  <>
+                                    <input
+                                      type="text"
+                                      value={warrantyClaimNotes[claimKey] || ''}
+                                      onChange={e => setWarrantyClaimNotes(prev => ({ ...prev, [claimKey]: e.target.value }))}
+                                      placeholder="اكتب سبب الاستبدال باختصار (مثال: الجراب أو الكابل فيه مشكلة)..."
+                                      className="flex-1 px-3 py-1.5 rounded-xl border border-line text-[11px]"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleRequestWarrantyReplacement(ord, it)}
+                                      className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] shrink-0"
+                                    >
+                                      🔄 اطلب استبدال فوري
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // --- Saved Family Devices Modal ("موبايلي وموبايل مراتي وأخويا") ---
+  const renderFamilyDevicesModal = () => {
+    if (!familyModalOpen) return null;
+    const ownerPresets = ['اختياراتي الشخصية', 'اختيارات زوجتي', 'اختيارات أخي', 'اختيارات أختي', 'اختيارات والدي / والدتي', 'احتياجات العمل / المكتب'];
+
+    return (
+      <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[185] flex items-center justify-center p-4">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-6 border-2 border-cyan-500/40 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div>
+              <h3 className="text-base font-black text-fg flex items-center gap-2">
+                <span>👨‍👩‍👧‍👦</span>
+                <span>اختياراتي وعائلتي (تنبيهات المنتجات الجديدة)</span>
+              </h3>
+              <p className="text-[11px] text-muted mt-0.5">
+                احفظ الأقسام أو الموديلات المفضلة لك ولعائلتك، وأول ما ينزل منتج جديد في أي قسم منها هيوصلك إشعار فوري!
+              </p>
+            </div>
+            <button type="button" onClick={() => setFamilyModalOpen(false)} className="p-1.5 rounded-lg bg-surface2 text-muted">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <form onSubmit={handleAddFamilyDevice} className="p-3.5 rounded-2xl bg-surface2 border border-line space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div>
+                <label className="font-bold text-muted block mb-1">صاحب الجهاز / الوصف:</label>
+                <select
+                  value={newFamilyOwnerLabel}
+                  onChange={e => setNewFamilyOwnerLabel(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                >
+                  {ownerPresets.map(lbl => (
+                    <option key={lbl} value={lbl}>{lbl}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="font-bold text-muted block mb-1">اختر الموديل / القسم:</label>
+                <select
+                  value={newFamilyModelId || (models[0]?.id || '')}
+                  onChange={e => setNewFamilyModelId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-line font-bold"
+                >
+                  {models.map(m => (
+                    <option key={m.id} value={m.id}>{m.brand} — {m.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button
+              type="submit"
+              className="w-full py-2.5 rounded-xl bg-accent text-accent-ink font-black text-xs shadow-xs"
+            >
+              + حفظ الجهاز وتفعيل إشعارات المنتجات الجديدة 🔔
+            </button>
+          </form>
+
+          <div className="flex-1 overflow-y-auto space-y-2">
+            {activeFamilyDevices.length === 0 ? (
+              <div className="py-8 text-center text-muted font-bold">
+                لم تقم بحفظ أي أجهزة بعد. أضف جهازك أو جهاز عائلتك بالأعلى!
+              </div>
+            ) : (
+              activeFamilyDevices.map(dev => {
+                const matchingParts = publicParts.filter(p => String(p.modelId) === String(dev.modelId));
+                const latestPart = matchingParts[0];
+                return (
+                  <div key={dev.id} className="p-3 rounded-2xl bg-surface2 border border-line space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-500 font-black text-[10px] ml-2">
+                          {dev.ownerLabel}
+                        </span>
+                        <span className="font-black text-fg text-xs">{dev.modelName}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedModelId(dev.modelId);
+                            setClientTab('search');
+                            setFamilyModalOpen(false);
+                          }}
+                          className="px-2.5 py-1 rounded-lg bg-accent text-accent-ink font-black text-[10px]"
+                        >
+                          عرض المنتجات ({matchingParts.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFamilyDevice(dev.id)}
+                          className="p-1 text-rose-500 hover:bg-rose-500/15 rounded-lg"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    {latestPart && (
+                      <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2 text-[11px]">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold truncate">
+                          🔔 متاح لـ {dev.ownerLabel}: <b>{latestPart.name}</b> ({formatMoney(latestPart.basePrice)})
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            updateCartQty(latestPart.id, 1);
+                            showToast(`تمت إضافة "${latestPart.name}" لـ (${dev.ownerLabel}) في السلة!`, 'success');
+                          }}
+                          className="px-2 py-0.5 rounded bg-emerald-600 text-white font-black shrink-0"
+                        >
+                          + أضف للسلة
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // --- Confetti Overlay ---
+  const renderConfettiOverlay = () => {
+    if (!confettiActive) return null;
+    const pieces = Array.from({ length: 36 }, (_, i) => i);
+    const colors = ['#10b981', '#22d3ee', '#fbbf24', '#f43f5e', '#a855f7', '#3b82f6'];
+    return (
+      <div className="fixed inset-0 pointer-events-none z-[250] overflow-hidden">
+        {pieces.map(i => {
+          const left = (i * 2.8) % 100;
+          const delay = (i % 7) * 0.12;
+          const bg = colors[i % colors.length];
+          return (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '-16px',
+                left: `${left}%`,
+                width: i % 2 === 0 ? '10px' : '8px',
+                height: i % 3 === 0 ? '18px' : '10px',
+                backgroundColor: bg,
+                borderRadius: '3px',
+                animation: `hm-confetti-fall 2.6s ease-in ${delay}s forwards`
+              }}
+            />
+          );
+        })}
       </div>
     );
   };
@@ -15474,7 +20338,7 @@ model OrderInvoice {
     }
 
     if (!isIndiv && (!regForm.shopName.trim() || regForm.shopName.trim().length < 3)) {
-      errs.shopName = 'اكتب اسم المحل أو مركز الصيانة صح (3 حروف على الأقل)';
+      errs.shopName = 'اكتب اسم النشاط أو الحساب التجاري بشكل صحيح (3 حروف على الأقل)';
     }
 
     // 2. Phone validation (Egyptian 11 digits starting with 010, 011, 012, 015 OR valid international +10 digits)
@@ -15500,6 +20364,10 @@ model OrderInvoice {
     // 5. Password Confirmation
     if (regForm.confirmPassword !== undefined && regForm.password !== regForm.confirmPassword) {
       errs.confirmPassword = 'كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط';
+    }
+
+    if (!regForm.birthDate || !String(regForm.birthDate).trim()) {
+      errs.birthDate = 'تاريخ الميلاد مطلوب (إجباري) عشان يوصلك كوبون هدية عيد ميلادك السنوي 🎂';
     }
 
     if (!regForm.acceptTerms) {
@@ -15544,6 +20412,8 @@ model OrderInvoice {
       ownerName: ownerName,
       phone: cleanPhone,
       email: regForm.email.trim(),
+      birthDate: regForm.birthDate || '1996-12-30',
+      referredByCode: (regForm.referredByCode || referralCodeInput || '').trim().toUpperCase(),
       requestedPassword: regForm.password,
       address: regForm.address.trim(),
       shopType: isIndiv ? 'عميل فردي (شخص عادي)' : regForm.shopType,
@@ -15563,6 +20433,10 @@ model OrderInvoice {
         owner: ownerName,
         phone: cleanPhone,
         email: regForm.email.trim(),
+        birthDate: regForm.birthDate || '1996-12-30',
+        referralCode: `REF-${cleanPhone.slice(-5)}`,
+        referredByCode: (regForm.referredByCode || referralCodeInput || '').trim().toUpperCase(),
+        savedFamilyDevices: [],
         password: regForm.password,
         address: regForm.address.trim(),
         secondaryAddress: '',
@@ -15973,7 +20847,7 @@ model OrderInvoice {
                     <div>
                       <div className="font-black text-fg text-xs">شخص عادي (استخدام شخصي)</div>
                       <div className="text-[10px] text-muted leading-relaxed mt-0.5">
-                        اشتري منتجات وإكسسوارات لموبايلك بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة
+                        تسوّق جميع المنتجات المختارة بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة
                       </div>
                     </div>
                   </div>
@@ -15983,7 +20857,7 @@ model OrderInvoice {
                       setRegForm(p => ({
                         ...p,
                         accountCategory: 'shop',
-                        shopType: 'مركز صيانة ومبيعات منتجات'
+                        shopType: 'تاجر / موزع ومبيعات معتمد'
                       }));
                       setRegErrors({});
                     }}
@@ -15999,7 +20873,7 @@ model OrderInvoice {
                       <Building2 className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-black text-fg text-xs">صاحب محل أو مركز صيانة</div>
+                      <div className="font-black text-fg text-xs">حساب تجاري / تاجر وموزع</div>
                       <div className="text-[10px] text-muted leading-relaxed mt-0.5">
                         حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع
                       </div>
@@ -16012,7 +20886,7 @@ model OrderInvoice {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {regForm.accountCategory === 'shop' && (
                   <div className="sm:col-span-2">
-                    <label className="font-bold text-muted block mb-1">اسم المحل / مركز الصيانة / الشركة *</label>
+                    <label className="font-bold text-muted block mb-1">اسم النشاط التجاري / المعرض / الشركة *</label>
                     <input
                       type="text"
                       required
@@ -16021,7 +20895,7 @@ model OrderInvoice {
                         setRegForm(p => ({ ...p, shopName: e.target.value }));
                         if (regErrors.shopName) setRegErrors(p => ({ ...p, shopName: null }));
                       }}
-                      placeholder="مثلاً: مركز الأهرام لصيانة الموبايلات..."
+                      placeholder="مثلاً: شركة أو معرض الأهرام للتجارة..."
                       className={`w-full p-2.5 rounded-xl border font-bold text-fg transition ${
                         regErrors.shopName ? 'border-rose-500 bg-rose-500/10 ring-1 ring-rose-400' : 'border-line'
                       }`}
@@ -16081,6 +20955,39 @@ model OrderInvoice {
                   )}
                 </div>
 
+                <div>
+                  <label className="font-bold text-muted block mb-1">🎂 تاريخ الميلاد (إجباري لهدايا عيد ميلادك) *</label>
+                  <input
+                    type="date"
+                    required
+                    value={regForm.birthDate || ''}
+                    onChange={e => {
+                      setRegForm(p => ({ ...p, birthDate: e.target.value }));
+                      if (regErrors.birthDate) setRegErrors(p => ({ ...p, birthDate: null }));
+                    }}
+                    className={`w-full p-2.5 rounded-xl border font-mono font-bold text-fg transition ${
+                      regErrors.birthDate ? 'border-rose-500 bg-rose-500/10 ring-1 ring-rose-400' : 'border-line'
+                    }`}
+                  />
+                  {regErrors.birthDate && (
+                    <p className="text-[11px] text-rose-600 font-bold mt-1 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3 shrink-0" /> {regErrors.birthDate}
+                    </p>
+                  )}
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="font-bold text-muted block mb-1">🤝 كود دعوة صديق — هات صاحبك (اختياري لربح رصيد بالمحفظة):</label>
+                  <input
+                    type="text"
+                    dir="ltr"
+                    value={regForm.referredByCode || ''}
+                    onChange={e => setRegForm(p => ({ ...p, referredByCode: e.target.value.toUpperCase() }))}
+                    placeholder="مثال: REF-10123 (إن وجد)"
+                    className="w-full p-2.5 rounded-xl border border-line font-mono font-bold text-fg"
+                  />
+                </div>
+
                 {regForm.accountCategory === 'shop' && (
                   <div>
                     <label className="font-bold text-muted block mb-1">نوع النشاط التجاري:</label>
@@ -16089,10 +20996,10 @@ model OrderInvoice {
                       onChange={e => setRegForm(p => ({ ...p, shopType: e.target.value }))}
                       className="w-full p-2.5 rounded-xl border border-line font-bold"
                     >
-                      <option>مركز صيانة ومبيعات منتجات</option>
+                      <option>تاجر / موزع ومبيعات معتمد</option>
                       <option>محل إكسسوارات وجوالات</option>
                       <option>تاجر جملة وموزع محلي</option>
-                      <option>فني صيانة مستقل</option>
+                      <option>موزع / عميل جملة معتمد</option>
                     </select>
                   </div>
                 )}
@@ -16408,6 +21315,7 @@ model OrderInvoice {
         password: directClientForm.password || '123',
         address: directClientForm.address.trim() || 'القاهرة',
         secondaryAddress: '',
+        birthDate: directClientForm.birthDate || '',
         groupId: directClientForm.groupId,
         walletBalance: 0,
         creditLimit: Number(directClientForm.creditLimit) || 0,
@@ -16515,7 +21423,7 @@ model OrderInvoice {
                 required
                 value={directClientForm.name}
                 onChange={e => setDirectClientForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="مثال: شركة الهدى لقطع الغيار..."
+                placeholder="مثال: مؤسسة الهدى للتجارة والتوريدات..."
                 className="w-full p-2.5 rounded-xl border border-line font-bold"
               />
             </div>
@@ -18119,7 +23027,7 @@ ${footer}
                 />
                 <div>
                   <h2 className="text-lg font-black text-slate-900 tracking-tight">
-                    {siteSettings.storeName || 'ELZOGHBI'} — {siteSettings.storeSubtitle || 'للهواتف والإكسسوارات وقطع الغيار'}
+                    {siteSettings.storeName || 'ELZOGHBI'} — {siteSettings.storeSubtitle || 'لأحدث المنتجات الأصلية والعروض الحصرية'}
                   </h2>
                   <p className="text-[11px] text-slate-600">
                     {effectiveMode === 'picking'
@@ -18274,7 +23182,16 @@ ${footer}
     if (!selectedDetailItem) return null;
     const { type, part, ad } = selectedDetailItem;
     const targetPart = part || parts[0];
-    const priceInfo = calculatePartPrice(targetPart, currentGroup);
+    const baseModalPriceInfo = calculatePartPrice(targetPart, currentGroup);
+    const modalQualityTiers = getPartQualityTiers(targetPart, baseModalPriceInfo.baseEgpPrice);
+    const activeModalTierId = selectedQualityTiers[targetPart.id] || cart[targetPart.id]?.qualityTier || 'original';
+    const activeModalTierObj = (siteSettings.enableQualityTiers !== false && modalQualityTiers.find(t => t.id === activeModalTierId)) || modalQualityTiers[0];
+    const modalCurrObj = currencies[currentGroup?.currency || 'EGP'] || currencies.EGP;
+    const priceInfo = {
+      ...baseModalPriceInfo,
+      baseEgpPrice: activeModalTierObj.priceEgp,
+      displayPrice: Number((activeModalTierObj.priceEgp * modalCurrObj.rateFromBase).toFixed(modalCurrObj.code === 'EGP' ? 0 : 2))
+    };
     const inCartQty = cart[targetPart.id]?.qty || 0;
     const isOutOfStock = targetPart.stock <= 0 || !!targetPart.soldOut;
     const activeColor = selectedColors[targetPart.id] || cart[targetPart.id]?.color || targetPart.colors[0];
@@ -18596,7 +23513,7 @@ ${footer}
                 className="w-full py-3 rounded-xl bg-amber-500 text-accent-ink font-extrabold flex items-center justify-center gap-2 text-xs"
               >
                 <Bell className="w-4 h-4" />
-                أبلغني فور توفر القطعة بالمخزن
+                🔔 نبّهني على واتساب فور توفر المنتج بالمخزن
               </button>
             ) : (
               <>
@@ -18843,10 +23760,10 @@ ${footer}
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
               <h3 className="text-base font-extrabold text-fg">
-                إدارة الماركات وأنواع الهواتف (إضافة / تعديل / حذف آمن)
+                إدارة الماركات والأقسام الرئيسية (إضافة / تعديل / حذف آمن)
               </h3>
               <p className="text-xs text-muted">
-                عند محاولة حذف ماركة تحتوي على موديلات أو قطع غيار، سيظهر لك تحذير بـ 3 خيارات (مسح الكل، أو نقل وتعديل الماركة، أو إلغاء)
+                عند محاولة حذف ماركة تحتوي على أقسام أو منتجات، سيظهر لك تحذير بـ 3 خيارات (مسح الكل، أو نقل وتعديل الماركة، أو إلغاء)
               </p>
             </div>
             <button onClick={() => setBrandManagerOpen(false)} className="p-1 text-muted">
@@ -18865,7 +23782,7 @@ ${footer}
                   </h4>
                   <p className="mt-1">
                     تحتوي هذه الماركة على <b>{brandDeleteProtectionModal.affectedModelsCount} موديلات</b> و{' '}
-                    <b>{brandDeleteProtectionModal.affectedPartsCount} قطع غيار</b> مسجلة. اختر الإجراء المناسب:
+                    <b>{brandDeleteProtectionModal.affectedPartsCount} منتجات</b> مسجلة. اختر الإجراء المناسب:
                   </p>
                 </div>
               </div>
@@ -18983,7 +23900,7 @@ ${footer}
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-fg text-sm">{b}</span>
                         <span className="text-[11px] text-muted">
-                          ({bModels.length} موديلات • {bPartsCount} قطع غيار)
+                          ({bModels.length} موديلات • {bPartsCount} منتج)
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
@@ -19050,7 +23967,7 @@ ${footer}
       const newTpl = {
         id: `tpl_${Date.now()}`,
         skuPrefix: newTplSkuPrefix.trim().toUpperCase() || 'PRT',
-        category: newTplCategory.trim() || 'قطع غيار متنوعة',
+        category: newTplCategory.trim() || 'منتجات مختارة',
         namePattern: pattern,
         qualityGrade: newTplQuality,
         colors: ['أسود', 'أصلي'],
@@ -19497,25 +24414,71 @@ ${footer}
         oldPrice: parsedOldPrice,
         hidden: isHiddenFlag,
         _isCustomUploaded: true,
+        cashbackEnabled: Boolean(addingPartToModel.cashbackEnabled),
+        cashbackPct: Number(addingPartToModel.cashbackPct) || Number(siteSettings.defaultCashbackPct) || 2,
+        isVipOnly: Boolean(addingPartToModel.isVipOnly),
+        vipPrice: Number(addingPartToModel.vipPrice) || 0,
         customGroupPrices: {
           _images: finalImgsList,
           _oldPrice: parsedOldPrice,
-          _hidden: isHiddenFlag
+          _hidden: isHiddenFlag,
+          _cashbackEnabled: Boolean(addingPartToModel.cashbackEnabled),
+          _cashbackPct: Number(addingPartToModel.cashbackPct) || Number(siteSettings.defaultCashbackPct) || 2,
+          _isVipOnly: Boolean(addingPartToModel.isVipOnly),
+          _vipPrice: Number(addingPartToModel.vipPrice) || 0,
+          _tierOriginalPrice: Number(addingPartToModel.basePrice) || 0,
+          _tierFirstClassPrice: Number(addingPartToModel.tierFirstClassPrice) || 0,
+          _tierEconomyPrice: Number(addingPartToModel.tierEconomyPrice) || 0
         },
         waitlistCount: 0
       };
 
       setParts(prev => [newPart, ...prev]);
+      markLocalUpsert('parts', newPart);
       saveSiteSettingsImmediate(prev => ({
         ...prev,
         hiddenPartIds: isHiddenFlag
           ? Array.from(new Set([...(prev.hiddenPartIds || []), newPartId]))
           : (prev.hiddenPartIds || []),
+        cashbackPartMap: {
+          ...(prev.cashbackPartMap || {}),
+          [newPartId]: Boolean(addingPartToModel.cashbackEnabled)
+        },
         partExtraMeta: {
           ...(prev.partExtraMeta || {}),
-          [newPartId]: { images: finalImgsList, oldPrice: parsedOldPrice }
+          [newPartId]: {
+            images: finalImgsList,
+            oldPrice: parsedOldPrice,
+            cashbackEnabled: Boolean(addingPartToModel.cashbackEnabled),
+            cashbackPct: Number(addingPartToModel.cashbackPct) || 2,
+            isVipOnly: Boolean(addingPartToModel.isVipOnly),
+            vipPrice: Number(addingPartToModel.vipPrice) || 0
+          }
         }
       }));
+
+      // Automatically notify all customers who saved this model in their Family Devices ("موبايلي وموبايل مراتي وأخويا")!
+      if (siteSettings.enableFamilySavedDevices !== false) {
+        const famNotifs = [];
+        clients.forEach(cli => {
+          (cli.savedFamilyDevices || []).forEach(dev => {
+            if (String(dev.modelId) === String(addingPartToModel.model.id)) {
+              famNotifs.push({
+                id: `ntf_fam_${Date.now()}_${cli.id}`,
+                target: cli.id,
+                type: 'family_arrival',
+                title: `🎉 نزل منتج جديد لـ (${dev.ownerLabel})!`,
+                msg: `توفر الآن "${newPart.name}" مناسب لـ ${dev.ownerLabel} (${dev.modelName}) بسعر ${newPart.basePrice} ج.م!`,
+                time: 'الآن',
+                read: false
+              });
+            }
+          });
+        });
+        if (famNotifs.length > 0) {
+          setNotifications(prev => [...famNotifs, ...prev]);
+        }
+      }
       setAddingPartToModel(null);
       showToast(`تمت إضافة "${newPart.name}" داخل موديل "${addingPartToModel.model.name}" بنجاح!`, 'success');
     };
@@ -19533,7 +24496,7 @@ ${footer}
         >
           <div className="flex items-center justify-between border-b border-line pb-3">
             <h3 className="text-base font-extrabold text-fg">
-              إضافة قطعة غيار جديدة لموديل: <span className="text-indigo-600">{addingPartToModel.model.name}</span>
+              إضافة منتج جديد داخل: <span className="text-indigo-600">{addingPartToModel.model.name}</span>
             </h3>
             <button type="button" onClick={() => setAddingPartToModel(null)} className="p-1.5 rounded-lg bg-surface2 hover:bg-rose-500/15 text-muted hover:text-rose-600">
               <X className="w-5 h-5" />
@@ -19632,7 +24595,7 @@ ${footer}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="sm:col-span-2">
-              <label className="font-bold text-muted block mb-1">اسم قطعة الغيار:</label>
+              <label className="font-bold text-muted block mb-1">اسم المنتج:</label>
               <input
                 type="text"
                 required
@@ -19648,7 +24611,7 @@ ${footer}
                 type="text"
                 value={addingPartToModel.category}
                 onChange={e => setAddingPartToModel(prev => ({ ...prev, category: e.target.value }))}
-                placeholder="شاشات كاملة، بطاريات، بورد شحن..."
+                placeholder="إلكترونيات، مستلزمات ذكية، إكسسوارات، عروض خاصة..."
                 className="w-full p-2.5 rounded-xl border border-line font-bold"
               />
             </div>
@@ -19760,7 +24723,7 @@ ${footer}
                 type="text"
                 value={addingPartToModel.warrantyText || ''}
                 onChange={e => setAddingPartToModel(prev => ({ ...prev, warrantyText: e.target.value }))}
-                placeholder="مثال: ضمان 6 شهور استبدال فوري ضد الانتفاخ، أو ضمان تجربة 14 يوم قبل اللزق..."
+                placeholder="مثال: ضمان 6 شهور استبدال فوري ضد الانتفاخ، أو ضمان معاينة وتجربة 14 يوم بحالته الأصلية..."
                 className="w-full p-2.5 rounded-xl border border-line font-bold"
               />
             </div>
@@ -19771,7 +24734,7 @@ ${footer}
                 rows={2}
                 value={addingPartToModel.description || ''}
                 onChange={e => setAddingPartToModel(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="اكتب أي مواصفات وتفاصيل فنية تهم العميل وفني الصيانة..."
+                placeholder="اكتب كافة المواصفات والتفاصيل والمميزات التي تهم العميل..."
                 className="w-full p-2.5 rounded-xl border border-line"
               />
             </div>
@@ -19791,7 +24754,7 @@ ${footer}
             type="submit"
             className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold"
           >
-            حفظ وإدراج القطعة داخل الموديل ✓
+            حفظ وإدراج المنتج الآن ✓
           </button>
         </form>
       </div>
@@ -19881,13 +24844,27 @@ ${footer}
                 costPrice: Number(editingPartObj.costPrice),
                 basePrice: Number(editingPartObj.basePrice),
                 oldPrice: parsedOldPrice,
+                cashbackEnabled: Boolean(editingPartObj.cashbackEnabled),
+                cashbackPct: Number(editingPartObj.cashbackPct) || 2,
+                isVipOnly: Boolean(editingPartObj.isVipOnly),
+                vipPrice: Number(editingPartObj.vipPrice) || 0,
+                tierOriginalPrice: Number(editingPartObj.basePrice) || 0,
+                tierFirstClassPrice: Number(editingPartObj.tierFirstClassPrice) || 0,
+                tierEconomyPrice: Number(editingPartObj.tierEconomyPrice) || 0,
                 hidden: isHiddenFlag,
                 _isCustomUploaded: true,
                 customGroupPrices: {
                   ...(p.customGroupPrices || {}),
                   _images: finalImgsList,
                   _oldPrice: parsedOldPrice,
-                  _hidden: isHiddenFlag
+                  _hidden: isHiddenFlag,
+                  _cashbackEnabled: Boolean(editingPartObj.cashbackEnabled),
+                  _cashbackPct: Number(editingPartObj.cashbackPct) || 2,
+                  _isVipOnly: Boolean(editingPartObj.isVipOnly),
+                  _vipPrice: Number(editingPartObj.vipPrice) || 0,
+                  _tierOriginalPrice: Number(editingPartObj.basePrice) || 0,
+                  _tierFirstClassPrice: Number(editingPartObj.tierFirstClassPrice) || 0,
+                  _tierEconomyPrice: Number(editingPartObj.tierEconomyPrice) || 0
                 },
                 colors: colorsArr.length > 0 ? colorsArr : ['قياسي'],
                 compatibleModels: compatArr.length > 0 ? compatArr : p.compatibleModels
@@ -19903,14 +24880,29 @@ ${footer}
         return {
           ...prev,
           hiddenPartIds: nextHidden,
+          cashbackPartMap: {
+            ...(prev.cashbackPartMap || {}),
+            [targetPid]: Boolean(editingPartObj.cashbackEnabled)
+          },
           partExtraMeta: {
             ...(prev.partExtraMeta || {}),
-            [targetPid]: { images: finalImgsList, oldPrice: parsedOldPrice }
+            [targetPid]: {
+              ...(prev.partExtraMeta?.[targetPid] || {}),
+              images: finalImgsList,
+              oldPrice: parsedOldPrice,
+              cashbackEnabled: Boolean(editingPartObj.cashbackEnabled),
+              cashbackPct: Number(editingPartObj.cashbackPct) || 2,
+              isVipOnly: Boolean(editingPartObj.isVipOnly),
+              vipPrice: Number(editingPartObj.vipPrice) || 0,
+              tierOriginalPrice: Number(editingPartObj.basePrice) || 0,
+              tierFirstClassPrice: Number(editingPartObj.tierFirstClassPrice) || 0,
+              tierEconomyPrice: Number(editingPartObj.tierEconomyPrice) || 0
+            }
           }
         };
       });
       setEditingPartObj(null);
-      showToast('تم حفظ تعديلات وروابط صور قطعة الغيار بنجاح ✓', 'success');
+      showToast('تم حفظ تعديلات وروابط صور المنتج بنجاح ✓', 'success');
     };
 
     const currentPreview = editFourSlots.map(s => s.trim()).find(Boolean) || PART_IMAGES.screen;
@@ -19922,7 +24914,7 @@ ${footer}
           className="bg-surface rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-xs max-h-[90vh] overflow-y-auto"
         >
           <div className="flex items-center justify-between border-b border-line pb-3">
-            <h3 className="text-base font-extrabold text-fg">تعديل بيانات وصور قطعة الغيار (حتى 4 صور)</h3>
+            <h3 className="text-base font-extrabold text-fg">تعديل بيانات وصور المنتج (حتى 4 صور)</h3>
             <button type="button" onClick={() => setEditingPartObj(null)} className="p-1.5 rounded-lg bg-surface2 hover:bg-rose-500/15 text-muted hover:text-rose-600">
               <X className="w-5 h-5" />
             </button>
@@ -20094,6 +25086,66 @@ ${footer}
                 />
                 <span>🚫 إخفاء هذا المنتج عن واجهة العميل</span>
               </label>
+            </div>
+
+            {/* Per-Product Cashback, VIP & 3 Quality Tiers Price Box */}
+            <div className="sm:col-span-2 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface border border-line font-black cursor-pointer">
+                  <span>💰 تفعيل الكاش باك على هذا المنتج:</span>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(editingPartObj.cashbackEnabled)}
+                    onChange={e => setEditingPartObj(prev => ({ ...prev, cashbackEnabled: e.target.checked, cashbackPct: prev.cashbackPct || 2 }))}
+                    className="w-4 h-4 accent-emerald-600"
+                  />
+                </label>
+                {editingPartObj.cashbackEnabled && (
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-muted shrink-0">نسبة الكاش باك (%):</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="25"
+                      value={editingPartObj.cashbackPct ?? 2}
+                      onChange={e => setEditingPartObj(prev => ({ ...prev, cashbackPct: e.target.value }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-line">
+                <div>
+                  <label className="text-[10px] font-bold text-muted block mb-1">✨ سعر الأصلي 100% (ج.م):</label>
+                  <input
+                    type="number"
+                    value={editingPartObj.basePrice ?? 0}
+                    onChange={e => setEditingPartObj(prev => ({ ...prev, basePrice: e.target.value }))}
+                    className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-muted block mb-1">⭐ سعر الفرز الأول (اختياري):</label>
+                  <input
+                    type="number"
+                    value={editingPartObj.tierFirstClassPrice ?? ''}
+                    onChange={e => setEditingPartObj(prev => ({ ...prev, tierFirstClassPrice: e.target.value }))}
+                    placeholder="اتركه فارغاً للحساب التلقائي"
+                    className="w-full p-2 rounded-xl border border-line font-mono font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold text-muted block mb-1">💡 سعر الاقتصادي (اختياري):</label>
+                  <input
+                    type="number"
+                    value={editingPartObj.tierEconomyPrice ?? ''}
+                    onChange={e => setEditingPartObj(prev => ({ ...prev, tierEconomyPrice: e.target.value }))}
+                    placeholder="اتركه فارغاً للحساب التلقائي"
+                    className="w-full p-2 rounded-xl border border-line font-mono font-bold"
+                  />
+                </div>
+              </div>
             </div>
 
             <div>
@@ -20483,7 +25535,7 @@ ${footer}
   const homeElRef = React.useRef(null);
   const searchElRef = React.useRef(null);
   const lastRenderSigRef = React.useRef('');
-  const currentRenderSig = `${uiTheme}_${JSON.stringify(siteSettings)}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${showcaseBars.length}_${activeRole}`;
+  const currentRenderSig = `${uiTheme}_${JSON.stringify(siteSettings)}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${showcaseBars.length}_${activeRole}_${JSON.stringify(cart)}_${JSON.stringify(selectedQualityTiers)}`;
   if (lastRenderSigRef.current !== currentRenderSig) {
     homeElRef.current = null;
     searchElRef.current = null;
@@ -20587,6 +25639,10 @@ ${footer}
         }
         html { -webkit-text-size-adjust: 100%; }
         [dir='ltr'] .text-right { text-align: left; }
+        @keyframes hm-confetti-fall {
+          0% { transform: translate3d(0, -10px, 0) rotate(0deg); opacity: 1; }
+          100% { transform: translate3d(25px, 100vh, 0) rotate(720deg); opacity: 0; }
+        }
         @keyframes hm-ticker-scroll-rtl {
           0% { transform: translate3d(0, 0, 0); }
           100% { transform: translate3d(50%, 0, 0); }
@@ -20646,8 +25702,44 @@ ${footer}
           <main className="flex-1">
             {renderAnnouncements()}
             {renderClientHeader()}
+            {/* Automatic Birthday / Seasonal Offer Banner */}
+            {activeBirthdayOrSeasonalBanner && (
+              <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 px-4 py-2.5 text-xs font-black shadow-md">
+                <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <span>{activeBirthdayOrSeasonalBanner.title} — </span>
+                    <span>{activeBirthdayOrSeasonalBanner.subtitle}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const bPromo = {
+                        id: `prm_${activeBirthdayOrSeasonalBanner.code}`,
+                        code: activeBirthdayOrSeasonalBanner.code,
+                        type: 'percentage',
+                        value: activeBirthdayOrSeasonalBanner.pct,
+                        maxDiscountCap: 500,
+                        minOrderAmount: 0,
+                        usageLimit: 10000,
+                        usedCount: 0,
+                        expiryDate: '2027-12-31',
+                        description: activeBirthdayOrSeasonalBanner.title,
+                        active: true
+                      };
+                      setPromoCodeInput(bPromo.code);
+                      setAppliedPromo(bPromo);
+                      showToast(`🎁 تم تفعيل الكوبون (${bPromo.code}) بخصم ${bPromo.value}%!`, 'success');
+                    }}
+                    className="px-3 py-1 rounded-xl bg-slate-950 text-amber-300 font-black text-[11px]"
+                  >
+                    تفعيل الكوبون ({activeBirthdayOrSeasonalBanner.code}) الآن ⚡
+                  </button>
+                </div>
+              </div>
+            )}
             {homeElRef.current && <div className={homeActiveNow ? '' : 'hidden'}>{homeElRef.current}</div>}
             {searchElRef.current && <div className={searchActiveNow ? '' : 'hidden'}>{searchElRef.current}</div>}
+            {clientTab === 'vip' && renderVipRouteView()}
             {clientTab === 'checkout' && renderCheckoutView()}
             {clientTab === 'account' && renderClientAccountPortal()}
           </main>
@@ -20675,6 +25767,15 @@ ${footer}
       {renderFilterSheet()}
       {renderSourcingFormModal()}
       {renderLightbox()}
+      {renderSpinToWinModal()}
+      {renderFloatingSpinTrigger()}
+      {renderLiveSocialProofToast()}
+      {renderExitIntentModal()}
+      {renderCustomerRestockNotifyModal()}
+      {renderAdminRestockWhatsappModal()}
+      {renderWarrantyLookupModal()}
+      {renderFamilyDevicesModal()}
+      {renderConfettiOverlay()}
     </div>
   );
 }
