@@ -3356,9 +3356,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v26_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v27_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v26_fast_boot_mobile_lock_and_smart_search') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v27_instant_progressive_hydration') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -3371,7 +3371,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v26_fast_boot_mobile_lock_and_smart_search');
+      window.localStorage.setItem('elzoghbi_app_version', 'v27_instant_progressive_hydration');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -3556,7 +3556,7 @@ export default function App() {
         const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
         let currentQuery = qStr;
 
-        for (let attempt = 0; attempt < 8; attempt++) {
+        for (let attempt = 0; attempt < 3; attempt++) {
           const currentCols = colsList.join(',');
           const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
             headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
@@ -3565,18 +3565,6 @@ export default function App() {
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
-              // Fast bounded fetch: NEVER loop up to 30,000 rows on page load! On-demand search & model filters fetch any specific slice in <200ms.
-              if (rows.length === 1000 && realTable === 'mobile_models' && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
-                try {
-                  const pRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&order=id.asc&limit=1000&offset=1000`, {
-                    headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                  });
-                  if (pRes.ok) {
-                    const pData = await pRes.json();
-                    if (Array.isArray(pData) && pData.length > 0) rows = rows.concat(pData);
-                  }
-                } catch (e) {}
-              }
               const mapped = rows.map(toCamelCaseRow);
               if (STATIC_SESSION_TABLES.has(realTable)) {
                 writeSessionTableCache(cacheKey, mapped);
@@ -3591,17 +3579,18 @@ export default function App() {
             const colMatch =
               errText.match(/column [^."]*\.?([a-zA-Z0-9_]+) does not exist/i) ||
               errText.match(/Could not find the '([^']+)' column/i);
+            // If an order-by column doesn't exist (e.g. sort_order or created_at), strip that order clause immediately
             if (colMatch && colMatch[1]) {
               const missingCol = colMatch[1].trim();
-              if (colsList.includes(missingCol) && colsList.length > 1) {
-                colsList = colsList.filter(c => c !== missingCol);
-                continue;
-              }
               if (currentQuery.includes(missingCol)) {
-                currentQuery = currentQuery.replace(new RegExp(`&?order=${missingCol}\\.(asc|desc)`, 'i'), '');
-                continue;
+                currentQuery = currentQuery
+                  .replace(new RegExp(`&?order=${missingCol}\\.(asc|desc)(,[a-zA-Z0-9_.]+)?`, 'ig'), '')
+                  .replace(new RegExp(`&?${missingCol}=[^&]+`, 'ig'), '');
               }
             }
+            // Immediately fall back to select=* instead of failing 8 times one column at a time!
+            colsList = ['*'];
+            continue;
           }
           break;
         }
@@ -4141,8 +4130,8 @@ export default function App() {
       return;
     }
 
-    // If this render was triggered by incoming server pull or cross-tab event, update baseline and skip diffing
-    if (isIncomingSyncRef.current || Date.now() < incomingSyncUntilRef.current) {
+    // If initial server pull hasn't completed yet, or this render was triggered by incoming server pull / cross-tab event, update baseline and skip diffing!
+    if (!hasCloudInitialPullCompletedRef.current || isIncomingSyncRef.current || Date.now() < incomingSyncUntilRef.current) {
       isIncomingSyncRef.current = false;
       prevSlicesRef.current = {
         ...currentSlices,
@@ -4464,462 +4453,346 @@ export default function App() {
   const pullFromSupabaseCloud = async (silent = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) {
+      setIsInitialCloudBooting(false);
       hasCloudInitialPullCompletedRef.current = true;
       return;
     }
 
-    // Never overwrite while a local save is queued or in-flight!
-    if (silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 5000))) {
+    const isInitialBoot = !hasCloudInitialPullCompletedRef.current;
+
+    // Never overwrite while a genuine user local save is in-flight (unless this is the very first boot pull!)
+    if (!isInitialBoot && silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 5000))) {
       return;
     }
 
     try {
-      // Optional lightweight check on sync_meta if table exists and initial pull already finished
-      if (silent && hasCloudInitialPullCompletedRef.current) {
-        try {
-          const smRes = await fetch(`${sbUrl}/rest/v1/sync_meta?select=table_name,updated_at`, {
-            headers: sbHeaders(sbKey, { 'Cache-Control': 'no-cache' })
-          });
-          if (smRes.ok) {
-            const smRows = await smRes.json();
-            if (Array.isArray(smRows) && smRows.length > 0) {
-              let anyChanged = false;
-              smRows.forEach(r => {
-                if (r.table_name && r.updated_at) {
-                  if (lastKnownTableTimestampsRef.current[r.table_name] !== r.updated_at) {
-                    anyChanged = true;
-                  }
-                  lastKnownTableTimestampsRef.current[r.table_name] = r.updated_at;
-                }
-              });
-              if (!anyChanged && Object.keys(lastKnownTableTimestampsRef.current).length > 0) {
-                return; // Zero changes on server -> 0 bytes downloaded!
-              }
-            }
-          }
-        } catch (e) {}
-      }
-
       const isAdmin = appPortal === 'admin' || adminAuthenticated;
-      if (silent && hasInitialBootPullRanRef.current && (!isAdmin || hasAdminTablesPulledRef.current)) {
+      if (!isInitialBoot && silent && hasInitialBootPullRanRef.current && (!isAdmin || hasAdminTablesPulledRef.current)) {
         return;
       }
       hasInitialBootPullRanRef.current = true;
       if (isAdmin) hasAdminTablesPulledRef.current = true;
 
       setCloudSyncStatus('syncing');
+      const forceRefresh = !silent || isInitialBoot;
 
-      // 1. STAGE 1 INSTANT BOOT (< 0.4s): Fetch lightweight settings, ads, bars, brands, models & custom/latest 300 products first!
-      const forceRefresh = !silent;
-      const [
-        partsRowsCustomDate,
-        partsRowsCustomSku,
-        partsRowsLatest,
-        modelsRows,
-        groupsRows,
-        adsRows,
-        barsRows,
-        brandsRows,
-        promosRows,
-        settingsRows,
-        templatesRows
-      ] = await Promise.all([
-        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=400', forceRefresh),
-        sbFetchTable('spare_parts', null, '&sku=ilike.PRT-*&limit=400', forceRefresh),
-        sbFetchTable('spare_parts', null, '&order=id.desc&limit=250', forceRefresh),
-        sbFetchTable('mobile_models', null, '&order=id.asc&limit=600', forceRefresh),
-        sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
-        sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20', forceRefresh),
-        sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20', forceRefresh),
-        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
-        sbFetchTable('promo_codes', null, '&limit=50', forceRefresh),
+      // Helper to apply incoming state safely without triggering false local mutation diffs
+      const markIncomingWindow = () => {
+        incomingSyncUntilRef.current = Date.now() + 1500;
+        isIncomingSyncRef.current = true;
+      };
+
+      // =========================================================================
+      // PHASE A (ULTRA-FAST ~150ms): Launch Settings, Ads, Showcase Bars, Brands, Groups & Promos
+      // They apply to the screen IMMEDIATELY as soon as they resolve — NEVER blocked by spare_parts!
+      // =========================================================================
+      const fastUiPromise = Promise.all([
         sbFetchTable('site_settings', null, '&limit=5', true),
-        isAdmin ? sbFetchTable('auto_templates', null, '&limit=50', forceRefresh) : Promise.resolve(null)
+        sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=30', forceRefresh),
+        sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=30', forceRefresh),
+        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
+        sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
+        sbFetchTable('promo_codes', null, '&limit=100', forceRefresh)
+      ]).then(([settingsRows, adsRows, barsRows, brandsRows, groupsRows, promosRows]) => {
+        markIncomingWindow();
+
+        // 1. Apply site_settings immediately
+        const latestLocalSettings = (() => {
+          try {
+            const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');
+            if (raw) return JSON.parse(raw);
+          } catch (e) {}
+          return null;
+        })();
+        const cfgRow = (Array.isArray(settingsRows) && settingsRows.length > 0)
+          ? (settingsRows.find(r => r.id === 'main') || settingsRows[0])
+          : null;
+        if (cfgRow) {
+          const srvSettings = cfgRow.settings || {};
+          const localTs = Number(latestLocalSettings?._updatedAt || 0);
+          const srvTs = Number(srvSettings?._updatedAt || (cfgRow.updated_at ? Date.parse(cfgRow.updated_at) : 0) || 0);
+          const winningSettings = (latestLocalSettings && localTs > srvTs)
+            ? { ...srvSettings, ...latestLocalSettings }
+            : { ...(latestLocalSettings || {}), ...srvSettings };
+          if (winningSettings && typeof winningSettings === 'object' && Object.keys(winningSettings).length > 0) {
+            const mergedSettings = {
+              ...siteSettings,
+              ...winningSettings,
+              supabaseUrl: winningSettings.supabaseUrl || sbUrl,
+              supabaseAnonKey: winningSettings.supabaseAnonKey || sbKey
+            };
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = mergedSettings;
+            setSiteSettings(mergedSettings);
+            try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(mergedSettings)); } catch (e) {}
+          }
+          if (cfgRow.credentials && typeof cfgRow.credentials === 'object' && cfgRow.credentials.username) {
+            if (prevSlicesRef.current) prevSlicesRef.current.adminCredentials = cfgRow.credentials;
+            setAdminCredentials(cfgRow.credentials);
+            try { window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(cfgRow.credentials)); } catch (e) {}
+          }
+          if (cfgRow.currencies && typeof cfgRow.currencies === 'object' && Object.keys(cfgRow.currencies).length > 0) {
+            if (prevSlicesRef.current) prevSlicesRef.current.currencies = cfgRow.currencies;
+            setCurrencies(cfgRow.currencies);
+            try { window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(cfgRow.currencies)); } catch (e) {}
+          }
+          if (Array.isArray(cfgRow.notifications) && cfgRow.notifications.length > 0) {
+            setNotifications(prev => {
+              const seen = new Set();
+              const combined = [];
+              [...cfgRow.notifications, ...(Array.isArray(prev) ? prev : [])].forEach(n => {
+                if (n && n.id && !seen.has(n.id)) {
+                  seen.add(n.id);
+                  combined.push(n);
+                }
+              });
+              const sliced = combined.slice(0, 120);
+              if (prevSlicesRef.current) prevSlicesRef.current.notifications = sliced;
+              try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(sliced)); } catch (e) {}
+              return sliced;
+            });
+          }
+        }
+
+        // 2. Apply store_ads immediately (replaces INITIAL_STORE_ADS right away!)
+        if (Array.isArray(adsRows) && adsRows.length > 0) {
+          setStoreAds(() => {
+            const cleanAds = adsRows.slice().sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+            if (prevSlicesRef.current) prevSlicesRef.current.storeAds = cleanAds;
+            try { window.localStorage.setItem('elzoghbi_v2_storeAds', JSON.stringify(cleanAds)); } catch (e) {}
+            return cleanAds;
+          });
+        }
+
+        // 3. Apply showcase_bars immediately (replaces INITIAL_SHOWCASE_BARS right away!)
+        if (Array.isArray(barsRows) && barsRows.length > 0) {
+          setShowcaseBars(() => {
+            const cleanBars = barsRows.slice().sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+            if (prevSlicesRef.current) prevSlicesRef.current.showcaseBars = cleanBars;
+            try { window.localStorage.setItem('elzoghbi_v2_showcaseBars', JSON.stringify(cleanBars)); } catch (e) {}
+            return cleanBars;
+          });
+        }
+
+        // 4. Apply brands & brand images immediately
+        if (Array.isArray(brandsRows) && brandsRows.length > 0) {
+          const fetchedBrandImgs = {};
+          brandsRows.forEach(b => {
+            if (b && typeof b === 'object' && b.name && (b.image_url || b.imageUrl || b.image)) {
+              fetchedBrandImgs[String(b.name).trim()] = b.image_url || b.imageUrl || b.image;
+            }
+          });
+          if (Object.keys(fetchedBrandImgs).length > 0) {
+            setBrandImages(prev => {
+              const next = { ...prev, ...fetchedBrandImgs };
+              try { window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(next)); } catch (e) {}
+              return next;
+            });
+          }
+          const explicitBrands = brandsRows
+            .map(b => String(typeof b === 'object' && b !== null ? (b.name || b.id || '') : b).trim())
+            .filter(Boolean);
+          if (explicitBrands.length > 0) {
+            setBrands(() => {
+              if (prevSlicesRef.current) prevSlicesRef.current.brands = explicitBrands;
+              try { window.localStorage.setItem('elzoghbi_v2_brands', JSON.stringify(explicitBrands)); } catch (e) {}
+              return explicitBrands;
+            });
+          }
+        }
+
+        // 5. Apply pricing_groups & promo_codes immediately
+        if (Array.isArray(groupsRows) && groupsRows.length > 0) {
+          setGroups(prev => {
+            const merged = mergeServerWithLocal('groups', prev, groupsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.groups = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_groups', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(promosRows) && promosRows.length > 0) {
+          setPromoCodes(prev => {
+            const merged = mergeServerWithLocal('promoCodes', prev, promosRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.promoCodes = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_promoCodes', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+      }).catch(() => {});
+
+      // =========================================================================
+      // PHASE B (FAST CATALOG ~250ms): Fetch Models + First 100 Custom/Latest Products
+      // Renders the storefront products immediately without waiting for thousands of rows!
+      // =========================================================================
+      const normalizeAndLinkParts = (partsInput, modelsInput) => {
+        const rawModels = Array.isArray(modelsInput) ? [...modelsInput] : [];
+        const modelIdsSet = new Set(rawModels.map(m => String(m?.id || '')));
+        const linkedParts = (Array.isArray(partsInput) ? partsInput : []).map(p => {
+          const fixedPart = { ...p };
+          if (!fixedPart.basePrice || Number(fixedPart.basePrice) <= 0) {
+            fixedPart.basePrice = Number(fixedPart.costPrice) > 0 ? Math.round(Number(fixedPart.costPrice) * 1.25) : 450;
+          }
+          if (fixedPart.stock === undefined || fixedPart.stock === null) {
+            fixedPart.stock = 15;
+          }
+          const currMdlId = String(fixedPart.modelId || '').trim();
+          if (!currMdlId || !modelIdsSet.has(currMdlId)) {
+            const pName = String(fixedPart.name || '').toLowerCase();
+            const pCompat = Array.isArray(fixedPart.compatibleModels) ? fixedPart.compatibleModels.join(' ').toLowerCase() : '';
+            const pHaystack = `${currMdlId.toLowerCase()} ${pName} ${pCompat} ${String(fixedPart.sku || '').toLowerCase()}`;
+            const matchedMdl = rawModels.find(m => {
+              const mn = String(m?.name || '').trim().toLowerCase();
+              return mn.length >= 2 && (pHaystack.includes(mn) || currMdlId.toLowerCase() === mn);
+            });
+            if (matchedMdl) {
+              fixedPart.modelId = matchedMdl.id;
+            }
+          }
+          return fixedPart;
+        });
+        return { linkedParts, rawModels };
+      };
+
+      const [modelsRows, fastCustomParts, fastLatestParts] = await Promise.all([
+        sbFetchTable('mobile_models', null, '&order=id.asc&limit=500', forceRefresh),
+        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=120', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=id.desc&limit=80', forceRefresh),
+        fastUiPromise
       ]);
 
-      // Combine & deduplicate custom/uploaded products first so the real catalog renders in <0.4s!
-      const combinedPartsMap = new Map();
-      [partsRowsCustomDate, partsRowsCustomSku, partsRowsLatest].forEach(arr => {
+      const fastMap = new Map();
+      [fastCustomParts, fastLatestParts].forEach(arr => {
         if (Array.isArray(arr)) {
           arr.forEach(r => {
             if (r && r.id !== undefined) {
-              const key = String(r.id).trim();
-              if (!combinedPartsMap.has(key)) combinedPartsMap.set(key, r);
-              else combinedPartsMap.set(key, { ...combinedPartsMap.get(key), ...r });
+              const k = String(r.id).trim();
+              if (!fastMap.has(k)) fastMap.set(k, r);
             }
           });
         }
       });
-      const partsRows = Array.from(combinedPartsMap.values());
 
-      // 2. Only fetch Admin tables when Admin is actually viewing the Admin Portal (#/AlaaDB)
-      let [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = [null, null, null, null, null, null];
-      if (isAdmin) {
-        [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = await Promise.all([
-          sbFetchTable('clients', null, '&limit=100'),
-          sbFetchTable('orders', null, '&order=created_at.desc&limit=50'),
-          sbFetchTable('complaints', null, '&order=created_at.desc&limit=50'),
-          sbFetchTable('returns_list', null, '&order=created_at.desc&limit=50'),
-          sbFetchTable('account_requests', null, '&order=created_at.desc&limit=50'),
-          sbFetchTable('sourcing_requests', null, '&order=created_at.desc&limit=30')
-        ]);
-      }
+      const fastPartsList = Array.from(fastMap.values());
+      const { linkedParts: initialLinkedParts, rawModels: initialModels } = normalizeAndLinkParts(fastPartsList, modelsRows);
 
-      // Legacy app_state_sync fallback disabled completely to prevent 5MB blob downloads
-      let legacyPayload = null;
-
-      // Guard again before applying state in case user started editing during network fetch
-      if (silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 4000))) {
-        return;
-      }
-
-      incomingSyncUntilRef.current = Date.now() + 1000;
-      isIncomingSyncRef.current = true;
-
-      // Helper to enrich partially-migrated rows with full fields from legacyPayload (if available)
-      const enrichFromLegacy = (rows, legacyArr) => {
-        if (!Array.isArray(rows) || !Array.isArray(legacyArr) || legacyArr.length === 0) return rows;
-        const legMap = new Map(legacyArr.map(item => [String(item?.id || ''), item]));
-        return rows.map(r => {
-          const leg = legMap.get(String(r?.id || ''));
-          if (!leg) return r;
-          const rPrice = Number(r.basePrice || 0);
-          const legPrice = Number(leg.basePrice || 0);
-          return {
-            ...leg,
-            ...r,
-            modelId: r.modelId || leg.modelId,
-            basePrice: rPrice > 0 ? rPrice : (legPrice > 0 ? legPrice : 450),
-            stock: Number(r.stock) > 0 ? Number(r.stock) : (Number(leg.stock) > 0 ? Number(leg.stock) : 15),
-            colors: (Array.isArray(r.colors) && r.colors.length > 0) ? r.colors : (leg.colors || ['قياسي']),
-            compatibleModels: (Array.isArray(r.compatibleModels) && r.compatibleModels.length > 0) ? r.compatibleModels : (leg.compatibleModels || []),
-            images: (Array.isArray(r.images) && r.images.length > 0) ? r.images : (leg.images || (r.image ? [r.image] : [])),
-            customGroupPrices: (r.customGroupPrices && Object.keys(r.customGroupPrices).length > 0) ? r.customGroupPrices : (leg.customGroupPrices || {}),
-            description: r.description || leg.description || '',
-            warrantyText: r.warrantyText || leg.warrantyText || '',
-            searchAliases: r.searchAliases || leg.searchAliases || ''
-          };
-        });
-      };
-
-      const rawModelsServer = (Array.isArray(modelsRows) && modelsRows.length > 0) ? [...modelsRows] : (Array.isArray(legacyPayload?.models) ? [...legacyPayload.models] : []);
-      const modelIdsSet = new Set(rawModelsServer.map(m => String(m?.id || '')));
-
-      // Auto-link any orphaned old parts to their matching model (or auto-reconstruct the missing model) so 100% of old products appear!
-      const rawPartsServer = enrichFromLegacy(partsRows, legacyPayload?.parts);
-      const finalPartsServer = Array.isArray(rawPartsServer) ? rawPartsServer.map(p => {
-        const fixedPart = { ...p };
-        if (!fixedPart.basePrice || Number(fixedPart.basePrice) <= 0) {
-          fixedPart.basePrice = Number(fixedPart.costPrice) > 0 ? Math.round(Number(fixedPart.costPrice) * 1.25) : 450;
-        }
-        if (fixedPart.stock === undefined || fixedPart.stock === null) {
-          fixedPart.stock = 15;
-        }
-        const currMdlId = String(fixedPart.modelId || '').trim();
-        if (!currMdlId || !modelIdsSet.has(currMdlId)) {
-          const pName = String(fixedPart.name || '').toLowerCase();
-          const pCompat = Array.isArray(fixedPart.compatibleModels) ? fixedPart.compatibleModels.join(' ').toLowerCase() : '';
-          const pHaystack = `${currMdlId.toLowerCase()} ${pName} ${pCompat} ${String(fixedPart.sku || '').toLowerCase()}`;
-          const matchedMdl = [...rawModelsServer]
-            .sort((a, b) => String(b?.name || '').length - String(a?.name || '').length)
-            .find(m => {
-              const mn = String(m?.name || '').trim().toLowerCase();
-              if (mn.length >= 2 && (pHaystack.includes(mn) || currMdlId.toLowerCase() === mn)) return true;
-              // Also check slash-separated sub-models (e.g. "Samsung Galaxy A52 / A52S" -> "Samsung Galaxy A52")
-              const subNames = mn.split(/[\/|]/).map(s => s.trim()).filter(s => s.length >= 4);
-              return subNames.some(sub => pHaystack.includes(sub));
-            });
-          if (matchedMdl) {
-            fixedPart.modelId = matchedMdl.id;
-          } else {
-            let extName = (Array.isArray(fixedPart.compatibleModels) && fixedPart.compatibleModels[0]) ? String(fixedPart.compatibleModels[0]).trim() : '';
-            if (!extName) {
-              extName = String(fixedPart.name || '')
-                .replace(/^(شاشة كاملة|شاشة|بطارية|بوردة\s*\/\s*فلاتة شحن|فلاتة شحن|بوردة شحن|كاميرا خلفية أساسية|كاميرا خلفية|كاميرا أمامية|ظهر زجاجي\s*\/\s*غطاء بطارية|ظهر زجاجي|غطاء بطارية|قطعة غيار|باغة|فريم|شاسيه|سماعة|جرس)\s+/i, '')
-                .replace(/\s+(أصلية توكيل.*|أوليد.*|إن سيل.*|إ.*سيل.*|أصلية سعة.*|أصلية بالمايك.*|أصلية خلع.*|أصلي بعدسات.*|أصلي.*|توكيل.*|خلع.*)$/i, '')
-                .trim();
-            }
-            if (!extName || extName.length < 2) extName = 'أقسام وموديلات عامة';
-            const existingByName = rawModelsServer.find(m => String(m?.name || '').trim().toLowerCase() === extName.toLowerCase());
-            if (existingByName) {
-              fixedPart.modelId = existingByName.id;
-            } else {
-              const newMdlId = currMdlId || `mdl_auto_${rawModelsServer.length + 1}`;
-              const lowerExt = extName.toLowerCase();
-              const guessedBrand = lowerExt.includes('iphone') || lowerExt.includes('ايفون') ? 'Apple'
-                : lowerExt.includes('samsung') || lowerExt.includes('galaxy') || lowerExt.includes('سامسونج') ? 'Samsung'
-                : lowerExt.includes('redmi') || lowerExt.includes('xiaomi') || lowerExt.includes('poco') ? 'Xiaomi'
-                : lowerExt.includes('honor') ? 'Honor'
-                : lowerExt.includes('oppo') || lowerExt.includes('reno') ? 'Oppo'
-                : lowerExt.includes('realme') ? 'Realme'
-                : lowerExt.includes('vivo') ? 'Vivo'
-                : lowerExt.includes('infinix') ? 'Infinix'
-                : lowerExt.includes('huawei') ? 'Huawei' : 'Apple';
-              rawModelsServer.push({
-                id: newMdlId,
-                brand: guessedBrand,
-                name: extName,
-                aliases: extName,
-                image: fixedPart.image || PART_IMAGES.screen
-              });
-              modelIdsSet.add(String(newMdlId));
-              fixedPart.modelId = newMdlId;
-            }
-          }
-        }
-        return fixedPart;
-      }) : rawPartsServer;
-
-      const finalModelsServer = rawModelsServer;
-      if (Array.isArray(finalModelsServer) && finalModelsServer.length > 0) {
-        setModels(prev => {
-          const merged = mergeServerWithLocal('models', prev, finalModelsServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.models = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_models', JSON.stringify(merged)); } catch (e) {}
-          return merged;
+      markIncomingWindow();
+      if (initialModels.length > 0) {
+        setModels(() => {
+          if (prevSlicesRef.current) prevSlicesRef.current.models = initialModels;
+          try { window.localStorage.setItem('elzoghbi_v2_models', JSON.stringify(initialModels)); } catch (e) {}
+          return initialModels;
         });
       }
-
-      if (Array.isArray(finalPartsServer) && finalPartsServer.length > 0) {
+      if (initialLinkedParts.length > 0) {
         setParts(prev => {
-          const merged = mergeServerWithLocal('parts', prev, finalPartsServer);
+          const merged = mergeServerWithLocal('parts', prev, initialLinkedParts);
           if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
           try { window.localStorage.setItem('elzoghbi_v2_parts', JSON.stringify(merged)); } catch (e) {}
           return merged;
         });
       }
 
-      const finalGroupsServer = enrichFromLegacy(groupsRows, legacyPayload?.groups);
-      if (Array.isArray(finalGroupsServer) && finalGroupsServer.length > 0) {
-        setGroups(prev => {
-          const merged = mergeServerWithLocal('groups', prev, finalGroupsServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.groups = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_groups', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
+      // Immediately unlock the UI so the user sees the real ads & products in ~0.3s!
+      setIsInitialCloudBooting(false);
+      setCloudSyncStatus('cloud_synced');
+      hasCloudInitialPullCompletedRef.current = true;
 
-      const finalAdsServer = enrichFromLegacy(adsRows, legacyPayload?.storeAds);
-      if (Array.isArray(finalAdsServer) && finalAdsServer.length > 0) {
-        setStoreAds(prev => {
-          const merged = mergeServerWithLocal('storeAds', prev, finalAdsServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.storeAds = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_storeAds', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
-
-      const finalBarsServer = (Array.isArray(barsRows) && barsRows.length > 0) ? barsRows : legacyPayload?.showcaseBars;
-      if (Array.isArray(finalBarsServer) && finalBarsServer.length > 0) {
-        setShowcaseBars(prev => {
-          const merged = mergeServerWithLocal('showcaseBars', prev, finalBarsServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.showcaseBars = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_showcaseBars', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
-
-      if (Array.isArray(brandsRows) && brandsRows.length > 0) {
-        const fetchedBrandImgs = {};
-        brandsRows.forEach(b => {
-          if (b && typeof b === 'object' && b.name && (b.image_url || b.imageUrl || b.image)) {
-            fetchedBrandImgs[String(b.name).trim()] = b.image_url || b.imageUrl || b.image;
-          }
-        });
-        if (Object.keys(fetchedBrandImgs).length > 0) {
-          setBrandImages(prev => {
-            const next = { ...prev, ...fetchedBrandImgs };
-            try { window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(next)); } catch (e) {}
-            return next;
-          });
-        }
-      }
-      const explicitBrands = (Array.isArray(brandsRows) && brandsRows.length > 0)
-        ? brandsRows.map(b => String(typeof b === 'object' && b !== null ? (b.name || b.id || '') : b).trim()).filter(Boolean)
-        : (Array.isArray(legacyPayload?.brands) ? legacyPayload.brands : []);
-      const modelDerivedBrands = Array.isArray(finalModelsServer)
-        ? finalModelsServer.map(m => String(m?.brand || '').trim()).filter(Boolean)
-        : [];
-      const finalBrandsServer = Array.from(new Set([...explicitBrands, ...modelDerivedBrands]));
-      if (finalBrandsServer.length > 0) {
-        setBrands(prev => {
-          const merged = Array.from(new Set([...mergeServerWithLocal('brands', prev, finalBrandsServer), ...modelDerivedBrands]));
-          if (prevSlicesRef.current) prevSlicesRef.current.brands = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_brands', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
-
-      const finalPromosServer = (Array.isArray(promosRows) && promosRows.length > 0) ? promosRows : legacyPayload?.promoCodes;
-      if (Array.isArray(finalPromosServer) && finalPromosServer.length > 0) {
-        setPromoCodes(prev => {
-          const merged = mergeServerWithLocal('promoCodes', prev, finalPromosServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.promoCodes = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_promoCodes', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
-
-      const finalTemplatesServer = (Array.isArray(templatesRows) && templatesRows.length > 0) ? templatesRows : legacyPayload?.autoTemplates;
-      if (Array.isArray(finalTemplatesServer) && finalTemplatesServer.length > 0) {
-        setAutoTemplates(prev => {
-          const merged = mergeServerWithLocal('autoTemplates', prev, finalTemplatesServer);
-          if (prevSlicesRef.current) prevSlicesRef.current.autoTemplates = merged;
-          try { window.localStorage.setItem('elzoghbi_v2_autoTemplates', JSON.stringify(merged)); } catch (e) {}
-          return merged;
-        });
-      }
-
-      // Restore siteSettings, adminCredentials, currencies — ALWAYS pick the newest _updatedAt between localStorage and server (never stale sessionStorage!)
-      const latestLocalSettings = (() => {
+      // =========================================================================
+      // PHASE C (NON-BLOCKING BACKGROUND HYDRATION): Fetch remaining catalog items & Admin tables
+      // Runs quietly in the background without blocking the user or delaying ads/products!
+      // =========================================================================
+      setTimeout(async () => {
         try {
-          const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');
-          if (raw) return JSON.parse(raw);
-        } catch (e) {}
-        return null;
-      })();
-
-      const cfgRow = (Array.isArray(settingsRows) && settingsRows.length > 0)
-        ? (settingsRows.find(r => r.id === 'main') || settingsRows[0])
-        : (legacyPayload ? {
-            settings: legacyPayload.siteSettings,
-            credentials: legacyPayload.adminCredentials,
-            currencies: legacyPayload.currencies,
-            notifications: legacyPayload.notifications
-          } : null);
-
-      if (cfgRow) {
-        const srvSettings = cfgRow.settings || {};
-        const localTs = Number(latestLocalSettings?._updatedAt || 0);
-        const srvTs = Number(srvSettings?._updatedAt || (cfgRow.updated_at ? Date.parse(cfgRow.updated_at) : 0) || 0);
-        const winningSettings = (latestLocalSettings && localTs >= srvTs)
-          ? { ...srvSettings, ...latestLocalSettings }
-          : { ...(latestLocalSettings || {}), ...srvSettings };
-
-        if (winningSettings && typeof winningSettings === 'object' && Object.keys(winningSettings).length > 0) {
-          const mergedSettings = {
-            ...siteSettings,
-            ...winningSettings,
-            supabaseUrl: winningSettings.supabaseUrl || sbUrl,
-            supabaseAnonKey: winningSettings.supabaseAnonKey || sbKey
-          };
-          if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = mergedSettings;
-          setSiteSettings(mergedSettings);
-          try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(mergedSettings)); } catch (e) {}
-        }
-        const remoteCreds = cfgRow.credentials;
-        if (remoteCreds && typeof remoteCreds === 'object' && remoteCreds.username) {
-          if (prevSlicesRef.current) prevSlicesRef.current.adminCredentials = remoteCreds;
-          setAdminCredentials(remoteCreds);
-          try { window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(remoteCreds)); } catch (e) {}
-        }
-        const remoteCurr = cfgRow.currencies;
-        if (remoteCurr && typeof remoteCurr === 'object' && Object.keys(remoteCurr).length > 0) {
-          if (prevSlicesRef.current) prevSlicesRef.current.currencies = remoteCurr;
-          setCurrencies(remoteCurr);
-          try { window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(remoteCurr)); } catch (e) {}
-        }
-        const remoteNotifs = cfgRow.notifications;
-        if (Array.isArray(remoteNotifs) && remoteNotifs.length > 0) {
-          setNotifications(prev => {
-            const byId = new Map();
-            remoteNotifs.forEach(n => { if (n && n.id) byId.set(String(n.id), n); });
-            prev.forEach(n => { if (n && n.id) byId.set(String(n.id), n); });
-            const mergedNotifs = Array.from(byId.values()).slice(0, 120);
-            if (prevSlicesRef.current) prevSlicesRef.current.notifications = mergedNotifs;
-            try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(mergedNotifs)); } catch (e) {}
-            return mergedNotifs;
+          const [moreCustomDate, moreCustomSku, moreAsc] = await Promise.all([
+            sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=500&offset=120', false),
+            sbFetchTable('spare_parts', null, '&sku=ilike.PRT-*&limit=500', false),
+            sbFetchTable('spare_parts', null, '&order=id.asc&limit=300', false)
+          ]);
+          const bgMap = new Map(initialLinkedParts.map(p => [String(p.id).trim(), p]));
+          [moreCustomDate, moreCustomSku, moreAsc].forEach(arr => {
+            if (Array.isArray(arr)) {
+              arr.forEach(r => {
+                if (r && r.id !== undefined) {
+                  const k = String(r.id).trim();
+                  if (!bgMap.has(k)) bgMap.set(k, r);
+                }
+              });
+            }
           });
-        }
-      }
+          if (bgMap.size > initialLinkedParts.length) {
+            const { linkedParts: fullLinked } = normalizeAndLinkParts(Array.from(bgMap.values()), initialModels);
+            markIncomingWindow();
+            setParts(prev => {
+              const merged = mergeServerWithLocal('parts', prev, fullLinked);
+              if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
+              try { window.localStorage.setItem('elzoghbi_v2_parts', JSON.stringify(merged)); } catch (e) {}
+              return merged;
+            });
+          }
+        } catch (e) {}
+      }, 250);
 
       if (isAdmin) {
-        const finalClientsServer = enrichFromLegacy(clientsRows, legacyPayload?.clients);
-        if (Array.isArray(finalClientsServer) && finalClientsServer.length > 0) {
+        const [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows, templatesRows] = await Promise.all([
+          sbFetchTable('clients', null, '&limit=150', forceRefresh),
+          sbFetchTable('orders', null, '&order=created_at.desc&limit=80', forceRefresh),
+          sbFetchTable('complaints', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('returns_list', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('account_requests', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('sourcing_requests', null, '&order=created_at.desc&limit=40', forceRefresh),
+          sbFetchTable('auto_templates', null, '&limit=50', forceRefresh)
+        ]);
+        markIncomingWindow();
+        if (Array.isArray(templatesRows) && templatesRows.length > 0) {
+          setAutoTemplates(prev => {
+            const merged = mergeServerWithLocal('autoTemplates', prev, templatesRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.autoTemplates = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_autoTemplates', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(clientsRows) && clientsRows.length > 0) {
           setClients(prev => {
-            const merged = mergeServerWithLocal('clients', prev, finalClientsServer);
+            const merged = mergeServerWithLocal('clients', prev, clientsRows);
             if (prevSlicesRef.current) prevSlicesRef.current.clients = merged;
             try { window.localStorage.setItem('elzoghbi_v2_clients', JSON.stringify(merged)); } catch (e) {}
             return merged;
           });
         }
-
-        const finalOrdersServer = enrichFromLegacy(ordersRows, legacyPayload?.orders);
-        if (Array.isArray(finalOrdersServer) && finalOrdersServer.length > 0) {
+        if (Array.isArray(ordersRows) && ordersRows.length > 0) {
           setOrders(prev => {
-            const merged = mergeServerWithLocal('orders', prev, finalOrdersServer);
+            const merged = mergeServerWithLocal('orders', prev, ordersRows);
             if (prevSlicesRef.current) prevSlicesRef.current.orders = merged;
             try { window.localStorage.setItem('elzoghbi_v2_orders', JSON.stringify(merged)); } catch (e) {}
             return merged;
           });
-          // Automatically ensure every new received order has an Admin Notification so no order is ever missed!
-          setNotifications(prevNotifs => {
-            let seenOrderIds = {};
-            try { seenOrderIds = JSON.parse(window.localStorage.getItem('elzoghbi_seen_admin_orders') || '{}'); } catch (e) {}
-            const existingOrderNotifIds = new Set(prevNotifs.map(n => String(n.orderId || '')));
-            const addedNotifs = [];
-            finalOrdersServer.forEach(ord => {
-              if (!ord || !ord.id) return;
-              const oid = String(ord.id);
-              if (ord.status === 'تم الاستلام' && !existingOrderNotifIds.has(oid) && !seenOrderIds[oid]) {
-                seenOrderIds[oid] = true;
-                addedNotifs.push({
-                  id: `ntf_ord_${oid}`,
-                  target: 'admin',
-                  type: 'new_order',
-                  title: `🔔 طلبية جديدة #${oid} (${ord.clientName || 'عميل'})`,
-                  msg: `أرسل "${ord.clientName || 'عميل'}" طلبية جديدة (${(ord.items || []).reduce((s, i) => s + (Number(i.qty) || 1), 0)} قطع)`,
-                  time: ord.createdAt || 'الآن',
-                  read: false,
-                  orderId: oid
-                });
-              }
-            });
-            if (addedNotifs.length > 0) {
-              try { window.localStorage.setItem('elzoghbi_seen_admin_orders', JSON.stringify(seenOrderIds)); } catch (e) {}
-              const nextNotifs = [...addedNotifs, ...prevNotifs].slice(0, 120);
-              if (prevSlicesRef.current) prevSlicesRef.current.notifications = nextNotifs;
-              try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(nextNotifs)); } catch (e) {}
-              return nextNotifs;
-            }
-            return prevNotifs;
-          });
         }
-
-        const finalComplaintsServer = enrichFromLegacy(complaintsRows, legacyPayload?.complaints);
-        if (Array.isArray(finalComplaintsServer) && finalComplaintsServer.length > 0) {
+        if (Array.isArray(complaintsRows) && complaintsRows.length > 0) {
           setComplaints(prev => {
-            const merged = mergeServerWithLocal('complaints', prev, finalComplaintsServer);
+            const merged = mergeServerWithLocal('complaints', prev, complaintsRows);
             if (prevSlicesRef.current) prevSlicesRef.current.complaints = merged;
             try { window.localStorage.setItem('elzoghbi_v2_complaints', JSON.stringify(merged)); } catch (e) {}
             return merged;
           });
         }
-
-        const finalReturnsServer = enrichFromLegacy(returnsRows, legacyPayload?.returnsList);
-        if (Array.isArray(finalReturnsServer) && finalReturnsServer.length > 0) {
+        if (Array.isArray(returnsRows) && returnsRows.length > 0) {
           setReturnsList(prev => {
-            const merged = mergeServerWithLocal('returnsList', prev, finalReturnsServer);
+            const merged = mergeServerWithLocal('returnsList', prev, returnsRows);
             if (prevSlicesRef.current) prevSlicesRef.current.returnsList = merged;
             try { window.localStorage.setItem('elzoghbi_v2_returnsList', JSON.stringify(merged)); } catch (e) {}
             return merged;
           });
         }
-
-        const finalReqsServer = enrichFromLegacy(reqsRows, legacyPayload?.accountRequests);
-        if (Array.isArray(finalReqsServer) && finalReqsServer.length > 0) {
+        if (Array.isArray(reqsRows) && reqsRows.length > 0) {
           setAccountRequests(prev => {
-            const merged = mergeServerWithLocal('accountRequests', prev, finalReqsServer);
+            const merged = mergeServerWithLocal('accountRequests', prev, reqsRows);
             if (prevSlicesRef.current) prevSlicesRef.current.accountRequests = merged;
             try { window.localStorage.setItem('elzoghbi_v2_accountRequests', JSON.stringify(merged)); } catch (e) {}
             return merged;
           });
         }
-
-        const finalSourcingServer = (Array.isArray(sourcingRows) && sourcingRows.length > 0) ? sourcingRows : legacyPayload?.sourcingRequests;
-        if (Array.isArray(finalSourcingServer) && finalSourcingServer.length > 0) {
+        if (Array.isArray(sourcingRows) && sourcingRows.length > 0) {
           setSourcingRequests(prev => {
-            const merged = mergeServerWithLocal('sourcingRequests', prev, finalSourcingServer);
+            const merged = mergeServerWithLocal('sourcingRequests', prev, sourcingRows);
             if (prevSlicesRef.current) prevSlicesRef.current.sourcingRequests = merged;
             try { window.localStorage.setItem('elzoghbi_v2_sourcingRequests', JSON.stringify(merged)); } catch (e) {}
             return merged;
@@ -4927,9 +4800,6 @@ export default function App() {
         }
       }
 
-      setCloudSyncStatus('cloud_synced');
-      setIsInitialCloudBooting(false);
-      hasCloudInitialPullCompletedRef.current = true;
       if (!silent) showToast('تمت مزامنة وتحديث كافة الجداول من السيرفر بنجاح ✓', 'success');
     } catch (err) {
       setIsInitialCloudBooting(false);
@@ -5549,6 +5419,8 @@ export default function App() {
           if (!r || !r.key) return;
           nextMap[r.key] = { enabled: Boolean(r.enabled), config: r.config || {}, updatedAt: r.updated_at };
         });
+        incomingSyncUntilRef.current = Date.now() + 1000;
+        isIncomingSyncRef.current = true;
         setServerFeatureFlags(nextMap);
         setSiteSettings(prev => {
           const localUpdatedAt = Number(prev?._updatedAt || 0);
@@ -27547,22 +27419,11 @@ ${footer}
     };
   }, [i18nActive]);
 
-  // نخلي صفحتي الرئيسية والبحث متركّبين (مخفيين) مع تحديثهم فوراً عند أي تعديل في الإعدادات أو المنتجات أو الثيم
+  // Live direct rendering (zero stale JSX ref caching!) so ads, products, and settings update on the exact frame they arrive!
   const homeElRef = React.useRef(null);
   const searchElRef = React.useRef(null);
-  const lastRenderSigRef = React.useRef('');
-  const currentRenderSig = `${uiTheme}_${JSON.stringify(siteSettings)}_${parts.length}_${models.length}_${brands.length}_${storeAds.length}_${showcaseBars.length}_${activeRole}_${JSON.stringify(cart)}_${JSON.stringify(selectedQualityTiers)}`;
-  if (lastRenderSigRef.current !== currentRenderSig) {
-    homeElRef.current = null;
-    searchElRef.current = null;
-    lastRenderSigRef.current = currentRenderSig;
-  }
   const homeActiveNow = clientTab === 'home' || clientTab === 'store';
   const searchActiveNow = clientTab === 'search';
-  if (appPortal !== 'admin') {
-    if (homeActiveNow) homeElRef.current = renderHomeView();
-    if (searchActiveNow) searchElRef.current = renderStorefront();
-  }
 
   // ============================================================================
   // MAIN RENDER (COMPLETELY SEPARATED STOREFRONT vs ADMIN DASHBOARD PORTAL)
@@ -27763,8 +27624,8 @@ ${footer}
                 </div>
               </div>
             )}
-            {homeElRef.current && <div className={homeActiveNow ? '' : 'hidden'}>{homeElRef.current}</div>}
-            {searchElRef.current && <div className={searchActiveNow ? '' : 'hidden'}>{searchElRef.current}</div>}
+            {homeActiveNow && renderHomeView()}
+            {searchActiveNow && renderStorefront()}
             {clientTab === 'vip' && renderVipRouteView()}
             {clientTab === 'checkout' && renderCheckoutView()}
             {clientTab === 'account' && renderClientAccountPortal()}
