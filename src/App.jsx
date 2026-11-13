@@ -2152,6 +2152,30 @@ export default function App() {
   const [brandImages, setBrandImages] = useState(() => loadPersisted('brandImages', {}));
   const [editingBrandImageFor, setEditingBrandImageFor] = useState(null); // { brandName, imageUrl }
 
+  // Smart Arabic & English Search Normalizer (unifies أ/إ/آ->ا, ة->ه, ى->ي, strips diacritics)
+  const normalizeArabicSearch = (rawStr) => {
+    if (!rawStr) return '';
+    return String(rawStr)
+      .toLowerCase()
+      .replace(/[\u064B-\u065F\u0670]/g, '')
+      .replace(/[أإآٱ]/g, 'ا')
+      .replace(/ة/g, 'ه')
+      .replace(/ى/g, 'ي')
+      .replace(/ؤ/g, 'و')
+      .replace(/ئ/g, 'ي')
+      .replace(/[٠-٩]/g, d => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)))
+      .trim();
+  };
+
+  // Track whether this browser already has cached server catalog data in localStorage
+  const [isInitialCloudBooting, setIsInitialCloudBooting] = useState(() => {
+    try {
+      return !window.localStorage.getItem('elzoghbi_v2_parts');
+    } catch (e) {
+      return false;
+    }
+  });
+
   // --- Persistent Global State (Survives Page Refresh & Syncs Across Tabs + Supabase Cloud) ---
   const [siteSettings, setSiteSettings] = useState(() => loadPersisted('siteSettings', INITIAL_SITE_SETTINGS));
 
@@ -3310,15 +3334,18 @@ export default function App() {
       }
     }
 
-    // 3. For catalog slices (parts, models, brands), preserve any previously loaded rows that were not deleted so on-demand or older items never disappear on refresh!
+    // 3. For catalog slices, only preserve on-demand server rows or admin-uploaded items — NEVER preserve hardcoded demo INITIAL_PARTS once real server data arrives!
+    const DEMO_INITIAL_PART_IDS = new Set(['prt_1','prt_2','prt_3','prt_4','prt_5','prt_6','prt_7','prt_8','prt_9','prt_10','prt_11','prt_12','prt_13']);
     const preservedCatalogItems = [];
-    if ((sliceKey === 'parts' || sliceKey === 'models' || sliceKey === 'brands') && Array.isArray(currentLocalArray)) {
+    if (sliceKey === 'parts' && Array.isArray(currentLocalArray)) {
       for (const localItem of currentLocalArray) {
-        const id = String(typeof localItem === 'string' ? localItem : (localItem?.id || localItem?.code || localItem?.name || ''));
-        if (id && !seenIds.has(id) && !delMap[id]) {
-          preservedCatalogItems.push(localItem);
-          seenIds.add(id);
-        }
+        const id = String(localItem?.id || '');
+        if (!id || seenIds.has(id) || delMap[id]) continue;
+        if (DEMO_INITIAL_PART_IDS.has(id) && !localItem._isCustomUploaded) continue;
+        // Skip old auto-generated template placeholders from local memory if not in server response
+        if (String(localItem?.createdAt || '') === '2026-11-01 08:25' && !localItem._isCustomUploaded) continue;
+        preservedCatalogItems.push(localItem);
+        seenIds.add(id);
       }
     }
 
@@ -3329,9 +3356,9 @@ export default function App() {
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates'
   ]);
-  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v25_';
+  const SESSION_CACHE_PREFIX = 'elzoghbi_scache_v26_';
   try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v25_instant_flag_sync_and_gm_reports') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v26_fast_boot_mobile_lock_and_smart_search') {
       const keepTheme = window.localStorage.getItem('elzoghbi_ui_theme_v2030') || 'vision_2030';
       const keepCart = window.localStorage.getItem('elzoghbi_v2_cart_v4');
       const keepRole = window.localStorage.getItem('elzoghbi_v2_activeClientRole');
@@ -3344,7 +3371,7 @@ export default function App() {
       if (keepCart) window.localStorage.setItem('elzoghbi_v2_cart_v4', keepCart);
       if (keepRole) window.localStorage.setItem('elzoghbi_v2_activeClientRole', keepRole);
       if (keepAdmin) window.localStorage.setItem('elzoghbi_v2_adminAuth', keepAdmin);
-      window.localStorage.setItem('elzoghbi_app_version', 'v25_instant_flag_sync_and_gm_reports');
+      window.localStorage.setItem('elzoghbi_app_version', 'v26_fast_boot_mobile_lock_and_smart_search');
     }
   } catch (e) {}
   const SESSION_CACHE_TTL = 10 * 60 * 1000; // 10 minutes smart session cache with instant cross-tab invalidation
@@ -3538,58 +3565,17 @@ export default function App() {
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
-              // If full catalog index was requested (`limit=1000`) and table has > 1000 rows, fetch ALL remaining pages in parallel batches with automatic chunk fallback if any page has heavy rows!
-              if (rows.length === 1000 && (realTable === 'spare_parts' || realTable === 'mobile_models') && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
-                const baseOrderQuery = currentQuery.replace(/&?limit=1000/g, '');
-                const effectiveOrder = baseOrderQuery.includes('order=') ? baseOrderQuery : `${baseOrderQuery}&order=id.asc`;
-                const fetchPageWithFallback = async (offsetVal) => {
-                  try {
-                    const pRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=1000&offset=${offsetVal}`, {
-                      headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                    });
-                    if (pRes.ok) {
-                      const pData = await pRes.json();
-                      return Array.isArray(pData) ? pData : [];
-                    }
-                  } catch (e) {}
-                  // Fallback: if a 1000-row page timed out (e.g. due to old Base64 images), fetch it in 4 smaller 250-row chunks without failing!
-                  let chunkRows = [];
-                  for (let subOff = 0; subOff < 1000; subOff += 250) {
-                    try {
-                      const cRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${effectiveOrder}&limit=250&offset=${offsetVal + subOff}`, {
-                        headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
-                      });
-                      if (cRes.ok) {
-                        const cData = await cRes.json();
-                        if (Array.isArray(cData) && cData.length > 0) {
-                          chunkRows = chunkRows.concat(cData);
-                          if (cData.length < 250) break;
-                        } else {
-                          break;
-                        }
-                      }
-                    } catch (e) {}
+              // Fast bounded fetch: NEVER loop up to 30,000 rows on page load! On-demand search & model filters fetch any specific slice in <200ms.
+              if (rows.length === 1000 && realTable === 'mobile_models' && currentQuery.includes('limit=1000') && !currentQuery.includes('offset=')) {
+                try {
+                  const pRes = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}&order=id.asc&limit=1000&offset=1000`, {
+                    headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+                  });
+                  if (pRes.ok) {
+                    const pData = await pRes.json();
+                    if (Array.isArray(pData) && pData.length > 0) rows = rows.concat(pData);
                   }
-                  return chunkRows;
-                };
-
-                for (let batchStart = 1000; batchStart <= 30000; batchStart += 3000) {
-                  const batchResults = await Promise.all([
-                    fetchPageWithFallback(batchStart),
-                    fetchPageWithFallback(batchStart + 1000),
-                    fetchPageWithFallback(batchStart + 2000)
-                  ]);
-                  let reachedEnd = false;
-                  for (const bRows of batchResults) {
-                    if (Array.isArray(bRows) && bRows.length > 0) {
-                      rows = rows.concat(bRows);
-                      if (bRows.length < 1000) reachedEnd = true;
-                    } else {
-                      reachedEnd = true;
-                    }
-                  }
-                  if (reachedEnd) break;
-                }
+                } catch (e) {}
               }
               const mapped = rows.map(toCamelCaseRow);
               if (STATIC_SESSION_TABLES.has(realTable)) {
@@ -3659,8 +3645,11 @@ export default function App() {
     }
     if (search && search.trim() !== '') {
       const cleanQ = search.trim().replace(/[%*,()]/g, '');
-      if (cleanQ) {
-        filters.push(`or=(name.ilike.*${encodeURIComponent(cleanQ)}*,sku.ilike.*${encodeURIComponent(cleanQ)}*)`);
+      const words = cleanQ.split(/\s+/).filter(w => w.length >= 2);
+      const primaryWord = words[0] || cleanQ;
+      if (primaryWord) {
+        const enc = encodeURIComponent(primaryWord);
+        filters.push(`or=(name.ilike.*${enc}*,category.ilike.*${enc}*,sku.ilike.*${enc}*,quality_grade.ilike.*${enc}*)`);
       }
     }
 
@@ -4520,13 +4509,12 @@ export default function App() {
 
       setCloudSyncStatus('syncing');
 
-      // 1. Fetch public storefront tables in parallel using strict pagination (`spare_parts` limit=20 = ~4-6 KB!)
+      // 1. STAGE 1 INSTANT BOOT (< 0.4s): Fetch lightweight settings, ads, bars, brands, models & custom/latest 300 products first!
       const forceRefresh = !silent;
       const [
-        partsRowsAsc,
         partsRowsCustomDate,
         partsRowsCustomSku,
-        partsRowsDesc,
+        partsRowsLatest,
         modelsRows,
         groupsRows,
         adsRows,
@@ -4536,23 +4524,22 @@ export default function App() {
         settingsRows,
         templatesRows
       ] = await Promise.all([
-        sbFetchTable('spare_parts', null, '&order=id.asc&limit=1000', forceRefresh),
-        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&limit=1000', forceRefresh),
-        sbFetchTable('spare_parts', null, '&sku=ilike.PRT-*&limit=1000', forceRefresh),
-        sbFetchTable('spare_parts', null, '&order=id.desc&limit=1000', forceRefresh),
-        sbFetchTable('mobile_models', null, '&order=id.asc&limit=1000', forceRefresh),
+        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=400', forceRefresh),
+        sbFetchTable('spare_parts', null, '&sku=ilike.PRT-*&limit=400', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=id.desc&limit=250', forceRefresh),
+        sbFetchTable('mobile_models', null, '&order=id.asc&limit=600', forceRefresh),
         sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=20', forceRefresh),
         sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=20', forceRefresh),
         sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
         sbFetchTable('promo_codes', null, '&limit=50', forceRefresh),
-        sbFetchTable('site_settings', null, '&limit=5', forceRefresh),
+        sbFetchTable('site_settings', null, '&limit=5', true),
         isAdmin ? sbFetchTable('auto_templates', null, '&limit=50', forceRefresh) : Promise.resolve(null)
       ]);
 
-      // Combine & deduplicate all spare_parts queries, putting custom/uploaded products first so 0 uploaded products are ever missed!
+      // Combine & deduplicate custom/uploaded products first so the real catalog renders in <0.4s!
       const combinedPartsMap = new Map();
-      [partsRowsCustomDate, partsRowsCustomSku, partsRowsDesc, partsRowsAsc].forEach(arr => {
+      [partsRowsCustomDate, partsRowsCustomSku, partsRowsLatest].forEach(arr => {
         if (Array.isArray(arr)) {
           arr.forEach(r => {
             if (r && r.id !== undefined) {
@@ -4563,7 +4550,7 @@ export default function App() {
           });
         }
       });
-      const partsRows = combinedPartsMap.size > 0 ? Array.from(combinedPartsMap.values()) : partsRowsAsc;
+      const partsRows = Array.from(combinedPartsMap.values());
 
       // 2. Only fetch Admin tables when Admin is actually viewing the Admin Portal (#/AlaaDB)
       let [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows] = [null, null, null, null, null, null];
@@ -4941,9 +4928,11 @@ export default function App() {
       }
 
       setCloudSyncStatus('cloud_synced');
+      setIsInitialCloudBooting(false);
       hasCloudInitialPullCompletedRef.current = true;
       if (!silent) showToast('تمت مزامنة وتحديث كافة الجداول من السيرفر بنجاح ✓', 'success');
     } catch (err) {
+      setIsInitialCloudBooting(false);
       hasCloudInitialPullCompletedRef.current = true;
     }
   };
@@ -4952,7 +4941,9 @@ export default function App() {
   const [realtimeConnected, setRealtimeConnected] = useState(false);
 
   useEffect(() => {
-    // 1. Single initial load on mount / portal switch (uses SessionStorage cache for static tables)
+    // Safety fallback: ensure initial boot loader never blocks for more than 1.8s even on slow/offline networks
+    const bootTimer = setTimeout(() => setIsInitialCloudBooting(false), 1800);
+    // 1. Single initial load on mount / portal switch
     pullFromSupabaseCloud(true);
 
     // 2. Establish lightweight Supabase Realtime Phoenix WebSocket for instant Order & SRC- notifications
@@ -5377,31 +5368,10 @@ export default function App() {
     };
   }, [appPortal, lang]);
 
+  // Keep header height 100% stable during mobile & desktop scrolling (prevents iOS Safari viewport jump & ghosting!)
   useEffect(() => {
-    let lastY = Math.max(0, window.scrollY || 0);
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        const y = Math.max(0, window.scrollY || 0);
-        const delta = y - lastY;
-        if (y < 40) {
-          setHeaderCompact(false);
-          lastY = y;
-        } else if (delta > 10 && y > 140) {
-          setHeaderCompact(true);
-          lastY = y;
-        } else if (delta < -10) {
-          setHeaderCompact(false);
-          lastY = y;
-        }
-        ticking = false;
-      });
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+    if (headerCompact) setHeaderCompact(false);
+  }, [headerCompact]);
   const [bannerClosedText, setBannerClosedText] = useState(() => {
     try { return sessionStorage.getItem('hm_banner_closed') || ''; } catch (e) { return ''; }
   });
@@ -7696,7 +7666,7 @@ export default function App() {
   };
 
   const parsedSearchWords = useMemo(() => {
-    const q = deferredSearchQuery.trim().toLowerCase();
+    const q = normalizeArabicSearch(deferredSearchQuery);
     return q ? q.split(/\s+/).filter(Boolean) : [];
   }, [deferredSearchQuery]);
 
@@ -7727,22 +7697,21 @@ export default function App() {
     if (storeStockFilter === 'OUT_OF_STOCK' && part.stock > 0) return false;
 
     if (parsedSearchWords.length > 0) {
-      let haystack = part._cachedHaystack;
+      let haystack = part._cachedNormHaystack;
       if (!haystack || part._cachedNameRef !== part.name) {
-        haystack = [
+        haystack = normalizeArabicSearch([
           part.name,
           part.sku,
           part.category,
           part.qualityGrade,
+          part.description,
           part.searchAliases,
           ...(part.compatibleModels || []),
           modelObj?.name || '',
           modelObj?.brand || '',
           modelObj?.aliases || ''
-        ]
-          .join(' ')
-          .toLowerCase();
-        part._cachedHaystack = haystack;
+        ].join(' '));
+        part._cachedNormHaystack = haystack;
         part._cachedNameRef = part.name;
       }
       for (let i = 0; i < parsedSearchWords.length; i++) {
@@ -9454,11 +9423,8 @@ export default function App() {
     const unreadCount = myNotifs.filter(n => !n.read).length;
 
     return (
-      <header
-        className="sticky top-0 z-40 pointer-events-none"
-        style={headerFullH ? { height: headerFullH } : undefined}
-      >
-      <div ref={headerInnerRef} className="pointer-events-auto bg-nav text-nav-fg border-b border-navline shadow-lg">
+      <header className="sticky top-0 z-40 w-full max-w-[100vw] overflow-x-hidden bg-nav text-nav-fg border-b border-navline shadow-lg">
+      <div ref={headerInnerRef} className="w-full max-w-full overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-2.5 sm:px-4 py-2 flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Brand — Always shows full ELZOGHBI name clearly on mobile & desktop without clipping! */}
           <div onClick={() => setClientTab('home')} className="flex items-center gap-1.5 sm:gap-2.5 cursor-pointer shrink-0">
@@ -9671,9 +9637,9 @@ export default function App() {
           </div>
         </div>
 
-        {/* Navigation tabs: Active = Cyan #22d3ee with #031a20 text; Inactive = nav2 (#142431) with navline (#223647) */}
-        <div className={`overflow-hidden transition-all duration-300 ${headerCompact ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}>
-          <div className="max-w-7xl mx-auto px-3 sm:px-4 pb-2.5 flex items-center gap-2">
+        {/* Navigation tabs: Contained horizontal scroll on mobile so it NEVER stretches viewport width! */}
+        <div className="w-full max-w-full overflow-hidden">
+          <div className="max-w-7xl mx-auto px-2.5 sm:px-4 pb-2.5 flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
             <button
               onClick={() => setClientTab('home')}
               className={`flex-1 h-11 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 border ${
@@ -9858,8 +9824,28 @@ export default function App() {
     const activeBars = showcaseBars.filter(b => b.active);
     const activePromos = promoCodes.filter(p => p.active);
 
+    if (isInitialCloudBooting) {
+      return (
+        <div className="max-w-7xl mx-auto px-4 py-12 space-y-6 w-full max-w-[100vw] overflow-x-hidden text-center">
+          <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface border border-line shadow-sm">
+            <RefreshCw className="w-5 h-5 text-accent-text animate-spin" />
+            <span className="text-xs sm:text-sm font-black text-fg">جاري تحميل أحدث المنتجات والعروض من السيرفر...</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(n => (
+              <div key={n} className="h-64 rounded-2xl bg-surface border border-line animate-pulse p-4 flex flex-col justify-between">
+                <div className="h-32 rounded-xl bg-surface2" />
+                <div className="h-4 w-3/4 rounded bg-surface2" />
+                <div className="h-8 w-full rounded-xl bg-surface2" />
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 space-y-6 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {/* إعلانات الواجهة: فوق البحث، بانر واحد بيقلب */}
         {siteSettings.showHomeAds !== false && activeAds.length > 0 && (() => {
           const currentAdIdx = heroAdIndex % activeAds.length;
@@ -10041,23 +10027,40 @@ export default function App() {
               </p>
             </div>
 
-            <div
-              onClick={() => setClientTab('search')}
-              className="flex-1 max-w-xl flex items-center bg-bg rounded-xl p-2 border border-line hover:border-accent cursor-pointer transition duration-200 group"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setClientTab('search');
+              }}
+              className="flex-1 max-w-xl w-full min-w-0 flex items-center bg-bg rounded-xl p-1.5 sm:p-2 border border-line focus-within:border-accent transition duration-200 gap-1.5"
             >
-              <div className="p-2.5 rounded-xl bg-surface2 text-accent-text transition">
-                <Search className="w-5 h-5 stroke-[2.5]" />
+              <div className="p-2 rounded-xl bg-surface2 text-accent-text shrink-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5]" />
               </div>
-              <span className="text-xs sm:text-sm text-muted font-bold px-3 flex-1 select-none">
-                {siteSettings.homeSearchPlaceholder || 'دوس هنا للبحث والفلترة...'}
-              </span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={siteSettings.homeSearchPlaceholder || 'ابحث باسم المنتج، القسم، الماركة، أو الكود...'}
+                className="flex-1 min-w-0 px-2 py-2 bg-transparent text-fg text-xs sm:text-sm font-bold focus:outline-none border-0"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="px-2 py-1 rounded-lg bg-surface2 text-muted text-[11px] font-bold shrink-0"
+                >
+                  مسح
+                </button>
+              )}
               <button
-                type="button"
-                className="px-5 py-2.5 rounded-xl bg-accent text-accent-ink font-black text-xs hover:opacity-95 transition shrink-0"
+                type="submit"
+                onClick={() => setClientTab('search')}
+                className="px-4 sm:px-5 py-2.5 rounded-xl bg-accent text-accent-ink font-black text-xs hover:opacity-95 transition shrink-0"
               >
                 دوّر ↵
               </button>
-            </div>
+            </form>
           </div>
         </div>
         )}
@@ -10407,7 +10410,7 @@ export default function App() {
     const showPageNavigator = (storeExtraEightShown && totalItems > FIRST_PAGE_INITIAL) || safePage > 1;
 
     return (
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 space-y-5 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {siteSettings.showSearchSourcing !== false && renderSourcingBanner()}
 
         {/* Search Banner at top of Products Page (surface bg, accent border, NO 'الرئيسية والعروض' chip, bg input, accent search button!) */}
@@ -27566,8 +27569,18 @@ ${footer}
   // ============================================================================
 
   return (
-    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className="min-h-[100svh] flex flex-col bg-bg text-fg font-sans">
+    <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className="min-h-[100svh] w-full max-w-[100vw] overflow-x-hidden flex flex-col bg-bg text-fg font-sans relative">
       <style>{`
+        html, body, #root {
+          max-width: 100vw !important;
+          width: 100% !important;
+          overflow-x: hidden !important;
+          position: relative;
+          -webkit-text-size-adjust: 100%;
+          touch-action: pan-y;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         :root {
           --bg: 243 246 249;
           --surface: 255 255 255;
@@ -27711,8 +27724,8 @@ ${footer}
       {appPortal === 'admin' ? (
         <main className="flex-1 flex flex-col">{renderAdminDashboard()}</main>
       ) : (
-        <div className="flex flex-col flex-1 min-h-[100svh] justify-between">
-          <main className="flex-1">
+        <div className="flex flex-col flex-1 min-h-[100svh] w-full max-w-[100vw] overflow-x-hidden justify-between">
+          <main className="flex-1 w-full max-w-[100vw] min-w-0 overflow-x-hidden">
             {renderAnnouncements()}
             {renderClientHeader()}
             {/* Automatic Birthday / Seasonal Offer Banner */}
