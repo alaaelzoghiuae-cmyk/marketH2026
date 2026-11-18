@@ -3,37 +3,38 @@
 @tailwind utilities;
 
 :root {
-  --bg: 243 246 249;
+  --bg: 248 250 252;
   --surface: 255 255 255;
-  --surface2: 233 239 244;
-  --fg: 15 27 38;
-  --muted: 86 104 121;
-  --line: 214 223 231;
-  --accent: 6 182 212;
-  --accent-ink: 4 34 42;
-  --accent-text: 14 116 144;
-  --go: 4 120 87;
+  --surface2: 239 246 255;
+  --fg: 15 23 42;
+  --muted: 100 116 139;
+  --line: 226 232 240;
+  --accent: 37 99 235;
+  --accent-ink: 255 255 255;
+  --accent-text: 37 99 235;
+  --go: 37 99 235;
   --go-ink: 255 255 255;
 }
 
 .dark {
-  --bg: 7 12 17;
-  --surface: 15 24 32;
-  --surface2: 21 33 43;
-  --fg: 231 238 244;
-  --muted: 147 163 179;
-  --line: 34 49 64;
-  --accent: 34 211 238;
-  --accent-ink: 3 26 32;
-  --accent-text: 34 211 238;
-  --go: 16 185 129;
-  --go-ink: 3 21 15;
+  --bg: 4 7 17;
+  --surface: 11 17 32;
+  --surface2: 17 26 46;
+  --fg: 248 250 252;
+  --muted: 148 163 184;
+  --line: 30 45 74;
+  --accent: 37 99 235;
+  --accent-ink: 255 255 255;
+  --accent-text: 96 165 250;
+  --go: 37 99 235;
+  --go-ink: 255 255 255;
 }
 
 html, body {
   min-height: 100svh;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -43,6 +44,7 @@ body {
   background-color: rgb(var(--bg));
   color: rgb(var(--fg));
   font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #root {
@@ -54,6 +56,36 @@ body {
 
 main {
   flex: 1;
+}
+
+/* VVIP Card & Pedestal Aesthetics */
+.hm-card {
+  position: relative;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease, box-shadow 0.28s ease;
+}
+:root:not(.dark) .hm-card {
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+}
+:root:not(.dark) .hm-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 20px 38px -12px rgba(37, 99, 235, 0.14), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
+}
+.dark .hm-card {
+  background-image: radial-gradient(120% 90% at 50% 0%, rgba(37, 99, 235, 0.14) 0%, rgba(11, 17, 32, 0.98) 70%);
+  box-shadow: 0 12px 32px -12px rgba(0, 0, 0, 0.65);
+}
+.dark .hm-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.65);
+  box-shadow: 0 18px 40px -12px rgba(37, 99, 235, 0.28), 0 0 20px 0 rgba(37, 99, 235, 0.12);
+}
+
+.vvip-img-pedestal {
+  background: radial-gradient(circle at 50% 42%, rgba(59, 130, 246, 0.12) 0%, rgba(239, 246, 255, 0.65) 65%, rgba(248, 250, 252, 0.95) 100%);
+}
+.dark .vvip-img-pedestal {
+  background: radial-gradient(circle at 50% 40%, rgba(37, 99, 235, 0.24) 0%, rgba(15, 25, 50, 0.85) 55%, rgba(8, 13, 26, 0.98) 100%);
 }
 
 /* Unified Inputs, Textareas & Select Dropdowns across Storefront & Admin Dashboard in Light & Dark Mode */
@@ -79,7 +111,7 @@ select {
   color: rgb(var(--fg)) !important;
   border: 1px solid rgb(var(--line)) !important;
   border-radius: 0.75rem !important;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23566879' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: left 0.75rem center;
   background-size: 1rem 1rem;
@@ -93,7 +125,7 @@ select {
 }
 
 .dark select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322d3ee' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2360a5fa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 select option,
@@ -107,13 +139,62 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: rgb(var(--accent)) !important;
-  box-shadow: 0 0 0 2px rgb(var(--accent) / 0.2);
+  box-shadow: 0 0 0 3px rgb(var(--accent) / 0.18);
 }
 
-/* Any bar or element explicitly given a white background must always use black text */
-.bg-white,
-.bg-white input,
-.bg-white textarea,
-.bg-white select {
-  color: #0f1b26 !important;
+/* Scope pure-white container text color so dark:bg-* cards never turn black in Dark Mode */
+:root:not(.dark) .bg-white,
+.bg-white:not([class*="dark:bg-"]) {
+  color: #0f172a;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Smooth Studio Range Sliders */
+input[type="range"].hm-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(59, 130, 246, 0.22);
+  outline: none;
+}
+input[type="range"].hm-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: #2563eb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.45);
+  cursor: pointer;
+}
+
+
+
+/* Hard-Kill Any Vertical or Horizontal Scrollbars Inside Admin Sidebar */
+html, body, #root {
+  overflow-x: clip !important;
+}
+#elz-admin-sidebar,
+#elz-admin-sidebar *,
+#elz-admin-sidebar-mobile,
+#elz-admin-sidebar-mobile * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+#elz-admin-sidebar::-webkit-scrollbar,
+#elz-admin-sidebar *::-webkit-scrollbar,
+#elz-admin-sidebar-mobile::-webkit-scrollbar,
+#elz-admin-sidebar-mobile *::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
 }
