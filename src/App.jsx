@@ -71,6 +71,55 @@ const mergeOrModelsList = (baseModels, delMap = {}, disabled = false) => {
   return list;
 };
 
+// Unified Clean Category Normalizer (eliminates overlapping/duplicate filter categories like 'سماعات' vs 'OR - سماعات ومايكات')
+const normalizePartCategory = (rawCat, partName = '') => {
+  const cleaned = String(rawCat || '').replace(/^OR\s*-\s*/i, '').trim();
+  const full = `${partName || ''} ${cleaned}`.toLowerCase();
+  if (!cleaned) return '';
+  if (cleaned === 'ALL') return 'ALL';
+
+  // Keep spare-parts categories distinct
+  if (cleaned === 'شاشات أصلية' || cleaned === 'شاشات كاملة') return 'شاشات كاملة';
+  if (['بطاريات', 'فلاتات وبورد شحن', 'ظهر وشاسيه وبصمة', 'كاميرات', 'عروض وباكدجات VIP'].includes(cleaned)) {
+    return cleaned;
+  }
+
+  // Exact unified accessory categories
+  const directMap = {
+    'باور بانك': 'باور بانك',
+    'كابلات ومحولات': 'كابلات ومحولات',
+    'شواحن': 'شواحن',
+    'شواحن سريعة ولاسلكية': 'شواحن',
+    'اسكرينات وحماية كاميرا': 'اسكرينات وحماية كاميرا',
+    'جرابات الموبايل': 'جرابات الموبايل',
+    'سماعات ومايكات': 'سماعات ومايكات',
+    'سماعات': 'سماعات ومايكات',
+    'سبيكر ومكبرات صوت': 'سبيكر ومكبرات صوت',
+    'ساعات وأساور ذكية': 'ساعات وأساور ذكية',
+    'إكسسوارات سيارة وحوامل وتصوير': 'إكسسوارات سيارة وحوامل وتصوير',
+    'ماوس وكيبورد وجيمنج': 'ماوس وكيبورد وجيمنج',
+    'مشتركات وأجهزة ذكية ومكتبية': 'مشتركات وأجهزة ذكية ومكتبية',
+    'ماكينات حلاقة وعناية': 'ماكينات حلاقة وعناية',
+    'إكسسوارات وعناية': 'ماكينات حلاقة وعناية'
+  };
+  if (directMap[cleaned]) return directMap[cleaned];
+
+  // Legacy combined categories -> smart split
+  if (cleaned === 'شواحن وكابلات' || cleaned === 'شواحن وكابلات أصلية') {
+    if (/(cable|كابل|وصلة|محول|otg|hub|aux|hdmi)/i.test(full) && !/(charger|شاحن)/i.test(full)) return 'كابلات ومحولات';
+    return 'شواحن';
+  }
+  if (cleaned === 'سماعات وساعات ذكية') {
+    if (/(watch|ساعة|ساعات|سوار|band|strap)/i.test(full)) return 'ساعات وأساور ذكية';
+    return 'سماعات ومايكات';
+  }
+  if (['جرابات وإكسسوارات حماية', 'جرابات واكسسوارات حماية', 'جرابات وحمايات'].includes(cleaned)) {
+    if (/(screen|glass|اسكرين|سكرين|عدسة|كاميرا)/i.test(full)) return 'اسكرينات وحماية كاميرا';
+    return 'جرابات الموبايل';
+  }
+  return cleaned;
+};
+
 const mergeOrPartsList = (baseParts, delMap = {}, disabled = false) => {
   const list = Array.isArray(baseParts) ? [...baseParts] : [];
   if (disabled) return list;
@@ -1076,14 +1125,14 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false }
 
   const bannerHeightMode = ad.bannerHeight || 'standard';
   const heightCls = compact
-    ? 'min-h-[132px]'
+    ? 'min-h-[110px]'
     : isPromoCard
-    ? 'min-h-[225px] sm:min-h-[250px]'
+    ? 'min-h-[145px] sm:min-h-[195px]'
     : bannerHeightMode === 'compact'
-    ? 'min-h-[240px] sm:min-h-[285px]'
+    ? 'min-h-[150px] sm:min-h-[210px]'
     : bannerHeightMode === 'tall'
-    ? 'min-h-[330px] sm:min-h-[420px]'
-    : 'min-h-[280px] sm:min-h-[350px]';
+    ? 'min-h-[215px] sm:min-h-[300px]'
+    : 'min-h-[168px] sm:min-h-[245px]';
 
   const iconKey = ad.iconPreset && SHORTCUT_ICON_PRESETS[ad.iconPreset] ? ad.iconPreset : 'flagship_iphones';
   const iconPresetObj = SHORTCUT_ICON_PRESETS[iconKey] || SHORTCUT_ICON_PRESETS.flagship_iphones;
@@ -1994,14 +2043,14 @@ Object.keys(SHORTCUT_ICON_PRESETS).forEach((presetKey) => {
 });
 
   const DEFAULT_HOME_SHORTCUT_ICONS = [
-  { id: 'sc_1', label: 'موبايلات', mode: 'preset', preset: 'phone', image: '', category: 'ALL', filterMode: 'ALL', visible: true },
-  { id: 'sc_2', label: 'سماعات', mode: 'preset', preset: 'headphones', image: '', category: 'سماعات وساعات ذكية', filterMode: 'ALL', visible: true },
-  { id: 'sc_3', label: 'ساعات ذكية', mode: 'preset', preset: 'watch', image: '', category: 'سماعات وساعات ذكية', filterMode: 'ALL', visible: true },
-  { id: 'sc_4', label: 'شاشات وقطع', mode: 'preset', preset: 'laptop', image: '', category: 'شاشات أصلية', filterMode: 'ALL', visible: true },
-  { id: 'sc_5', label: 'اكسسوارات', mode: 'preset', preset: 'accessories', image: '', category: 'جرابات واكسسوارات حماية', filterMode: 'ALL', visible: true },
-  { id: 'sc_6', label: 'شواحن وكابلات', mode: 'preset', preset: 'charger', image: '', category: 'شواحن وكابلات أصلية', filterMode: 'ALL', visible: true },
-  { id: 'sc_7', label: 'العروض', mode: 'preset', preset: 'offers', image: '', category: 'ALL', filterMode: 'DISCOUNTS', visible: true },
-  { id: 'sc_8', label: 'المزيد', mode: 'preset', preset: 'more', image: '', category: 'ALL', filterMode: 'ALL', visible: true }
+  { id: 'sc_1', label: 'شواحن', mode: 'preset', preset: 'charger', image: '', category: 'شواحن', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_2', label: 'كابلات ومحولات', mode: 'preset', preset: 'cable_usb', image: '', category: 'كابلات ومحولات', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_3', label: 'باور بانك', mode: 'preset', preset: 'powerbank', image: '', category: 'باور بانك', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_4', label: 'سماعات ومايكات', mode: 'preset', preset: 'headphones', image: '', category: 'سماعات ومايكات', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_5', label: 'اسكرينات', mode: 'preset', preset: 'screen_glass', image: '', category: 'اسكرينات وحماية كاميرا', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_6', label: 'جرابات', mode: 'preset', preset: 'case_armor', image: '', category: 'جرابات الموبايل', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_7', label: 'ساعات ذكية', mode: 'preset', preset: 'watch', image: '', category: 'ساعات وأساور ذكية', filterMode: 'ALL', visible: true, showInSearch: true },
+  { id: 'sc_8', label: 'العروض', mode: 'preset', preset: 'offers', image: '', category: 'ALL', filterMode: 'DISCOUNTS', visible: true, showInSearch: false }
 ];
 
 // Smart AI E-Commerce Product Copy & Spec Auto-Fill Engine
@@ -3395,6 +3444,9 @@ export default function App() {
   const [expandedAdminBrands, setExpandedAdminBrands] = useState({});
   const [expandedAdminModels, setExpandedAdminModels] = useState({});
   const storeGridTopRef = useRef(null);
+  const productsGridAnchorRef = useRef(null);
+  const pendingScrollToProductsRef = useRef(false);
+  const [mobileFiltersExpanded, setMobileFiltersExpanded] = useState(false);
   const [activeCatalogPricingGroupId, setActiveCatalogPricingGroupId] = useState('ALL');
   const [brandDeleteProtectionModal, setBrandDeleteProtectionModal] = useState(null); // { brandName, affectedModelsCount, affectedPartsCount, targetBrand }
 
@@ -3419,6 +3471,20 @@ export default function App() {
   // activeRole in storefront: 'guest' | clientId (persisted so logged-in user stays logged in after refresh!)
   const [activeRole, setActiveRole] = useState(() => loadPersisted('activeClientRole', 'guest'));
   const [clientTab, setClientTab] = useState('home'); // 'home' | 'search' | 'checkout' | 'account'
+
+  // Smooth-scroll directly to the start of the products grid when triggered from category icons / brand chips
+  useEffect(() => {
+    if (clientTab === 'search' && pendingScrollToProductsRef.current) {
+      pendingScrollToProductsRef.current = false;
+      const timer = setTimeout(() => {
+        const target = productsGridAnchorRef.current || storeGridTopRef.current;
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
+      return () => clearTimeout(timer);
+    }
+  }, [clientTab]);
   const [accountSubTab, setAccountSubTab] = useState('profile'); // 'profile' | 'orders' | 'ledger' | 'returns' | 'complaints'
   const [adminTab, setAdminTab] = useState('overview');
 
@@ -9081,7 +9147,7 @@ ${adminLink}`;
         return false;
       }
     }
-    if (!ignoreCategory && selectedCategory !== 'ALL' && part.category !== selectedCategory) return false;
+    if (!ignoreCategory && selectedCategory !== 'ALL' && normalizePartCategory(part.category, part.name) !== normalizePartCategory(selectedCategory)) return false;
 
     if (storeStockFilter === 'IN_STOCK' && part.stock <= 0) return false;
     if (storeStockFilter === 'LOW_STOCK' && (part.stock <= 0 || part.stock > part.lowStockThreshold)) return false;
@@ -10812,15 +10878,15 @@ ${adminLink}`;
         } backdrop-blur-xl transition-colors duration-200`}
       >
         <div ref={headerInnerRef} className="w-full max-w-full">
-          <div className={`max-w-[1380px] mx-auto px-4 sm:px-8 ${hCfg.compactHeight ? 'h-16' : 'h-20'} flex items-center justify-between gap-4`}>
+          <div className={`max-w-[1380px] mx-auto px-3 sm:px-8 ${hCfg.compactHeight ? 'h-14 sm:h-16' : 'h-16 sm:h-20'} flex items-center justify-between gap-2 sm:gap-4`}>
             {/* Right: Brand Logo + Customizable Navigation Links */}
-            <div className="flex items-center gap-5 lg:gap-8 shrink-0">
+            <div className="flex items-center gap-3 lg:gap-8 min-w-0 shrink">
               <div
                 onClick={() => {
                   setStoreStockFilter('ALL');
                   setClientTab('home');
                 }}
-                className="cursor-pointer shrink-0"
+                className="cursor-pointer shrink-0 scale-90 sm:scale-100 origin-right"
               >
                 {renderVvipBrandEmblem('md', hCfg.forceDarkHeader)}
               </div>
@@ -11026,24 +11092,13 @@ ${adminLink}`;
               </form>
             )}
 
-            {/* Left: Customizable Utility Buttons */}
-            <div className="flex items-center gap-2 shrink-0">
-              {hCfg.showSearchBar && (
-                <button
-                  type="button"
-                  onClick={() => setClientTab('search')}
-                  className="md:hidden w-10 h-10 rounded-full bg-surface2 dark:bg-[#0D1528] text-fg border border-line flex items-center justify-center"
-                  title="بحث وتصفح"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              )}
-
+            {/* Left: Cleanly Ordered Utility Buttons (All Icons Clearly Visible on Mobile & Desktop) */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               {hCfg.showWarrantyBtn && siteSettings.enableWarrantyLookup !== false && (
                 <button
                   type="button"
                   onClick={() => setWarrantyModalOpen(true)}
-                  className="hidden sm:flex h-10 px-3 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] text-fg border border-slate-200 dark:border-[#1E2D4A] items-center gap-1.5 text-xs font-extrabold transition"
+                  className="hidden sm:flex h-9 sm:h-10 px-3 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] text-fg border border-slate-200 dark:border-[#1E2D4A] items-center gap-1.5 text-xs font-extrabold transition"
                   title="فحص الضمان بالرقم"
                 >
                   <Shield className="w-3.5 h-3.5 text-[#2563EB]" />
@@ -11056,7 +11111,7 @@ ${adminLink}`;
                   href={siteSettings.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-emerald-500/15 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/30 flex items-center justify-center transition"
+                  className="hidden sm:flex w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-emerald-500/15 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/30 items-center justify-center transition"
                   title="تواصل معنا عبر واتساب"
                 >
                   <Phone className="w-4 h-4" />
@@ -11067,11 +11122,11 @@ ${adminLink}`;
                 <button
                   type="button"
                   onClick={() => setCartDrawerOpen(true)}
-                  className="relative w-10 h-10 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] text-fg border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center transition"
+                  className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] text-fg border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center transition"
                   title="سلة المشتريات"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#2563EB] text-white text-[10px] font-black flex items-center justify-center shadow">
+                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#2563EB] text-white text-[9px] font-black flex items-center justify-center shadow">
                     {cartSummary.totalQty}
                   </span>
                 </button>
@@ -11085,9 +11140,10 @@ ${adminLink}`;
                     setSelectedModelId('ALL');
                     setSelectedCategory('ALL');
                     setStoreStockFilter(storeStockFilter === 'FAVORITES' ? 'ALL' : 'FAVORITES');
+                    pendingScrollToProductsRef.current = true;
                     setClientTab('search');
                   }}
-                  className={`relative w-10 h-10 rounded-full border flex items-center justify-center transition ${
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition ${
                     storeStockFilter === 'FAVORITES' && clientTab === 'search'
                       ? 'bg-rose-500 text-white border-rose-400'
                       : 'bg-surface2 dark:bg-[#0D1528] hover:border-rose-400 text-fg border-slate-200 dark:border-[#1E2D4A]'
@@ -11098,7 +11154,7 @@ ${adminLink}`;
                     <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                   </svg>
                   {favoritePartIds.length > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center">
                       {favoritePartIds.length}
                     </span>
                   )}
@@ -11117,7 +11173,7 @@ ${adminLink}`;
                       setLoginModalOpen(true);
                     }
                   }}
-                  className={`relative w-10 h-10 rounded-full border flex items-center justify-center transition ${
+                  className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition ${
                     clientTab === 'account'
                       ? 'bg-[#2563EB] text-white border-[#2563EB]'
                       : 'bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] text-fg border-slate-200 dark:border-[#1E2D4A]'
@@ -11137,19 +11193,68 @@ ${adminLink}`;
                 <button
                   type="button"
                   onClick={toggleUiTheme}
-                  className="h-10 px-2.5 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] border border-slate-200 dark:border-[#1E2D4A] flex items-center gap-1 transition"
+                  className="w-9 h-9 sm:w-auto sm:h-10 sm:px-2.5 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#3B82F6] border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center gap-1 transition"
                   title={uiTheme === 'dark' ? 'التبديل إلى الوضع الفاتح' : 'التبديل إلى الوضع الليلي'}
                 >
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all ${uiTheme === 'dark' ? 'bg-[#2563EB] text-white shadow' : 'text-slate-400'}`}>
+                  <span className={`sm:hidden text-sm`}>{uiTheme === 'dark' ? '🌙' : '☀️'}</span>
+                  <span className={`hidden sm:flex w-6 h-6 rounded-full items-center justify-center text-xs transition-all ${uiTheme === 'dark' ? 'bg-[#2563EB] text-white shadow' : 'text-slate-400'}`}>
                     🌙
                   </span>
-                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all ${uiTheme === 'light' ? 'bg-amber-400 text-slate-950 shadow' : 'text-slate-500'}`}>
+                  <span className={`hidden sm:flex w-6 h-6 rounded-full items-center justify-center text-xs transition-all ${uiTheme === 'light' ? 'bg-amber-400 text-slate-950 shadow' : 'text-slate-500'}`}>
                     ☀️
                   </span>
                 </button>
               )}
             </div>
           </div>
+
+          {/* Dedicated Full-Width Search Bar Directly Below Header (Mobile & Tablet) */}
+          {hCfg.showSearchBar && (
+            <div className="md:hidden px-3 pb-2">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  pendingScrollToProductsRef.current = true;
+                  setClientTab('search');
+                }}
+                className={`flex items-center gap-2 rounded-2xl px-3 py-1.5 border transition ${
+                  hCfg.forceDarkHeader
+                    ? 'bg-[#0D1528] border-[#1E2D4A] text-white'
+                    : 'bg-surface2 dark:bg-[#0D1528] border-line dark:border-[#1E2D4A] text-fg'
+                } focus-within:border-[#3B82F6]`}
+              >
+                <Search className="w-4 h-4 text-[#3B82F6] shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (clientTab !== 'search' && e.target.value.trim().length > 1) {
+                      setClientTab('search');
+                    }
+                  }}
+                  placeholder={hCfg.searchPlaceholder || 'ابحث باسم المنتج أو البراند أو الموديل...'}
+                  className="flex-1 bg-transparent border-0 text-xs font-bold placeholder:text-slate-400 focus:outline-none py-1"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="p-1 rounded-full bg-surface text-muted hover:text-fg"
+                    title="مسح"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                <button
+                  type="submit"
+                  className="px-3 py-1 rounded-xl bg-[#2563EB] text-white text-[11px] font-extrabold shrink-0"
+                >
+                  بحث
+                </button>
+              </form>
+            </div>
+          )}
 
           {/* Mobile Quick Navigation Strip (Clean & Reachable on Phones) */}
           <div className="lg:hidden flex items-center gap-1.5 px-3 pb-2.5 overflow-x-auto no-scrollbar text-xs font-extrabold">
@@ -11498,9 +11603,9 @@ ${adminLink}`;
               </div>
             )}
 
-            {/* 4 Trust Pillars Strip */}
-            <div className="border-t border-line bg-surface dark:bg-[#070D1D] px-4 sm:px-8 py-4">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* 4 Trust Pillars Strip (Compact on Mobile) */}
+            <div className="border-t border-line bg-surface dark:bg-[#070D1D] px-3 sm:px-8 py-2.5 sm:py-3.5">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#2563EB]/10 text-[#2563EB] dark:text-[#60A5FA] flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-5 h-5" />
@@ -11545,7 +11650,7 @@ ${adminLink}`;
           </section>
         )}
 
-        {/* 2. QUICK CATEGORY SHORTCUTS STRIP */}
+        {/* 2. COMPACT QUICK CATEGORY SHORTCUTS STRIP (Compact on Mobile + Scrolls Directly to Products!) */}
         {siteSettings.showHomeShortcuts !== false && (() => {
           const shortcutsList = (Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0
             ? siteSettings.homeShortcutIcons
@@ -11553,8 +11658,8 @@ ${adminLink}`;
           ).filter(sc => sc && sc.visible !== false);
           if (shortcutsList.length === 0) return null;
           return (
-            <section id="vvip-categories-section" className="space-y-3">
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-stretch">
+            <section id="vvip-categories-section" className="space-y-2.5">
+              <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-2.5 items-stretch">
                 {shortcutsList.map((sc, idx) => {
                   const presetObj = SHORTCUT_ICON_PRESETS[sc.preset] || SHORTCUT_ICON_PRESETS.phone;
                   const useCustomImg = sc.mode === 'image' && sc.image;
@@ -11567,10 +11672,12 @@ ${adminLink}`;
                         setSelectedModelId('ALL');
                         setSearchQuery('');
                         setStoreStockFilter(sc.filterMode || 'ALL');
-                        setSelectedCategory(sc.category || 'ALL');
+                        setSelectedCategory(normalizePartCategory(sc.category || 'ALL'));
+                        setStorePage(1);
+                        pendingScrollToProductsRef.current = true;
                         setClientTab('search');
                       }}
-                      className="hm-card group h-[122px] p-3 rounded-2xl bg-surface border border-line hover:border-[#3B82F6] flex flex-col items-center justify-between text-center gap-2"
+                      className="hm-card group h-[76px] sm:h-[96px] p-1.5 sm:p-2.5 rounded-2xl bg-surface border border-line hover:border-[#3B82F6] flex flex-col items-center justify-between text-center gap-1"
                     >
                       <div className="flex-1 w-full flex items-center justify-center overflow-hidden group-hover:scale-105 transition duration-300">
                         {useCustomImg ? (
@@ -11579,15 +11686,15 @@ ${adminLink}`;
                             alt={sc.label}
                             loading="lazy"
                             referrerPolicy="no-referrer"
-                            className="max-h-14 max-w-full w-auto h-auto object-contain rounded-xl"
+                            className="max-h-9 sm:max-h-11 max-w-full w-auto h-auto object-contain rounded-lg"
                           />
                         ) : (
-                          <div className="w-12 h-12 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full">
                             {presetObj.svg || (typeof presetObj.render === 'function' ? presetObj.render() : null)}
                           </div>
                         )}
                       </div>
-                      <div className="text-xs font-extrabold text-fg group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] truncate w-full">
+                      <div className="text-[10px] sm:text-xs font-extrabold text-fg group-hover:text-[#2563EB] dark:group-hover:text-[#60A5FA] truncate w-full leading-tight">
                         {sc.label}
                       </div>
                     </button>
@@ -11597,6 +11704,110 @@ ${adminLink}`;
             </section>
           );
         })()}
+
+        {/* 2B. ORGANIZED BRANDS BAR UNDER CATEGORY ICONS (Full Dashboard Control: Order & Visibility) */}
+        {siteSettings.showHomeBrandsBar !== false && (() => {
+          const configuredBrands = Array.isArray(siteSettings.homeFeaturedBrands) && siteSettings.homeFeaturedBrands.length > 0
+            ? siteSettings.homeFeaturedBrands.filter(b => publicBrands.includes(b))
+            : publicBrands;
+          if (configuredBrands.length === 0) return null;
+          return (
+            <section id="vvip-brands-section" className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-xs sm:text-sm font-black text-fg flex items-center gap-1.5">
+                  <span>🏷️</span>
+                  <span>تصفح حسب البراند</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedBrand('ALL');
+                    setSelectedCategory('ALL');
+                    pendingScrollToProductsRef.current = true;
+                    setClientTab('search');
+                  }}
+                  className="text-[11px] font-extrabold text-[#2563EB] dark:text-[#60A5FA] hover:underline"
+                >
+                  عرض كل البراندات ({publicBrands.length})
+                </button>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1">
+                {configuredBrands.map(br => {
+                  const cleanBrLabel = String(br).replace(/^OR\s*-\s*/i, '').trim();
+                  const brImg = (siteSettings.brandImages && siteSettings.brandImages[br]) || OR_BRAND_IMAGES[br] || '';
+                  const brCnt = publicPartCountByBrandMap.get(br) || 0;
+                  return (
+                    <button
+                      key={`home_br_${br}`}
+                      type="button"
+                      onClick={() => {
+                        setSelectedBrand(br);
+                        setSelectedModelId('ALL');
+                        setSelectedCategory('ALL');
+                        setSearchQuery('');
+                        setStoreStockFilter('ALL');
+                        setStorePage(1);
+                        fetchSparePartsSliceOnDemand({ brand: br, limit: 250 });
+                        pendingScrollToProductsRef.current = true;
+                        setClientTab('search');
+                      }}
+                      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-surface hover:bg-[#2563EB] text-fg hover:text-white border border-line hover:border-[#2563EB] shadow-2xs transition text-[11px] sm:text-xs font-extrabold group"
+                    >
+                      {brImg ? (
+                        <img
+                          src={brImg}
+                          alt={cleanBrLabel}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                          className="w-5 h-5 rounded-full object-cover bg-white border border-line/60 shrink-0"
+                        />
+                      ) : (
+                        <span className="w-5 h-5 rounded-full bg-[#2563EB]/15 text-[#2563EB] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                          {cleanBrLabel.charAt(0)}
+                        </span>
+                      )}
+                      <span className="whitespace-nowrap">{cleanBrLabel}</span>
+                      {brCnt > 0 && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-surface2 group-hover:bg-white/20 text-muted group-hover:text-white font-black">
+                          {brCnt}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })()}
+
+        {/* 2C. COMPACT & CLEAR "اطلب منتجك" BAR ON HOMEPAGE (Visible Immediately Without Taking Much Space) */}
+        {siteSettings.showHomeSourcing !== false && (
+          <section
+            onClick={openSourcing}
+            className="cursor-pointer rounded-2xl bg-gradient-to-l from-[#0B1F52] via-[#172554] to-[#1E1B4B] hover:from-[#1D4ED8] hover:to-[#312E81] text-white px-3.5 py-2.5 sm:px-5 sm:py-3.5 border border-[#3B82F6]/45 shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3"
+          >
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-lg sm:text-xl shrink-0">
+                🌍
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5 flex-wrap">
+                  <span>خدمة اطلب منتجك</span>
+                  <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">استيراد وتوفير خاص</span>
+                </div>
+                <p className="text-[10px] sm:text-xs text-blue-100/90 font-semibold truncate">
+                  ملقتش المنتج اللي بتدور عليه؟ ابعتلنا اسمه أو صورته وهنوفرهولك بأفضل سعر!
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white text-[#0F172A] hover:bg-amber-300 font-black text-[11px] sm:text-xs shadow transition whitespace-nowrap"
+            >
+              اطلب منتجك ←
+            </button>
+          </section>
+        )}
 
         {/* 3. DUAL PROMOTIONAL SPLIT BANNERS (Rendered via Real Architectural AdContent Engine!) */}
         {siteSettings.showHomePromoSplit !== false && promoSplitAds.length > 0 && (
@@ -11714,8 +11925,7 @@ ${adminLink}`;
           );
         })}
 
-        {/* 6. SOURCING FROM ABROAD BANNER ON HOMEPAGE (When Enabled) */}
-        {siteSettings.showHomeSourcing !== false && renderSourcingBanner()}
+        {/* Compact Sourcing Bar is now prominently displayed near the top of Homepage */}
 
         {/* 7. NEWSLETTER SUBSCRIPTION BANNER */}
         {siteSettings.showHomeNewsletter !== false && (
@@ -11785,8 +11995,9 @@ ${adminLink}`;
   const renderStorefront = () => {
     const catCounts = {};
     publicParts.filter(p => partPassesStoreFilters(p, true)).forEach(p => {
-      if (p.category && !isCategoryHidden(p.category)) {
-        catCounts[p.category] = (catCounts[p.category] || 0) + 1;
+      const normCat = normalizePartCategory(p.category, p.name);
+      if (normCat && !isCategoryHidden(normCat) && !isCategoryHidden(p.category)) {
+        catCounts[normCat] = (catCounts[normCat] || 0) + 1;
       }
     });
     (Array.isArray(siteSettings.customCategories) ? siteSettings.customCategories : []).forEach(cc => {
@@ -11882,67 +12093,179 @@ ${adminLink}`;
           ))}
         </div>
 
-        {/* Search Banner at top of Products Page */}
-        <div className="bg-surface rounded-3xl p-4 sm:p-6 text-fg border border-line shadow-sm space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-base sm:text-xl font-black text-fg">
+        {/* Compact Search & 1-Tap Quick Shortcuts Bar (Mobile-Friendly!) */}
+        <div className="bg-surface rounded-2xl sm:rounded-3xl p-3 sm:p-5 text-fg border border-line shadow-sm space-y-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm sm:text-lg font-black text-fg truncate">
               {storeStockFilter === 'FAVORITES'
                 ? '❤️ قائمة منتجاتك المفضلة'
                 : storeStockFilter === 'DISCOUNTS'
                 ? '🔥 أقوى العروض والخصومات الحصرية'
                 : storeStockFilter === 'BEST_SELLERS'
                 ? '⭐ المنتجات الأكثر مبيعاً وطلباً'
-                : 'ابحث بالموديل أو اسم المنتج أو كود التوافق'}
+                : 'ابحث وفلتر المنتجات بسرعة'}
             </h2>
-            {hasActiveFilters && (
+            <div className="flex items-center gap-1.5 shrink-0">
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={clearAllStoreFilters}
+                  className="px-2.5 py-1 rounded-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 text-[11px] font-extrabold transition"
+                >
+                  × مسح الفلاتر
+                </button>
+              )}
               <button
                 type="button"
-                onClick={clearAllStoreFilters}
-                className="px-3.5 py-1.5 rounded-full bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/30 text-xs font-extrabold transition"
+                onClick={() => setMobileFiltersExpanded(prev => !prev)}
+                className={`sm:hidden px-2.5 py-1 rounded-full border text-[11px] font-extrabold flex items-center gap-1 transition ${
+                  mobileFiltersExpanded
+                    ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                    : 'bg-surface2 text-fg border-line'
+                }`}
               >
-                × إعادة ضبط جميع الفلاتر
+                <Filter className="w-3 h-3" />
+                <span>{mobileFiltersExpanded ? 'إخفاء الفلاتر' : 'فلاتر متقدمة'}</span>
               </button>
-            )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <div className="relative flex-1">
-              <Search className="w-5 h-5 text-muted absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 text-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="ابحث باسم المنتج، الموديل، أو الكود..."
-                className="w-full pr-11 pl-16 py-3 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#3B82F6]"
+                className="w-full pr-9 pl-12 py-2 sm:py-2.5 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#3B82F6]"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-full bg-surface2 hover:bg-line text-fg text-xs font-bold flex items-center gap-1"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 p-1 rounded-full bg-surface2 hover:bg-line text-fg text-xs font-bold"
+                  title="مسح"
                 >
                   <X className="w-3.5 h-3.5" />
-                  <span>مسح</span>
                 </button>
               )}
             </div>
             <button
               type="button"
               onClick={() => {
-                if (storeGridTopRef.current) {
-                  storeGridTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                const t = productsGridAnchorRef.current || storeGridTopRef.current;
+                if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
-              className="px-6 py-3 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-xs sm:text-sm shadow-lg shadow-blue-600/25 transition shrink-0"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-xs sm:text-sm shadow shadow-blue-600/20 transition shrink-0"
             >
-              بحث ↵
+              بحث
             </button>
           </div>
+
+          {/* 1-Tap Category Icon Shortcuts (Dashboard-Controlled) */}
+          {(() => {
+            const allSc = (Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0
+              ? siteSettings.homeShortcutIcons
+              : DEFAULT_HOME_SHORTCUT_ICONS
+            ).filter(sc => sc && sc.visible !== false && sc.showInSearch !== false && sc.category && sc.category !== 'ALL');
+            if (allSc.length === 0) return null;
+            return (
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => { setSelectedCategory('ALL'); setStorePage(1); }}
+                  className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition ${
+                    selectedCategory === 'ALL'
+                      ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                      : 'bg-surface2 text-fg border-line hover:border-[#3B82F6]'
+                  }`}
+                >
+                  الكل
+                </button>
+                {allSc.map((sc, idx) => {
+                  const normC = normalizePartCategory(sc.category);
+                  const isAct = normalizePartCategory(selectedCategory) === normC;
+                  const presetObj = SHORTCUT_ICON_PRESETS[sc.preset] || SHORTCUT_ICON_PRESETS.phone;
+                  return (
+                    <button
+                      key={`srch_cat_${sc.id || idx}`}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(isAct ? 'ALL' : normC);
+                        setStorePage(1);
+                      }}
+                      className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-extrabold border flex items-center gap-1.5 transition ${
+                        isAct
+                          ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-sm'
+                          : 'bg-surface2 text-fg border-line hover:border-[#3B82F6]'
+                      }`}
+                    >
+                      <span className="w-4 h-4 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full shrink-0">
+                        {sc.mode === 'image' && sc.image
+                          ? <img src={sc.image} alt="" className="w-4 h-4 object-contain rounded" />
+                          : (presetObj.svg || (typeof presetObj.render === 'function' ? presetObj.render() : null))}
+                      </span>
+                      <span className="whitespace-nowrap">{sc.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* 1-Tap Brand Shortcuts (Dashboard-Controlled) */}
+          {(() => {
+            const searchBrands = Array.isArray(siteSettings.searchShortcutBrands) && siteSettings.searchShortcutBrands.length > 0
+              ? siteSettings.searchShortcutBrands.filter(b => publicBrands.includes(b))
+              : publicBrands.slice(0, 12);
+            if (searchBrands.length === 0) return null;
+            return (
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+                <span className="text-[10px] font-extrabold text-muted shrink-0">البراند:</span>
+                <button
+                  type="button"
+                  onClick={() => { setSelectedBrand('ALL'); setSelectedModelId('ALL'); setStorePage(1); }}
+                  className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold border transition ${
+                    selectedBrand === 'ALL'
+                      ? 'bg-emerald-600 text-white border-emerald-600'
+                      : 'bg-bg text-fg border-line hover:border-emerald-500'
+                  }`}
+                >
+                  كل البراندات
+                </button>
+                {searchBrands.map(br => {
+                  const isAct = selectedBrand === br;
+                  const cleanBr = String(br).replace(/^OR\s*-\s*/i, '').trim();
+                  return (
+                    <button
+                      key={`srch_br_${br}`}
+                      type="button"
+                      onClick={() => {
+                        const nextBr = isAct ? 'ALL' : br;
+                        setSelectedBrand(nextBr);
+                        setSelectedModelId('ALL');
+                        setStorePage(1);
+                        if (nextBr !== 'ALL') fetchSparePartsSliceOnDemand({ brand: nextBr, limit: 250 });
+                      }}
+                      className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold border transition whitespace-nowrap ${
+                        isAct
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-bg text-fg border-line hover:border-emerald-500'
+                      }`}
+                    >
+                      {cleanBr}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
         </div>
 
-        {/* Filter Bar */}
-        <div ref={storeGridTopRef} className="bg-surface rounded-3xl p-4 sm:p-5 border border-line shadow-sm space-y-3">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '0.75rem' }}>
+        {/* Collapsible Advanced Filter Bar on Mobile (Always Open on Desktop) */}
+        <div ref={storeGridTopRef} className={`${mobileFiltersExpanded ? 'block' : 'hidden sm:block'} bg-surface rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-line shadow-sm space-y-3`}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.65rem' }}>
             {/* 1. البراند */}
             <div>
               <label className="block text-xs font-extrabold text-muted mb-1.5">1. البراند (الماركة):</label>
@@ -12119,6 +12442,20 @@ ${adminLink}`;
             </div>
           </div>
         </div>
+
+        {/* Direct Scroll Target: Start of Products Grid (Used when clicking Homepage Icons/Brands) */}
+        <div ref={productsGridAnchorRef} className="scroll-mt-28 flex items-center justify-between gap-2 sm:hidden px-1">
+          <span className="text-xs text-muted font-bold">
+            المنتجات: <span className="text-accent-text font-black">{totalItems}</span>
+            {selectedCategory !== 'ALL' && <span className="mr-1.5 text-[11px] text-[#2563EB] font-extrabold">• {selectedCategory}</span>}
+            {selectedBrand !== 'ALL' && <span className="mr-1.5 text-[11px] text-emerald-500 font-extrabold">• {String(selectedBrand).replace(/^OR\s*-\s*/i, '')}</span>}
+          </span>
+          <div className="flex items-center bg-surface2 rounded-full p-0.5 border border-line gap-0.5">
+            <button type="button" onClick={() => changeCols(1)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 1 ? 'bg-[#2563EB] text-white' : 'text-muted'}`}>☰</button>
+            <button type="button" onClick={() => changeCols(2)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 2 ? 'bg-[#2563EB] text-white' : 'text-muted'}`}>▦</button>
+          </div>
+        </div>
+        <div className="hidden sm:block scroll-mt-28" ref={el => { if (el && !productsGridAnchorRef.current) productsGridAnchorRef.current = el; }} />
 
         {/* Product Grid (4 Columns on Desktop matching Reference Mockups!) */}
         {totalItems === 0 ? (
@@ -14879,37 +15216,38 @@ ${adminLink}`;
           </div>
         </div>
 
-        {/* Sleek Floating Bottom Bar: ONLY 3 Shortcuts + 1 'باقي الصفحات' Menu Button (Zero Clipping, Zero Dragging!) */}
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center">
-          {/* Pop-up Directory of All Pages When 'باقي الصفحات' Is Clicked */}
+        {/* Sleek Responsive Floating Bottom Bar & Scrollable Mobile Popup (Zero Clipping on Any Phone!) */}
+        <div className="fixed bottom-3 inset-x-0 px-2.5 z-40 flex flex-col items-center pointer-events-none">
+          {/* Pop-up Directory of All Pages — Bounded Height & Scrollable on Mobile */}
           {floatingBottomMenuOpen && (
             <>
-              <div className="fixed inset-0 z-[-1]" onClick={() => setFloatingBottomMenuOpen(false)} />
-              <div className="mb-2.5 w-[92vw] max-w-[680px] rounded-3xl bg-surface dark:bg-[#0B1224] border-2 border-[#3B82F6]/45 shadow-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between gap-2 pb-2 border-b border-line">
-                  <span className="font-black text-xs sm:text-sm text-fg">🧭 الانتقال السريع لجميع صفحات الداشبورد</span>
-                  <div className="flex items-center gap-2">
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[-1] pointer-events-auto" onClick={() => setFloatingBottomMenuOpen(false)} />
+              <div className="pointer-events-auto mb-2 w-full max-w-[660px] max-h-[70vh] rounded-3xl bg-surface dark:bg-[#0B1224] border-2 border-[#3B82F6]/50 shadow-2xl flex flex-col overflow-hidden">
+                <div className="shrink-0 flex items-center justify-between gap-2 px-3.5 py-2.5 border-b border-line bg-surface dark:bg-[#0B1224]">
+                  <span className="font-black text-xs sm:text-sm text-fg truncate">🧭 جميع صفحات الداشبورد</span>
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         setFloatingBottomMenuOpen(false);
                       }}
-                      className="px-3 py-1 rounded-lg bg-[#2563EB] text-white text-[11px] font-extrabold"
+                      className="px-2.5 py-1 rounded-lg bg-[#2563EB] text-white text-[10px] sm:text-[11px] font-extrabold"
                     >
-                      ↑ الصعود لأول الصفحة
+                      ↑ أعلى الصفحة
                     </button>
                     <button
                       type="button"
                       onClick={() => setFloatingBottomMenuOpen(false)}
-                      className="w-7 h-7 rounded-lg bg-surface2 text-fg flex items-center justify-center"
+                      className="w-7 h-7 rounded-lg bg-rose-500/15 text-rose-500 hover:bg-rose-600 hover:text-white flex items-center justify-center transition"
+                      title="إغلاق"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                <div className="flex-1 overflow-y-auto overscroll-contain p-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
                   {navGroups.map((grp, gIdx) => {
                     const gTheme = groupThemes[gIdx % groupThemes.length];
                     return (
@@ -14954,11 +15292,12 @@ ${adminLink}`;
             </>
           )}
 
-          {/* Compact 4-Pill Dock: 3 Shortcuts + 1 'باقي الصفحات' */}
-          <div className="px-2.5 py-1.5 rounded-full bg-[#070D1D]/95 text-white border border-[#3B82F6]/45 shadow-2xl backdrop-blur-xl flex items-center gap-1.5 text-[11px] font-extrabold">
+          {/* Compact Responsive 4-Button Dock: Always 100% Visible on Mobile Without Clipping */}
+          <div className="pointer-events-auto w-full max-w-[430px] sm:w-auto sm:max-w-none px-1.5 sm:px-2.5 py-1.5 rounded-2xl sm:rounded-full bg-[#070D1D]/95 text-white border border-[#3B82F6]/50 shadow-2xl backdrop-blur-xl grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-extrabold">
             {bottomPrimaryShortcuts.map(sc => {
               const IconC = sc.icon;
               const isAct = adminTab === sc.id;
+              const shortMobileLabel = sc.id === 'quick_stock' ? 'الجرد' : sc.id === 'storefront_cms' ? 'الواجهة' : sc.label;
               return (
                 <button
                   key={`bshort_${sc.id}`}
@@ -14968,14 +15307,20 @@ ${adminLink}`;
                     setFloatingBottomMenuOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 transition whitespace-nowrap ${
+                  className={`px-1.5 sm:px-3 py-1.5 rounded-xl sm:rounded-full flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 transition min-w-0 ${
                     isAct ? `${sc.activeCls} shadow` : 'bg-white/10 hover:bg-white/20 text-slate-100'
                   }`}
                 >
-                  <IconC className="w-3.5 h-3.5 shrink-0" />
-                  <span>{sc.label}</span>
+                  <span className="relative flex items-center justify-center">
+                    <IconC className="w-3.5 h-3.5 shrink-0" />
+                    {sc.badge !== null && (
+                      <span className="sm:hidden absolute -top-1.5 -right-2.5 px-1 rounded-full bg-rose-600 text-white text-[8px] font-black leading-tight">{sc.badge}</span>
+                    )}
+                  </span>
+                  <span className="sm:hidden truncate max-w-full">{shortMobileLabel}</span>
+                  <span className="hidden sm:inline whitespace-nowrap">{sc.label}</span>
                   {sc.badge !== null && (
-                    <span className="px-1.5 rounded-full bg-black/25 text-[9px] font-black">{sc.badge}</span>
+                    <span className="hidden sm:inline px-1.5 rounded-full bg-black/25 text-[9px] font-black">{sc.badge}</span>
                   )}
                 </button>
               );
@@ -14984,14 +15329,14 @@ ${adminLink}`;
             <button
               type="button"
               onClick={() => setFloatingBottomMenuOpen(prev => !prev)}
-              className={`px-3.5 py-1.5 rounded-full flex items-center gap-1.5 transition whitespace-nowrap border ${
+              className={`px-1.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 transition border min-w-0 ${
                 floatingBottomMenuOpen
                   ? 'bg-[#2563EB] text-white border-[#60A5FA]'
                   : 'bg-[#2563EB]/25 hover:bg-[#2563EB] text-[#93C5FD] hover:text-white border-[#3B82F6]/40'
               }`}
             >
               <Menu className="w-3.5 h-3.5 shrink-0" />
-              <span>القائمة</span>
+              <span className="whitespace-nowrap">القائمة</span>
             </button>
           </div>
         </div>
@@ -23253,6 +23598,172 @@ ${adminLink}`;
               </div>
             </div>
           )}
+        </div>
+
+        {/* SECTION 3B: Full Dashboard Control — Brands Bar Under Icons + Search Filter Quick Shortcuts */}
+        <div className="bg-surface rounded-3xl p-5 border border-line shadow-sm space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-line">
+            <div>
+              <h3 className="text-sm sm:text-base font-black text-fg">🏷️ التحكم الكامل في شريط البراندات (تحت الأيقونات) واختصارات البحث السريعة</h3>
+              <p className="text-[11px] text-muted mt-0.5">اختر البراندات التي تظهر تحت أيقونات الصفحة الرئيسية ورتبها، وتحكم في البراندات وأيقونات التصنيفات الظاهرة كاختصارات بضغطة واحدة في شريط البحث</p>
+            </div>
+            <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface2 border border-line cursor-pointer font-extrabold text-xs">
+              <input
+                type="checkbox"
+                checked={siteSettings.showHomeBrandsBar !== false}
+                onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, showHomeBrandsBar: e.target.checked }))}
+              />
+              <span>إظهار شريط البراندات بالرئيسية</span>
+            </label>
+          </div>
+
+          {/* A. Homepage Brands Bar Manager */}
+          {(() => {
+            const selectedHomeBrands = Array.isArray(siteSettings.homeFeaturedBrands) && siteSettings.homeFeaturedBrands.length > 0
+              ? siteSettings.homeFeaturedBrands.filter(b => brands.includes(b))
+              : brands;
+            const toggleHomeBrand = (br) => {
+              const exists = selectedHomeBrands.includes(br);
+              const next = exists ? selectedHomeBrands.filter(x => x !== br) : [...selectedHomeBrands, br];
+              saveSiteSettingsImmediate(prev => ({ ...prev, homeFeaturedBrands: next }));
+            };
+            const moveHomeBrand = (idx, dir) => {
+              const target = idx + dir;
+              if (target < 0 || target >= selectedHomeBrands.length) return;
+              const copy = [...selectedHomeBrands];
+              [copy[idx], copy[target]] = [copy[target], copy[idx]];
+              saveSiteSettingsImmediate(prev => ({ ...prev, homeFeaturedBrands: copy }));
+            };
+            return (
+              <div className="space-y-3 p-4 rounded-2xl bg-bg border border-line">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-black text-xs text-fg">1. براندات الصفحة الرئيسية تحت الأيقونات ({selectedHomeBrands.length} / {brands.length})</span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, homeFeaturedBrands: [...brands] }))}
+                      className="px-2.5 py-1 rounded-lg bg-[#2563EB]/15 text-[#2563EB] font-extrabold text-[11px]"
+                    >
+                      تحديد الكل
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, homeFeaturedBrands: [] }))}
+                      className="px-2.5 py-1 rounded-lg bg-surface2 border border-line text-muted font-bold text-[11px]"
+                    >
+                      استعادة الترتيب الافتراضي
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedHomeBrands.map((br, idx) => (
+                    <div key={`hb_ord_${br}`} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2563EB]/15 border border-[#2563EB]/40 text-fg text-[11px] font-extrabold">
+                      <button type="button" onClick={() => moveHomeBrand(idx, -1)} disabled={idx === 0} className="px-1 hover:text-[#2563EB] disabled:opacity-30" title="تقديم">→</button>
+                      <span>{String(br).replace(/^OR\s*-\s*/i, '')}</span>
+                      <button type="button" onClick={() => moveHomeBrand(idx, 1)} disabled={idx === selectedHomeBrands.length - 1} className="px-1 hover:text-[#2563EB] disabled:opacity-30" title="تأخير">←</button>
+                      <button type="button" onClick={() => toggleHomeBrand(br)} className="text-rose-500 hover:text-rose-600 pr-0.5" title="إخفاء">×</button>
+                    </div>
+                  ))}
+                </div>
+                {brands.filter(b => !selectedHomeBrands.includes(b)).length > 0 && (
+                  <div className="pt-2 border-t border-line/60 space-y-1.5">
+                    <span className="text-[10px] font-bold text-muted">براندات مخفية (اضغط لإظهارها):</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {brands.filter(b => !selectedHomeBrands.includes(b)).map(br => (
+                        <button
+                          key={`hb_hid_${br}`}
+                          type="button"
+                          onClick={() => toggleHomeBrand(br)}
+                          className="px-2.5 py-1 rounded-full bg-surface2 border border-line text-muted hover:text-fg hover:border-[#3B82F6] text-[11px] font-bold"
+                        >
+                          + {String(br).replace(/^OR\s*-\s*/i, '')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* B. Search Filter 1-Tap Brand Shortcuts Manager */}
+          {(() => {
+            const selectedSearchBrands = Array.isArray(siteSettings.searchShortcutBrands) && siteSettings.searchShortcutBrands.length > 0
+              ? siteSettings.searchShortcutBrands.filter(b => brands.includes(b))
+              : brands.slice(0, 12);
+            const toggleSearchBrand = (br) => {
+              const exists = selectedSearchBrands.includes(br);
+              const next = exists ? selectedSearchBrands.filter(x => x !== br) : [...selectedSearchBrands, br];
+              saveSiteSettingsImmediate(prev => ({ ...prev, searchShortcutBrands: next }));
+            };
+            return (
+              <div className="space-y-2.5 p-4 rounded-2xl bg-bg border border-line">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-black text-xs text-fg">2. اختصارات البراندات في واجهة البحث ({selectedSearchBrands.length} براند ظاهر للعميل)</span>
+                  <button
+                    type="button"
+                    onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, searchShortcutBrands: brands.slice(0, 12) }))}
+                    className="px-2.5 py-1 rounded-lg bg-surface2 border border-line text-muted font-bold text-[11px]"
+                  >
+                    استعادة الافتراضي
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {brands.map(br => {
+                    const active = selectedSearchBrands.includes(br);
+                    return (
+                      <button
+                        key={`sb_tog_${br}`}
+                        type="button"
+                        onClick={() => toggleSearchBrand(br)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition ${
+                          active
+                            ? 'bg-emerald-600 text-white border-emerald-600'
+                            : 'bg-surface2 text-muted border-line hover:text-fg'
+                        }`}
+                      >
+                        {active ? '✓ ' : '+ '}{String(br).replace(/^OR\s*-\s*/i, '')}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* C. Search Filter 1-Tap Category Icons Toggle */}
+          {(() => {
+            const curSc = Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0
+              ? siteSettings.homeShortcutIcons
+              : DEFAULT_HOME_SHORTCUT_ICONS;
+            return (
+              <div className="space-y-2.5 p-4 rounded-2xl bg-bg border border-line">
+                <span className="font-black text-xs text-fg block">3. اختصارات أيقونات التصنيفات في شريط البحث (مثل السماعات والشواحن):</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {curSc.filter(sc => sc && sc.category && sc.category !== 'ALL').map((sc, idx) => {
+                    const active = sc.showInSearch !== false;
+                    return (
+                      <button
+                        key={`sc_srch_tog_${sc.id || idx}`}
+                        type="button"
+                        onClick={() => {
+                          const updated = curSc.map(item => item.id === sc.id ? { ...item, showInSearch: !active } : item);
+                          saveSiteSettingsImmediate(prev => ({ ...prev, homeShortcutIcons: updated }));
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${
+                          active
+                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                            : 'bg-surface2 text-muted border-line hover:text-fg'
+                        }`}
+                      >
+                        {active ? '✓ ' : '+ '}{sc.label} ({normalizePartCategory(sc.category)})
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         </>
