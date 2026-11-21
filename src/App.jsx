@@ -4896,7 +4896,7 @@ ${adminLink}`;
 
   const STATIC_SESSION_TABLES = new Set([
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
-    'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates'
+    'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
   // --- Persistent Cross-Tab LocalStorage Smart Cache (Cuts Repeat Tab & Visitor Egress by >92%!) ---
   const SESSION_CACHE_PREFIX = 'elzoghbi_lcache_v29_';
@@ -6024,7 +6024,7 @@ ${adminLink}`;
       if (isAdmin) hasAdminTablesPulledRef.current = true;
 
       setCloudSyncStatus('syncing');
-      const forceRefresh = !silent || isInitialBoot;
+      const forceRefresh = !silent; // Respect 6h localStorage cache on normal boot/F5; force only on explicit manual sync
 
       // Helper to apply incoming state safely without triggering false local mutation diffs
       const markIncomingWindow = () => {
@@ -6037,7 +6037,7 @@ ${adminLink}`;
       // They apply to the screen IMMEDIATELY as soon as they resolve — NEVER blocked by spare_parts!
       // =========================================================================
       const fastUiPromise = Promise.all([
-        sbFetchTable('site_settings', null, '&limit=5', true),
+        sbFetchTable('site_settings', null, '&limit=5', forceRefresh),
         sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=30', forceRefresh),
         sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=30', forceRefresh),
         sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
