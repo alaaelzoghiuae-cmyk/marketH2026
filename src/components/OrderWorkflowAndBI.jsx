@@ -409,6 +409,7 @@ export function AdminCommandPalette({ open, onClose, parts = [], orders = [], cl
   const low = q.trim().toLowerCase();
   const quickCommands = [
     { label: 'فتح مركز الأوامر الذكي (AI Command Center)', action: () => { onClose(); onOpenAi && onOpenAi(); } },
+    { label: 'وكيل الاستيراد الذكي من المواقع (AI Product Sourcing)', action: () => { onNavigateTab('ai_product_sourcing'); onClose(); } },
     { label: 'استيراد منتجات جديدة بروابط الصور (Bulk Importer)', action: () => { onNavigateTab('bulk_importer'); onClose(); } },
     { label: 'إدارة المنتجات السريعة (جدول Excel)', action: () => { onNavigateTab('excel_products'); onClose(); } },
     { label: 'محرك التسعير الذكي ومحاكاة الأرباح', action: () => { onNavigateTab('smart_pricing'); onClose(); } },

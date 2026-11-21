@@ -18,6 +18,7 @@ import {
 } from './orCatalogData';
 import AiCommandCenter from './components/AiCommandCenter';
 import BulkProductImporter from './components/BulkProductImporter';
+import AiProductSourcingAgent from './components/AiProductSourcingAgent';
 import ExcelProductManager from './components/ExcelProductManager';
 import SmartPricingEngine from './components/SmartPricingEngine';
 import ProductQualityAndImages from './components/ProductQualityAndImages';
@@ -1638,8 +1639,8 @@ const DEFAULT_SOURCING_TERMS = `1) الخدمة
 - بعد "جاري التوصيل" العربون بيتحسب من تمن المنتج وما يتردش لو رفضت الاستلام من غير سبب.
 
 5) الاسترجاع
-- لو المنتج وصل بمواصفات مختلفة عن اللي اتطلب (مقاس أو لون أو موديل غلط...) من حقك ترجّعه.
-- مفيش استرجاع لو المنتج مطابق للمواصفات اللي إنت حددتها. مثال: لو طلبت حذاء مقاس معين واتسلّم بنفس المقاس، وبعدين شفته كبير أو صغير أو مش عاجبك، الاسترجاع هنا مرفوض لأن المقاس هو اللي إنت اخترته.
+- لو المنتج وصل بمواصفات مختلفة عن اللي اتطلب (موديل أو لون أو قدرة شحن مختلفة...) من حقك ترجّعه.
+- مفيش استرجاع لو المنتج مطابق للمواصفات اللي إنت حددتها. مثال: لو طلبت شاحن أيفون 40W أو جراب لموديل معين واتسلّم بنفس المواصفات واللون، وبعدين قررت تغيّر رأيك أو لقيت إنه مش مناسب لجهازك، الاسترجاع هنا مرفوض لأن المواصفات هي اللي إنت اخترتها.
 
 6) الشحن والمدة
 مدة التوصيل تقريبية وبتتحدد في المحادثة حسب مكان الشراء والشحن والجمارك لو في.
@@ -14586,6 +14587,15 @@ ${adminLink}`;
             urgent: false
           },
           {
+            id: 'ai_product_sourcing',
+            label: 'وكيل الاستيراد الذكي (AI Sourcing)',
+            desc: 'اكتشاف، فلترة، كشف تكرار، إثراء عربي، تسعير، واستيراد كمسودات',
+            keywords: 'وكيل استيراد ذكي ai product sourcing مواقع موردين مسودات google pixel',
+            icon: Globe,
+            badge: 'Agent',
+            urgent: false
+          },
+          {
             id: 'bulk_importer',
             label: 'المستورد الذكي بالروابط',
             desc: 'استيراد منتجات جماعي عبر لصق روابط الصور أو CSV',
@@ -15402,6 +15412,44 @@ ${adminLink}`;
                   setParts(prev => prev.map(p => {
                     if (!priceMap[p.id]) return p;
                     const u = { ...p, ...priceMap[p.id] };
+                    synced.push(u);
+                    return u;
+                  }));
+                  synced.forEach(u => {
+                    markLocalUpsert('parts', u);
+                    sbUpsert('spare_parts', u);
+                  });
+                }}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'ai_product_sourcing' && (
+              <AiProductSourcingAgent
+                parts={parts}
+                brands={brands}
+                models={models}
+                categories={Array.from(new Set(parts.map(p => normalizePartCategory(p.category, p.name)).filter(Boolean)))}
+                normalizePartCategory={normalizePartCategory}
+                onConfirmImportParts={async (newParts, opts = {}) => {
+                  const asDraft = opts.asDraft !== false;
+                  setParts(prev => [...newParts, ...prev]);
+                  newParts.forEach(np => {
+                    markLocalUpsert('parts', np);
+                    sbUpsert('spare_parts', np);
+                  });
+                  if (asDraft && newParts.length > 0) {
+                    saveSiteSettingsImmediate(prev => {
+                      const cur = new Set((prev.hiddenPartIds || []).map(String));
+                      newParts.forEach(np => cur.add(String(np.id)));
+                      return { ...prev, hiddenPartIds: Array.from(cur) };
+                    });
+                  }
+                }}
+                onApplyCatalogUpdates={(patchMap) => {
+                  const synced = [];
+                  setParts(prev => prev.map(p => {
+                    if (!patchMap[p.id]) return p;
+                    const u = { ...p, ...patchMap[p.id] };
                     synced.push(u);
                     return u;
                   }));
@@ -29105,11 +29153,11 @@ model OrderInvoice {
           >
             <label className="block space-y-1 font-bold text-muted">
               اسم المنتج *
-              <input type="text" value={srcForm.name} onChange={e => setSrcForm(p => ({ ...p, name: e.target.value }))} placeholder="مثلاً: حذاء رياضي نايك Air Max" className="w-full px-3 py-2.5 rounded-xl border border-line" />
+              <input type="text" value={srcForm.name} onChange={e => setSrcForm(p => ({ ...p, name: e.target.value }))} placeholder="مثلاً: شاحن أيفون أصلي 40W سريع (USB-C PD)" className="w-full px-3 py-2.5 rounded-xl border border-line" />
             </label>
             <label className="block space-y-1 font-bold text-muted">
               وصف المنتج والمواصفات *
-              <textarea rows={4} value={srcForm.desc} onChange={e => setSrcForm(p => ({ ...p, desc: e.target.value }))} placeholder="اشرح بالتفصيل: المقاس، اللون، الموديل، الكمية، رابط لو معاك..." className="w-full px-3 py-2.5 rounded-xl border border-line" />
+              <textarea rows={4} value={srcForm.desc} onChange={e => setSrcForm(p => ({ ...p, desc: e.target.value }))} placeholder="اشرح بالتفصيل: الموديل، القدرة (وات)، اللون، الكمية، أو رابط المنتج لو معاك..." className="w-full px-3 py-2.5 rounded-xl border border-line" />
             </label>
             <label className="block space-y-1 font-bold text-muted">
               رقم الموبايل للتواصل *
