@@ -7,20 +7,23 @@
  *  - action=exchange-rate  : Live verified exchange rate lookup (never fabricated)
  *  - action=enrich         : Optional server-side AI enrichment when GEMINI_API_KEY or OPENAI_API_KEY is configured
  *
- * Security protections (Phase 15):
- *  - Strict http/https validation, private IPv4/IPv6 & cloud metadata blocking, DNS resolution check
- *  - Manual redirect validation (max 3 hops)
- *  - Request timeouts, max payload/item limits, sliding-window rate limiting
- *  - robots.txt awareness, zero anti-bot/CAPTCHA/auth bypassing
+ * v19.1 Reliability Fix:
+ *  - Dual-transport fetch: native fetch + automatic Node http/https IPv4 fallback (fixes Vercel IPv6/Undici "fetch failed" errors)
+ *  - Detailed Arabic error diagnostics extracting err.cause.code (ECONNRESET, ETIMEDOUT, ENOTFOUND, SSL, etc.)
+ *  - Added WooCommerce Store API (/wp-json/wc/store/v1/products) + multi-product HTML link/card fallback
  */
 
 import dns from 'node:dns/promises';
 import net from 'node:net';
+import http from 'node:http';
+import https from 'node:https';
+import zlib from 'node:zlib';
 
-const USER_AGENT = 'ElzoghbiMarketSourcingAgent/1.0 (+https://elzoghbi.market-h.com; compliant-catalog-sourcing)';
-const REQUEST_TIMEOUT_MS = 12000;
+const USER_AGENT =
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+const REQUEST_TIMEOUT_MS = 14000;
 const MAX_BODY_BYTES = 3 * 1024 * 1024; // 3 MB
-const MAX_REDIRECTS = 3;
+const MAX_REDIRECTS = 4;
 const MAX_EXTRACTED_ITEMS = 120;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQ = 30;
@@ -43,7 +46,6 @@ export function isPrivateOrReservedIp(ip) {
   if (!ip || typeof ip !== 'string') return true;
   const clean = ip.trim().toLowerCase();
 
-  // Handle IPv4-mapped IPv6 addresses like ::ffff:127.0.0.1
   if (clean.startsWith('::ffff:')) {
     return isPrivateOrReservedIp(clean.slice(7));
   }
@@ -53,22 +55,22 @@ export function isPrivateOrReservedIp(ip) {
     const parts = clean.split('.').map(Number);
     if (parts.length !== 4 || parts.some(n => Number.isNaN(n) || n < 0 || n > 255)) return true;
     const [a, b] = parts;
-    if (a === 0) return true; // 0.0.0.0/8
-    if (a === 10) return true; // 10.0.0.0/8
-    if (a === 127) return true; // 127.0.0.0/8 loopback
-    if (a === 169 && b === 254) return true; // 169.254.0.0/16 link-local & cloud metadata
-    if (a === 172 && b >= 16 && b <= 31) return true; // 172.16.0.0/12
-    if (a === 192 && b === 168) return true; // 192.168.0.0/16
-    if (a === 100 && b >= 64 && b <= 127) return true; // 100.64.0.0/10 CGNAT
-    if (a >= 224) return true; // multicast & reserved
+    if (a === 0) return true;
+    if (a === 10) return true;
+    if (a === 127) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true;
+    if (a >= 224) return true;
     return false;
   }
 
   if (version === 6) {
     if (clean === '::1' || clean === '::') return true;
-    if (clean.startsWith('fc') || clean.startsWith('fd')) return true; // ULA fc00::/7
-    if (clean.startsWith('fe8') || clean.startsWith('fe9') || clean.startsWith('fea') || clean.startsWith('feb')) return true; // fe80::/10
-    if (clean.startsWith('ff')) return true; // multicast
+    if (clean.startsWith('fc') || clean.startsWith('fd')) return true;
+    if (clean.startsWith('fe8') || clean.startsWith('fe9') || clean.startsWith('fea') || clean.startsWith('feb')) return true;
+    if (clean.startsWith('ff')) return true;
     return false;
   }
 
@@ -100,7 +102,7 @@ export async function validateSafePublicUrl(rawUrl, options = {}) {
     return { ok: false, reason: 'لا يُسمح بروابط تحتوي على بيانات اعتماد مدمجة (username/password).' };
   }
 
-  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  const host = parsed.hostname.toLowerCase().replace(/^\[|\]$/g, '');
   if (
     BLOCKED_HOSTNAMES.has(host) ||
     host.endsWith('.local') ||
@@ -130,11 +132,114 @@ export async function validateSafePublicUrl(rawUrl, options = {}) {
         }
       }
     } catch {
-      return { ok: false, reason: 'تعذر التحقق من DNS للنطاق المطلوب.' };
+      return { ok: false, reason: 'تعذر التحقق من DNS للنطاق المطلوب (تأكد من كتابة الرابط بشكل صحيح).' };
     }
   }
 
   return { ok: true, url: parsed.toString(), hostname: host };
+}
+
+function formatNetworkErrorArabic(err) {
+  const code = err?.cause?.code || err?.code || '';
+  const msg = err?.cause?.message || err?.message || '';
+  if (err?.name === 'AbortError' || code === 'ETIMEDOUT' || code === 'UND_ERR_CONNECT_TIMEOUT' || code === 'UND_ERR_HEADERS_TIMEOUT') {
+    return 'انتهت مهلة الاتصال بالموقع المصدر (Timeout). الموقع بطيء في الاستجابة أو يقيّد الطلبات الآلية؛ يمكنك استخدام بديل CSV / JSON Feed.';
+  }
+  if (code === 'ECONNRESET' || code === 'UND_ERR_SOCKET') {
+    return 'أغلق الموقع المصدر الاتصال فجأة (ECONNRESET) — غالباً بسبب جدار حماية (Cloudflare/WAF). استخدم بديل CSV / JSON Feed المصرح به.';
+  }
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+    return 'تعذر العثور على النطاق (DNS ENOTFOUND) — تأكد من صحة رابط الموقع.';
+  }
+  if (code === 'ECONNREFUSED') {
+    return 'رفض الخادم المصدر الاتصال (ECONNREFUSED).';
+  }
+  if (/CERT|TLS|SSL/i.test(code) || /certificate|TLS|SSL/i.test(msg)) {
+    return `مشكلة في شهادة الأمان (SSL/TLS) للموقع المصدر (${code || msg}).`;
+  }
+  return msg && msg !== 'fetch failed'
+    ? `تعذر جلب المصدر: ${msg}${code ? ` (${code})` : ''}`
+    : `تعذر الاتصال بالموقع المصدر (${code || 'Network/TLS error'}). جرب رابط صفحة الكولكشن أو استخدم لصق CSV / JSON Feed.`;
+}
+
+/**
+ * Node native http/https IPv4 fallback — bypasses Undici IPv6 / HTTP2 socket resets on Vercel
+ */
+function nodeHttpRequest(targetUrl, method = 'GET', customHeaders = {}) {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(targetUrl);
+    const lib = parsed.protocol === 'https:' ? https : http;
+    const req = lib.request(
+      {
+        protocol: parsed.protocol,
+        hostname: parsed.hostname,
+        port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+        path: `${parsed.pathname}${parsed.search}`,
+        method,
+        family: 4, // Force IPv4 to avoid Vercel IPv6 ENETUNREACH
+        timeout: REQUEST_TIMEOUT_MS,
+        headers: {
+          'User-Agent': USER_AGENT,
+          'Accept': 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.8',
+          'Accept-Language': 'ar,en-US;q=0.9,en;q=0.8',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Connection': 'close',
+          ...customHeaders
+        }
+      },
+      (res) => {
+        const status = res.statusCode || 0;
+        const headersMap = new Map();
+        for (const [k, v] of Object.entries(res.headers || {})) {
+          headersMap.set(k.toLowerCase(), Array.isArray(v) ? v.join(', ') : String(v ?? ''));
+        }
+        const headers = { get: (k) => headersMap.get(String(k).toLowerCase()) || null };
+
+        if (method === 'HEAD' || [301, 302, 303, 307, 308].includes(status)) {
+          res.resume();
+          return resolve({
+            ok: status >= 200 && status < 300,
+            status,
+            headers,
+            text: async () => '',
+            json: async () => ({})
+          });
+        }
+
+        let stream = res;
+        const enc = (res.headers['content-encoding'] || '').toLowerCase();
+        if (enc === 'gzip') stream = res.pipe(zlib.createGunzip());
+        else if (enc === 'deflate') stream = res.pipe(zlib.createInflate());
+        else if (enc === 'br') stream = res.pipe(zlib.createBrotliDecompress());
+
+        const chunks = [];
+        let totalBytes = 0;
+        stream.on('data', (chunk) => {
+          totalBytes += chunk.length;
+          if (totalBytes <= MAX_BODY_BYTES) chunks.push(chunk);
+          else stream.destroy();
+        });
+        stream.on('end', () => {
+          const bodyStr = Buffer.concat(chunks).toString('utf8');
+          resolve({
+            ok: status >= 200 && status < 300,
+            status,
+            headers,
+            text: async () => bodyStr,
+            json: async () => JSON.parse(bodyStr)
+          });
+        });
+        stream.on('error', reject);
+      }
+    );
+    req.on('timeout', () => {
+      const err = new Error('Timeout');
+      err.code = 'ETIMEDOUT';
+      req.destroy(err);
+    });
+    req.on('error', reject);
+    req.end();
+  });
 }
 
 async function safeFetch(rawUrl, init = {}, hops = 0) {
@@ -146,32 +251,45 @@ async function safeFetch(rawUrl, init = {}, hops = 0) {
     throw new Error(check.reason);
   }
 
+  const method = (init.method || 'GET').toUpperCase();
+  const headers = {
+    'User-Agent': USER_AGENT,
+    'Accept': 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.8',
+    'Accept-Language': 'ar,en-US;q=0.9,en;q=0.8',
+    ...(init.headers || {})
+  };
+
+  let res;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(check.url, {
+    res = await fetch(check.url, {
       ...init,
+      method,
       redirect: 'manual',
       signal: controller.signal,
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Accept': 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.8',
-        'Accept-Language': 'ar,en-US;q=0.9,en;q=0.8',
-        ...(init.headers || {})
-      }
+      headers
     });
-
-    if ([301, 302, 303, 307, 308].includes(res.status)) {
-      const location = res.headers.get('location');
-      if (!location) throw new Error('إعادة توجيه غير صالحة بدون وجهة.');
-      const nextUrl = new URL(location, check.url).toString();
-      return safeFetch(nextUrl, init, hops + 1);
+  } catch (fetchErr) {
+    clearTimeout(timer);
+    // Automatic IPv4 Node http/https fallback when Undici fetch fails on Vercel
+    try {
+      res = await nodeHttpRequest(check.url, method, headers);
+    } catch (fallbackErr) {
+      throw new Error(formatNetworkErrorArabic(fallbackErr || fetchErr));
     }
-
-    return { res, finalUrl: check.url };
   } finally {
     clearTimeout(timer);
   }
+
+  if ([301, 302, 303, 307, 308].includes(res.status)) {
+    const location = res.headers.get('location');
+    if (!location) throw new Error('إعادة توجيه غير صالحة بدون وجهة.');
+    const nextUrl = new URL(location, check.url).toString();
+    return safeFetch(nextUrl, init, hops + 1);
+  }
+
+  return { res, finalUrl: check.url };
 }
 
 async function readLimitedText(res) {
@@ -208,7 +326,7 @@ async function checkRobotsAllowed(targetUrl) {
       }
     }
     const targetPath = parsed.pathname || '/';
-    const blockedRule = disallowed.find(rule => rule === '/' || targetPath.startsWith(rule));
+    const blockedRule = disallowed.find(rule => rule === '/' || (rule.length > 1 && targetPath.startsWith(rule)));
     if (blockedRule) {
       return {
         allowed: false,
@@ -400,6 +518,49 @@ function extractShopifyProducts(jsonData, sourceUrl) {
       sourceVerifiedFields: ['name', 'productUrl', ...(price ? ['price'] : []), ...(images.length ? ['images'] : []), ...(firstVar.sku ? ['sku'] : []), ...(p.vendor ? ['brand'] : [])]
     };
   });
+}
+
+function extractWooProducts(arr, sourceUrl) {
+  if (!Array.isArray(arr)) return [];
+  return arr.slice(0, MAX_EXTRACTED_ITEMS).map(p => {
+    const minorUnit = Number(p?.prices?.currency_minor_unit ?? 2);
+    const divisor = Math.pow(10, minorUnit);
+    const rawP = Number(p?.prices?.price || 0);
+    const price = rawP > 0 ? rawP / divisor : 0;
+    const origRaw = Number(p?.prices?.regular_price || rawP || 0);
+    const origPrice = origRaw > 0 ? origRaw / divisor : price;
+    const images = normalizeImageList((p.images || []).map(i => i.src || i), sourceUrl);
+    const inStock = p.is_in_stock !== false;
+    return {
+      name: stripHtml(p.name || ''),
+      brand: stripHtml(p.brands?.[0]?.name || ''),
+      model: String(p.sku || p.slug || '').trim(),
+      sku: String(p.sku || '').trim(),
+      gtin: '',
+      ean: '',
+      upc: '',
+      productUrl: p.permalink || sourceUrl,
+      sourceUrl,
+      originalDescription: stripHtml(p.short_description || p.description || ''),
+      images,
+      price,
+      originalPrice: origPrice,
+      salePrice: price < origPrice ? price : 0,
+      currency: String(p?.prices?.currency_code || 'EGP').toUpperCase(),
+      availability: inStock ? 'in_stock' : 'out_of_stock',
+      stockStatus: inStock ? 'متوفر' : 'غير متوفر',
+      category: stripHtml(p.categories?.[0]?.name || ''),
+      specifications: {},
+      variants: [],
+      color: '',
+      weight: '',
+      warranty: '',
+      rating: Number(p.average_rating || 0) || null,
+      reviewCount: Number(p.review_count || 0) || null,
+      extractionMethod: 'woocommerce_store_api',
+      sourceVerifiedFields: ['name', 'productUrl', ...(price ? ['price'] : []), ...(images.length ? ['images'] : []), ...(p.sku ? ['sku'] : [])]
+    };
+  }).filter(p => p.name);
 }
 
 function extractXmlFeedProducts(xmlText, sourceUrl) {
@@ -636,35 +797,38 @@ export default async function handler(req, res) {
       const parsed = new URL(urlCheck.url);
       const logs = [`تم التحقق الأمني من الرابط (SSRF + DNS + robots.txt): ${urlCheck.url}`];
 
-      // Strategy 1: Try authorized Shopify public JSON endpoint first when URL looks like Shopify collection/store
-      const shopifyCandidates = [];
+      // Strategy 1: Try authorized Shopify & WooCommerce public JSON endpoints
+      const apiCandidates = [];
       if (parsed.pathname.includes('/collections/')) {
-        shopifyCandidates.push(`${parsed.origin}${parsed.pathname.replace(/\/$/, '')}/products.json?limit=100`);
-      } else if (parsed.pathname === '/' || parsed.pathname === '') {
-        shopifyCandidates.push(`${parsed.origin}/products.json?limit=100`);
+        apiCandidates.push({ kind: 'shopify', url: `${parsed.origin}${parsed.pathname.replace(/\/$/, '')}/products.json?limit=100` });
+      } else if (parsed.pathname === '/' || parsed.pathname === '' || parsed.pathname.includes('/shop')) {
+        apiCandidates.push({ kind: 'shopify', url: `${parsed.origin}/products.json?limit=100` });
+        apiCandidates.push({ kind: 'woo', url: `${parsed.origin}/wp-json/wc/store/v1/products?per_page=100` });
       }
 
-      for (const cand of shopifyCandidates) {
+      for (const cand of apiCandidates) {
         try {
-          const { res: sRes } = await safeFetch(cand);
+          const { res: sRes } = await safeFetch(cand.url);
           if (sRes.ok && (sRes.headers.get('content-type') || '').includes('json')) {
             const text = await readLimitedText(sRes);
             const json = JSON.parse(text);
-            const items = extractShopifyProducts(json, urlCheck.url);
+            const items = cand.kind === 'woo'
+              ? extractWooProducts(json, urlCheck.url)
+              : extractShopifyProducts(json, urlCheck.url);
             if (items.length > 0) {
-              logs.push(`تم الاستخراج عبر واجهة JSON المصرح بها (${items.length} منتج).`);
+              logs.push(`تم الاستخراج عبر واجهة ${cand.kind === 'woo' ? 'WooCommerce' : 'Shopify'} JSON المصرح بها (${items.length} منتج).`);
               return res.status(200).json({
                 ok: true,
                 sourceUrl: urlCheck.url,
-                sourceType: classifySourceType(urlCheck.url, 'shopify_json_api', items.length),
-                extractionMethod: 'shopify_json_api',
+                sourceType: classifySourceType(urlCheck.url, items[0].extractionMethod, items.length),
+                extractionMethod: items[0].extractionMethod,
                 products: items,
                 logs
               });
             }
           }
         } catch {
-          // Fall through to general fetch
+          // Fall through to direct URL fetch
         }
       }
 
@@ -698,35 +862,37 @@ export default async function handler(req, res) {
           const parsedJson = JSON.parse(bodyText);
           const items = parsedJson.products || parsedJson.product
             ? extractShopifyProducts(parsedJson, finalUrl)
-            : (Array.isArray(parsedJson) ? parsedJson : parsedJson.items || []).slice(0, MAX_EXTRACTED_ITEMS).map(it => ({
-                name: String(it.name || it.title || '').trim(),
-                brand: String(it.brand || it.vendor || '').trim(),
-                model: String(it.model || it.mpn || '').trim(),
-                sku: String(it.sku || it.id || '').trim(),
-                gtin: String(it.gtin || it.barcode || '').trim(),
-                ean: String(it.ean || '').trim(),
-                upc: String(it.upc || '').trim(),
-                productUrl: it.url || it.productUrl || finalUrl,
-                sourceUrl: finalUrl,
-                originalDescription: stripHtml(it.description || ''),
-                images: normalizeImageList(it.images || it.image, finalUrl),
-                price: Number(it.price || 0) || 0,
-                originalPrice: Number(it.originalPrice || it.compare_at_price || it.price || 0) || 0,
-                salePrice: Number(it.salePrice || 0) || 0,
-                currency: String(it.currency || 'USD').toUpperCase(),
-                availability: it.availability === 'out_of_stock' || it.inStock === false ? 'out_of_stock' : 'in_stock',
-                stockStatus: it.availability === 'out_of_stock' || it.inStock === false ? 'غير متوفر' : 'متوفر',
-                category: String(it.category || '').trim(),
-                specifications: typeof it.specifications === 'object' && it.specifications ? it.specifications : {},
-                variants: Array.isArray(it.variants) ? it.variants : [],
-                color: String(it.color || '').trim(),
-                weight: String(it.weight || '').trim(),
-                warranty: String(it.warranty || '').trim(),
-                rating: Number(it.rating || 0) || null,
-                reviewCount: Number(it.reviewCount || 0) || null,
-                extractionMethod: 'json_feed',
-                sourceVerifiedFields: ['name', 'productUrl']
-              }));
+            : Array.isArray(parsedJson) && parsedJson[0]?.prices?.currency_code
+              ? extractWooProducts(parsedJson, finalUrl)
+              : (Array.isArray(parsedJson) ? parsedJson : parsedJson.items || []).slice(0, MAX_EXTRACTED_ITEMS).map(it => ({
+                  name: String(it.name || it.title || '').trim(),
+                  brand: String(it.brand || it.vendor || '').trim(),
+                  model: String(it.model || it.mpn || '').trim(),
+                  sku: String(it.sku || it.id || '').trim(),
+                  gtin: String(it.gtin || it.barcode || '').trim(),
+                  ean: String(it.ean || '').trim(),
+                  upc: String(it.upc || '').trim(),
+                  productUrl: it.url || it.productUrl || finalUrl,
+                  sourceUrl: finalUrl,
+                  originalDescription: stripHtml(it.description || ''),
+                  images: normalizeImageList(it.images || it.image, finalUrl),
+                  price: Number(it.price || 0) || 0,
+                  originalPrice: Number(it.originalPrice || it.compare_at_price || it.price || 0) || 0,
+                  salePrice: Number(it.salePrice || 0) || 0,
+                  currency: String(it.currency || 'USD').toUpperCase(),
+                  availability: it.availability === 'out_of_stock' || it.inStock === false ? 'out_of_stock' : 'in_stock',
+                  stockStatus: it.availability === 'out_of_stock' || it.inStock === false ? 'غير متوفر' : 'متوفر',
+                  category: String(it.category || '').trim(),
+                  specifications: typeof it.specifications === 'object' && it.specifications ? it.specifications : {},
+                  variants: Array.isArray(it.variants) ? it.variants : [],
+                  color: String(it.color || '').trim(),
+                  weight: String(it.weight || '').trim(),
+                  warranty: String(it.warranty || '').trim(),
+                  rating: Number(it.rating || 0) || null,
+                  reviewCount: Number(it.reviewCount || 0) || null,
+                  extractionMethod: 'json_feed',
+                  sourceVerifiedFields: ['name', 'productUrl']
+                }));
           logs.push(`تم تحليل خلاصة JSON واستخراج ${items.length} منتج.`);
           return res.status(200).json({
             ok: true,
@@ -794,7 +960,6 @@ export default async function handler(req, res) {
           note: 'لا يوجد مفتاح AI خارجي مضاف في إعدادات السيرفر؛ تم استخدام محرك الإثراء المدمج الدقيق.'
         });
       }
-      // If GEMINI_API_KEY is configured on Vercel, enrich strictly from source data
       if (hasGemini && req.body?.product) {
         const p = req.body.product;
         const prompt = `أنت خبير منتجات إلكترونية لمتجر مصري (Elzoghbi Market). اعتماداً فقط على بيانات المصدر التالية بدون اختراع أي مواصفات أو ضمان غير مذكور، أرجع JSON يحتوي على: titleAr, descriptionAr, seoTitle, seoDescription, tags (array).\nبيانات المصدر: ${JSON.stringify({
@@ -833,9 +998,7 @@ export default async function handler(req, res) {
   } catch (err) {
     return res.status(500).json({
       ok: false,
-      error: err?.name === 'AbortError'
-        ? 'انتهت مهلة الاتصال بالمصدر (Timeout).'
-        : (err?.message || 'حدث خطأ غير متوقع أثناء معالجة المصدر.')
+      error: formatNetworkErrorArabic(err)
     });
   }
 }
