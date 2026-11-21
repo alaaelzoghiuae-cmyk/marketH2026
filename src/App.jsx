@@ -4913,7 +4913,7 @@ ${adminLink}`;
       window.localStorage.setItem('elzoghbi_app_version', 'v30_vvip_v16_or_catalog');
     }
   } catch (e) {}
-  const SESSION_CACHE_TTL = 35 * 60 * 1000; // 35 minutes shared cross-tab cache (invalidated instantly on any Admin edit!)
+  const SESSION_CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours shared cross-tab cache (per-table invalidation only -> ~90% less PostgREST Egress!)
 
   const readSessionTableCache = (cacheKey) => {
     try {
@@ -4943,7 +4943,7 @@ ${adminLink}`;
 
   const invalidateSessionTableCache = (tableName) => {
     try {
-      window.localStorage.setItem('elzoghbi_cache_bust_ts', String(Date.now()));
+      if (!tableName) window.localStorage.setItem('elzoghbi_cache_bust_ts', String(Date.now())); // Per-table invalidation only; never wipe unrelated tables!
       const clearMatching = (store) => {
         const keysToRemove = [];
         for (let i = 0; i < store.length; i++) {
@@ -6561,6 +6561,14 @@ ${adminLink}`;
         if (typeof document !== 'undefined' && document.hidden) return;
         const { sbUrl, sbKey, isValid } = getSupabaseConfig();
         if (!isValid) return;
+        // Step 1: Tiny ~80-byte ID probe; only fetch full order rows if a truly new order ID appeared!
+        const probeRes = await fetch(`${sbUrl}/rest/v1/orders?select=id&order=created_at.desc&limit=1`, {
+          headers: sbHeaders(sbKey)
+        });
+        if (!probeRes.ok) return;
+        const probeRows = await probeRes.json();
+        const latestId = Array.isArray(probeRows) && probeRows[0]?.id ? String(probeRows[0].id) : '';
+        if (!latestId || orders.some(o => String(o.id) === latestId)) return;
         const ordRes = await fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=5`, {
           headers: sbHeaders(sbKey)
         });
@@ -6594,7 +6602,7 @@ ${adminLink}`;
         }
       } catch (e) {}
     };
-    const timer = setInterval(pollAdminAlerts, 60000);
+    const timer = setInterval(pollAdminAlerts, 300000); // 5 minutes (Realtime WS handles instant alerts)
     return () => clearInterval(timer);
   }, [appPortal, adminAuthenticated, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
 
@@ -15433,10 +15441,8 @@ ${adminLink}`;
                 onConfirmImportParts={async (newParts, opts = {}) => {
                   const asDraft = opts.asDraft !== false;
                   setParts(prev => [...newParts, ...prev]);
-                  newParts.forEach(np => {
-                    markLocalUpsert('parts', np);
-                    sbUpsert('spare_parts', np);
-                  });
+                  newParts.forEach(np => markLocalUpsert('parts', np));
+                  sbUpsert('spare_parts', newParts);
                   if (asDraft && newParts.length > 0) {
                     saveSiteSettingsImmediate(prev => {
                       const cur = new Set((prev.hiddenPartIds || []).map(String));
@@ -15470,10 +15476,8 @@ ${adminLink}`;
                 generateAiDetails={generateAiProductDetails}
                 onConfirmImport={(newParts) => {
                   setParts(prev => [...newParts, ...prev]);
-                  newParts.forEach(np => {
-                    markLocalUpsert('parts', np);
-                    sbUpsert('spare_parts', np);
-                  });
+                  newParts.forEach(np => markLocalUpsert('parts', np));
+                  sbUpsert('spare_parts', newParts);
                   showToast(`تم استيراد وحفظ ${newParts.length} منتج جديد ومزامنتها مع قاعدة البيانات ✓`, 'success');
                 }}
                 showToast={showToast}
