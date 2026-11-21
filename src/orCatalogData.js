@@ -1,4 +1,4 @@
-// Auto-generated OR Multi-Store Catalog Data (Clean Unified Categories + Multi-Image CDN Links)
+// Auto-generated OR Multi-Store Catalog Data (Clean Unified Categories — Zero Base64 / Zero Supabase Storage Egress)
 // Sources: majentik.com, trust-egypt.com/collections/joyroom-products, bia3.net, three-egypt.com/collections, vontx.com
 
 export const OR_IMPORTED_BRANDS = [
@@ -692,10 +692,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611",
     "imageUrl": "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611",
     "images": [
-      "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mm001_1.jpg?v=1779388611",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CarPlay_MM-001-01.jpg?v=1778004962",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CarPlay_MM-001-02.jpg?v=1778004965"
+      "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -709,10 +706,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mm001_1.jpg?v=1779388611",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CarPlay_MM-001-01.jpg?v=1778004962",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CarPlay_MM-001-02.jpg?v=1778004965"
+        "https://majentik.com/cdn/shop/files/mm001_1.jpg?v=1779388611"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-play-mm-001",
@@ -746,10 +740,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
     "imageUrl": "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
     "images": [
-      "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-07-30-at-11.11.58-AM2.jpg?v=1769498712",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IMG_6877.jpg?v=1769498712"
+      "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -763,10 +754,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-07-30-at-11.11.58-AM2.jpg?v=1769498712",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IMG_6877.jpg?v=1769498712"
+        "https://majentik.com/cdn/shop/files/Self_Glass_Fit_Screen_Protector.jpg?v=1777674966"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/self-glass-fit-screen-protector",
@@ -800,10 +788,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-13_10000_mAh-01.jpg?v=1778004558",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-13_10000_mAh-02.jpg?v=1778004558"
+      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -817,10 +802,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-13_10000_mAh-01.jpg?v=1778004558",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-13_10000_mAh-02.jpg?v=1778004558"
+        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-05-17-at-19.09.16_2817d598.jpg?v=1769498683"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-13-10000-mah",
@@ -854,10 +836,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576",
     "imageUrl": "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576",
     "images": [
-      "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Mic_2in1_MM-001.jpg?v=1777674576",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1001-1.jpg?v=1769498669",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Mic_2in1_MM-0011-07.jpg?v=1778004674"
+      "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -871,10 +850,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Mic_2in1_MM-001.jpg?v=1777674576",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1001-1.jpg?v=1769498669",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Mic_2in1_MM-0011-07.jpg?v=1778004674"
+        "https://majentik.com/cdn/shop/files/Mic_2in1_MM-001.jpg?v=1777674576"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/mic-2in1-mm-001",
@@ -908,10 +884,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022",
     "imageUrl": "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022",
     "images": [
-      "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro.jpg?v=1778002022",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/budspro-min.png?v=1769498653",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds-pro-3w-min-e1681844996226.png?v=1769498653"
+      "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -925,10 +898,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro.jpg?v=1778002022",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/budspro-min.png?v=1769498653",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds-pro-3w-min-e1681844996226.png?v=1769498653"
+        "https://majentik.com/cdn/shop/files/Buds_Pro.jpg?v=1778002022"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/buds-pro",
@@ -962,10 +932,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
     "imageUrl": "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
     "images": [
-      "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-4.25.22-PM.jpg?v=1772127145",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-4.25.21-PM1.jpg?v=1772127145"
+      "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -979,10 +946,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-4.25.22-PM.jpg?v=1772127145",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-4.25.21-PM1.jpg?v=1772127145"
+        "https://majentik.com/cdn/shop/files/Android_Car_AI_Box_MCC-004.jpg?v=1777674683"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/android-car-ai-box-mcc-004",
@@ -1016,10 +980,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022",
     "imageUrl": "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022",
     "images": [
-      "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_3.jpg?v=1778002022",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/buds3a.png?v=1769498653",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/buds3-min.png?v=1769498653"
+      "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1033,10 +994,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_3.jpg?v=1778002022",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/buds3a.png?v=1769498653",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/buds3-min.png?v=1769498653"
+        "https://majentik.com/cdn/shop/files/Buds_3.jpg?v=1778002022"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/buds-3",
@@ -1070,10 +1028,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040",
     "imageUrl": "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040",
     "images": [
-      "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/5strong_screen.jpg?v=1777675040",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-19-at-8.48.55-PM.jpg?v=1769498652",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_A7_D8_B3_D9_83_D8_B1_D9_8A_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-_D8_B4_D9_81_D8_A7_D9_815strong.jpg?v=1769498653"
+      "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1087,10 +1042,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/5strong_screen.jpg?v=1777675040",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-19-at-8.48.55-PM.jpg?v=1769498652",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_A7_D8_B3_D9_83_D8_B1_D9_8A_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-_D8_B4_D9_81_D8_A7_D9_815strong.jpg?v=1769498653"
+        "https://majentik.com/cdn/shop/files/5strong_screen.jpg?v=1777675040"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/5-strong",
@@ -1124,10 +1076,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023",
     "imageUrl": "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023",
     "images": [
-      "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro_2.jpg?v=1778002023",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-04-04-at-15.59.48_fdaf565b.jpg?v=1769498653",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-04-02-at-00.57.04_2a54b55e.jpg?v=1769498652"
+      "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1141,10 +1090,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro_2.jpg?v=1778002023",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-04-04-at-15.59.48_fdaf565b.jpg?v=1769498653",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-04-02-at-00.57.04_2a54b55e.jpg?v=1769498652"
+        "https://majentik.com/cdn/shop/files/Buds_Pro_2.jpg?v=1778002023"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/buds-pro-2",
@@ -1178,10 +1124,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592",
     "imageUrl": "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592",
     "images": [
-      "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-018.jpg?v=1777999592",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1_f3fb6b41-960a-4f50-a906-f8a698a6b55f.jpg?v=1778600025",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_65c6d5b7-f102-47fb-8968-30c984bbeb50.jpg?v=1778600025"
+      "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1195,10 +1138,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-018.jpg?v=1777999592",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1_f3fb6b41-960a-4f50-a906-f8a698a6b55f.jpg?v=1778600025",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_65c6d5b7-f102-47fb-8968-30c984bbeb50.jpg?v=1778600025"
+        "https://majentik.com/cdn/shop/files/mc-018.jpg?v=1777999592"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/charger-head-mc-018-ai",
@@ -1232,10 +1172,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-22.jpg?v=1777998142",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-26-at-18.23.04_b16bff35.jpg?v=1769498687",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/48e4c6d39c406fb9feda99d6ff81911.png?v=1769498688"
+      "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1249,10 +1186,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-22.jpg?v=1777998142",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-26-at-18.23.04_b16bff35.jpg?v=1769498687",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/48e4c6d39c406fb9feda99d6ff81911.png?v=1769498688"
+        "https://majentik.com/cdn/shop/files/mj-22.jpg?v=1777998142"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-22-10000mah",
@@ -1286,10 +1220,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG38-05_49917768-dbd7-4cf8-add7-7c7f73b197eb.jpg?v=1783251321",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG38-01_e1f74549-3c3e-4009-b8d2-f4197d9263cb.jpg?v=1783251321"
+      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1303,10 +1234,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG38-05_49917768-dbd7-4cf8-add7-7c7f73b197eb.jpg?v=1783251321",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG38-01_e1f74549-3c3e-4009-b8d2-f4197d9263cb.jpg?v=1783251321"
+        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.52AM.jpg?v=1783251321"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-dash-cam-mz-03",
@@ -1340,10 +1268,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
     "imageUrl": "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
     "images": [
-      "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-2.58.10-PM-1.jpg?v=1772127145",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-2.58.10-PM.jpg?v=1772127145"
+      "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1357,10 +1282,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-2.58.10-PM-1.jpg?v=1772127145",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-02-19-at-2.58.10-PM.jpg?v=1772127145"
+        "https://majentik.com/cdn/shop/files/Car_Play_MCC-003_5d646b17-7b5a-4ab0-96fe-1ffb8789e743.jpg?v=1778161300"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-play-mmc-003",
@@ -1394,10 +1316,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769",
     "imageUrl": "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769",
     "images": [
-      "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Privacy_360_Screen.jpg?v=1780598769",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_81_D8_A7_D9_85_D9_8A_D9_87-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83.jpg?v=1769498694",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B5_D8_A8_D9_8A_D8_AA_D9_89_D8_A7.jpg?v=1769498695"
+      "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1411,10 +1330,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Privacy_360_Screen.jpg?v=1780598769",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_81_D8_A7_D9_85_D9_8A_D9_87-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83.jpg?v=1769498694",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B5_D8_A8_D9_8A_D8_AA_D9_89_D8_A7.jpg?v=1769498695"
+        "https://majentik.com/cdn/shop/files/Privacy_360_Screen.jpg?v=1780598769"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/privacy-360-screen",
@@ -1448,10 +1364,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512",
     "imageUrl": "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512",
     "images": [
-      "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Play_MMC-002.jpg?v=1777674512",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/n2.jpg?v=1769498658",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/n.png?v=1769498658"
+      "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1465,10 +1378,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Play_MMC-002.jpg?v=1777674512",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/n2.jpg?v=1769498658",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/n.png?v=1769498658"
+        "https://majentik.com/cdn/shop/files/Car_Play_MMC-002.jpg?v=1777674512"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-play-mmc-002",
@@ -1502,10 +1412,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611",
     "imageUrl": "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611",
     "images": [
-      "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Magnetic_Neck_Holder.jpg?v=1777674611",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/028b9a25206d5cd79867181864d0c930-scaled.jpg?v=1769498669",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8a3f776b117f07da9efde941f8e99ea0-scaled.jpg?v=1769498669"
+      "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1519,10 +1426,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Magnetic_Neck_Holder.jpg?v=1777674611",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/028b9a25206d5cd79867181864d0c930-scaled.jpg?v=1769498669",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8a3f776b117f07da9efde941f8e99ea0-scaled.jpg?v=1769498669"
+        "https://majentik.com/cdn/shop/files/Magnetic_Neck_Holder.jpg?v=1777674611"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/magnetic-neck-holder",
@@ -1556,10 +1460,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683",
     "imageUrl": "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683",
     "images": [
-      "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-1.jpg?v=1769498683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/box-1.jpg?v=1769498683",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2-1.jpg?v=1769498683"
+      "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1573,10 +1474,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-1.jpg?v=1769498683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/box-1.jpg?v=1769498683",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2-1.jpg?v=1769498683"
+        "https://majentik.com/cdn/shop/files/2-1.jpg?v=1769498683"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-14-1300-mah",
@@ -1610,10 +1508,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-Led-Majentik-CL002-C.jpg?v=1769498653",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/dza.jpg?v=1769498653"
+      "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1627,10 +1522,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-Led-Majentik-CL002-C.jpg?v=1769498653",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/dza.jpg?v=1769498653"
+        "https://majentik.com/cdn/shop/files/Cable_CL-002_Led_Type-C_To_Lightning.jpg?v=1777999590"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-002-led-type-c-to-type-c",
@@ -1664,10 +1556,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023",
     "imageUrl": "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023",
     "images": [
-      "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IRON_Pods.jpg?v=1778002023",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ironpods-min-1-1.jpg?v=1769498669",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IronPods-front-min.jpg?v=1769498669"
+      "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1681,10 +1570,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IRON_Pods.jpg?v=1778002023",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ironpods-min-1-1.jpg?v=1769498669",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IronPods-front-min.jpg?v=1769498669"
+        "https://majentik.com/cdn/shop/files/IRON_Pods.jpg?v=1778002023"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/iron-pods",
@@ -1718,10 +1604,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-02.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-04-at-18.54.50_35ce96a0.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-04-at-19.36.18_ad5926e2.jpg?v=1769498678"
+      "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1735,10 +1618,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-02.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-04-at-18.54.50_35ce96a0.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-04-at-19.36.18_ad5926e2.jpg?v=1769498678"
+        "https://majentik.com/cdn/shop/files/mj-02.jpg?v=1779265667"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-02-wireless-10000-mah",
@@ -1772,9 +1652,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-011_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-03-28-at-16.01.30_6c818e9c.jpg?v=1769498656"
+      "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1788,9 +1666,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-011_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-03-28-at-16.01.30_6c818e9c.jpg?v=1769498656"
+        "https://majentik.com/cdn/shop/files/Cable_CL-011_Type-C.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-011-type-c",
@@ -1824,10 +1700,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-18.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-27-at-17.30.32_65235ba9.jpg?v=1769498694",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-27-at-17.30.31_c1705f63.jpg?v=1769498694"
+      "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1841,10 +1714,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-18.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-27-at-17.30.32_65235ba9.jpg?v=1769498694",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-08-27-at-17.30.31_c1705f63.jpg?v=1769498694"
+        "https://majentik.com/cdn/shop/files/mj-18.jpg?v=1779265667"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-18-20000-mah",
@@ -1878,10 +1748,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-16.jpg?v=1779265666",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/90014807fb3cf3d76d29f446833b717.png?v=1769498679",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj16.jpg?v=1769498678"
+      "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1895,10 +1762,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-16.jpg?v=1779265666",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/90014807fb3cf3d76d29f446833b717.png?v=1769498679",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj16.jpg?v=1769498678"
+        "https://majentik.com/cdn/shop/files/mj-16.jpg?v=1779265666"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-16-30000mah",
@@ -1932,10 +1796,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668",
     "imageUrl": "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668",
     "images": [
-      "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/003.jpg?v=1769498668",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/003-1.jpg?v=1769498669",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-30-at-4.39.13-AM.jpg?v=1769498669"
+      "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -1949,10 +1810,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/003.jpg?v=1769498668",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/003-1.jpg?v=1769498669",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-30-at-4.39.13-AM.jpg?v=1769498669"
+        "https://majentik.com/cdn/shop/files/003.jpg?v=1769498668"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-holder-mr-003",
@@ -1986,10 +1844,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658",
     "imageUrl": "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658",
     "images": [
-      "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Charger_Head_M-CC01_dbad5015-d676-4601-84a8-45538074dadf.jpg?v=1779266726",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mcc001.jpg?v=1769498658",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Charger_Head_M-CC01-01.jpg?v=1778004828"
+      "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2003,10 +1858,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Charger_Head_M-CC01_dbad5015-d676-4601-84a8-45538074dadf.jpg?v=1779266726",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mcc001.jpg?v=1769498658",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Car_Charger_Head_M-CC01-01.jpg?v=1778004828"
+        "https://majentik.com/cdn/shop/files/mcc001.jpg?v=1769498658"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-charger-head-m-cc01",
@@ -2040,10 +1892,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-32.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-01_0810e873-1f3e-48f3-be3d-c1e86750eab0.jpg?v=1778514903",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-02_4ce78ade-5c23-4124-9255-5e7c477d9a4e.jpg?v=1778514907"
+      "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2057,10 +1906,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-32.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-01_0810e873-1f3e-48f3-be3d-c1e86750eab0.jpg?v=1778514903",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-02_4ce78ade-5c23-4124-9255-5e7c477d9a4e.jpg?v=1778514907"
+        "https://majentik.com/cdn/shop/files/mj-32.jpg?v=1777998144"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-32",
@@ -2094,10 +1940,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at10.30.06PM.jpg?v=1789471941",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at10.14.09PM_2.jpg?v=1789471941"
+      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2111,10 +1954,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at10.30.06PM.jpg?v=1789471941",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at10.14.09PM_2.jpg?v=1789471941"
+        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.09.59PM_1.jpg?v=1789471941"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/microphone-mm-003",
@@ -2148,10 +1988,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314",
     "imageUrl": "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314",
     "images": [
-      "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IMG_3649.jpg?v=1780598314",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-05-22-at-10.17.42-PM.webp?v=1779712614",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-05-22-at-10.17.44-PM.webp?v=1779712615"
+      "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2165,10 +2002,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/IMG_3649.jpg?v=1780598314",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-05-22-at-10.17.42-PM.webp?v=1779712614",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-05-22-at-10.17.44-PM.webp?v=1779712615"
+        "https://majentik.com/cdn/shop/files/IMG_3649.jpg?v=1780598314"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/tempered-glass-borderless-screen",
@@ -2202,10 +2036,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-27.jpg?v=1779265666",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-01_a00c0b1b-35eb-437e-84b9-6b0df8c3b49e.jpg?v=1778003274",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-02_186e68db-8e13-4b4c-8491-20be6e2dc8d1.jpg?v=1778003300"
+      "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2219,10 +2050,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-27.jpg?v=1779265666",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-01_a00c0b1b-35eb-437e-84b9-6b0df8c3b49e.jpg?v=1778003274",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Power_Bank_MJ-32_10000_mAh-02_186e68db-8e13-4b4c-8491-20be6e2dc8d1.jpg?v=1778003300"
+        "https://majentik.com/cdn/shop/files/mj-27.jpg?v=1779265666"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-27",
@@ -2256,10 +2084,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM_3.jpg?v=1783611501",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM_2.jpg?v=1783611501"
+      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2273,10 +2098,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM_3.jpg?v=1783611501",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-07-09at5.30.07PM_2.jpg?v=1783611501"
+        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-07-09at5.30.07PM.jpg?v=1783611501"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/obd-hardwire-kit-for-dash-cam",
@@ -2310,10 +2132,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-08at12.11.13AM.jpg?v=1786182468",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-08at12.11.11AM.jpg?v=1786182468"
+      "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2327,10 +2146,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-08at12.11.13AM.jpg?v=1786182468",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-08at12.11.11AM.jpg?v=1786182468"
+        "https://majentik.com/cdn/shop/files/WhatsApp_Image_2026-08-06_at_12.25.01_AM.jpg?v=1786182534"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-play-majentik-mcc-005",
@@ -2364,10 +2180,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/006.jpg?v=1769498652",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/006-4.jpg?v=1769498653"
+      "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2381,10 +2194,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/006.jpg?v=1769498652",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/006-4.jpg?v=1769498653"
+        "https://majentik.com/cdn/shop/files/Cable_C-006_Type-C_To_Type-C.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-006-type-c-to-type-c",
@@ -2418,10 +2228,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at1.26.29AM.jpg?v=1789473001",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at1.26.27AM.jpg?v=1789473001"
+      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2435,10 +2242,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at1.26.29AM.jpg?v=1789473001",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-09-14at1.26.27AM.jpg?v=1789473001"
+        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-09-13at9.10.00PM_1.jpg?v=1789473001"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/microphone-mm-002",
@@ -2472,10 +2276,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021",
     "imageUrl": "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021",
     "images": [
-      "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro_3.jpg?v=1778002021",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-04-16-at-1.27.38-AM-1.jpg?v=1777229606",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-04-16-at-1.27.39-AM-1.jpg?v=1777229605"
+      "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2489,10 +2290,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Buds_Pro_3.jpg?v=1778002021",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-04-16-at-1.27.38-AM-1.jpg?v=1777229606",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2026-04-16-at-1.27.39-AM-1.jpg?v=1777229605"
+        "https://majentik.com/cdn/shop/files/Buds_Pro_3.jpg?v=1778002021"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/buds-pro-3",
@@ -2526,10 +2324,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-19-at-2.57.46-PM2.jpg?v=1769498695",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-25-at-4.19.10-PM.jpg?v=1769498694"
+      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2543,10 +2338,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-19-at-2.57.46-PM2.jpg?v=1769498695",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-10-25-at-4.19.10-PM.jpg?v=1769498694"
+        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2025-10-23-at-10.55.00-AM.jpg?v=1769498694"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-33-20000-mah",
@@ -2580,10 +2372,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-12.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-12-at-14.04.57_9f9ec8e8.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/product-featured-2546-1704924000.jpg?v=1769498678"
+      "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2597,10 +2386,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-12.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-09-12-at-14.04.57_9f9ec8e8.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/product-featured-2546-1704924000.jpg?v=1769498678"
+        "https://majentik.com/cdn/shop/files/mj-12.jpg?v=1779265667"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-12-30000-mah",
@@ -2634,10 +2420,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/9814e8ee5d4e95e57dab11334c72ea4.png?v=1769498688",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj21.jpg?v=1769498687"
+      "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2651,10 +2434,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/9814e8ee5d4e95e57dab11334c72ea4.png?v=1769498688",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj21.jpg?v=1769498687"
+        "https://majentik.com/cdn/shop/files/mj-21_87b40abf-41eb-4eda-b1fc-e9ee01d901dc.jpg?v=1779265667"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-21-10000-mah",
@@ -2688,10 +2468,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-28.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8-5.jpg?v=1769498687",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-4.jpg?v=1769498687"
+      "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2705,10 +2482,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-28.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8-5.jpg?v=1769498687",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-4.jpg?v=1769498687"
+        "https://majentik.com/cdn/shop/files/mj-28.jpg?v=1777998144"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-28",
@@ -2742,10 +2516,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-013_C.jpg?v=1777999593",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-07-04-at-18.41.21_5ca23f62.jpg?v=1769498657",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/01333-1.jpg?v=1769498657"
+      "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2759,10 +2530,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-013_C.jpg?v=1777999593",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2025-07-04-at-18.41.21_5ca23f62.jpg?v=1769498657",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/01333-1.jpg?v=1769498657"
+        "https://majentik.com/cdn/shop/files/Cable_CL-013_C.jpg?v=1777999593"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl013-c",
@@ -2796,10 +2564,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
     "imageUrl": "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
     "images": [
-      "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-10at3.36.26PM.jpg?v=1786444147",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-10at3.36.25PM_1.jpg?v=1786444147"
+      "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2813,10 +2578,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-10at3.36.26PM.jpg?v=1786444147",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-08-10at3.36.25PM_1.jpg?v=1786444147"
+        "https://majentik.com/cdn/shop/files/2_d9aa1157-b9f9-41fc-9a12-af56e88fb6cd.png?v=1786444148"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-play-mcc-006",
@@ -2850,10 +2612,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG36-10_ea6c9f7a-81db-460a-aa38-ebf10b2a2efd.jpg?v=1783250854",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG36-06_4b26ff93-02c3-48e5-b229-b9a211bea7b2.jpg?v=1783250854"
+      "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2867,10 +2626,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG36-10_ea6c9f7a-81db-460a-aa38-ebf10b2a2efd.jpg?v=1783250854",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/DashCamG36-06_4b26ff93-02c3-48e5-b229-b9a211bea7b2.jpg?v=1783250854"
+        "https://majentik.com/cdn/shop/files/WhatsAppImage2026-06-28at2.37.53AM.jpg?v=1783250853"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/car-dash-cam-mz-02",
@@ -2904,10 +2660,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627",
     "imageUrl": "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627",
     "images": [
-      "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Samsung_Camera_Screen.jpg?v=1779265627",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_83_D8_A7_D9_85_D9_8A_D8_B1_D8_A7-_D8_B3_D8_A7_D9_85_D8_B3_D9_88_D9_86_D8_AC-1.jpg?v=1769498695",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_A7_D8_B3_D9_83_D8_B1_D9_8A_D9_86-_D9_83_D8_A7_D9_85_D9_8A_D8_B1_D8_A7-_D8_A7_D9_8A_D9_81_D9_88_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83.jpg?v=1769498695"
+      "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2921,10 +2674,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Samsung_Camera_Screen.jpg?v=1779265627",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_83_D8_A7_D9_85_D9_8A_D8_B1_D8_A7-_D8_B3_D8_A7_D9_85_D8_B3_D9_88_D9_86_D8_AC-1.jpg?v=1769498695",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_A7_D8_B3_D9_83_D8_B1_D9_8A_D9_86-_D9_83_D8_A7_D9_85_D9_8A_D8_B1_D8_A7-_D8_A7_D9_8A_D9_81_D9_88_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83.jpg?v=1769498695"
+        "https://majentik.com/cdn/shop/files/Samsung_Camera_Screen.jpg?v=1779265627"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/samsung-camera-screen",
@@ -2958,10 +2708,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678",
     "imageUrl": "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678",
     "images": [
-      "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1_e6387f7a-7507-4179-af21-daf87e2ef827.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_91a0c201-6ccd-41ef-b141-3ce95c0ad9be.jpg?v=1769498679"
+      "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -2975,10 +2722,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/8.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1_e6387f7a-7507-4179-af21-daf87e2ef827.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_91a0c201-6ccd-41ef-b141-3ce95c0ad9be.jpg?v=1769498679"
+        "https://majentik.com/cdn/shop/files/8.jpg?v=1769498678"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-03-10000-mah",
@@ -3012,10 +2756,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-001.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ChargerHeadMC-00125W-01.jpg?v=1778603738",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ChargerHeadMC-00125W-02.jpg?v=1778603738"
+      "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3029,10 +2770,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-001.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ChargerHeadMC-00125W-01.jpg?v=1778603738",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/ChargerHeadMC-00125W-02.jpg?v=1778603738"
+        "https://majentik.com/cdn/shop/files/mc-001.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/charger-head-mc-001-25w",
@@ -3066,10 +2804,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668",
     "imageUrl": "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668",
     "images": [
-      "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002.jpg?v=1769498668",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002-2.jpg?v=1769498669",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/02c2157f-7fa4-410b-a075-32b70470d2b3.jpg?v=1769498669"
+      "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3083,10 +2818,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002.jpg?v=1769498668",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002-2.jpg?v=1769498669",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/02c2157f-7fa4-410b-a075-32b70470d2b3.jpg?v=1769498669"
+        "https://majentik.com/cdn/shop/files/002.jpg?v=1769498668"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/magnetic-bracket-mr-002",
@@ -3120,10 +2852,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665",
     "imageUrl": "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665",
     "images": [
-      "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002-1.png?v=1769498665",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Headphone_MH002-01.jpg?v=1778604213",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Headphone_MH002-02.jpg?v=1778604216"
+      "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3137,10 +2866,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/002-1.png?v=1769498665",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Headphone_MH002-01.jpg?v=1778604213",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Headphone_MH002-02.jpg?v=1778604216"
+        "https://majentik.com/cdn/shop/files/002-1.png?v=1769498665"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/headphone-mh002",
@@ -3174,10 +2900,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588",
     "imageUrl": "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588",
     "images": [
-      "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-002.jpg?v=1777999588",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head-Charger-Majentik-MC-002.jpg?v=1769498659",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B1_D8_A7_D8_B3-_D8_B4_D8_A7_D8_AD_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-mc-002.jpg?v=1769498660"
+      "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3191,10 +2914,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-002.jpg?v=1777999588",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head-Charger-Majentik-MC-002.jpg?v=1769498659",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B1_D8_A7_D8_B3-_D8_B4_D8_A7_D8_AD_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-mc-002.jpg?v=1769498660"
+        "https://majentik.com/cdn/shop/files/mc-002.jpg?v=1777999588"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/charger-head-mc-002-25w",
@@ -3228,10 +2948,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653",
     "imageUrl": "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653",
     "images": [
-      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp_Image_2026-09-28_at_5.22.16_PM.jpg?v=1790609085",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-17-at-19.14.36_27f3577c.jpg?v=1769498652",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653"
+      "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3245,10 +2962,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp_Image_2026-09-28_at_5.22.16_PM.jpg?v=1790609085",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-17-at-19.14.36_27f3577c.jpg?v=1769498652",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653"
+        "https://majentik.com/cdn/shop/files/WhatsApp-Image-2024-12-20-at-20.04.09_1a8db4d7.jpg?v=1769498653"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-008-type-c-to-type-c",
@@ -3282,10 +2996,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590",
     "imageUrl": "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590",
     "images": [
-      "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head_charger_MC-006_45w.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/tht-1.jpg?v=1769498660",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-20-at-20.04.10_35b12cd2.jpg?v=1769498660"
+      "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3299,10 +3010,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head_charger_MC-006_45w.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/tht-1.jpg?v=1769498660",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/WhatsApp-Image-2024-12-20-at-20.04.10_35b12cd2.jpg?v=1769498660"
+        "https://majentik.com/cdn/shop/files/Head_charger_MC-006_45w.jpg?v=1777999590"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/head-charger-mc-006",
@@ -3336,10 +3044,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-004.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/BFSXSX.jpg?v=1769498657",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B1_D8_A7_D8_B3-_D8_B4_D8_A7_D8_AD_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-mc-004.jpg?v=1769498657"
+      "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3353,10 +3058,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-004.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/BFSXSX.jpg?v=1769498657",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D8_B1_D8_A7_D8_B3-_D8_B4_D8_A7_D8_AD_D9_86-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-mc-004.jpg?v=1769498657"
+        "https://majentik.com/cdn/shop/files/mc-004.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/head-charger-mc-004-45w",
@@ -3390,10 +3092,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/007-5.jpg?v=1769498664",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/007.jpg?v=1769498664"
+      "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3407,10 +3106,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Head_Charger_MC-007_67W.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/007-5.jpg?v=1769498664",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/007.jpg?v=1769498664"
+        "https://majentik.com/cdn/shop/files/Head_Charger_MC-007_67W.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/head-charger-mc-007",
@@ -3444,10 +3140,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
     "imageUrl": "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
     "images": [
-      "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/RabbitCageMR-005-01.jpg?v=1778616055",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/RabbitCageMR-005-02.jpg?v=1778616055"
+      "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3461,10 +3154,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Rabbit_Cage_MR-005.jpg?v=1777674634",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/RabbitCageMR-005-01.jpg?v=1778616055",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/RabbitCageMR-005-02.jpg?v=1778616055"
+        "https://majentik.com/cdn/shop/files/Rabbit_Cage_MR-005.jpg?v=1777674634"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/rabbit-cage-mr-005",
@@ -3498,10 +3188,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-31.jpg?v=1777998142",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/11-3.jpg?v=1769498695",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-2.jpg?v=1769498695"
+      "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3515,10 +3202,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-31.jpg?v=1777998142",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/11-3.jpg?v=1769498695",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/1-2.jpg?v=1769498695"
+        "https://majentik.com/cdn/shop/files/mj-31.jpg?v=1777998142"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-31",
@@ -3552,9 +3236,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CL016.jpg?v=1769498655"
+      "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3568,9 +3250,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/CL016.jpg?v=1769498655"
+        "https://majentik.com/cdn/shop/files/Cable_CL-016_Type-C_To_Type-C.jpg?v=1777999592"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-016-type-c-to-type-c",
@@ -3604,10 +3284,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590",
     "imageUrl": "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590",
     "images": [
-      "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert_CC01.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert-CC01-TC.3.5m.jpg?v=1769498665",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert-CC01-TC.3.5m_1edf1f2b-2d17-4ecf-916a-ec6dbdfd1b6d.jpg?v=1769498665"
+      "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3621,10 +3298,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert_CC01.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert-CC01-TC.3.5m.jpg?v=1769498665",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Convert-CC01-TC.3.5m_1edf1f2b-2d17-4ecf-916a-ec6dbdfd1b6d.jpg?v=1769498665"
+        "https://majentik.com/cdn/shop/files/Convert_CC01.jpg?v=1777999590"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/convert-cc01",
@@ -3658,9 +3332,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-015_Type-C.jpg?v=1777999590",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-CL-015-Type-C.jpg?v=1769498656"
+      "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3674,9 +3346,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-015_Type-C.jpg?v=1777999590",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-CL-015-Type-C.jpg?v=1769498656"
+        "https://majentik.com/cdn/shop/files/Cable_CL-015_Type-C.jpg?v=1777999590"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/cable-cl-015-type-c",
@@ -3710,10 +3380,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-Majentik-CL001-C.jpg?v=1769498652",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_83_D8_A7_D8_A8_D9_84-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-CL001-C.jpg?v=1769498652"
+      "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3727,10 +3394,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/Cable-Majentik-CL001-C.jpg?v=1769498652",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/D9_83_D8_A7_D8_A8_D9_84-_D9_85_D8_A7_D8_AC_D9_8A_D9_86_D8_AA_D9_83-CL001-C.jpg?v=1769498652"
+        "https://majentik.com/cdn/shop/files/Cable_CL-001_Type-C_To_Type-C.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/c-l-001",
@@ -3764,10 +3428,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-04.jpg?v=1777998128",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/gray2.jpg?v=1769498678",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/blueandgray.jpg?v=1769498678"
+      "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3781,10 +3442,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-04.jpg?v=1777998128",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/gray2.jpg?v=1769498678",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/blueandgray.jpg?v=1769498678"
+        "https://majentik.com/cdn/shop/files/mj-04.jpg?v=1777998128"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-04",
@@ -3818,10 +3476,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591",
     "imageUrl": "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591",
     "images": [
-      "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-009.jpg?v=1777999591",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/02_E6_B0_B4_E6_BB_B4.png?v=1769498665",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/04_E6_B0_B4_E6_BB_B4.png?v=1769498666"
+      "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3835,10 +3490,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mc-009.jpg?v=1777999591",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/02_E6_B0_B4_E6_BB_B4.png?v=1769498665",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/04_E6_B0_B4_E6_BB_B4.png?v=1769498666"
+        "https://majentik.com/cdn/shop/files/mc-009.jpg?v=1777999591"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/head-charger-mc-009-67w",
@@ -3872,10 +3524,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144",
     "imageUrl": "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144",
     "images": [
-      "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-30.jpg?v=1777998144",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_24f51b42-2d09-4961-be48-6875777430af.jpg?v=1769498687",
-      "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/3_2673b888-b32f-4691-b130-8f0f7f21cdc7.jpg?v=1769498687"
+      "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -3889,10 +3538,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "majentik.com",
     "customGroupPrices": {
       "_images": [
-        "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/mj-30.jpg?v=1777998144",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/2_24f51b42-2d09-4961-be48-6875777430af.jpg?v=1769498687",
-        "https://cdn.shopify.com/s/files/1/0973/9750/6353/files/3_2673b888-b32f-4691-b130-8f0f7f21cdc7.jpg?v=1769498687"
+        "https://majentik.com/cdn/shop/files/mj-30.jpg?v=1777998144"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://majentik.com/products/power-bank-mj-30",
@@ -8678,9 +8324,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
     "imageUrl": "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
     "images": [
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
-      "https://trust-egypt.com/cdn/shop/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
-      "https://trust-egypt.com/cdn/shop/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp"
+      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8694,9 +8338,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
-        "https://trust-egypt.com/cdn/shop/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929",
-        "https://trust-egypt.com/cdn/shop/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp"
+        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_4938dc02-9718-45c7-a146-c775ff6655b4.webp?v=1781103929"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-pbf05-pro-65w-digital-display-fast-charging-power-bank-30000mah",
@@ -8730,10 +8372,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844",
     "imageUrl": "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844",
     "images": [
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/d92e076f69cb1a6f81c9bab8cd8f57a2_b3b41d44-e57e-411c-9531-7e63ab77bf87_45076953137436.jpg?v=1724326973",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/9_c056452a-833c-459a-8cfe-c8fee7ac9262_45076952776988.jpg?v=1724326973",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_49f59fcd-03e8-4e5d-935a-23a1e57d3e39_45076952875292.jpg?v=1724326973"
+      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8747,10 +8386,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/d92e076f69cb1a6f81c9bab8cd8f57a2_b3b41d44-e57e-411c-9531-7e63ab77bf87_45076953137436.jpg?v=1724326973",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/9_c056452a-833c-459a-8cfe-c8fee7ac9262_45076952776988.jpg?v=1724326973",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_49f59fcd-03e8-4e5d-935a-23a1e57d3e39_45076952875292.jpg?v=1724326973"
+        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8a9b95c9-c970-4b4a-94bc-4235a853b132.jpg?v=1779113844"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-pbm01-20w-magnetic-wireless-power-bank-with-built-in-cable-kickst",
@@ -8784,10 +8420,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/10.webp?v=1744533862",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20.webp?v=1744533863",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/30.webp?v=1744533865"
+      "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8801,10 +8434,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/10.webp?v=1744533862",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20.webp?v=1744533863",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/30.webp?v=1744533865"
+        "https://trust-egypt.com/cdn/shop/files/20.webp?v=1744533863&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-jh1-hybrid-anc-wireless-headphones-black",
@@ -8838,9 +8468,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2.1_4571a969-d7fc-4ac7-8e27-9fccb4ab1935_2_48095480906012.jpg?v=1734603237"
+      "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8854,9 +8482,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2.1_4571a969-d7fc-4ac7-8e27-9fccb4ab1935_2_48095480906012.jpg?v=1734603237"
+        "https://trust-egypt.com/cdn/shop/files/1.1_8f75d391-9119-47c4-903b-6331b2d930eb_48095480873244.jpg?v=1734603233&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-tcf23-25w-charger-black",
@@ -8890,9 +8516,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM-JR-PR1-Power-Bank-10000mAh-22.5W-Super-Fast-Charging-1.webp?v=1757229538",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822"
+      "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8906,9 +8530,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM-JR-PR1-Power-Bank-10000mAh-22.5W-Super-Fast-Charging-1.webp?v=1757229538",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822"
+        "https://trust-egypt.com/cdn/shop/files/1_1080x_68ef3055-18c3-47a1-91a5-e93785b3bd74.webp?v=1779115822&width=1080"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-pr1",
@@ -8942,10 +8564,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/10_23d3623a-19ea-46ea-9a26-a31266332398.webp?v=1744534436",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/7_f864b8e5-8a2b-4d55-a10e-b006f393937a.webp?v=1744534433"
+      "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -8959,10 +8578,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/10_23d3623a-19ea-46ea-9a26-a31266332398.webp?v=1744534436",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/7_f864b8e5-8a2b-4d55-a10e-b006f393937a.webp?v=1744534433"
+        "https://trust-egypt.com/cdn/shop/files/1_1554bb02-8fc6-4570-8af3-9f6947dcdeeb.webp?v=1744534429&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-fc2-pro-classic-series-smart-watch",
@@ -8996,8 +8612,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420"
+      "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9011,8 +8626,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420"
+        "https://trust-egypt.com/cdn/shop/files/joyroom-podix-140w-5-port-desktop-gan-charger_7.webp?v=1774278420&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-trd01-podix-140w-5-port-desktop-gan-charger",
@@ -9046,10 +8660,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?v=1762438728",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.02PM.jpg?v=1762438731",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.11PM_1.jpg?v=1762438735"
+      "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9063,10 +8674,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?v=1762438728",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.02PM.jpg?v=1762438731",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2025-11-06at4.05.11PM_1.jpg?v=1762438735"
+        "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2025-11-06at4.05.12PM_1.jpg?format=webp&v=1762438728&width=1300"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/classic-series-jr-fc3-smart-watch-answer-make-call-%D8%B3%D8%A7%D8%B9%D8%A9-%D8%B0%D9%83%D9%8A%D8%A9-jr-fc3-%D9%85%D9%86-%D8%A7%D9%84%D8%B3%D9%84%D8%B3%D9%84%D8%A9-%D8%A7%D9%84%D9%83%D9%84%D8%A7%D8%B3%D9%8A%D9%83%D9%8A%D8%A9-%D8%A7%D9%84%D8%B1%D8%AF-%D8%B9%D9%84%D9%89-%D8%A7%D9%84%D9%85%D9%83%D8%A7%D9%84%D9%85%D8%A7%D8%AA-%D8%A5%D8%AC%D8%B1%D8%A7%D8%A4%D9%87%D8%A7",
@@ -9100,9 +8708,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/L3PRO_10.png?v=1715248401"
+      "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9116,9 +8722,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/L3PRO_10.png?v=1715248401"
+        "https://trust-egypt.com/cdn/shop/files/WhatsAppImage2023-08-06at7.58.50PM_46798b4a-5b74-4b7f-a168-27f70fd7c4da.jpg?v=1715248401&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-t03s-airoha-pvoc-tws-bluetooth-headset-white-1",
@@ -9152,10 +8756,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650",
     "imageUrl": "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650",
     "images": [
-      "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_2048x2048_e35bff94-562d-4c3b-9132-72d2e608875a.webp?v=1675772948",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_2048x2048_cede1c3e-85ed-41f2-bfde-54f89d05d268.webp?v=1675772948"
+      "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9169,10 +8770,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_2048x2048_e35bff94-562d-4c3b-9132-72d2e608875a.webp?v=1675772948",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_2048x2048_cede1c3e-85ed-41f2-bfde-54f89d05d268.webp?v=1675772948"
+        "https://trust-egypt.com/cdn/shop/products/JR-QP193SKU_1800x1800_52e51781-bbfa-4b85-9e6a-86d9b3e96542.webp?v=1675772948&width=1650"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-powerbank-30000mah-22-5w-fast-charging-jr-qp193",
@@ -9206,10 +8804,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/sku_bc0a31ac-9349-489f-b49e-e66e33d95554.webp?v=1740306447",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/3_87ef0511-434e-4772-a7ca-941818d05260_45338376339740.jpg?v=1740306447"
+      "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9223,10 +8818,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/sku_bc0a31ac-9349-489f-b49e-e66e33d95554.webp?v=1740306447",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/3_87ef0511-434e-4772-a7ca-941818d05260_45338376339740.jpg?v=1740306447"
+        "https://trust-egypt.com/cdn/shop/files/2_2119fd88-c1fc-4a80-9f15-1a140ae90109_45338376634652.jpg?v=1740306447&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ccb01-48w-dual-mic-car-wireless-fm-transmitter",
@@ -9260,10 +8852,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/66_1800x1800_a982408f-848d-4a65-a0b4-bfcfc213fb03.webp?v=1758534480",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/30_720x_c5f2939b-0364-4bf0-9ce4-9825c6805763.webp?v=1758534482"
+      "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9277,10 +8866,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/66_1800x1800_a982408f-848d-4a65-a0b4-bfcfc213fb03.webp?v=1758534480",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/30_720x_c5f2939b-0364-4bf0-9ce4-9825c6805763.webp?v=1758534482"
+        "https://trust-egypt.com/cdn/shop/files/100_1800x1800_29c015bb-97a7-41c8-bde2-32e5ed5a608c.webp?v=1758534478&width=1600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/s-a16-pro-100w-66w-30w-3a-cc-cl-type-c-lightning-digital-display-fast-charging-data-cable-1-2m-black",
@@ -9314,10 +8900,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_6b6dfb6c-dd78-4aa4-8309-6bdd814d4cef.webp?v=1727947024",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_fdb723d0-5370-407d-ab9b-55ee9c4438c2.webp?v=1727947024"
+      "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9331,10 +8914,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_6b6dfb6c-dd78-4aa4-8309-6bdd814d4cef.webp?v=1727947024",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_fdb723d0-5370-407d-ab9b-55ee9c4438c2.webp?v=1727947024"
+        "https://trust-egypt.com/cdn/shop/files/1_04428691-e1e8-45a8-b1c0-0f700640a99b.webp?v=1740300337&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pbf12-2-4a-led-power-bank-22-5w-10000mah",
@@ -9368,8 +8948,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188"
+      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9383,8 +8962,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188"
+        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah_1.webp?v=1774278188&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-qp192-mini-22-5w-power-bank-20000mah",
@@ -9418,9 +8996,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA006338402A_47478460055836.jpg?v=1728989534",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA006338402A_3_47478460088604.jpg?v=1728989539"
+      "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9434,9 +9010,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA006338402A_47478460055836.jpg?v=1728989534",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA006338402A_3_47478460088604.jpg?v=1728989539"
+        "https://trust-egypt.com/cdn/shop/files/EDA006338402A_47478460055836.jpg?format=webp&v=1728989534&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-tcm02-6-in-1-65w-gan-4-usb-c-2-usb-a-multi-port-charger-power-plug-uk-plugdark-gray",
@@ -9470,10 +9044,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_750x_5dd8ac26-0ebb-41ba-bffc-0f633c54cbd6.webp?v=1701358302",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_f706cbc0-44a0-4744-83f1-bdf9193ae5a3_750x_png.webp?v=1701358303"
+      "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9487,10 +9058,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_750x_5dd8ac26-0ebb-41ba-bffc-0f633c54cbd6.webp?v=1701358302",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_f706cbc0-44a0-4744-83f1-bdf9193ae5a3_750x_png.webp?v=1701358303"
+        "https://trust-egypt.com/cdn/shop/files/1_750x_977323da-6bbf-4182-8e8d-e359a5b044e6.webp?v=1701358301&width=750"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-zs368-magnetic-cable-organizer-3pcs",
@@ -9524,8 +9092,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351"
+      "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9539,8 +9106,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351"
+        "https://trust-egypt.com/cdn/shop/files/1_720x_c8bea105-5722-4221-baee-5fb81d513a5a.webp?v=1774278351&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-w23-qi2-4-in-1-wireless-charger-white",
@@ -9574,10 +9140,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom-TYPE-C-Earphones.jpg?v=1693492791",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8bc913c1-a876-40b0-82a7-6a04f46e497d.png?v=1693492790",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/300c256b53eda93e57949a7b03fb901b_600x600_b62f460b-95c7-4add-bc2e-12d41c9a46b2.png?v=1693492790"
+      "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9591,10 +9154,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom-TYPE-C-Earphones.jpg?v=1693492791",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_8bc913c1-a876-40b0-82a7-6a04f46e497d.png?v=1693492790",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/300c256b53eda93e57949a7b03fb901b_600x600_b62f460b-95c7-4add-bc2e-12d41c9a46b2.png?v=1693492790"
+        "https://trust-egypt.com/cdn/shop/files/Joyroom-TYPE-C-Earphones.jpg?format=webp&v=1693492791&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ec05-type-c-series-half-in-ear-wired-earphones-white",
@@ -9628,8 +9188,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197"
+      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9643,8 +9202,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197"
+        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-pbf14-pro-22-5w-power-bank-1.webp?v=1779614197&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pbf14-pro-22-5w-20000mah-power-bank-with-digital-display",
@@ -9678,10 +9236,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_1_3e49f052-c7eb-4e98-8530-ce2a38118c65.jpg?v=1758545512",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/5.jpg?v=1758545514"
+      "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9695,10 +9250,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_1_3e49f052-c7eb-4e98-8530-ce2a38118c65.jpg?v=1758545512",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/5.jpg?v=1758545514"
+        "https://trust-egypt.com/cdn/shop/files/joyroom-jr-zs259-automobilio-prietaisu-skydelio-laikiklis-juodas-6941237136275-625x625_0.jpg?v=1758545510&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-zs259-air-vent-hook-car-mount-360-degree-bracket-holder-for-4-7-6-9inch-mobile-phone",
@@ -9732,8 +9284,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352"
+      "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9747,8 +9298,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352"
+        "https://trust-egypt.com/cdn/shop/files/sku-4_720x_cc28a121-9f2b-417c-a2bb-0d032d8ea79a.webp?v=1740305352&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/sy-a07-type-c-to-3-5mm-audio-cable-hifi",
@@ -9782,10 +9332,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?v=1735037028",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_b140c91b-ef60-4f87-a030-3bae0fc66cb2_48132730650908.jpg?v=1735037028",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_846969fe-5c0c-42e8-8979-f652b724ac35_48132730716444.jpg?v=1735036893"
+      "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9799,10 +9346,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?v=1735037028",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_b140c91b-ef60-4f87-a030-3bae0fc66cb2_48132730650908.jpg?v=1735037028",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/2_846969fe-5c0c-42e8-8979-f652b724ac35_48132730716444.jpg?v=1735036893"
+        "https://trust-egypt.com/cdn/shop/files/1_ba2dbc45-81da-435e-9508-f7263094ce66_48132730683676.jpg?format=webp&v=1735037028&width=700"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ew01-wired-series-half-in-ear-wired-earphones-white",
@@ -9836,10 +9380,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/PnfxFGuY1600842921-1000x1000.jpg?v=1685540481",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Heaa298cec4d34d79890446238c65b66cV.jpg?v=1685540481"
+      "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9853,10 +9394,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/PnfxFGuY1600842921-1000x1000.jpg?v=1685540481",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Heaa298cec4d34d79890446238c65b66cV.jpg?v=1685540481"
+        "https://trust-egypt.com/cdn/shop/files/51R0qh7VxEL._AC_SX679.jpg?v=1685540480&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-new-mouse-phone-holder-jr-ok3",
@@ -9890,10 +9428,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61Mnh94LGuL._AC_SL1200.jpg?v=1680078227",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/71Gfba45i4L._AC_SL1200.jpg?v=1680078227"
+      "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9907,10 +9442,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61Mnh94LGuL._AC_SL1200.jpg?v=1680078227",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/71Gfba45i4L._AC_SL1200.jpg?v=1680078227"
+        "https://trust-egypt.com/cdn/shop/products/51omRP3lY8L._AC_SL1200.jpg?v=1680078227&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-h151-type-c-male-to-usb-female-adapter",
@@ -9944,10 +9476,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA008509301B.jpg?v=1764495919",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/0_-_-_18_-_-_A55-AL-B_YfMFgM0Kv9U_n3AqNUKXV.webp?v=1764495921"
+      "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -9961,10 +9490,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA008509301B.jpg?v=1764495919",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/0_-_-_18_-_-_A55-AL-B_YfMFgM0Kv9U_n3AqNUKXV.webp?v=1764495921"
+        "https://trust-egypt.com/cdn/shop/files/JOYROOM-S-A55-StarFlight-Series-1.webp?v=1764495917&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-a55-fast-charging-data-cable-3a-1-2m-%D9%83%D8%A7%D8%A8%D9%84-%D8%A8%D9%8A%D8%A7%D9%86%D8%A7%D8%AA-joyroom-%D9%84%D9%84%D8%B4%D8%AD%D9%86-%D8%A7%D9%84%D8%B3%D8%B1%D9%8A%D8%B9-3-%D8%A3%D9%85%D8%A8%D9%8A%D8%B1-1-2-%D9%85%D8%AA%D8%B1s-a55",
@@ -9998,10 +9524,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504B.jpg?v=1764495226",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504A.jpg?v=1764495227",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504B_6.jpg?v=1764495229"
+      "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10015,10 +9538,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504B.jpg?v=1764495226",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504A.jpg?v=1764495227",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/EDA007135504B_6.jpg?v=1764495229"
+        "https://trust-egypt.com/cdn/shop/files/EDA007135504B.jpg?v=1764495226&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-a42-usb-a-to-lightning-30w-cable-1-2m-%D9%83%D8%A7%D8%A8%D9%84s-a42-usb-a-%D8%A5%D9%84%D9%89-lightning-30w-%D8%A8%D8%B7%D9%88%D9%84-1-2-%D9%85%D8%AA%D8%B1",
@@ -10052,8 +9572,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931"
+      "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10067,8 +9586,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931"
+        "https://trust-egypt.com/cdn/shop/files/51ysT7f0-sL._AC_SL1000.jpg?v=1758541931&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ec07-type-c-series-half-in-ear-wired-earphones",
@@ -10102,9 +9620,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/CTOC_720x_1d96e550-9eb9-45b3-ae3a-350632f849a2.webp?v=1758536531"
+      "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10118,9 +9634,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/CTOC_720x_1d96e550-9eb9-45b3-ae3a-350632f849a2.webp?v=1758536531"
+        "https://trust-egypt.com/cdn/shop/files/ATOL_720x_55769fac-16ed-4094-8fb1-db849ff4df76.webp?v=1758536529&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/s-a28-3a-30w-60w-fast-charging-data-cable-type-c-lighting-2m",
@@ -10154,8 +9668,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403"
+      "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10169,8 +9682,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403"
+        "https://trust-egypt.com/cdn/shop/files/kapxxuc_uwsondq8fgbhlv07_1_47478325870876.jpg?v=1728988403&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-usb-c-pd-wall-charger-20-watt-black-jr-tcf20",
@@ -10204,10 +9716,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61hoXpS1RtL._AC_SL1000.jpg?v=1680078385",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61H2CyECW4L._AC_SL1000.jpg?v=1680078385"
+      "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10221,10 +9730,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61hoXpS1RtL._AC_SL1000.jpg?v=1680078385",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/61H2CyECW4L._AC_SL1000.jpg?v=1680078385"
+        "https://trust-egypt.com/cdn/shop/products/51IMUccX6LL._AC_SL1000.jpg?v=1680078386&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-h152-usb-male-to-type-c-female-adapter-2pcs",
@@ -10258,10 +9764,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300",
     "imageUrl": "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300",
     "images": [
-      "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_1300x_0e2d0610-0baa-481e-9e12-9388a60c9231.webp?v=1679714414",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/3_1300x_fe10aef4-aa99-41b7-8759-82b03f29fcd2.webp?v=1679714416"
+      "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10275,10 +9778,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/2_1300x_0e2d0610-0baa-481e-9e12-9388a60c9231.webp?v=1679714414",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/products/3_1300x_fe10aef4-aa99-41b7-8759-82b03f29fcd2.webp?v=1679714416"
+        "https://trust-egypt.com/cdn/shop/products/1_1300x_07424c94-275b-48a6-b1d9-3054250951ef.webp?v=1734605493&width=1300"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-zs259-mechanical-car-holder",
@@ -10312,9 +9812,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?v=1791220190",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/33a065da-6721-45c2-ab0a-8b4659ca993a.jpg?v=1791220195"
+      "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10328,9 +9826,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?v=1791220190",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/33a065da-6721-45c2-ab0a-8b4659ca993a.jpg?v=1791220195"
+        "https://trust-egypt.com/cdn/shop/files/b5b7f445-328f-462c-be03-c3a16139e381.jpg?format=webp&v=1791220190&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-cp3-carplay-android-auto-2-in-1-wireless-adapter",
@@ -10364,9 +9860,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/53e8eb61-b291-4525-9ee0-9a44749fa1ed.jpg?v=1791309183",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188"
+      "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10380,9 +9874,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/53e8eb61-b291-4525-9ee0-9a44749fa1ed.jpg?v=1791309183",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188"
+        "https://trust-egypt.com/cdn/shop/files/e8aa7e19-2c8f-49a5-a7fa-861af081f002.jpg?v=1791309188&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-tg11-100w-4-port-gan-fast-charger-with-2m-usb-c-cable",
@@ -10416,8 +9908,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-L012-UltraBlack.jpg?v=1790680388"
+      "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10431,8 +9922,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-L012-UltraBlack.jpg?v=1790680388"
+        "https://trust-egypt.com/cdn/shop/files/JR-L012-UltraBlack.jpg?v=1790680388&width=3000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-l012-plus-20000mah-45w-power-bank-with-built-in-type-c-lightning-cables",
@@ -10466,8 +9956,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PBF02-Pro.jpg?v=1791320869"
+      "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10481,8 +9970,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PBF02-Pro.jpg?v=1791320869"
+        "https://trust-egypt.com/cdn/shop/files/JR-PBF02-Pro.jpg?v=1791320869&width=3000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pbf02-pro-20000mah-45w-power-bank-with-digital-display-black",
@@ -10516,8 +10004,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PC1_Black.jpg?v=1790680387"
+      "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10531,8 +10018,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PC1_Black.jpg?v=1790680387"
+        "https://trust-egypt.com/cdn/shop/files/JR-PC1_Black.jpg?v=1790680387&width=3000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pc1-10000mah-22-5w-mini-power-bank-with-built-in-cables-black",
@@ -10566,10 +10052,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717463_46754cb95b7a11d3e9f2c68b31134fb9.jpg?v=1794919509",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717599_dd05b115301c719cf6f79e7f45dc305b.jpg?v=1794919520",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717599_1f4c0d7de5153870c8336832aab59589.jpg?v=1794919513"
+      "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10583,10 +10066,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717463_46754cb95b7a11d3e9f2c68b31134fb9.jpg?v=1794919509",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717599_dd05b115301c719cf6f79e7f45dc305b.jpg?v=1794919520",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1774717599_1f4c0d7de5153870c8336832aab59589.jpg?v=1794919513"
+        "https://trust-egypt.com/cdn/shop/files/2_049114c3-a8ba-48bc-88e8-f86f343f3a46.jpg?format=webp&v=1791320867&width=680"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pr2l-10000mah-35w-mini-power-bank-with-retractable-lightning-type-c-cables-white",
@@ -10620,10 +10100,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PC2Black.jpg?v=1790680387",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_2.jpg?v=1791304922"
+      "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10637,10 +10114,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JR-PC2Black.jpg?v=1790680387",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_2.jpg?v=1791304922"
+        "https://trust-egypt.com/cdn/shop/files/20000mah-22-5w-power-bank-with-3-built-in-cables-black_1.jpg?v=1791304917&width=1600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pc2-20000mah-22-5w-power-bank-with-3-built-in-cables-black",
@@ -10674,8 +10148,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?v=1789260741"
+      "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10689,8 +10162,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?v=1789260741"
+        "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-JR-MST0159-Tempered-Glass-for-iPad-Air-10-5-quot-2019-iPad-Pro-10-5-quot-2017-iPad-10-2-quot-2019-2020-2021-171212_2.jpg?format=webp&v=1789260741&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-tablet-screen-protector-ipad-10-5-10-2-jr-mst0159",
@@ -10724,8 +10196,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?v=1788432554"
+      "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10739,8 +10210,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?v=1788432554"
+        "https://trust-egypt.com/cdn/shop/files/1_f202da01-c77c-4823-ba98-853842986641.jpg?format=webp&v=1788432554&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-tablet-screen-protector-ipad-9-7-jr-mst0158",
@@ -10774,8 +10244,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?v=1789260739"
+      "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10789,8 +10258,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?v=1789260739"
+        "https://trust-egypt.com/cdn/shop/files/1_55218ee8-0a7a-4283-a316-11132f915c7d.jpg?format=webp&v=1789260739&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-samsung-galaxy-s26-ultra-2-5d-full-screen-privacy-jr-mjs0632",
@@ -10824,8 +10292,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/671024-thickbox_default.jpg?v=1789260739"
+      "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10839,8 +10306,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/671024-thickbox_default.jpg?v=1789260739"
+        "https://trust-egypt.com/cdn/shop/files/671024-thickbox_default.jpg?format=webp&v=1789260739&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-samsung-galaxy-s24-ultra-2-5d-full-screen-hd-jr-mjs0220",
@@ -10874,8 +10340,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?v=1789242763"
+      "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10889,8 +10354,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?v=1789242763"
+        "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720_37f27192-e236-431c-b557-0190add1bd66.jpg?format=webp&v=1789242763&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-rapidx-series-100w-2-in-1-cable-type-c-to-c-c-s-a57",
@@ -10924,8 +10388,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?v=1788432465"
+      "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10939,8 +10402,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?v=1788432465"
+        "https://trust-egypt.com/cdn/shop/files/019b499f-e7ca-768a-9f88-3b1c8b42a944_720.jpg?format=webp&v=1788432465&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-100w-2-in-1-cable-1-5m-usb-c-to-c-lightning-s-a57",
@@ -10974,8 +10436,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/203889_1.jpg?v=1788432456"
+      "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -10989,8 +10450,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/203889_1.jpg?v=1788432456"
+        "https://trust-egypt.com/cdn/shop/files/203889_1.jpg?v=1788432456&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-vibrant-series-cable-3a-usb-a-to-lightning-s-a59",
@@ -11024,8 +10484,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/ctc.jpg?v=1788432448"
+      "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11039,8 +10498,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/ctc.jpg?v=1788432448"
+        "https://trust-egypt.com/cdn/shop/files/ctc.jpg?v=1788432448&width=1367"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-silicone-fast-charging-cable-60w-type-c-to-type-c-s-a62",
@@ -11074,8 +10532,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704"
+      "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11089,8 +10546,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704"
+        "https://trust-egypt.com/cdn/shop/files/JOYROOM_S_A16_Prism_Series_Digital_Display_Fast_Charging_Cable.jpg?v=1789260704&width=1200"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-prism-series-cable-100w-type-c-to-type-c-s-a16pro",
@@ -11124,8 +10580,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419"
+      "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11139,8 +10594,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419"
+        "https://trust-egypt.com/cdn/shop/files/66_1800x1800_0ad4a629-a535-47e7-8c52-a6275fc40bea.jpg?v=1789260419&width=1600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-prism-series-cable-66w-usb-a-to-type-c-s-a16pro",
@@ -11174,9 +10628,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_6.webp?v=1780843807"
+      "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11190,9 +10642,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_6.webp?v=1780843807"
+        "https://trust-egypt.com/cdn/shop/files/Joyroom45W3PortGalliumNitrideGaNWallChargerJR-TO1Three-Egypt.com_5_c6edfd9e-de48-456a-9e9d-63ad61b27392.webp?v=1780843800&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-45w-3-port-gallium-nitride-gan-wall-charger-jr-to1-1",
@@ -11226,10 +10676,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/3_1800x1800_18258572-47b1-45f4-af2e-91c64d8ad28c.webp?v=1779616183",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_545f9aa7-caa3-4f76-9bad-31a32df04db1.webp?v=1779616189"
+      "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11243,10 +10690,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/3_1800x1800_18258572-47b1-45f4-af2e-91c64d8ad28c.webp?v=1779616183",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1800x1800_545f9aa7-caa3-4f76-9bad-31a32df04db1.webp?v=1779616189"
+        "https://trust-egypt.com/cdn/shop/files/4_1800x1800_61fe4c2f-d891-4daa-afd5-d6c4796d1b5e.webp?v=1779616176&width=1300"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ccn18-65w-a-c-pull-ring-style-mini-car-charger",
@@ -11280,8 +10724,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032"
+      "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11295,8 +10738,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032"
+        "https://trust-egypt.com/cdn/shop/files/Power-Bank-22.5W-JOYROOM-JR-PBF12-10000mAh-LED-Black.webp?v=1779615032&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-pbf14-20000mah-led-power-bank-with-2-4a-fast-charge-copy",
@@ -11330,8 +10772,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037"
+      "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11345,8 +10786,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037"
+        "https://trust-egypt.com/cdn/shop/files/1_42a77ac7-606c-4088-9e7d-57f87e9c5794.jpg?v=1774279037&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-tf4-18w-fast-charger",
@@ -11380,8 +10820,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083"
+      "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11395,8 +10834,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083"
+        "https://trust-egypt.com/cdn/shop/files/Joyroom33WDual-PortChargerJR-TG7Three-Egypt.com_11.webp?v=1775575083&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-jr-tg7-33w-dual-port-charger",
@@ -11430,8 +10868,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426"
+      "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11445,8 +10882,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426"
+        "https://trust-egypt.com/cdn/shop/files/51Z5sECaXuL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758541426&width=300"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/sy-a06-audio-transfer-series-aux-audio-cable-lightning-to-3-5mm-1-2m-black",
@@ -11480,10 +10916,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/61RBMwOYptL._AC_SL1000.jpg?v=1758541288",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/4179kx7oe2L.jpg?v=1758541289"
+      "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11497,10 +10930,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/61RBMwOYptL._AC_SL1000.jpg?v=1758541288",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/4179kx7oe2L.jpg?v=1758541289"
+        "https://trust-egypt.com/cdn/shop/files/Joyroom-S-UC027A11-USB-to-Type-C-Mobile-Cable-Fast-Charge-PD-Mobile-Cable-Store-8419.webp?v=1758541285&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-a11-surpass-series-usb-a-to-type-c-data-cable",
@@ -11534,9 +10964,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51UHrhhFjmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758540044",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046"
+      "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11550,9 +10978,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51UHrhhFjmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758540044",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046"
+        "https://trust-egypt.com/cdn/shop/files/1_1_d276f6cf-af58-4145-91fe-b33c0a8db9c8.jpg?v=1758540046&width=680"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-s-a45-type-c-lightning-cable-30w-1m-white",
@@ -11586,8 +11012,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820"
+      "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11601,8 +11026,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820"
+        "https://trust-egypt.com/cdn/shop/files/61K9wZa2pmL.__AC_SX300_SY300_QL70_ML2.jpg?v=1758537820&width=179"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-sa37-2t2-multi-function-series-for-iphone-16-15-series-usb-a-type-c-to-8pin-type-c-60w-4-in-1-fast-charging-cable-data-cord-1-2m",
@@ -11636,10 +11060,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/PINK.jpg?v=1758192273",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51LPjxMiP6L._AC_SL1000.jpg?v=1758705538",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51LPjxMiP6L._AC_SL1000_4dde24b4-5e60-4fef-aeaa-4c6790b2bc9b.jpg?v=1758705604"
+      "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11653,10 +11074,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/PINK.jpg?v=1758192273",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51LPjxMiP6L._AC_SL1000.jpg?v=1758705538",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/51LPjxMiP6L._AC_SL1000_4dde24b4-5e60-4fef-aeaa-4c6790b2bc9b.jpg?v=1758705604"
+        "https://trust-egypt.com/cdn/shop/files/PINK.jpg?v=1758192273&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/ar/products/joyroom-crystal-clear-series-type-c-to-type-c-data-cable-1-2-meter-60-watt-black-s-a42",
@@ -11690,8 +11108,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795"
+      "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11705,8 +11122,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795"
+        "https://trust-egypt.com/cdn/shop/files/Al-Sheikh-Stores-JOYROOM-Fast-Charging-Data-Cable-S-A9-60W-USB-A-to-Lightning-Cable-1M-White_5ff68917-3e7d-4df0-832f-527109b37a72.webp?v=1757230795&width=540"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/s-a9-1m-usb-a-to-lightning",
@@ -11740,10 +11156,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?v=1754467341",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1875e89e-92d2-466a-9471-9f5f7a600139.jpg?v=1754467342",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/5001fd2b-1e1b-4ddc-828e-ef29d2c19dd9.jpg?v=1754467344"
+      "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11757,10 +11170,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?v=1754467341",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1875e89e-92d2-466a-9471-9f5f7a600139.jpg?v=1754467342",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/5001fd2b-1e1b-4ddc-828e-ef29d2c19dd9.jpg?v=1754467344"
+        "https://trust-egypt.com/cdn/shop/files/0a956efe-41fb-445f-86ac-002bf10a64b4.jpg?format=webp&v=1754467341&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ccl07",
@@ -11794,8 +11204,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/444444444444444.webp?v=1740567349"
+      "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11809,8 +11218,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/444444444444444.webp?v=1740567349"
+        "https://trust-egypt.com/cdn/shop/files/444444444444444.webp?v=1740567349&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/jr-ccn16-mini-qc-pd-15w-charger-black",
@@ -11844,8 +11252,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118"
+      "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11859,8 +11266,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118"
+        "https://trust-egypt.com/cdn/shop/files/1_540x_1b6f499d-0127-406e-a433-9c265865484d_48095813665052.jpg?v=1734605118&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/sa21-1t3-speedy-series-30w-3-in-1-fast-charging-cable-type-c-to-l-c-m-1-2m-black",
@@ -11894,9 +11300,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048",
     "imageUrl": "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048",
     "images": [
-      "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728",
-      "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pl_Joyroom-S-A51-Cutting-Edge-Series-30W-USB-C-Lightning-cable-1-2m-gray-181998_11_48095560827164.jpg?v=1734603732"
+      "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -11910,9 +11314,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "trust-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728",
-        "https://cdn.shopify.com/s/files/1/0709/5255/0684/files/eng_pl_Joyroom-S-A51-Cutting-Edge-Series-30W-USB-C-Lightning-cable-1-2m-gray-181998_11_48095560827164.jpg?v=1734603732"
+        "https://trust-egypt.com/cdn/shop/files/eng_pm_Joyroom-S-A51-Cutting-Edge-Series-3A-USB-A-Lightning-cable-1-2m-gray-181996_1_1_600x_3b25b564-d813-436d-a3ed-028e24516c57_48095560794396.jpg?v=1734603728&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://trust-egypt.com/products/joyroom-usb-a-to-lightning-1-2m-fast-charging-data-cable-3a-s-a51-grey",
@@ -12234,10 +11636,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1776605067101017905.png",
     "imageUrl": "https://files.easy-orders.net/1776605067101017905.png",
     "images": [
-      "https://files.easy-orders.net/1776605067101017905.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1776380449569695368.jpg",
-      "https://files.easy-orders.net/1776380449227981628.jpg"
+      "https://files.easy-orders.net/1776605067101017905.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12251,10 +11650,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1776605067101017905.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1776380449569695368.jpg",
-        "https://files.easy-orders.net/1776380449227981628.jpg"
+        "https://files.easy-orders.net/1776605067101017905.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/vgr361",
@@ -12288,10 +11684,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1724115494527352048.png",
     "imageUrl": "https://files.easy-orders.net/1724115494527352048.png",
     "images": [
-      "https://files.easy-orders.net/1724115494527352048.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1724115702991515501.png",
-      "https://files.easy-orders.net/1724115703245556379.png"
+      "https://files.easy-orders.net/1724115494527352048.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12305,10 +11698,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1724115494527352048.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1724115702991515501.png",
-        "https://files.easy-orders.net/1724115703245556379.png"
+        "https://files.easy-orders.net/1724115494527352048.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/VGRV-375",
@@ -12342,10 +11732,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766869959716544298.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766869959716544298.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766869959716544298.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1757509899201297351.jpg",
-      "https://files.easy-orders.net/1757509900665335096.webp"
+      "https://files.easy-orders.net/1766869959716544298.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12359,10 +11746,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766869959716544298.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1757509899201297351.jpg",
-        "https://files.easy-orders.net/1757509900665335096.webp"
+        "https://files.easy-orders.net/1766869959716544298.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/V-110",
@@ -12396,10 +11780,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766869145302719875.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766869145302719875.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766869145302719875.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1723837287163584319.webp",
-      "https://files.easy-orders.net/1723837290287601819.webp"
+      "https://files.easy-orders.net/1766869145302719875.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12413,10 +11794,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766869145302719875.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1723837287163584319.webp",
-        "https://files.easy-orders.net/1723837290287601819.webp"
+        "https://files.easy-orders.net/1766869145302719875.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/v106",
@@ -12450,10 +11828,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766869446821974787.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766869446821974787.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766869446821974787.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1752771817941567988.webp",
-      "https://files.easy-orders.net/1752771817975796528.webp"
+      "https://files.easy-orders.net/1766869446821974787.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12467,10 +11842,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766869446821974787.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1752771817941567988.webp",
-        "https://files.easy-orders.net/1752771817975796528.webp"
+        "https://files.easy-orders.net/1766869446821974787.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/v653",
@@ -12504,10 +11876,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1774397434005409220.png",
     "imageUrl": "https://files.easy-orders.net/1774397434005409220.png",
     "images": [
-      "https://files.easy-orders.net/1774397434005409220.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1753647561319689993.jpg",
-      "https://files.easy-orders.net/1753647561677996173.jpg"
+      "https://files.easy-orders.net/1774397434005409220.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12521,10 +11890,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1774397434005409220.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1753647561319689993.jpg",
-        "https://files.easy-orders.net/1753647561677996173.jpg"
+        "https://files.easy-orders.net/1774397434005409220.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/Vgr-393",
@@ -12558,10 +11924,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1790695941737446235.png",
     "imageUrl": "https://files.easy-orders.net/1790695941737446235.png",
     "images": [
-      "https://files.easy-orders.net/1790695941737446235.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1790655979265517286.webp",
-      "https://files.easy-orders.net/1790655979343596055.webp"
+      "https://files.easy-orders.net/1790695941737446235.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12575,10 +11938,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1790695941737446235.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1790655979265517286.webp",
-        "https://files.easy-orders.net/1790655979343596055.webp"
+        "https://files.easy-orders.net/1790695941737446235.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/V-096",
@@ -12612,10 +11972,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766868854085749216.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766868854085749216.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766868854085749216.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1724962725635855298.jpg",
-      "https://files.easy-orders.net/1724962725694048292.webp"
+      "https://files.easy-orders.net/1766868854085749216.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12629,10 +11986,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766868854085749216.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1724962725635855298.jpg",
-        "https://files.easy-orders.net/1724962725694048292.webp"
+        "https://files.easy-orders.net/1766868854085749216.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/v071",
@@ -12666,10 +12020,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1724965614953893741.jpg",
     "imageUrl": "https://files.easy-orders.net/1724965614953893741.jpg",
     "images": [
-      "https://files.easy-orders.net/1724965614953893741.jpg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1724965624962113535.webp",
-      "https://files.easy-orders.net/1724965626482149213.webp"
+      "https://files.easy-orders.net/1724965614953893741.jpg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12683,10 +12034,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1724965614953893741.jpg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1724965624962113535.webp",
-        "https://files.easy-orders.net/1724965626482149213.webp"
+        "https://files.easy-orders.net/1724965614953893741.jpg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/v030",
@@ -12720,10 +12068,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1790695332200773556.png",
     "imageUrl": "https://files.easy-orders.net/1790695332200773556.png",
     "images": [
-      "https://files.easy-orders.net/1790695332200773556.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1790622446314615744.webp",
-      "https://files.easy-orders.net/1760531640625962057.png"
+      "https://files.easy-orders.net/1790695332200773556.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12737,10 +12082,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1790695332200773556.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1790622446314615744.webp",
-        "https://files.easy-orders.net/1760531640625962057.png"
+        "https://files.easy-orders.net/1790695332200773556.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/V-330",
@@ -12774,10 +12116,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1789120403234214699.png",
     "imageUrl": "https://files.easy-orders.net/1789120403234214699.png",
     "images": [
-      "https://files.easy-orders.net/1789120403234214699.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1785008534077249964.webp",
-      "https://files.easy-orders.net/1760531640625962057.png"
+      "https://files.easy-orders.net/1789120403234214699.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12791,10 +12130,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1789120403234214699.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1785008534077249964.webp",
-        "https://files.easy-orders.net/1760531640625962057.png"
+        "https://files.easy-orders.net/1789120403234214699.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/V-503",
@@ -12828,10 +12164,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766868990717892408.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766868990717892408.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766868990717892408.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1687398676865181876.jpeg",
-      "https://files.easy-orders.net/1687398677983807560.webp"
+      "https://files.easy-orders.net/1766868990717892408.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12845,10 +12178,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766868990717892408.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1687398676865181876.jpeg",
-        "https://files.easy-orders.net/1687398677983807560.webp"
+        "https://files.easy-orders.net/1766868990717892408.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/vgr-v070",
@@ -12882,10 +12212,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766869403485631374.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766869403485631374.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766869403485631374.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1731615624990111784.webp",
-      "https://files.easy-orders.net/1731615625056669342.webp"
+      "https://files.easy-orders.net/1766869403485631374.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12899,10 +12226,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766869403485631374.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1731615624990111784.webp",
-        "https://files.easy-orders.net/1731615625056669342.webp"
+        "https://files.easy-orders.net/1766869403485631374.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/vgrv906",
@@ -12936,10 +12260,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766869699560205789.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766869699560205789.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766869699560205789.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1731682517930579290.jpg",
-      "https://files.easy-orders.net/1731682518627291150.jpg"
+      "https://files.easy-orders.net/1766869699560205789.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -12953,10 +12274,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766869699560205789.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1731682517930579290.jpg",
-        "https://files.easy-orders.net/1731682518627291150.jpg"
+        "https://files.easy-orders.net/1766869699560205789.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/v982",
@@ -12990,10 +12308,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1766868964754802172.jpeg",
     "imageUrl": "https://files.easy-orders.net/1766868964754802172.jpeg",
     "images": [
-      "https://files.easy-orders.net/1766868964754802172.jpeg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1754873679147316102.jpg",
-      "https://files.easy-orders.net/1754873679600930498.jpg"
+      "https://files.easy-orders.net/1766868964754802172.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13007,10 +12322,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1766868964754802172.jpeg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1754873679147316102.jpg",
-        "https://files.easy-orders.net/1754873679600930498.jpg"
+        "https://files.easy-orders.net/1766868964754802172.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://e-energy.myeasyorders.com/products/v055",
@@ -13044,10 +12356,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1781286286871921063.webp",
     "imageUrl": "https://files.easy-orders.net/1781286286871921063.webp",
     "images": [
-      "https://files.easy-orders.net/1781286286871921063.webp",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1781286287312203699.webp",
-      "https://files.easy-orders.net/1781286287385746650.webp"
+      "https://files.easy-orders.net/1781286286871921063.webp"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13061,10 +12370,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1781286286871921063.webp",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1781286287312203699.webp",
-        "https://files.easy-orders.net/1781286287385746650.webp"
+        "https://files.easy-orders.net/1781286286871921063.webp"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/Watch-4-Smart",
@@ -13098,10 +12404,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1737227330858727168.webp",
     "imageUrl": "https://files.easy-orders.net/1737227330858727168.webp",
     "images": [
-      "https://files.easy-orders.net/1737227330858727168.webp",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1737412370012344907.webp",
-      "https://files.easy-orders.net/1737412370029190761.webp"
+      "https://files.easy-orders.net/1737227330858727168.webp"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13115,10 +12418,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1737227330858727168.webp",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1737412370012344907.webp",
-        "https://files.easy-orders.net/1737412370029190761.webp"
+        "https://files.easy-orders.net/1737227330858727168.webp"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/W23",
@@ -13152,10 +12452,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1711258539542953959.jpg",
     "imageUrl": "https://files.easy-orders.net/1711258539542953959.jpg",
     "images": [
-      "https://files.easy-orders.net/1711258539542953959.jpg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1711258612911035914.jpg",
-      "https://files.easy-orders.net/1711258614055335882.jpg"
+      "https://files.easy-orders.net/1711258539542953959.jpg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13169,10 +12466,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1711258539542953959.jpg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1711258612911035914.jpg",
-        "https://files.easy-orders.net/1711258614055335882.jpg"
+        "https://files.easy-orders.net/1711258539542953959.jpg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/magic3",
@@ -13206,9 +12500,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1713635048787825265.jpg",
     "imageUrl": "https://files.easy-orders.net/1713635048787825265.jpg",
     "images": [
-      "https://files.easy-orders.net/1713635048787825265.jpg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1760531640625962057.png"
+      "https://files.easy-orders.net/1713635048787825265.jpg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13222,9 +12514,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1713635048787825265.jpg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1760531640625962057.png"
+        "https://files.easy-orders.net/1713635048787825265.jpg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/watcht10ultra",
@@ -13258,10 +12548,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1702079965285223369.png",
     "imageUrl": "https://files.easy-orders.net/1702079965285223369.png",
     "images": [
-      "https://files.easy-orders.net/1702079965285223369.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1702079780263382862.jpg",
-      "https://files.easy-orders.net/1702079476591763051.jpg"
+      "https://files.easy-orders.net/1702079965285223369.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13275,10 +12562,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1702079965285223369.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1702079780263382862.jpg",
-        "https://files.easy-orders.net/1702079476591763051.jpg"
+        "https://files.easy-orders.net/1702079965285223369.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/badeel-hogara",
@@ -13312,10 +12596,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1742668730744339230.jpg",
     "imageUrl": "https://files.easy-orders.net/1742668730744339230.jpg",
     "images": [
-      "https://files.easy-orders.net/1742668730744339230.jpg",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1774649286939851354.png",
-      "https://files.easy-orders.net/1774649276201230584.png"
+      "https://files.easy-orders.net/1742668730744339230.jpg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13329,10 +12610,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1742668730744339230.jpg",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1774649286939851354.png",
-        "https://files.easy-orders.net/1774649276201230584.png"
+        "https://files.easy-orders.net/1742668730744339230.jpg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/Smart-security-subscriber",
@@ -13366,10 +12644,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1734726077639692186.png",
     "imageUrl": "https://files.easy-orders.net/1734726077639692186.png",
     "images": [
-      "https://files.easy-orders.net/1734726077639692186.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1734728861679259893.jpg",
-      "https://files.easy-orders.net/1734728861703840615.jpg"
+      "https://files.easy-orders.net/1734726077639692186.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13383,10 +12658,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1734726077639692186.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1734728861679259893.jpg",
-        "https://files.easy-orders.net/1734728861703840615.jpg"
+        "https://files.easy-orders.net/1734726077639692186.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://www.bia3.net/products/lg1",
@@ -13420,10 +12692,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://files.easy-orders.net/1774649175461444097.png",
     "imageUrl": "https://files.easy-orders.net/1774649175461444097.png",
     "images": [
-      "https://files.easy-orders.net/1774649175461444097.png",
-      "https://files.easy-orders.net/1760531617429795048.png",
-      "https://files.easy-orders.net/1742668730336230183.jpg",
-      "https://files.easy-orders.net/1742668730412589467.jpg"
+      "https://files.easy-orders.net/1774649175461444097.png"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13437,10 +12706,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "bia3.net",
     "customGroupPrices": {
       "_images": [
-        "https://files.easy-orders.net/1774649175461444097.png",
-        "https://files.easy-orders.net/1760531617429795048.png",
-        "https://files.easy-orders.net/1742668730336230183.jpg",
-        "https://files.easy-orders.net/1742668730412589467.jpg"
+        "https://files.easy-orders.net/1774649175461444097.png"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://e-energy.myeasyorders.com/products/lg",
@@ -13474,10 +12740,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226",
     "imageUrl": "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226",
     "images": [
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0000010.webp?v=1794992230",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/000010.webp?v=1794992233",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/00010.webp?v=1794992237"
+      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13491,10 +12754,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0000010.webp?v=1794992230",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/000010.webp?v=1794992233",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/00010.webp?v=1794992237"
+        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0010.webp?v=1794992226"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-2-1m-professional-camera-tripod-with-carry-bag-th-010",
@@ -13528,10 +12788,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_RS-001.webp?v=1776938473",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/LedlightingforDSLR.webp?v=1776938473",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-interface.webp?v=1776938473"
+      "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13545,10 +12802,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_RS-001.webp?v=1776938473",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/LedlightingforDSLR.webp?v=1776938473",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-interface.webp?v=1776938473"
+        "https://three-egypt.com/cdn/shop/files/Packing_RS-001.webp?v=1776938473&width=900"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-portable-led-video-rig-stand-rs-001",
@@ -13582,10 +12836,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_RS-002.webp?v=1776938078",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-interface_b1bf5fa7-c8d6-487f-93e0-b57274a58f66.webp?v=1776938078",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Getbetter.webp?v=1776938078"
+      "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13599,10 +12850,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_RS-002.webp?v=1776938078",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-interface_b1bf5fa7-c8d6-487f-93e0-b57274a58f66.webp?v=1776938078",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Getbetter.webp?v=1776938078"
+        "https://three-egypt.com/cdn/shop/files/Packing_RS-002.webp?v=1776938078&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/ar/products/zoovia-rgb-led-video-rig-with-4000mah-battery-rs-002",
@@ -13636,10 +12884,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Neck_holder_Proudact.webp?v=1776937251",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Magnitic.webp?v=1776937251",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/mobile_phone_neck_bracket_NH-001_Packing.webp?v=1776937251"
+      "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13653,10 +12898,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Neck_holder_Proudact.webp?v=1776937251",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Magnitic.webp?v=1776937251",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/mobile_phone_neck_bracket_NH-001_Packing.webp?v=1776937251"
+        "https://three-egypt.com/cdn/shop/files/Neck_holder_kitchen.webp?v=1776937251&width=900"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/ar/products/zoovia-mobile-phone-neck-bracket-nh-001",
@@ -13690,10 +12932,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-003.webp?v=1776937614",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Lightingmakesthedifference.webp?v=1776937615",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MobilePhoneCamera_e87cdb63-610d-40e8-8762-5ba436c3408f.webp?v=1776937615"
+      "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13707,10 +12946,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-003.webp?v=1776937614",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Lightingmakesthedifference.webp?v=1776937615",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MobilePhoneCamera_e87cdb63-610d-40e8-8762-5ba436c3408f.webp?v=1776937615"
+        "https://three-egypt.com/cdn/shop/files/Packing_R-003.webp?v=1776937614&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-mobile-phone-fill-light-r-003",
@@ -13744,10 +12980,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-002.webp?v=1776936480",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MobilePhoneCamera.webp?v=1776936480",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Smallsize.webp?v=1776936480"
+      "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13761,10 +12994,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-002.webp?v=1776936480",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MobilePhoneCamera.webp?v=1776936480",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Smallsize.webp?v=1776936480"
+        "https://three-egypt.com/cdn/shop/files/Packing_R-002.webp?v=1776936480&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-mobile-phone-fill-light-r-002",
@@ -13798,10 +13028,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-004.webp?v=1776936037",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/multi-interface_663d3d87-20d4-45ab-b7de-dae8dabd1d78.webp?v=1776936037",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/SMALL_LIGHTWEIGHT.webp?v=1776936037"
+      "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13815,10 +13042,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-004.webp?v=1776936037",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/multi-interface_663d3d87-20d4-45ab-b7de-dae8dabd1d78.webp?v=1776936037",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/SMALL_LIGHTWEIGHT.webp?v=1776936037"
+        "https://three-egypt.com/cdn/shop/files/Packing_R-004.webp?v=1776936037&width=900"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-mobile-phone-fill-light-r-004",
@@ -13852,10 +13076,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-006.webp?v=1776935394",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/SamllSize_4f83fc6e-7df6-4dfc-b968-3e1b15206a5a.webp?v=1776935394"
+      "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13869,10 +13090,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Packing_R-006.webp?v=1776935394",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/SamllSize_4f83fc6e-7df6-4dfc-b968-3e1b15206a5a.webp?v=1776935394"
+        "https://three-egypt.com/cdn/shop/files/multi-interface_975ce351-635e-419c-a3ad-85e32c7ca36d.webp?v=1776935394&width=900"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-magnetic-mobile-phone-fill-light-r-006",
@@ -13906,10 +13124,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-Functional_4c090c11-f8e5-4bb9-846a-1221e3c1d0fc.webp?v=1776934988",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Magnetic.webp?v=1776934988"
+      "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13923,10 +13138,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-Functional_4c090c11-f8e5-4bb9-846a-1221e3c1d0fc.webp?v=1776934988",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Magnetic.webp?v=1776934988"
+        "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing_8f9273c3-87a7-4220-ba98-5c22c4cd5bc4.webp?v=1776934988&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-magnetic-portable-stand-360-oh-003",
@@ -13960,10 +13172,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/HANDHELDSTAND.webp?v=1776934727",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional.webp?v=1776934727"
+      "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -13977,10 +13186,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/HANDHELDSTAND.webp?v=1776934727",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/MULTI-Functional.webp?v=1776934727"
+        "https://three-egypt.com/cdn/shop/files/MULTI-Functional_OH-002_Packing.webp?v=1776934727&width=900"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-multi-functional-travel-phone-stand-oh-002",
@@ -14014,10 +13220,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/FOLDSMALL.webp?v=1776933700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Travel_ce5100b3-f010-45b1-9477-89f8ef3eac33.webp?v=1776933701"
+      "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14031,10 +13234,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/FOLDSMALL.webp?v=1776933700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Travel_ce5100b3-f010-45b1-9477-89f8ef3eac33.webp?v=1776933701"
+        "https://three-egypt.com/cdn/shop/files/OH-006Clampingarm_Magnetic_Packing.webp?v=1776933700&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-portable-stand-360-oh-006",
@@ -14068,10 +13268,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-Functional_5575db81-7893-4e3d-97d7-9d8ced396903.webp?v=1776932527",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/FOLDTABLE_d1ed60a3-b2f9-4e5e-8176-cce5236f28b7.webp?v=1776932528"
+      "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14085,10 +13282,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Multi-Functional_5575db81-7893-4e3d-97d7-9d8ced396903.webp?v=1776932527",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/FOLDTABLE_d1ed60a3-b2f9-4e5e-8176-cce5236f28b7.webp?v=1776932528"
+        "https://three-egypt.com/cdn/shop/files/COLLAPSIBLE_OH-001_Packing_f62a96f8-1977-4c4a-97ba-04ae157b3336_1.webp?v=1776932527&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/zoovia-collapsible-telescopic-phone-stand-oh-001",
@@ -14122,10 +13316,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/ff2bcc0c-da81-490d-b84f-1a4f2f6d5244.jpg?v=1793716018",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/5e997ea7-b019-4998-80a9-ea48cde8a418.jpg?v=1793716023"
+      "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14139,10 +13330,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/ff2bcc0c-da81-490d-b84f-1a4f2f6d5244.jpg?v=1793716018",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/5e997ea7-b019-4998-80a9-ea48cde8a418.jpg?v=1793716023"
+        "https://three-egypt.com/cdn/shop/files/e03f5712-2918-46e7-8d83-dee85af8bb15.jpg?v=1793716031&width=1280"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-maggo-power-bank-10000-mah-qi2-15w-ultra-fast-1",
@@ -14176,10 +13364,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61NYC_j4zaL._AC_SX522.jpg?v=1790166346",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71zJGHiR5UL._AC_SL1500.jpg?v=1790166441"
+      "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14193,10 +13378,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61NYC_j4zaL._AC_SX522.jpg?v=1790166346",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71zJGHiR5UL._AC_SL1500.jpg?v=1790166441"
+        "https://three-egypt.com/cdn/shop/files/71IN_u2cMIL._AC_SL1500.jpg?v=1790166434&width=1200"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-usb-c-to-usb-c-cable-fast-charging-240w",
@@ -14230,10 +13412,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/716LMdDqFXL._AC_SL1500.jpg?v=1784725771",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71AHD0jTNyL._AC_SL1500.jpg?v=1784725776"
+      "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14247,10 +13426,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/716LMdDqFXL._AC_SL1500.jpg?v=1784725771",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71AHD0jTNyL._AC_SL1500.jpg?v=1784725776"
+        "https://three-egypt.com/cdn/shop/files/61Gnu96XtdL._AC_SL1500.jpg?v=1784725757&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-soundcore-liberty-5-pro-max-18-month-warranty",
@@ -14284,10 +13460,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/81fSyF8krpL._AC_SL1500.jpg?v=1781707402",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/81hYHo_PgcL._AC_SL1500.jpg?v=1781707403"
+      "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14301,10 +13474,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/81fSyF8krpL._AC_SL1500.jpg?v=1781707402",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/81hYHo_PgcL._AC_SL1500.jpg?v=1781707403"
+        "https://three-egypt.com/cdn/shop/files/816S5nYYEdL._AC_SL1500.jpg?v=1781707402&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-soundcore-select-4-go-wireless-bluetooth-speaker",
@@ -14338,10 +13508,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/sp164-2-min_1.jpg?v=1781706507",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/4_5dbb29f8-6386-4751-ad16-d6e526309a40.jpg?v=1781706507",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A31A3TD-04_2878x_76708dba-92cd-4b2f-8e38-a466fb871755.webp?v=1781706507"
+      "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14355,10 +13522,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/sp164-2-min_1.jpg?v=1781706507",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/4_5dbb29f8-6386-4751-ad16-d6e526309a40.jpg?v=1781706507",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A31A3TD-04_2878x_76708dba-92cd-4b2f-8e38-a466fb871755.webp?v=1781706507"
+        "https://three-egypt.com/cdn/shop/files/sp164-2-min_1.jpg?v=1781706507&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-soundcore-rave-3s-portable-bluetooth-speaker-with-microphone-a31a3012",
@@ -14392,10 +13556,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_bbd490e4-5364-432b-ba04-6dd7504456e8.jpg?v=1790167594",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_1c8a47a0-5645-4187-990c-63b427b2aca6.jpg?v=1790167599"
+      "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14409,10 +13570,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_bbd490e4-5364-432b-ba04-6dd7504456e8.jpg?v=1790167594",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_1c8a47a0-5645-4187-990c-63b427b2aca6.jpg?v=1790167599"
+        "https://three-egypt.com/cdn/shop/files/1_8c37f4ca-a158-4072-8842-89b0e7342e14.jpg?v=1790167931&width=680"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-zolo-charger-gan-fast-charging-station-70w",
@@ -14446,10 +13604,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71Od38iepUL_0df7b662-39b5-4c45-bd87-9bf273c50a07.webp?v=1775296651",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61qQxMBgTPL_41543efe-06a4-4d50-8dc2-4e1d5ab12d69_1.webp?v=1775296651"
+      "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14463,10 +13618,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71Od38iepUL_0df7b662-39b5-4c45-bd87-9bf273c50a07.webp?v=1775296651",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61qQxMBgTPL_41543efe-06a4-4d50-8dc2-4e1d5ab12d69_1.webp?v=1775296651"
+        "https://three-egypt.com/cdn/shop/files/A1637111_TD01_V16_1600x_1.webp?v=1775296651&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-power-bank-built-in-cable-10000mha-30w-a1637",
@@ -14500,10 +13652,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion.webp?v=1775141303",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_7.webp?v=1775141303"
+      "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14517,10 +13666,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion.webp?v=1775141303",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_7.webp?v=1775141303"
+        "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub7-in-1Multi-PortUSBAdapterforLaptopsA83D2PA1-AsiaVersion_1.webp?v=1775141303&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-7-in-1-usb-c-hub-85w-pd-fast-charging-a83d2pa1",
@@ -14554,10 +13700,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1.webp?v=1770669234",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_2.webp?v=1770669237"
+      "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14571,10 +13714,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1.webp?v=1770669234",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_2.webp?v=1770669237"
+        "https://three-egypt.com/cdn/shop/files/AnkerNanoPowerBank_10K_45W_Built-InRetractableUSB-CCable_A1638P11Three-Egypt.com_1_69bfea75-f55e-40ff-83d0-9e8bf5e0cc09.webp?v=1770669233&width=1400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-nano-power-bank-10k-45w-built-in-retractable-usb-c-cable-a1638p11",
@@ -14608,10 +13748,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_4.jpg?v=1770669211",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_7.jpg?v=1770669212",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_9.jpg?v=1770669213"
+      "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14625,10 +13762,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_4.jpg?v=1770669211",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_7.jpg?v=1770669212",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_9.jpg?v=1770669213"
+        "https://three-egypt.com/cdn/shop/files/AnkerUSB-CHub_5-in-1_4KHDMI_A83575Three-Egypt.com_5.jpg?v=1770669219&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-usb-c-hub-5-in-1-4k-hdmi-a83575",
@@ -14662,10 +13796,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1.jpg?v=1770658992",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_6.jpg?v=1770658993",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_7.jpg?v=1770658994"
+      "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14679,10 +13810,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1.jpg?v=1770658992",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_6.jpg?v=1770658993",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_7.jpg?v=1770658994"
+        "https://three-egypt.com/cdn/shop/files/AnkerLaptopPowerBank25K_165W_Built-InandRetractableCables_1_04a4291c-6994-465e-8cec-ceff6216a1c4.jpg?v=1770658997&width=1400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-laptop-power-bank-25k-165w-built-in-and-retractable-cables",
@@ -14716,10 +13844,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Screenshot_1.png?v=1770600972",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61n4uzM8fL__AC_SL1500__jpg_720x_5e353c24-0a87-4363-afb5-21f381112488.webp?v=1770600973"
+      "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14733,10 +13858,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Screenshot_1.png?v=1770600972",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61n4uzM8fL__AC_SL1500__jpg_720x_5e353c24-0a87-4363-afb5-21f381112488.webp?v=1770600973"
+        "https://three-egypt.com/cdn/shop/files/51Gv5-7oTnL._AC_SL1500.jpg?v=1770600971&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-usb-c-hub-powerexpand-3-in-1-usb-c-hub-a8339",
@@ -14770,10 +13892,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Anker-313-30-II-PD-11-12.jpg_640x640_52aa460d-c838-4c0c-a079-e115a1ae21af.jpg?v=1770586388",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S857b9a78c35546439f29a3b99a5ba3fdQ.jpg?v=1770586389",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Sa204b15e4d21480380131570b5e70df27.jpg?v=1770586391"
+      "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14787,10 +13906,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Anker-313-30-II-PD-11-12.jpg_640x640_52aa460d-c838-4c0c-a079-e115a1ae21af.jpg?v=1770586388",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S857b9a78c35546439f29a3b99a5ba3fdQ.jpg?v=1770586389",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Sa204b15e4d21480380131570b5e70df27.jpg?v=1770586391"
+        "https://three-egypt.com/cdn/shop/files/Anker-313-GaN-Foldable-30W-Charger-PIQ-3.0.webp?v=1770586398&width=1000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/anker-313-gan-30w-foldable-charger",
@@ -14824,10 +13940,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71VPq00c5YL._AC_SX679.jpg?v=1784796026",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51jMQALIjzL._AC_SX679.jpg?v=1784796026"
+      "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14841,10 +13954,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/71VPq00c5YL._AC_SX679.jpg?v=1784796026",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51jMQALIjzL._AC_SX679.jpg?v=1784796026"
+        "https://three-egypt.com/cdn/shop/files/71v_bB9UKuL._AC_SX679.jpg?v=1784796026&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-magnetic-card-wallet-holder-with-magsafe-g02",
@@ -14878,10 +13988,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp-Image-2026-04-28-at-12.51.07-PM-1.jpg?v=1784706182",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-3-500x620.webp?v=1784706182"
+      "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14895,10 +14002,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp-Image-2026-04-28-at-12.51.07-PM-1.jpg?v=1784706182",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-3-500x620.webp?v=1784706182"
+        "https://three-egypt.com/cdn/shop/files/degree-1_dad278f0-65e6-4dbf-b901-d705e8368c82.webp?v=1784706182&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-a17-slim-shockproof-case-for-iphone-17-pro-max",
@@ -14932,10 +14036,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/8_35e7e0ef-147e-44aa-9d14-eae6c74fdcaf_1.webp?v=1784705435",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UAF_1.webp?v=1784705435"
+      "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -14949,10 +14050,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/8_35e7e0ef-147e-44aa-9d14-eae6c74fdcaf_1.webp?v=1784705435",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UAF_1.webp?v=1784705435"
+        "https://three-egypt.com/cdn/shop/files/S26UAF_4d62b4d5-45fe-453f-b773-98993617c5af.webp?v=1784705435&width=700"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-slim-aramid-fiber-case-for-samsung-galaxy-s26-ultra",
@@ -14986,10 +14084,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10__1.webp?v=1778400468",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10_22845121-2c1d-4ae2-8780-4b910d8e41a3.webp?v=1778400469",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10_299398d0-d29e-4c81-85a0-0dc973a59feb.webp?v=1778400469"
+      "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15003,10 +14098,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10__1.webp?v=1778400468",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10_22845121-2c1d-4ae2-8780-4b910d8e41a3.webp?v=1778400469",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/M10_299398d0-d29e-4c81-85a0-0dc973a59feb.webp?v=1778400469"
+        "https://three-egypt.com/cdn/shop/files/M10__1.webp?v=1778400468&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-power-bank-multi-charging-dual-mag10000mah-m10",
@@ -15040,10 +14132,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.19_PM.jpg?v=1778148410",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_1.jpg?v=1778148409"
+      "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15057,10 +14146,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.19_PM.jpg?v=1778148410",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_1.jpg?v=1778148409"
+        "https://three-egypt.com/cdn/shop/files/WhatsApp_Image_2026-05-07_at_1.02.17_PM_2.jpg?v=1778148410&width=1289"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-af01-crystal-clear-screen-protector-for-iphone-17-pro-max",
@@ -15094,10 +14180,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G09-1027_1.webp?v=1778055178",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/20260318-163346.webp?v=1778054614",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G09-1027_6.webp?v=1778054614"
+      "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15111,10 +14194,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G09-1027_1.webp?v=1778055178",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/20260318-163346.webp?v=1778054614",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G09-1027_6.webp?v=1778054614"
+        "https://three-egypt.com/cdn/shop/files/G09-1027_1.webp?v=1778055178&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-infinite-360-magnetic-stand-3-axis-rotation-g09",
@@ -15148,10 +14228,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17_____1_25.webp?v=1778050072",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17_SP_P_5754f9e5-bb17-4c69-afeb-eb3f94bdcbcc.webp?v=1778050072",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-1.webp?v=1778051860"
+      "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15165,10 +14242,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17_____1_25.webp?v=1778050072",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17_SP_P_5754f9e5-bb17-4c69-afeb-eb3f94bdcbcc.webp?v=1778050072",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/degree-1.webp?v=1778051860"
+        "https://three-egypt.com/cdn/shop/files/A17_____1_25.webp?v=1778050072&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-vegan-leather-case-for-iphone-17-pro-max",
@@ -15202,10 +14276,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU_33b4c501-bd9d-437e-85a8-ef4b0f9dc04f.webp?v=1777985880",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU.webp?v=1777985880",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU_42d7fe06-ae35-4a23-9b71-a5b30fd01d19.webp?v=1777985880"
+      "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15219,10 +14290,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU_33b4c501-bd9d-437e-85a8-ef4b0f9dc04f.webp?v=1777985880",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU.webp?v=1777985880",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/S26UTPU_42d7fe06-ae35-4a23-9b71-a5b30fd01d19.webp?v=1777985880"
+        "https://three-egypt.com/cdn/shop/files/S26UTPU_6413c17f-7067-4ff6-ac0c-d5a87cac85c5.webp?v=1777985880&width=1400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-frosted-glow-case-for-samsung-galaxy-s26-ultra",
@@ -15256,10 +14324,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17-1030_14.webp?v=1784641683",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-01.webp?v=1784641683",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17TPU_PM_0fc64149-4805-4ceb-af22-017901fbcb06.webp?v=1777984368"
+      "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15273,10 +14338,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17-1030_14.webp?v=1784641683",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-01.webp?v=1784641683",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17TPU_PM_0fc64149-4805-4ceb-af22-017901fbcb06.webp?v=1777984368"
+        "https://three-egypt.com/cdn/shop/files/1_2ef4805b-eb98-46ab-a573-d8f681368fd4.webp?v=1777984655&width=1400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-frosted-case-for-iphone-17-pro",
@@ -15310,10 +14372,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-01.webp?v=1784641683",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17TPU_PM_0fc64149-4805-4ceb-af22-017901fbcb06.webp?v=1777984368",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-05.webp?v=1777984654"
+      "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15327,10 +14386,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-01.webp?v=1784641683",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/A17TPU_PM_0fc64149-4805-4ceb-af22-017901fbcb06.webp?v=1777984368",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/banner-05.webp?v=1777984654"
+        "https://three-egypt.com/cdn/shop/files/banner-01.webp?v=1784641683&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-frosted-case-for-iphone-17-series-a17",
@@ -15364,10 +14420,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/b848ce3cffa9c55628417741e2ee8aac.webp?v=1777806967",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/3088c66ec5333e7b9cb6d20f9b6ef30f.webp?v=1777806967"
+      "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15381,10 +14434,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/b848ce3cffa9c55628417741e2ee8aac.webp?v=1777806967",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/3088c66ec5333e7b9cb6d20f9b6ef30f.webp?v=1777806967"
+        "https://three-egypt.com/cdn/shop/files/1_d4232888-6a1b-4a37-9541-ddb5b4cbc504.webp?v=1777806967&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-mag-buckle-slim-band-for-apple-watch-series-a11",
@@ -15418,10 +14468,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/IF__bundle-3.webp?v=1777801728",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C03-SKU_-06.webp?v=1777801728",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C03banner_SKU_-04_00d131c9-244b-446e-bfb6-3c703290794c.webp?v=1777801728"
+      "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15435,10 +14482,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/IF__bundle-3.webp?v=1777801728",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C03-SKU_-06.webp?v=1777801728",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C03banner_SKU_-04_00d131c9-244b-446e-bfb6-3c703290794c.webp?v=1777801728"
+        "https://three-egypt.com/cdn/shop/files/IF__bundle-3.webp?v=1777801728&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-titanium-mag-buckle-quick-release-band-c03",
@@ -15472,10 +14516,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/13_8889968c-317e-4953-9ea0-f09ee3a5c00b.webp?v=1777801431",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C01___-5_1c083321-ec0c-4e95-afc3-422dce2beb38.webp?v=1777801431"
+      "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15489,10 +14530,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/13_8889968c-317e-4953-9ea0-f09ee3a5c00b.webp?v=1777801431",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/C01___-5_1c083321-ec0c-4e95-afc3-422dce2beb38.webp?v=1777801431"
+        "https://three-egypt.com/cdn/shop/files/C01___-7_b0f7883b-9d89-4fc2-b7e5-4c21db20812d.webp?v=1777801431&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/hi-per-titanium-alloy-watch-band-aulumu-c01",
@@ -15526,9 +14564,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_1.jpg?v=1777552199",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_1_76e2915e-c2eb-4b94-9cbc-c3c141346134.jpg?v=1777552199"
+      "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15542,9 +14578,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_1.jpg?v=1777552199",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_1_76e2915e-c2eb-4b94-9cbc-c3c141346134.jpg?v=1777552199"
+        "https://three-egypt.com/cdn/shop/files/2_1.jpg?v=1777552199&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-aramid-fiber-case-magsafe-compatible-iphone-17-pro-max-a17",
@@ -15578,10 +14612,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/20260203-143829.webp?v=1777551219",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G05AIR-zh_10.webp?v=1777551219",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G05AIR-zh_11.webp?v=1777551219"
+      "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15595,10 +14626,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/20260203-143829.webp?v=1777551219",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G05AIR-zh_10.webp?v=1777551219",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G05AIR-zh_11.webp?v=1777551219"
+        "https://three-egypt.com/cdn/shop/files/20260203-143829.webp?v=1777551219&width=700"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-air-next-gen-hi-per-magnetic-stand-g05",
@@ -15632,10 +14660,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/10_55e30258-fc42-40ad-a537-865ff7680170.webp?v=1777550671",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/9_158517cc-7729-4cfb-a1fe-3609259a79a4.webp?v=1777550671"
+      "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15649,10 +14674,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/10_55e30258-fc42-40ad-a537-865ff7680170.webp?v=1777550671",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/9_158517cc-7729-4cfb-a1fe-3609259a79a4.webp?v=1777550671"
+        "https://three-egypt.com/cdn/shop/files/8_7fd8c917-3512-4383-9377-070aa8a046f0_1.webp?v=1777550671&width=713"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-multi-tool-magnetic-metal-wallet-genuine-leather-cover-g03",
@@ -15686,10 +14708,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF_2.webp?v=1777550055",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF.webp?v=1777550055",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF_1.webp?v=1777550055"
+      "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15703,10 +14722,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF_2.webp?v=1777550055",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF.webp?v=1777550055",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/G03-CF_1.webp?v=1777550055"
+        "https://three-egypt.com/cdn/shop/files/G03-CF.webp?v=1777550055&width=700"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-card-case-magnetic-carbon-fiber-multi-functional-g03",
@@ -15740,10 +14756,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/aulumug07popuplaptopstand_934654f1-3517-4e4c-bb0b-92d686d42116.webp?v=1777549537",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_e4f991c7-704b-470e-9b41-4a143bd8b9dd.webp?v=1777549537"
+      "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15757,10 +14770,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/aulumug07popuplaptopstand_934654f1-3517-4e4c-bb0b-92d686d42116.webp?v=1777549537",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2_e4f991c7-704b-470e-9b41-4a143bd8b9dd.webp?v=1777549537"
+        "https://three-egypt.com/cdn/shop/files/1_d2ccfed2-18a9-4791-b400-a93ce8da48d0.jpg?v=1777549537&width=700"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/pop-up-laptop-kickstand-g07",
@@ -15794,10 +14804,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_12.webp?v=1777548569",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_6_14141685-6bef-41f7-9484-330c685b048f.webp?v=1777548569",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_9_6e762851-454f-41e3-af6b-cace112da169.webp?v=1777548569"
+      "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15811,10 +14818,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_12.webp?v=1777548569",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_6_14141685-6bef-41f7-9484-330c685b048f.webp?v=1777548569",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_9_6e762851-454f-41e3-af6b-cace112da169.webp?v=1777548569"
+        "https://three-egypt.com/cdn/shop/files/1_12.webp?v=1777548569&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/mag-buckle-slim-band-for-garmin-watch-quickfit-22mm-26mm-c11",
@@ -15848,10 +14852,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/28_672be351-e7f5-454b-a7b9-44adef628a98.webp?v=1777547905",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/800x.webp?v=1777547908",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/19.webp?v=1777547905"
+      "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15865,10 +14866,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/28_672be351-e7f5-454b-a7b9-44adef628a98.webp?v=1777547905",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/800x.webp?v=1777547908",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/19.webp?v=1777547905"
+        "https://three-egypt.com/cdn/shop/files/800x.webp?v=1777547908&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/apple-watch-aulumu-offbeat-sport-band-a02",
@@ -15902,10 +14900,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/7_1920x_b89291b8-3644-4580-a382-04b975da1ab5.webp?v=1777547114",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/6_1920x_cf1bc6df-1ead-4e47-954c-f52e338661d9.webp?v=1777547114"
+      "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15919,10 +14914,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/7_1920x_b89291b8-3644-4580-a382-04b975da1ab5.webp?v=1777547114",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/6_1920x_cf1bc6df-1ead-4e47-954c-f52e338661d9.webp?v=1777547114"
+        "https://three-egypt.com/cdn/shop/files/1_85b90b9e-b66b-4049-870c-239ced0c4d9f.webp?v=1777547114&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/aulumu-magnetic-flip-wallet-stand-magsafe-compatible-g02",
@@ -15956,10 +14948,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_63726b75-86cd-42c6-b6e7-4ba00aeaa582.avif?v=1787654774",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_0ce9453a-caf7-442f-b4ff-91bb8875057e.avif?v=1787654779"
+      "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -15973,10 +14962,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_63726b75-86cd-42c6-b6e7-4ba00aeaa582.avif?v=1787654774",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/greenecodetail_0ce9453a-caf7-442f-b4ff-91bb8875057e.avif?v=1787654779"
+        "https://three-egypt.com/cdn/shop/files/greenecodetail_a046c14b-71ef-421b-9a7d-722824ff80b3.avif?v=1787654768&width=896"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/green-4-in-1-multi-charging-cable-ge-cc174",
@@ -16010,10 +14996,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61EwiuyJq5L._AC_SL1500.jpg?v=1787553626",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51B5dVIsH5L._AC_SL1500.jpg?v=1787553621"
+      "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16027,10 +15010,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61EwiuyJq5L._AC_SL1500.jpg?v=1787553626",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/51B5dVIsH5L._AC_SL1500.jpg?v=1787553621"
+        "https://three-egypt.com/cdn/shop/files/61E0VInE_9L._AC_SL1500.jpg?v=1787553650&width=1500"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/green-magnetic-super-fast-charge-65w-cable-type-c-to-type-c-ge-c085",
@@ -16064,10 +15044,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/723866375_122175545258855049_9111742453170218424_n.jpg?v=1782909498",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/721471159_122175545072855049_8363350918838044316_n.jpg?v=1782909497"
+      "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16081,10 +15058,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/723866375_122175545258855049_9111742453170218424_n.jpg?v=1782909498",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/721471159_122175545072855049_8363350918838044316_n.jpg?v=1782909497"
+        "https://three-egypt.com/cdn/shop/files/724109798_122175545342855049_9152018660790315417_n.jpg?v=1782909497&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/lenyes-type-c-to-type-c-100w-fast-charging-cable-lc558",
@@ -16118,10 +15092,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515850-40-B.webp?v=1782908033",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515851-40-B.webp?v=1782908033"
+      "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16135,10 +15106,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515850-40-B.webp?v=1782908033",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515851-40-B.webp?v=1782908033"
+        "https://three-egypt.com/cdn/shop/files/lenyes-lc557-4in1-usb-a-type-c-type-c-to-lightning-e-mark-smart-cipli-data-ve-sarj-kablosu-240w-1m-kablo-ve-donusturuculer-lenyes-515852-40-B.webp?v=1782908033&width=850"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/lenyes-lc557-4-in-1-fast-charging-cable-lc557",
@@ -16172,10 +15140,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.01PM.jpg?v=1778597686",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.18PM.jpg?v=1778597686"
+      "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16189,10 +15154,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.01PM.jpg?v=1778597686",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2026-05-12at5.33.18PM.jpg?v=1778597686"
+        "https://three-egypt.com/cdn/shop/files/WhatsAppImage2026-05-12at5.33.33PM.jpg?v=1778597686&width=1024"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/2-in-1-fast-charging-cable-doubles-phone-stand",
@@ -16226,10 +15188,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_2.webp?v=1771270688",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_3.webp?v=1771270690"
+      "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16243,10 +15202,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_2.webp?v=1771270688",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_3.webp?v=1771270690"
+        "https://three-egypt.com/cdn/shop/files/OriginalMagneticCableFor17ProMaxThree-Egypt.com_5.webp?v=1771270686&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/original-magnetic-cable-for-17-pro-max",
@@ -16280,10 +15236,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_1.webp?v=1770667974",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_6.webp?v=1770667976"
+      "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16297,10 +15250,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_1.webp?v=1770667974",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_6.webp?v=1770667976"
+        "https://three-egypt.com/cdn/shop/files/Joyroom3-in-1iPWatchMagneticChargerLightningType-Ccable_USB-A_1.2mS-IW008Three-Egypt.com_3.webp?v=1770667972&width=1000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/joyroom-3-in-1-ip-watch-magnetic-charger-lightning-type-c-cable-usb-a-1-2m-s-iw008",
@@ -16334,10 +15284,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_5.jpg?v=1770667966",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_6.jpg?v=1770667967"
+      "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16351,10 +15298,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_5.jpg?v=1770667966",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_6.jpg?v=1770667967"
+        "https://three-egypt.com/cdn/shop/files/JoyroomBenSeriesofAppleWatchMagneticChargingCable1.2MS-IW001SThree-Egypt.com_4.jpg?v=1770667964&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/joyroom-ben-series-of-apple-watch-magnetic-charging-cable-1-2m-s-iw001s",
@@ -16388,10 +15332,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_1.webp?v=1770661334",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_2.jpg?v=1770661340"
+      "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16405,10 +15346,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_1.webp?v=1770661334",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_2.jpg?v=1770661340"
+        "https://three-egypt.com/cdn/shop/files/RecciLampDisplayCableType-CtoType-CPD240WRS42CCThree-EGypt.com_3.jpg?v=1770661338&width=1000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/recci-lamp-display-cable-type-c-to-type-c-pd-240w-rs42cc",
@@ -16442,10 +15380,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_4.jpg?v=1770661277",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_3.jpg?v=1770661278"
+      "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16459,10 +15394,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_4.jpg?v=1770661277",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_3.jpg?v=1770661278"
+        "https://three-egypt.com/cdn/shop/files/Recci150CMType-CDataCablePD100WRS32CCThree-Egypt.com_1.jpg?v=1770661276&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/recci-150cm-data-cable-pd-100w-rs32cc",
@@ -16496,10 +15428,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_1.jpg?v=1770596089",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/31KjibzElGL._SY445.jpg?v=1770596090"
+      "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16513,10 +15442,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/1_1.jpg?v=1770596089",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/31KjibzElGL._SY445.jpg?v=1770596090"
+        "https://three-egypt.com/cdn/shop/files/cable-type-c-watch-magnetic-3.5w-120.cm-white-lw06-lanex-1.jpg?v=1770596088&width=800"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/lanex-watch-cable-3-5w-lw06",
@@ -16550,10 +15476,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/s-l1600_814e6897-6acc-4ae6-89c0-2049188c9fcb.jpg?v=1770591573",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0043242_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591574"
+      "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16567,10 +15490,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/s-l1600_814e6897-6acc-4ae6-89c0-2049188c9fcb.jpg?v=1770591573",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/0043242_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591574"
+        "https://three-egypt.com/cdn/shop/files/0043241_samsung-usb-c-to-usb-c-cable-5a-18m-ep-dx510.jpg?v=1770591572&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/original-samsung-type-c-cable",
@@ -16604,10 +15524,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_1.jpg?v=1770615505",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_2.jpg?v=1770615507"
+      "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16621,10 +15538,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_1.jpg?v=1770615505",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/2in1WatchWirelessChargingCableRCW-39threestore_2.jpg?v=1770615507"
+        "https://three-egypt.com/cdn/shop/files/2in1WatchWirelessChargingCableRCW-39threestore_1.png?v=1770615506&width=1000"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/2-in-1-watch-wireless-charging-cable-rcw-39",
@@ -16658,10 +15572,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Untitleddesign_23.webp?v=1787484820",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2025-12-31at5.54.21AM.webp?v=1787484832",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/f26fe78e-70c3-4488-9dd9-37434cec4248.webp?v=1787484837"
+      "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16675,10 +15586,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Untitleddesign_23.webp?v=1787484820",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/WhatsAppImage2025-12-31at5.54.21AM.webp?v=1787484832",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/f26fe78e-70c3-4488-9dd9-37434cec4248.webp?v=1787484837"
+        "https://three-egypt.com/cdn/shop/files/Untitleddesign_23.webp?crop=center&height=1200&v=1787484820&width=1200"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/green-led-mp3-car-charger-55w-ge-y085",
@@ -16712,9 +15620,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048",
     "imageUrl": "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048",
     "images": [
-      "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Untitleddesign_24.webp?v=1787483874",
-      "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Gemini_Generated_Image_ijkzs2ijkzs2ijkz.webp?v=1787483879"
+      "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -16728,9 +15634,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "three-egypt.com",
     "customGroupPrices": {
       "_images": [
-        "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Untitleddesign_24.webp?v=1787483874",
-        "https://cdn.shopify.com/s/files/1/0701/5291/3208/files/Gemini_Generated_Image_ijkzs2ijkzs2ijkz.webp?v=1787483879"
+        "https://three-egypt.com/cdn/shop/files/Untitleddesign_24.webp?v=1787483874&width=2048"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://three-egypt.com/products/green-3-in1-led-mp3-car-charger-45w-ge-y086",
@@ -22860,10 +21764,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/512.png?v=1791283238",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/1_6_3aa898fa-c342-41f3-9b31-56c1364778a0.png?v=1791283238",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/54654.png?v=1791283238"
+      "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -22877,10 +21778,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/512.png?v=1791283238",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/1_6_3aa898fa-c342-41f3-9b31-56c1364778a0.png?v=1791283238",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/54654.png?v=1791283238"
+        "https://vontx.com/cdn/shop/files/54654.png?v=1791283238&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/strap-22mm",
@@ -22914,9 +21812,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/6.png?v=1788442875",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/Anker-Soundcore-R60i-NC-True-Wireless-Earphones-White-0194644269487-01062026-01-p.jpg?v=1794981381"
+      "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -22930,9 +21826,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/6.png?v=1788442875",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/Anker-Soundcore-R60i-NC-True-Wireless-Earphones-White-0194644269487-01062026-01-p.jpg?v=1794981381"
+        "https://vontx.com/cdn/shop/files/bd97768701cfa34b7be04dc939d1cae9.jpg?v=1793644933&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-airpods-r60i-nc",
@@ -22966,8 +21860,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -22981,8 +21874,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/5_3da7b684-cfd7-45b7-9509-bf0e84e5bad3.png?v=1788438437&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-airpods-liberty-5",
@@ -23016,10 +21908,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/146d1f229f45b5edd80f87be37990935.png?v=1788442113",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/e9e59b229f27aaa33caff01c26c91d37.png?v=1788442176"
+      "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23033,10 +21922,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/146d1f229f45b5edd80f87be37990935.png?v=1788442113",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/e9e59b229f27aaa33caff01c26c91d37.png?v=1788442176"
+        "https://vontx.com/cdn/shop/files/c6c95dd22033abace48a5cd9f9eed925.png?v=1788442057&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-airpods-r50i",
@@ -23070,9 +21956,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/a1c69043f257e173c4501a06aacd056b.png?v=1788260354"
+      "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23086,9 +21970,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/a1c69043f257e173c4501a06aacd056b.png?v=1788260354"
+        "https://vontx.com/cdn/shop/files/9ee6da385c2fe48a9aa04a264e3bb46f.png?v=1788260297&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/baseus-earbuds-bp1-nc-in-ear?variant=47113195880646",
@@ -23122,8 +22004,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35546932347078.jpg?v=1794974493"
+      "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23137,8 +22018,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35546932347078.jpg?v=1794974493"
+        "https://vontx.com/cdn/shop/files/1ddba15b934757e31178ba54f6054650.jpg?v=1793616630&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/infinix-gt-buds-5",
@@ -23172,8 +22052,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769"
+      "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23187,8 +22066,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769"
+        "https://vontx.com/cdn/shop/files/51_f450bbc1-a3ab-4128-bcd0-f1d5b8a2eb16.png?v=1788452769&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/joyroom-jr-fn3",
@@ -23222,9 +22100,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/dsds.png?v=1788452329",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/fbf.png?v=1788452341"
+      "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23238,9 +22114,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/dsds.png?v=1788452329",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/fbf.png?v=1788452341"
+        "https://vontx.com/cdn/shop/files/dsds.png?v=1788452329&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/joyroom-airpods-jr-fb3?variant=47137324957894",
@@ -23274,8 +22148,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35342865825990.jpg?v=1794974445"
+      "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23289,8 +22162,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35342865825990.jpg?v=1794974445"
+        "https://vontx.com/cdn/shop/files/oraimo-november-47249222500550.png?v=1793833708&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/oraimo-airbuds-4-enc-true-wireless-earbuds",
@@ -23324,8 +22196,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/csac.png?v=1793095921"
+      "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23339,8 +22210,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/csac.png?v=1793095921"
+        "https://vontx.com/cdn/shop/files/oraimo-november-48467717816518.png?v=1793835183&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/oraimo-earbuds-open-arc-opn-675",
@@ -23374,10 +22244,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35838140350662.jpg?v=1794974493",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35838146445510.jpg?v=1794974492",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/xcvx.jpg?v=1793279146"
+      "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23391,10 +22258,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35838140350662.jpg?v=1794974493",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35838146445510.jpg?v=1794974492",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/xcvx.jpg?v=1793279146"
+        "https://vontx.com/cdn/shop/files/46544.png?v=1792924162&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/frontpage/products/oraimo-spacebuds-lite-2-otw-325",
@@ -23428,9 +22292,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-36181902328006.jpg?v=1794974494",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/832813-Product-0-I-638918538603194683.jpg?v=1794970017"
+      "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23444,9 +22306,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-36181902328006.jpg?v=1794974494",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/832813-Product-0-I-638918538603194683.jpg?v=1794970017"
+        "https://vontx.com/cdn/shop/files/18_4d3e808f-9ec2-4262-9c1d-e7de5cdd31db.jpg?v=1793529709&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/philips-airpods-3000-series",
@@ -23480,8 +22340,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
     "imageUrl": "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
     "images": [
-      "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23495,8 +22354,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/recci-airpods-rep-w99",
@@ -23530,10 +22388,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/3_1_a98f109a-f3e8-4647-bd9c-340cc7eed951.png?v=1790519436",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35488935444678.jpg?v=1794974491",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35488937279686.jpg?v=1794974491"
+      "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23547,10 +22402,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/3_1_a98f109a-f3e8-4647-bd9c-340cc7eed951.png?v=1790519436",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35488935444678.jpg?v=1794974491",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35488937279686.jpg?v=1794974491"
+        "https://vontx.com/cdn/shop/files/smart-gate-wafer-aktar-12-47895750869190.png?v=1794137255&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/smart-gate-pure-plus",
@@ -23584,8 +22436,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376"
+      "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23599,8 +22450,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376"
+        "https://vontx.com/cdn/shop/files/AirPods-Pro-2-_-ANC-with-LCD-Screen-AAA-Grade-Premium-Clone-mymemorylk-2.jpg?v=1789958376&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/airpods-screen-white",
@@ -23634,8 +22484,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_17_faa81417-6fd5-498e-81bd-1de2adb4b30b.jpg?v=1794991600"
+      "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23649,8 +22498,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_17_faa81417-6fd5-498e-81bd-1de2adb4b30b.jpg?v=1794991600"
+        "https://vontx.com/cdn/shop/files/25_0274d4bb-3372-4d17-a48a-8f2766722be9.jpg?v=1793691738&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/nv35-wireless-extra-stereo-earphones",
@@ -23684,8 +22532,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/sdgg.png?v=1793281737"
+      "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23699,8 +22546,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/sdgg.png?v=1793281737"
+        "https://vontx.com/cdn/shop/files/sdgg.png?v=1793281737&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/airpods-white-3?variant=48560965419206",
@@ -23734,8 +22580,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35897921405126.jpg?v=1794974491"
+      "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23749,8 +22594,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35897921405126.jpg?v=1794974491"
+        "https://vontx.com/cdn/shop/files/13zC.png?v=1793282140&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/airpods-white-pro-2",
@@ -23784,8 +22628,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxc-35915899076806.jpg?v=1794972400"
+      "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23799,8 +22642,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxc-35915899076806.jpg?v=1794972400"
+        "https://vontx.com/cdn/shop/files/5c2edbb599822ebed4f57ac99c79a750.jpg?v=1793390588&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-power-bank-20000mah-15w",
@@ -23834,8 +22676,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216",
     "imageUrl": "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216",
     "images": [
-      "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216"
+      "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23849,8 +22690,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216"
+        "https://vontx.com/cdn/shop/files/61Bb6n42VTL._AC_SL1500-removebg-preview.png?v=1794967216"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-power-bank-325-core-20-000",
@@ -23884,8 +22724,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_8.jpg?v=1794989038"
+      "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23899,8 +22738,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_8.jpg?v=1794989038"
+        "https://vontx.com/cdn/shop/files/56_828ccb88-0b0d-45ce-8de7-25546607652a.jpg?v=1793645239&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-power-bank-endless-20k-15w-black",
@@ -23934,8 +22772,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214",
     "imageUrl": "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214",
     "images": [
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/A110D_blk.jpg?v=1795082142"
+      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23949,8 +22786,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/A110D_blk.jpg?v=1795082142"
+        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/09a11ebe29a894d01e9611e3f11b21bf.png?v=1788435214"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/anker-power-bank-zolo-10-000mah-22-5w",
@@ -23984,8 +22820,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-36181852422342.jpg?v=1794973248"
+      "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -23999,8 +22834,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-36181852422342.jpg?v=1794973248"
+        "https://vontx.com/cdn/shop/files/1_56.jpg?v=1793645909&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/baseus-airpow-fast-charge-c50-20w-20k",
@@ -24034,10 +22868,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/88090.jpg?v=1788165395",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/88990.jpg?v=1788165372",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/0990_9cad31e4-4475-467d-8951-3fd1a080462a.jpg?v=1788165528"
+      "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24051,10 +22882,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/88090.jpg?v=1788165395",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/88990.jpg?v=1788165372",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/0990_9cad31e4-4475-467d-8951-3fd1a080462a.jpg?v=1788165528"
+        "https://vontx.com/cdn/shop/files/88090.jpg?v=1788165395&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/infinix-power-bank-xpower-10-pro",
@@ -24088,8 +22916,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
     "imageUrl": "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
     "images": [
-      "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24103,8 +22930,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/k.png?v=1788706428&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/recci-power-bank-50-000-rpb-p76",
@@ -24138,8 +22964,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/s1s.png?v=1789310285"
+      "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24153,8 +22978,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/s1s.png?v=1789310285"
+        "https://vontx.com/cdn/shop/files/s1s.png?v=1789310285&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/%D8%B7%D8%A7%D8%A8%D8%B9%D8%A7%D8%AA-%D9%84%D9%8A%D8%B2%D8%B1/products/compatable-easy-refill-toner-t200-for-deli-m2000s-use-only-4500-pages",
@@ -24188,10 +23012,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144141.987.jpg?v=1792410234",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144217.347.jpg?v=1792410234",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144306.113.jpg?v=1792410234"
+      "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24205,10 +23026,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144141.987.jpg?v=1792410234",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144217.347.jpg?v=1792410234",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-10-19T144306.113.jpg?v=1792410234"
+        "https://vontx.com/cdn/shop/files/8800-2026-10-19T144217.347.jpg?v=1792410234&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/cover-beky-open-ring-magsafe-case-for-iphone-17-18-pro-max",
@@ -24242,8 +23060,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24257,8 +23074,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/iphone17-case-19-0-with-phone.png?v=1794708906&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/covers",
@@ -24292,10 +23108,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-0-with-phone.png?v=1794709064",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-1-with-phone.png?v=1794709074",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-2-with-phone.png?v=1794709111"
+      "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24309,10 +23122,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-0-with-phone.png?v=1794709064",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-1-with-phone.png?v=1794709074",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-17-2-with-phone.png?v=1794709111"
+        "https://vontx.com/cdn/shop/files/iphone17-case-17-0-with-phone.png?v=1794709064&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/iphone-17-pro-max/products/cover-new-case-leather-magsafe-for-iphone-18-17-pro-max",
@@ -24346,10 +23156,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-0-with-phone.png?v=1794708945",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-1-with-phone.png?v=1794708924",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-2-with-phone.png?v=1794708954"
+      "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24363,10 +23170,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-0-with-phone.png?v=1794708945",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-1-with-phone.png?v=1794708924",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/iphone17-case-15-2-with-phone.png?v=1794708954"
+        "https://vontx.com/cdn/shop/files/iphone17-case-15-0-with-phone.png?v=1794708945&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/cover-silicone-for-iphone-18-17-pro-max",
@@ -24400,8 +23204,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/653185c7.png?v=1794800500"
+      "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24415,8 +23218,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/653185c7.png?v=1794800500"
+        "https://vontx.com/cdn/shop/files/653185c7.png?v=1794800500&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/%D8%B7%D9%82%D9%85-%D8%AC%D9%8A%D9%85%D9%86%D8%AC-5-%D9%81%D9%8A-1-%D9%81%D8%A7%D9%86%D8%AA%D9%83-fantech-p51-power-bundle-%D8%A3%D8%A8%D9%8A%D8%B6-%D8%B6%D9%85%D8%A7%D9%86-12-%D8%B4%D9%87%D8%B1",
@@ -24450,10 +23252,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/f25a8f07105d77dcd485f47cffc0d5af.png?v=1788182061",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/ad1305021745d184b995f5d76b0222ee.png?v=1788182123",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/ec4398808661c306a1bdfa06cab3737f.png?v=1788182168"
+      "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24467,10 +23266,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/f25a8f07105d77dcd485f47cffc0d5af.png?v=1788182061",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/ad1305021745d184b995f5d76b0222ee.png?v=1788182123",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/ec4398808661c306a1bdfa06cab3737f.png?v=1788182168"
+        "https://vontx.com/cdn/shop/files/jbl-7-0-farha.png?v=1794451130&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/jbl-tune-520bt",
@@ -24504,10 +23300,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BLACK_A.png?v=1794979719",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BLUE_A.png?v=1794979719",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BEIGE_A.png?v=1794979719"
+      "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24521,10 +23314,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BLACK_A.png?v=1794979719",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BLUE_A.png?v=1794979719",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/TUNE730BT_BEIGE_A.png?v=1794979719"
+        "https://vontx.com/cdn/shop/files/jbl-20-1-farha.png?v=1794473621&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/jbl-tune-730bt-wireless-headphones",
@@ -24558,9 +23348,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156",
     "imageUrl": "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156",
     "images": [
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-orb-smartwatch-black-with-black-silicone-strap-5-min.webp?v=1794968269",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-orb-smartwatch-silver-with-orange-silicone-strap-5-min.webp?v=1794968269"
+      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24574,9 +23362,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-orb-smartwatch-black-with-black-silicone-strap-5-min.webp?v=1794968269",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-orb-smartwatch-silver-with-orange-silicone-strap-5-min.webp?v=1794968269"
+        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/orb1.png?v=1791824156"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kospet-orb",
@@ -24610,9 +23396,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600",
     "imageUrl": "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600",
     "images": [
-      "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-pluse-smartwatch-black-with-black-silicone-strap-1-min.webp?v=1794968269",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-pluse-smartwatch-silver-with-orange-silicone-strap-1-min.webp?v=1794968269"
+      "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24626,9 +23410,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-pluse-smartwatch-black-with-black-silicone-strap-1-min.webp?v=1794968269",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-magic-pluse-smartwatch-silver-with-orange-silicone-strap-1-min.webp?v=1794968269"
+        "https://vontx.com/cdn/shop/files/3_dff8b52c-7ed0-4cf5-b7c7-45da029d7f27.jpg?v=1793526878&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kospet-pulse",
@@ -24710,9 +23492,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600",
     "imageUrl": "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600",
     "images": [
-      "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/26_1ef9a665-10d2-4771-9631-041663b30772.png?v=1788786325",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-tank-t3-ultra-2-smartwatch-silver-with-steel-straps-media-6_d9a4ca5e-0fdc-4e7b-840b-99c0db56aa2b.webp?v=1794979719"
+      "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24726,9 +23506,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/26_1ef9a665-10d2-4771-9631-041663b30772.png?v=1788786325",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/kospet-tank-t3-ultra-2-smartwatch-silver-with-steel-straps-media-6_d9a4ca5e-0fdc-4e7b-840b-99c0db56aa2b.webp?v=1794979719"
+        "https://vontx.com/cdn/shop/files/2ad1dbee7b1370bfc75baac03c693fb8.jpg?v=1793620876&width=600"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kospet-t3-ultra2",
@@ -24762,8 +23540,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400",
     "imageUrl": "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400",
     "images": [
-      "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24777,8 +23554,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/kospet-tank-t3-ultra-2-smartwatch-black-with-silicone-straps-media-1.webp?v=1794968269&width=400"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/offers1?page=2",
@@ -24812,8 +23588,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg",
     "imageUrl": "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg",
     "images": [
-      "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35196907684038.jpg?v=1794974446"
+      "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24827,8 +23602,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35196907684038.jpg?v=1794974446"
+        "https://www.kieslect.com/wp-content/uploads/2025/01/1.jpg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kieslect-actor-leading",
@@ -24862,8 +23636,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987"
+      "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24877,8 +23650,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987"
+        "https://vontx.com/cdn/shop/files/5_910826a6-6b59-45cc-85f8-ff1ea76b3761.png?v=1788850987&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kieslect-al-watch-elite2",
@@ -24912,8 +23684,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608",
     "imageUrl": "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608",
     "images": [
-      "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24927,8 +23698,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/ca61.png?v=1788792608"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kieslect-kr-3",
@@ -24962,8 +23732,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg",
     "imageUrl": "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg",
     "images": [
-      "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35304969404614.jpg?v=1794974446"
+      "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -24977,8 +23746,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35304969404614.jpg?v=1794974446"
+        "https://www.kieslect.com/wp-content/uploads/replace/e5c9c21bc1f8a25efd9062e23fde62b9.jpeg"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kieslect-watch-lora",
@@ -25012,8 +23780,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720",
-      "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+      "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25027,8 +23794,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720",
-        "https://vontx.com/cdn/shop/files/vontx-share.jpg?v=1794978858"
+        "https://vontx.com/cdn/shop/files/80f43986f35cb22ed0ead3837edad4b7.png?v=1788852310&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/kieslect-calling-watch-ks2-ltd",
@@ -25062,9 +23828,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/d8cabfa0194625f7c049eae35e478523cf760513_1__1.jpg?v=1794981542",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/oraimo-Smart-Watch-Watch-6-MOCO-OSW-809-03-mainimage.png?v=1794981478"
+      "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25078,9 +23842,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/d8cabfa0194625f7c049eae35e478523cf760513_1__1.jpg?v=1794981542",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/oraimo-Smart-Watch-Watch-6-MOCO-OSW-809-03-mainimage.png?v=1794981478"
+        "https://vontx.com/cdn/shop/files/145_-_Copy.jpg?v=1793843999&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/%D8%B3%D8%A7%D8%B9%D8%A9-%D8%A3%D9%88%D8%B1%D8%A7%D9%8A%D9%85%D9%88-oraimo-watch-6-hayato-%D8%B6%D9%85%D8%A7%D9%86-12-%D8%B4%D9%87%D8%B1-2-%D8%A7%D8%B3%D8%AA%D8%B1%D8%A7%D8%A8-%D9%88%D8%A7%D8%B3%D9%83%D8%B1%D9%8A%D9%86-%D8%AD%D9%85%D8%A7%D9%8A%D9%87-%D9%87%D8%AF%D9%8A%D8%A9-%D8%B5%D9%81%D9%82%D8%A7%D8%AA-%D8%A7%D9%84%D8%B4%D9%87%D8%B1",
@@ -25114,8 +23876,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35343010496710.jpg?v=1794974445"
+      "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25129,8 +23890,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35343010496710.jpg?v=1794974445"
+        "https://vontx.com/cdn/shop/files/oraimo-november-47249582981318.png?v=1793833956&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/collections/smartwatch/products/oraimo-watch-6-lite-smart-watch?variant=47249582981318",
@@ -25164,8 +23924,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35155269451974.jpg?v=1794974444"
+      "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25179,8 +23938,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35155269451974.jpg?v=1794974444"
+        "https://vontx.com/cdn/shop/files/oraimo-november-47134330454214.png?v=1793833013"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/oraimo-watch-6n",
@@ -25214,8 +23972,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35342670201030.jpg?v=1794974446"
+      "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25229,8 +23986,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxz-35342670201030.jpg?v=1794974446"
+        "https://vontx.com/cdn/shop/files/oraimo-november-47248686350534.png?v=1793833696&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/oraimo-smart-watch-6r",
@@ -25264,9 +24020,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxc-35961126781126.jpg?v=1794980699",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/watch-5-lite-osw-804.png?v=1794981477"
+      "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25280,9 +24034,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/vxc-35961126781126.jpg?v=1794980699",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/watch-5-lite-osw-804.png?v=1794981477"
+        "https://vontx.com/cdn/shop/files/oraimo-november-48590771388614.png?v=1793835402&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/oraimo-watch-5-lite",
@@ -25364,8 +24116,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_100.jpg?v=1788337355"
+      "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25379,8 +24130,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800_100.jpg?v=1788337355"
+        "https://vontx.com/cdn/shop/files/8800_100.jpg?v=1788337355&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/qcy-smart-watch-gt",
@@ -25462,8 +24212,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-11-08T103621.494.jpg?v=1794127082"
+      "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25477,8 +24226,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/8800-2026-11-08T103621.494.jpg?v=1794127082"
+        "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48659932446918.png?v=1794141124&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/smart-gate-smart-watch-fmale",
@@ -25512,9 +24260,7 @@ export const OR_IMPORTED_PARTS = [
     "image": "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720",
     "imageUrl": "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720",
     "images": [
-      "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/d31.png?v=1791714835",
-      "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/fbd.png?v=1791714880"
+      "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720"
     ],
     "stock": 5,
     "lowStockThreshold": 2,
@@ -25528,9 +24274,7 @@ export const OR_IMPORTED_PARTS = [
     "sourceSite": "vontx.com",
     "customGroupPrices": {
       "_images": [
-        "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/d31.png?v=1791714835",
-        "https://cdn.shopify.com/s/files/1/0758/7335/3926/files/fbd.png?v=1791714880"
+        "https://vontx.com/cdn/shop/files/smart-gate-reduced-price-48266456203462.png?v=1794141104&width=720"
       ],
       "_isOrCatalog": true,
       "_sourceUrl": "https://vontx.com/products/smart-gate-rg3",

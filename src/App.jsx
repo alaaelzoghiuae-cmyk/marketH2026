@@ -16,6 +16,17 @@ import {
   OR_IMPORTED_MODELS,
   OR_IMPORTED_PARTS
 } from './orCatalogData';
+import AiCommandCenter from './components/AiCommandCenter';
+import BulkProductImporter from './components/BulkProductImporter';
+import ExcelProductManager from './components/ExcelProductManager';
+import SmartPricingEngine from './components/SmartPricingEngine';
+import ProductQualityAndImages from './components/ProductQualityAndImages';
+import {
+  OrderWorkflowBoard,
+  BusinessIntelligenceView,
+  AdminCommandPalette,
+  SmartNotificationsPopover
+} from './components/OrderWorkflowAndBI';
 
 // Backward-compatible alias for Edit3
 const Edit3 = Edit;
@@ -3487,9 +3498,28 @@ export default function App() {
   }, [clientTab]);
   const [accountSubTab, setAccountSubTab] = useState('profile'); // 'profile' | 'orders' | 'ledger' | 'returns' | 'complaints'
   const [adminTab, setAdminTab] = useState('overview');
+  const [aiCommandOpen, setAiCommandOpen] = useState(false);
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
+  const [smartNotifsOpen, setSmartNotifsOpen] = useState(false);
 
   // --- Admin Login Credentials & Auth State (Persisted) ---
   const [adminAuthenticated, setAdminAuthenticated] = useState(() => loadPersisted('adminAuth', false));
+
+  // Global Ctrl+K / Cmd+K Command Palette & ESC shortcut in Admin Dashboard
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (appPortal !== 'admin' || !adminAuthenticated) return;
+      if ((e.ctrlKey || e.metaKey) && String(e.key || '').toLowerCase() === 'k') {
+        e.preventDefault();
+        setCmdPaletteOpen(prev => !prev);
+      } else if (e.key === 'Escape') {
+        setCmdPaletteOpen(false);
+        setSmartNotifsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [appPortal, adminAuthenticated]);
   const [adminCredentials, setAdminCredentials] = useState(() =>
     loadPersisted('adminCredentials', { username: 'admin', password: '123' })
   );
@@ -12443,8 +12473,9 @@ ${adminLink}`;
           </div>
         </div>
 
-        {/* Direct Scroll Target: Start of Products Grid (Used when clicking Homepage Icons/Brands) */}
-        <div ref={productsGridAnchorRef} className="scroll-mt-28 flex items-center justify-between gap-2 sm:hidden px-1">
+        {/* Direct Scroll Target: Always-Visible Anchor at Start of Products Grid (Mobile & Desktop!) */}
+        <div ref={productsGridAnchorRef} className="scroll-mt-28" />
+        <div className="flex items-center justify-between gap-2 sm:hidden px-1">
           <span className="text-xs text-muted font-bold">
             المنتجات: <span className="text-accent-text font-black">{totalItems}</span>
             {selectedCategory !== 'ALL' && <span className="mr-1.5 text-[11px] text-[#2563EB] font-extrabold">• {selectedCategory}</span>}
@@ -12455,7 +12486,6 @@ ${adminLink}`;
             <button type="button" onClick={() => changeCols(2)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 2 ? 'bg-[#2563EB] text-white' : 'text-muted'}`}>▦</button>
           </div>
         </div>
-        <div className="hidden sm:block scroll-mt-28" ref={el => { if (el && !productsGridAnchorRef.current) productsGridAnchorRef.current = el; }} />
 
         {/* Product Grid (4 Columns on Desktop matching Reference Mockups!) */}
         {totalItems === 0 ? (
@@ -14465,6 +14495,15 @@ ${adminLink}`;
             urgent: false
           },
           {
+            id: 'bi_analytics',
+            label: 'تحليلات الأعمال (BI)',
+            desc: 'مبيعات فعلية، متوسط الطلب، أداء التصنيفات، وتوصيات AI',
+            keywords: 'تحليلات bi ارباح مبيعات احصائيات ذكاء اصطناعي',
+            icon: TrendingUp,
+            badge: 'BI',
+            urgent: false
+          },
+          {
             id: 'reports',
             label: 'تقارير المدير العام',
             desc: 'بناء وطباعة تقارير A4 PDF وتصدير Excel',
@@ -14486,6 +14525,15 @@ ${adminLink}`;
             icon: ClipboardList,
             badge: newOrdersCount > 0 ? `${newOrdersCount} جديد` : orders.length,
             urgent: newOrdersCount > 0
+          },
+          {
+            id: 'order_workflow',
+            label: 'سير عمل الطلبات (Kanban)',
+            desc: 'عرض المراحل Kanban والجدول وتحديث الحالات وتصدير CSV',
+            keywords: 'كانبان kanban مراحل شحن تجهيز طلبات',
+            icon: LayoutGrid,
+            badge: 'Kanban',
+            urgent: false
           },
           {
             id: 'sourcing',
@@ -14517,6 +14565,42 @@ ${adminLink}`;
             keywords: 'منتجات موديلات براندات ماركات صور اضافة قسم',
             icon: Layers,
             badge: models.length,
+            urgent: false
+          },
+          {
+            id: 'excel_products',
+            label: 'جدول المنتجات (Excel)',
+            desc: 'تعديل مباشر للأسعار والمخزون والتصنيف وتعديلات جماعية مع تراجع',
+            keywords: 'اكسل excel جدول منتجات تعديل جماعي اسعار مخزون',
+            icon: LayoutGrid,
+            badge: 'Excel',
+            urgent: false
+          },
+          {
+            id: 'smart_pricing',
+            label: 'محرك التسعير الذكي (AI)',
+            desc: 'حساب الهوامش ومحاكاة قواعد التسعير قبل الاعتماد',
+            keywords: 'تسعير هامش ربح تكلفة smart pricing ai',
+            icon: DollarSign,
+            badge: 'AI',
+            urgent: false
+          },
+          {
+            id: 'bulk_importer',
+            label: 'المستورد الذكي بالروابط',
+            desc: 'استيراد منتجات جماعي عبر لصق روابط الصور أو CSV',
+            keywords: 'استيراد روابط صور csv bulk importer',
+            icon: Upload,
+            badge: 'Bulk',
+            urgent: false
+          },
+          {
+            id: 'quality_images',
+            label: 'جودة الكتالوج والصور',
+            desc: 'فحص جودة المنتجات وإدارة روابط الصور المتعددة وكشف المعطوب',
+            keywords: 'جودة صور روابط معطوبة وصف تحسين',
+            icon: Camera,
+            badge: 'Audit',
             urgent: false
           },
           {
@@ -15017,8 +15101,41 @@ ${adminLink}`;
                 </div>
               </div>
 
-              {/* Left: Clean Color-Differentiated Action Buttons */}
+              {/* Left: Clean Color-Differentiated Action Buttons + Global Ctrl+K + AI Command Center + Smart Alerts */}
               <div className="flex items-center gap-1.5 sm:gap-2 text-xs flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setCmdPaletteOpen(true)}
+                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-surface2 hover:border-[#3B82F6] border border-line text-fg font-extrabold flex items-center gap-1.5 transition"
+                  title="بحث شامل وأوامر سريعة (Ctrl+K)"
+                >
+                  <Search className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <span className="hidden md:inline">بحث سريع</span>
+                  <span className="hidden lg:inline text-[10px] px-1.5 py-0.5 rounded bg-surface border border-line text-muted font-mono">Ctrl+K</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSmartNotifsOpen(prev => !prev)}
+                  className="relative h-9 w-9 rounded-xl bg-surface2 hover:border-[#3B82F6] border border-line text-fg flex items-center justify-center transition"
+                  title="التنبيهات الذكية للمتجر"
+                >
+                  <Bell className="w-4 h-4 text-amber-500" />
+                  {(newOrdersCount > 0 || parts.some(p => Number(p.stock || 0) <= 0)) && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-rose-600 border-2 border-surface" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAiCommandOpen(true)}
+                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-l from-violet-600 to-[#2563EB] hover:opacity-95 text-white font-black flex items-center gap-1.5 shadow-sm transition"
+                  title="مركز الأوامر الذكي (AI Command Center)"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span className="hidden sm:inline">مساعد AI</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -15199,6 +15316,141 @@ ${adminLink}`;
           {/* Active Module Content Container */}
           <div className="flex-1 w-full max-w-[1440px] mx-auto p-3 sm:p-6 pb-24 min-w-0">
             {adminTab === 'overview' && renderAdminOverview()}
+            {adminTab === 'bi_analytics' && (
+              <BusinessIntelligenceView
+                parts={parts}
+                orders={orders}
+                clients={clients}
+                normalizePartCategory={normalizePartCategory}
+              />
+            )}
+            {adminTab === 'order_workflow' && (
+              <OrderWorkflowBoard
+                orders={orders}
+                onUpdateOrderStatus={(orderId, nextStatus) => {
+                  handleUpdateOrderStatus(orderId, nextStatus, false);
+                }}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'excel_products' && (
+              <ExcelProductManager
+                parts={parts}
+                categories={Array.from(new Set(parts.map(p => normalizePartCategory(p.category, p.name)).filter(Boolean)))}
+                hiddenPartIds={siteSettings.hiddenPartIds || []}
+                normalizePartCategory={normalizePartCategory}
+                onUpdatePart={(partId, patch) => {
+                  let updatedObj = null;
+                  setParts(prev => prev.map(p => {
+                    if (String(p.id) !== String(partId)) return p;
+                    updatedObj = { ...p, ...patch };
+                    return updatedObj;
+                  }));
+                  if (updatedObj) {
+                    markLocalUpsert('parts', updatedObj);
+                    sbUpsert('spare_parts', updatedObj);
+                  }
+                }}
+                onBulkUpdateParts={(patchMap) => {
+                  const synced = [];
+                  setParts(prev => prev.map(p => {
+                    if (!patchMap[p.id]) return p;
+                    const u = { ...p, ...patchMap[p.id] };
+                    synced.push(u);
+                    return u;
+                  }));
+                  synced.forEach(u => {
+                    markLocalUpsert('parts', u);
+                    sbUpsert('spare_parts', u);
+                  });
+                }}
+                onToggleHideParts={(ids, shouldHide) => {
+                  const idSet = new Set(ids.map(String));
+                  saveSiteSettingsImmediate(prev => {
+                    const cur = new Set((prev.hiddenPartIds || []).map(String));
+                    if (shouldHide) idSet.forEach(x => cur.add(x));
+                    else idSet.forEach(x => cur.delete(x));
+                    return { ...prev, hiddenPartIds: Array.from(cur) };
+                  });
+                  showToast(shouldHide ? `تم إخفاء ${ids.length} منتج` : `تم إظهار ${ids.length} منتج`, 'info');
+                }}
+                onDuplicateParts={(ids) => {
+                  const idSet = new Set(ids.map(String));
+                  const clones = parts.filter(p => idSet.has(String(p.id))).map((p, i) => ({
+                    ...p,
+                    id: `dup_${Date.now()}_${i}`,
+                    sku: `${p.sku || 'SKU'}-COPY`,
+                    name: `${p.name} (نسخة)`
+                  }));
+                  setParts(prev => [...clones, ...prev]);
+                  clones.forEach(c => {
+                    markLocalUpsert('parts', c);
+                    sbUpsert('spare_parts', c);
+                  });
+                  showToast(`تم نسخ ${clones.length} منتج ومزامنتها بنجاح ✓`, 'success');
+                }}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'smart_pricing' && (
+              <SmartPricingEngine
+                parts={parts}
+                categories={Array.from(new Set(parts.map(p => normalizePartCategory(p.category, p.name)).filter(Boolean)))}
+                normalizePartCategory={normalizePartCategory}
+                onApplyPricingMap={(priceMap) => {
+                  const synced = [];
+                  setParts(prev => prev.map(p => {
+                    if (!priceMap[p.id]) return p;
+                    const u = { ...p, ...priceMap[p.id] };
+                    synced.push(u);
+                    return u;
+                  }));
+                  synced.forEach(u => {
+                    markLocalUpsert('parts', u);
+                    sbUpsert('spare_parts', u);
+                  });
+                }}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'bulk_importer' && (
+              <BulkProductImporter
+                brands={brands}
+                models={models}
+                categories={Array.from(new Set(parts.map(p => normalizePartCategory(p.category, p.name)).filter(Boolean)))}
+                normalizePartCategory={normalizePartCategory}
+                generateAiDetails={generateAiProductDetails}
+                onConfirmImport={(newParts) => {
+                  setParts(prev => [...newParts, ...prev]);
+                  newParts.forEach(np => {
+                    markLocalUpsert('parts', np);
+                    sbUpsert('spare_parts', np);
+                  });
+                  showToast(`تم استيراد وحفظ ${newParts.length} منتج جديد ومزامنتها مع قاعدة البيانات ✓`, 'success');
+                }}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'quality_images' && (
+              <ProductQualityAndImages
+                parts={parts}
+                normalizePartCategory={normalizePartCategory}
+                generateAiDetails={generateAiProductDetails}
+                onUpdatePart={(partId, patch) => {
+                  let updatedObj = null;
+                  setParts(prev => prev.map(p => {
+                    if (String(p.id) !== String(partId)) return p;
+                    updatedObj = { ...p, ...patch };
+                    return updatedObj;
+                  }));
+                  if (updatedObj) {
+                    markLocalUpsert('parts', updatedObj);
+                    sbUpsert('spare_parts', updatedObj);
+                  }
+                }}
+                showToast={showToast}
+              />
+            )}
             {adminTab === 'reports' && renderAdminExecutiveReportsView()}
             {adminTab === 'feature_flags' && renderAdminFeatureFlagsDashboard()}
             {adminTab === 'restock_alerts' && renderAdminRestockAlertsView()}
@@ -15215,6 +15467,82 @@ ${adminLink}`;
             {adminTab === 'schema' && renderAdminDatabaseSchema()}
           </div>
         </div>
+
+        {/* Persistent Executive Overlays: AI Command Center, Ctrl+K Command Palette & Smart Notifications */}
+        <AiCommandCenter
+          open={aiCommandOpen}
+          onClose={() => setAiCommandOpen(false)}
+          parts={parts}
+          orders={orders}
+          clients={clients}
+          models={models}
+          brands={brands}
+          normalizePartCategory={normalizePartCategory}
+          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onCreateProductFromAi={(payload) => {
+            const targetModel = models[0] || { id: 'or_mdl_001', brand: brands[0] || 'OR - Majentik' };
+            const created = {
+              id: `ai_prt_${Date.now()}`,
+              sku: `AI-${Date.now().toString().slice(-5)}`,
+              modelId: targetModel.id,
+              brand: targetModel.brand,
+              category: payload.category || 'شواحن',
+              name: payload.name,
+              qualityGrade: 'أصلي معتمد',
+              colors: ['قياسي'],
+              compatibleModels: [targetModel.brand],
+              description: `${payload.name} — تمت إضافته عبر مركز الأوامر الذكي بضمان متجر ELZOGHBI.`,
+              warrantyText: 'ضمان استبدال ومعاينة معتمد من متجر الزغبي',
+              image: payload.image || '',
+              imageUrl: payload.image || '',
+              images: payload.image ? [payload.image] : [],
+              stock: Number(payload.stock) || 5,
+              lowStockThreshold: 2,
+              maxOrderQty: 5,
+              costPrice: Number(payload.costPrice) || 0,
+              basePrice: Number(payload.basePrice) || 350,
+              customGroupPrices: { _images: payload.image ? [payload.image] : [] },
+              createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
+              waitlistCount: 0
+            };
+            setParts(prev => [created, ...prev]);
+            markLocalUpsert('parts', created);
+            sbUpsert('spare_parts', created);
+          }}
+          onApplyBulkPriceChange={(ids, pct) => {
+            const idSet = new Set(ids.map(String));
+            const synced = [];
+            setParts(prev => prev.map(p => {
+              if (!idSet.has(String(p.id))) return p;
+              const u = { ...p, basePrice: Math.max(1, Math.round(Number(p.basePrice || 0) * (1 + Number(pct) / 100))) };
+              synced.push(u);
+              return u;
+            }));
+            synced.forEach(u => {
+              markLocalUpsert('parts', u);
+              sbUpsert('spare_parts', u);
+            });
+          }}
+          showToast={showToast}
+        />
+
+        <AdminCommandPalette
+          open={cmdPaletteOpen}
+          onClose={() => setCmdPaletteOpen(false)}
+          parts={parts}
+          orders={orders}
+          clients={clients}
+          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onOpenAi={() => setAiCommandOpen(true)}
+        />
+
+        <SmartNotificationsPopover
+          open={smartNotifsOpen}
+          onClose={() => setSmartNotifsOpen(false)}
+          parts={parts}
+          orders={orders}
+          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        />
 
         {/* Sleek Responsive Floating Bottom Bar & Scrollable Mobile Popup (Zero Clipping on Any Phone!) */}
         <div className="fixed bottom-3 inset-x-0 px-2.5 z-40 flex flex-col items-center pointer-events-none">
