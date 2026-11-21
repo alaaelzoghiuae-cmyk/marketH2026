@@ -265,13 +265,25 @@ export default function AiProductSourcingAgent({
 
   // Core Pipeline Runner (Real URLs via /api/ai-sourcing, Structured Feed CSV/JSON, OR Explicit Isolated Test Mode)
   const runSourcingPipeline = async ({ useIsolatedTest = false } = {}) => {
+    // Auto-sync workflow if user edited the instruction text without clicking "تحليل الأمر" first
+    let activeWorkflow = workflow;
+    if (instruction.trim() !== (workflow.rawInstruction || '').trim() && !planEdited) {
+      const reparsed = parseSourcingInstruction(instruction, parsedUrls);
+      if (workflow.pricing?.exchangeRate) {
+        reparsed.pricing.exchangeRate = workflow.pricing.exchangeRate;
+        reparsed.pricing.exchangeRateSource = workflow.pricing.exchangeRateSource;
+        reparsed.pricing.exchangeRateDate = workflow.pricing.exchangeRateDate;
+      }
+      activeWorkflow = reparsed;
+      setWorkflow(reparsed);
+    }
     if (filterConflicts.length > 0) {
       showToast?.('يوجد تعارض في قواعد الفلترة؛ يرجى تصحيحه أولاً قبل التنفيذ.', 'error');
       setActiveView('filters_pricing');
       return;
     }
 
-    const urlsToScan = workflow.sourceUrls.length ? workflow.sourceUrls : parsedUrls;
+    const urlsToScan = activeWorkflow.sourceUrls.length ? activeWorkflow.sourceUrls : parsedUrls;
     const hasFeed = structuredFeedText.trim().length > 0;
 
     if (!useIsolatedTest && urlsToScan.length === 0 && !hasFeed) {
@@ -379,7 +391,7 @@ export default function AiProductSourcingAgent({
       }));
 
       // STAGE 2: Filtering
-      const { passed, excluded } = applyProductFilters(discoveredRaw, workflow.filters);
+      const { passed, excluded } = applyProductFilters(discoveredRaw, activeWorkflow.filters);
       pushLog(`🔎 نتائج الفلترة: ${passed.length} منتج مطابق، ${excluded.length} منتج مستبعد.`);
 
       setExecState(prev => ({
@@ -392,8 +404,8 @@ export default function AiProductSourcingAgent({
       }));
 
       // STAGE 3: Catalog Update Mode vs New Import / Analyze Mode
-      if (workflow.mode === 'catalog_update') {
-        const proposals = buildCatalogUpdateProposals(passed, parts, workflow.pricing);
+      if (activeWorkflow.mode === 'catalog_update') {
+        const proposals = buildCatalogUpdateProposals(passed, parts, activeWorkflow.pricing);
         pushLog(`🔄 وضع تحديث الكتالوج: تم رصد ${proposals.length} منتج لديه تغييرات مقترحة (بدون تعديل فعلي حتى الموافقة).`);
         setUpdateProposals(proposals);
         setExcludedItems(excluded);
@@ -435,7 +447,7 @@ export default function AiProductSourcingAgent({
         const duplicate = classifyDuplicate(p, parts);
         if (duplicate.status !== DUPLICATE_STATUS.NEW_PRODUCT) dupCount++;
 
-        if (workflow.filters.excludeDuplicates && duplicate.status === DUPLICATE_STATUS.EXACT_DUPLICATE) {
+        if (activeWorkflow.filters.excludeDuplicates && duplicate.status === DUPLICATE_STATUS.EXACT_DUPLICATE) {
           extraExcluded.push({ ...p, exclusionReasons: [`مستبعد تلقائياً: ${duplicate.reason}`] });
           continue;
         }
@@ -446,7 +458,7 @@ export default function AiProductSourcingAgent({
           existingCategories: categories,
           language: workflow.enrichment?.language || 'ar'
         });
-        const pricing = calculateProductPricing(p, workflow.pricing, enriched.matchedCategory);
+        const pricing = calculateProductPricing(p, activeWorkflow.pricing, enriched.matchedCategory);
         const idempotencyKey = computeIdempotencyKey({ ...p, enriched });
 
         staged.push({
@@ -752,7 +764,7 @@ export default function AiProductSourcingAgent({
     return list;
   }, [stagedItems, reviewSearch, reviewDupFilter, reviewSort]);
 
-  const PAGE_SIZE = 15;
+  const PAGE_SIZE = 30;
   const totalPages = Math.max(1, Math.ceil(filteredReviewItems.length / PAGE_SIZE));
   const paginatedReviewItems = filteredReviewItems.slice((reviewPage - 1) * PAGE_SIZE, reviewPage * PAGE_SIZE);
   const selectedCount = stagedItems.filter(it => it.selected && it.importState !== 'imported').length;

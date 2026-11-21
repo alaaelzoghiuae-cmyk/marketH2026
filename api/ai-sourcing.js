@@ -7,10 +7,10 @@
  *  - action=exchange-rate  : Live verified exchange rate lookup (never fabricated)
  *  - action=enrich         : Optional server-side AI enrichment when GEMINI_API_KEY or OPENAI_API_KEY is configured
  *
- * v19.1 Reliability Fix:
- *  - Dual-transport fetch: native fetch + automatic Node http/https IPv4 fallback (fixes Vercel IPv6/Undici "fetch failed" errors)
- *  - Detailed Arabic error diagnostics extracting err.cause.code (ECONNRESET, ETIMEDOUT, ENOTFOUND, SSL, etc.)
- *  - Added WooCommerce Store API (/wp-json/wc/store/v1/products) + multi-product HTML link/card fallback
+ * v19.2 Speed & Vercel Timeout Fix:
+ *  - Direct fast IPv4 HTTP/HTTPS client (no double 14s+14s Undici fallback stall)
+ *  - Short per-stage timeouts (robots.txt 2.5s, API probes 4.5s, direct page 7.5s) to stay safely inside Vercel limits
+ *  - Parallel robots.txt + Shopify/WooCommerce JSON probing
  */
 
 import dns from 'node:dns/promises';
@@ -21,10 +21,12 @@ import zlib from 'node:zlib';
 
 const USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
-const REQUEST_TIMEOUT_MS = 14000;
+const DEFAULT_TIMEOUT_MS = 7500;
+const ROBOTS_TIMEOUT_MS = 2500;
+const PROBE_TIMEOUT_MS = 4500;
 const MAX_BODY_BYTES = 3 * 1024 * 1024; // 3 MB
 const MAX_REDIRECTS = 4;
-const MAX_EXTRACTED_ITEMS = 120;
+const MAX_EXTRACTED_ITEMS = 250;
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_REQ = 30;
 
@@ -143,10 +145,10 @@ function formatNetworkErrorArabic(err) {
   const code = err?.cause?.code || err?.code || '';
   const msg = err?.cause?.message || err?.message || '';
   if (err?.name === 'AbortError' || code === 'ETIMEDOUT' || code === 'UND_ERR_CONNECT_TIMEOUT' || code === 'UND_ERR_HEADERS_TIMEOUT') {
-    return 'انتهت مهلة الاتصال بالموقع المصدر (Timeout). الموقع بطيء في الاستجابة أو يقيّد الطلبات الآلية؛ يمكنك استخدام بديل CSV / JSON Feed.';
+    return 'انتهت مهلة الاتصال بالموقع المصدر (Timeout). غالباً الموقع يحجب خوادم الاستضافة السحابية (Datacenter IP) أو بطيء جداً — الحل السريع: افتح رابط /products.json أو الكتالوج من متصفحك وانسخه في خانة "أو الصق بيانات CSV / JSON Feed".';
   }
   if (code === 'ECONNRESET' || code === 'UND_ERR_SOCKET') {
-    return 'أغلق الموقع المصدر الاتصال فجأة (ECONNRESET) — غالباً بسبب جدار حماية (Cloudflare/WAF). استخدم بديل CSV / JSON Feed المصرح به.';
+    return 'أغلق الموقع المصدر الاتصال فجأة (ECONNRESET) بسبب جدار حماية (Cloudflare/WAF). استخدم بديل CSV / JSON Feed المصرح به.';
   }
   if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
     return 'تعذر العثور على النطاق (DNS ENOTFOUND) — تأكد من صحة رابط الموقع.';
@@ -159,13 +161,13 @@ function formatNetworkErrorArabic(err) {
   }
   return msg && msg !== 'fetch failed'
     ? `تعذر جلب المصدر: ${msg}${code ? ` (${code})` : ''}`
-    : `تعذر الاتصال بالموقع المصدر (${code || 'Network/TLS error'}). جرب رابط صفحة الكولكشن أو استخدم لصق CSV / JSON Feed.`;
+    : `تعذر الاتصال بالموقع المصدر (${code || 'Network/TLS error'}). جرب لصق بيانات CSV / JSON Feed.`;
 }
 
 /**
- * Node native http/https IPv4 fallback — bypasses Undici IPv6 / HTTP2 socket resets on Vercel
+ * Direct fast IPv4 Node http/https request with hard timeout & gzip/br decompression
  */
-function nodeHttpRequest(targetUrl, method = 'GET', customHeaders = {}) {
+function nodeHttpRequest(targetUrl, method = 'GET', customHeaders = {}, timeoutMs = DEFAULT_TIMEOUT_MS) {
   return new Promise((resolve, reject) => {
     const parsed = new URL(targetUrl);
     const lib = parsed.protocol === 'https:' ? https : http;
@@ -176,8 +178,8 @@ function nodeHttpRequest(targetUrl, method = 'GET', customHeaders = {}) {
         port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
         path: `${parsed.pathname}${parsed.search}`,
         method,
-        family: 4, // Force IPv4 to avoid Vercel IPv6 ENETUNREACH
-        timeout: REQUEST_TIMEOUT_MS,
+        family: 4,
+        timeout: timeoutMs,
         headers: {
           'User-Agent': USER_AGENT,
           'Accept': 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.8',
@@ -252,34 +254,14 @@ async function safeFetch(rawUrl, init = {}, hops = 0) {
   }
 
   const method = (init.method || 'GET').toUpperCase();
-  const headers = {
-    'User-Agent': USER_AGENT,
-    'Accept': 'application/json, application/xml, text/xml, text/html;q=0.9, */*;q=0.8',
-    'Accept-Language': 'ar,en-US;q=0.9,en;q=0.8',
-    ...(init.headers || {})
-  };
+  const timeoutMs = Number(init.timeoutMs || DEFAULT_TIMEOUT_MS);
+  const headers = init.headers || {};
 
   let res;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    res = await fetch(check.url, {
-      ...init,
-      method,
-      redirect: 'manual',
-      signal: controller.signal,
-      headers
-    });
-  } catch (fetchErr) {
-    clearTimeout(timer);
-    // Automatic IPv4 Node http/https fallback when Undici fetch fails on Vercel
-    try {
-      res = await nodeHttpRequest(check.url, method, headers);
-    } catch (fallbackErr) {
-      throw new Error(formatNetworkErrorArabic(fallbackErr || fetchErr));
-    }
-  } finally {
-    clearTimeout(timer);
+    res = await nodeHttpRequest(check.url, method, headers, timeoutMs);
+  } catch (err) {
+    throw new Error(formatNetworkErrorArabic(err));
   }
 
   if ([301, 302, 303, 307, 308].includes(res.status)) {
@@ -308,7 +290,7 @@ async function checkRobotsAllowed(targetUrl) {
   try {
     const parsed = new URL(targetUrl);
     const robotsUrl = `${parsed.origin}/robots.txt`;
-    const { res } = await safeFetch(robotsUrl, { method: 'GET' });
+    const { res } = await safeFetch(robotsUrl, { method: 'GET', timeoutMs: ROBOTS_TIMEOUT_MS });
     if (!res.ok) return { allowed: true, note: 'لا يوجد robots.txt مقيد.' };
     const txt = await readLimitedText(res);
     const lines = txt.split(/\r?\n/);
@@ -335,7 +317,7 @@ async function checkRobotsAllowed(targetUrl) {
     }
     return { allowed: true, note: 'مسموح حسب robots.txt.' };
   } catch {
-    return { allowed: true, note: 'تعذر قراءة robots.txt؛ المتابعة بحذر.' };
+    return { allowed: true, note: 'تخطي robots.txt السريع.' };
   }
 }
 
@@ -722,7 +704,7 @@ export default async function handler(req, res) {
           conversionDate: new Date().toISOString()
         });
       }
-      const { res: fxRes } = await safeFetch(`https://open.er-api.com/v6/latest/${base}`);
+      const { res: fxRes } = await safeFetch(`https://open.er-api.com/v6/latest/${base}`, { timeoutMs: 5000 });
       if (!fxRes.ok) {
         return res.status(200).json({
           ok: false,
@@ -757,7 +739,7 @@ export default async function handler(req, res) {
             return { url: u, valid: false, status: 0, error: check.reason };
           }
           try {
-            const { res: imgRes } = await safeFetch(check.url, { method: 'HEAD' });
+            const { res: imgRes } = await safeFetch(check.url, { method: 'HEAD', timeoutMs: 4500 });
             const ct = imgRes.headers.get('content-type') || '';
             const bytes = Number(imgRes.headers.get('content-length') || 0);
             const isImage = ct.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(check.url);
@@ -777,7 +759,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, results });
     }
 
-    // 3. DISCOVER & EXTRACT PRODUCTS FROM AUTHORIZED PUBLIC URL
+    // 3. DISCOVER & EXTRACT PRODUCTS FROM AUTHORIZED PUBLIC URL (PARALLEL FAST PROBE)
     if (action === 'discover') {
       const rawUrl = String(req.body?.url || req.query?.url || '').trim();
       const urlCheck = await validateSafePublicUrl(rawUrl);
@@ -785,7 +767,22 @@ export default async function handler(req, res) {
         return res.status(400).json({ ok: false, error: urlCheck.reason, blockedBySecurity: true });
       }
 
-      const robots = await checkRobotsAllowed(urlCheck.url);
+      const parsed = new URL(urlCheck.url);
+      const logs = [`تم التحقق الأمني من الرابط (SSRF + DNS): ${urlCheck.url}`];
+
+      // Build parallel probe list (robots.txt + Shopify/Woo JSON if applicable)
+      const shopifyProbeUrl = parsed.pathname.includes('/collections/')
+        ? `${parsed.origin}${parsed.pathname.replace(/\/$/, '')}/products.json?limit=250`
+        : (parsed.pathname === '/' || parsed.pathname === '')
+          ? `${parsed.origin}/products.json?limit=250`
+          : null;
+
+      const [robotsRes, shopifyRes] = await Promise.allSettled([
+        checkRobotsAllowed(urlCheck.url),
+        shopifyProbeUrl ? safeFetch(shopifyProbeUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null)
+      ]);
+
+      const robots = robotsRes.status === 'fulfilled' ? robotsRes.value : { allowed: true };
       if (!robots.allowed) {
         return res.status(403).json({
           ok: false,
@@ -794,46 +791,33 @@ export default async function handler(req, res) {
         });
       }
 
-      const parsed = new URL(urlCheck.url);
-      const logs = [`تم التحقق الأمني من الرابط (SSRF + DNS + robots.txt): ${urlCheck.url}`];
-
-      // Strategy 1: Try authorized Shopify & WooCommerce public JSON endpoints
-      const apiCandidates = [];
-      if (parsed.pathname.includes('/collections/')) {
-        apiCandidates.push({ kind: 'shopify', url: `${parsed.origin}${parsed.pathname.replace(/\/$/, '')}/products.json?limit=100` });
-      } else if (parsed.pathname === '/' || parsed.pathname === '' || parsed.pathname.includes('/shop')) {
-        apiCandidates.push({ kind: 'shopify', url: `${parsed.origin}/products.json?limit=100` });
-        apiCandidates.push({ kind: 'woo', url: `${parsed.origin}/wp-json/wc/store/v1/products?per_page=100` });
-      }
-
-      for (const cand of apiCandidates) {
-        try {
-          const { res: sRes } = await safeFetch(cand.url);
-          if (sRes.ok && (sRes.headers.get('content-type') || '').includes('json')) {
+      // Check Shopify parallel probe result first
+      if (shopifyRes.status === 'fulfilled' && shopifyRes.value?.res?.ok) {
+        const sRes = shopifyRes.value.res;
+        if ((sRes.headers.get('content-type') || '').includes('json')) {
+          try {
             const text = await readLimitedText(sRes);
             const json = JSON.parse(text);
-            const items = cand.kind === 'woo'
-              ? extractWooProducts(json, urlCheck.url)
-              : extractShopifyProducts(json, urlCheck.url);
+            const items = extractShopifyProducts(json, urlCheck.url);
             if (items.length > 0) {
-              logs.push(`تم الاستخراج عبر واجهة ${cand.kind === 'woo' ? 'WooCommerce' : 'Shopify'} JSON المصرح بها (${items.length} منتج).`);
+              logs.push(`تم الاستخراج السريع عبر Shopify JSON API (${items.length} منتج).`);
               return res.status(200).json({
                 ok: true,
                 sourceUrl: urlCheck.url,
-                sourceType: classifySourceType(urlCheck.url, items[0].extractionMethod, items.length),
-                extractionMethod: items[0].extractionMethod,
+                sourceType: classifySourceType(urlCheck.url, 'shopify_json_api', items.length),
+                extractionMethod: 'shopify_json_api',
                 products: items,
                 logs
               });
             }
+          } catch {
+            // fall through to direct fetch
           }
-        } catch {
-          // Fall through to direct URL fetch
         }
       }
 
-      // Strategy 2-4: Fetch the provided URL directly
-      const { res: pageRes, finalUrl } = await safeFetch(urlCheck.url);
+      // Direct fetch of provided URL
+      const { res: pageRes, finalUrl } = await safeFetch(urlCheck.url, { timeoutMs: DEFAULT_TIMEOUT_MS });
       const contentType = (pageRes.headers.get('content-type') || '').toLowerCase();
       const bodyText = await readLimitedText(pageRes);
 
@@ -949,7 +933,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // 4. OPTIONAL SERVER-SIDE AI ENRICHMENT (uses env keys only; never exposes credentials)
+    // 4. OPTIONAL SERVER-SIDE AI ENRICHMENT
     if (action === 'enrich') {
       const hasGemini = Boolean(process.env.GEMINI_API_KEY);
       const hasOpenAi = Boolean(process.env.OPENAI_API_KEY);

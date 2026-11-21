@@ -389,7 +389,7 @@ const KNOWN_BRANDS = [
 ];
 
 const PRODUCT_TYPE_MAP = [
-  { key: 'watch', labelAr: 'ساعات ذكية', patterns: [/watch/i, /smartwatch/i, /ساع(?:ة|ات)/i, /pixel\s*watch/i] },
+  { key: 'watch', labelAr: 'ساعات ذكية', patterns: [/watch/i, /smartwatch/i, /ساع(?:ة|ات)/i, /pixel\s*watch/i, /fitbit/i, /whoop/i, /amazfit/i, /mibro/i, /kieslect/i, /haylou/i, /fitness\s*tracker/i, /health\s*tracker/i] },
   { key: 'earbuds', labelAr: 'سماعات أذن ولاسلكية', patterns: [/buds/i, /earbuds/i, /airpods/i, /headphone/i, /سماع(?:ة|ات)/i, /هيدفون/i, /pixel\s*buds/i] },
   { key: 'tablet', labelAr: 'تابلت', patterns: [/tablet/i, /ipad/i, /تابلت/i] },
   { key: 'charger', labelAr: 'شواحن', patterns: [/charger/i, /adapter/i, /شاحن|شواحن/i] },
