@@ -1190,7 +1190,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
   // Hero carousel: one fixed height for every slide so flipping between ads
   // never resizes the banner (each ad's own bannerHeight used to win).
   const heightCls = heroFixed
-    ? 'h-[270px] sm:h-[320px]'
+    ? 'h-[470px] sm:h-[500px] lg:h-[370px]'
     : compact
     ? 'min-h-[110px]'
     : isPromoCard
@@ -1415,7 +1415,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
       <div className={`relative w-full ${heightCls} flex items-center overflow-hidden ${compact ? 'p-3.5' : isPromoCard ? 'p-6 sm:p-8' : 'px-6 sm:px-12 py-7 sm:py-10'}`}>
         {renderAmbientWaves()}
         <div
-          className={`relative z-10 w-full flex ${
+          className={`relative z-10 w-full ${heroFixed ? 'h-full min-h-0' : ''} flex ${
             compact
               ? `flex-row items-center justify-between gap-3 ${reverseRow ? 'flex-row-reverse' : ''}`
               : isTop
@@ -1426,7 +1426,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
           <div className={compact ? 'w-[58%]' : isTop ? 'w-full max-w-2xl' : 'w-full lg:w-[55%]'}>
             {renderCopyBlock()}
           </div>
-          <div className={`${compact ? 'w-[38%] h-24' : isPromoCard ? 'w-36 h-36 sm:w-44 sm:h-44' : 'w-48 h-48 sm:w-64 sm:h-64 lg:w-[42%] lg:h-[290px]'} relative flex items-center justify-center shrink-0`}>
+          <div className={`${compact ? 'w-[38%] h-24' : isPromoCard ? 'w-36 h-36 sm:w-44 sm:h-44' : 'w-48 h-48 sm:w-64 sm:h-64 lg:w-[42%] lg:h-[290px]'} ${heroFixed && !compact && !isPromoCard ? 'max-lg:w-full max-lg:flex-1 max-lg:min-h-0 max-lg:h-auto' : ''} relative flex items-center justify-center shrink-0`}>
             <div className="pointer-events-none absolute w-40 h-40 sm:w-60 sm:h-60 rounded-full blur-3xl opacity-35" style={{ backgroundColor: th.accentColor || '#3B82F6' }} />
             <div
               style={imgTransformStyle}
@@ -1480,7 +1480,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
       <div className={`relative w-full ${heightCls} flex items-center overflow-hidden ${compact ? 'p-3.5' : isPromoCard ? 'p-6 sm:p-8' : 'px-6 sm:px-12 py-7 sm:py-9'}`}>
         {renderAmbientWaves()}
         <div
-          className={`relative z-10 w-full flex ${
+          className={`relative z-10 w-full ${heroFixed ? 'h-full min-h-0' : ''} flex ${
             compact
               ? `flex-row items-center justify-between gap-3 ${reverseRow ? 'flex-row-reverse' : ''}`
               : isPromoCard
@@ -1501,7 +1501,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
           {/* Precision Product Visual Stage */}
           <div
             style={stageWidthStyle}
-            className={`relative flex items-center justify-center shrink-0 ${
+            className={`relative flex items-center justify-center shrink-0 ${heroFixed && !compact && !isPromoCard ? 'max-lg:flex-1 max-lg:min-h-0 max-lg:w-full' : ''} ${
               compact ? '' : isPromoCard ? '' : isTop ? 'w-full flex justify-center' : 'w-full lg:w-auto flex justify-center'
             }`}
           >
@@ -1510,7 +1510,7 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, 
               style={{ backgroundColor: th.accentColor || '#3B82F6' }}
             />
             <div
-              className={`relative flex items-center justify-center overflow-hidden transition-all duration-300 ${stageHeightCls} ${radiusCls} ${frameContainerCls}`}
+              className={`relative flex items-center justify-center overflow-hidden transition-all duration-300 ${stageHeightCls}${heroFixed && !compact && !isPromoCard ? ' max-lg:h-full max-lg:max-h-[190px]' : ''} ${radiusCls} ${frameContainerCls}`}
             >
               {frameStyle === 'ambient_fill' && !isCover && (
                 <img
@@ -5778,6 +5778,11 @@ ${adminLink}`;
     })();
   }, []);
 
+  // Append-only customer records: state shrinkage must never turn into a
+  // server DELETE for these (a stale tab or a racing cloud pull silently
+  // wiped real returns). Admin deletions call sbDelete explicitly.
+  const APPEND_ONLY_SLICES = new Set(['returnsList', 'complaints', 'orders', 'accountRequests', 'sourcingRequests']);
+
   // --- Automatic Per-Row Diff Detector & Instant Local Persistence ---
   useEffect(() => {
     const currentSlices = {
@@ -5888,6 +5893,7 @@ ${adminLink}`;
 
       prevMap.forEach((_, id) => {
         if (!currIds.has(id)) {
+          if (APPEND_ONLY_SLICES.has(sliceKey)) return;
           markLocalDelete(sliceKey, id);
           hasAnyMutation = true;
         }
@@ -5989,8 +5995,17 @@ ${adminLink}`;
   useEffect(() => {
     try {
       window.localStorage.setItem('elzoghbi_v2_activeClientRole', JSON.stringify(activeRole));
-      window.localStorage.setItem('elzoghbi_v2_adminAuth', JSON.stringify(adminAuthenticated));
-      window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+      // Only an admin-authenticated tab persists the admin session. A
+      // storefront tab sharing this browser used to overwrite the saved
+      // admin login with its own logged-out state on any cart/role
+      // change, so refreshing the dashboard signed the admin out.
+      // Explicit logout writes 'false' itself (see the logout buttons).
+      if (adminAuthenticated) {
+        window.localStorage.setItem('elzoghbi_v2_adminAuth', 'true');
+        if ((adminCredentials.username || '').trim()) {
+          window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+        }
+      }
       window.localStorage.setItem('elzoghbi_v2_cart_v4', JSON.stringify(cart));
     } catch (e) {}
   }, [activeRole, adminAuthenticated, adminCredentials, cart]);
@@ -13980,7 +13995,7 @@ ${adminLink}`;
   const renderClientComplaintsView = () => {
     const myTickets = complaints.filter(c => c.clientId === currentClient?.id);
 
-    const handleSendComplaint = (e) => {
+    const handleSendComplaint = async (e) => {
       e.preventDefault();
       if (!newComplaintSubject.trim() || !newComplaintMsg.trim()) return;
       const newTck = {
@@ -13995,9 +14010,13 @@ ${adminLink}`;
         replies: [],
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
+      const savedOk = await sbUpsert('complaints', newTck);
+      if (!savedOk) {
+        showToast('معلش، رسالتك ماوصلتش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
       setComplaints(prev => [newTck, ...prev]);
       markLocalUpsert('complaints', newTck);
-      sbUpsert('complaints', newTck);
       setNotifications(prev => [
         {
           id: `ntf_tck_${Date.now()}`,
@@ -14015,7 +14034,7 @@ ${adminLink}`;
       showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
     };
 
-    const handleClientSendFollowup = (ticketId) => {
+    const handleClientSendFollowup = async (ticketId) => {
       const txt = (clientFollowupText[ticketId] || '').trim();
       if (!txt) return;
       // Persist the updated ticket as well (was local-only, like the new
@@ -14036,8 +14055,12 @@ ${adminLink}`;
             }
           ]
         };
+        const savedOk = await sbUpsert('complaints', updatedTck);
+        if (!savedOk) {
+          showToast('معلش، ردّك ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+          return;
+        }
         markLocalUpsert('complaints', updatedTck);
-        sbUpsert('complaints', updatedTck);
       }
       setComplaints(prev =>
         prev.map(t =>
@@ -14211,8 +14234,8 @@ ${adminLink}`;
           </div>
 
           {/* Avatar Picker & Upload */}
-          <div className="p-4 rounded-2xl bg-surface2 border border-line flex flex-wrap items-center gap-4">
-            {renderClientAvatar({ ...currentClient, ...profileForm }, 'w-16 h-16 text-xl')}
+          <div className="p-3 rounded-2xl bg-surface2 border border-line flex items-start gap-3">
+            {renderClientAvatar({ ...currentClient, ...profileForm }, 'w-14 h-14 text-lg')}
             <div className="flex-1 space-y-2">
               <div className="text-xs font-extrabold text-fg">صورة الحساب / شعار المحل:</div>
               <div className="flex flex-wrap items-center gap-2">
@@ -15413,6 +15436,7 @@ ${adminLink}`;
           <button
             type="button"
             onClick={() => {
+              try { window.localStorage.setItem('elzoghbi_v2_adminAuth', 'false'); } catch (e) {}
               setAdminAuthenticated(false);
               switchPortal('storefront');
               showToast('تم قفل لوحة التحكم والعودة للمتجر.', 'info');
@@ -15477,6 +15501,7 @@ ${adminLink}`;
         <button
           type="button"
           onClick={() => {
+            try { window.localStorage.setItem('elzoghbi_v2_adminAuth', 'false'); } catch (e) {}
             setAdminAuthenticated(false);
             switchPortal('storefront');
           }}
@@ -17749,6 +17774,7 @@ ${adminLink}`;
                             handleUpdateOrderStatus(order.id, 'ملغي');
                           }
                           setOrders(prev => prev.filter(o => o.id !== order.id));
+                          sbDelete('orders', order.id);
                           showToast(`تم حذف الطلب #${order.id} نهائياً بنجاح.`, 'info');
                         }
                       );
@@ -26292,6 +26318,7 @@ ${adminLink}`;
                     confirmText: 'امسح الطلب',
                     onConfirm: () => {
                       setReturnsList(prev => prev.filter(r => r.id !== ret.id));
+                      sbDelete('returns_list', ret.id);
                       setConfirmDialog(null);
                       showToast('طلب المرتجع اتمسح.', 'success');
                     }
@@ -26465,6 +26492,7 @@ ${adminLink}`;
                     confirmText: 'امسح الشكوى',
                     onConfirm: () => {
                       setComplaints(prev => prev.filter(c => c.id !== tck.id));
+                      sbDelete('complaints', tck.id);
                       setConfirmDialog(null);
                       showToast('الشكوى اتمسحت.', 'success');
                     }
@@ -29333,7 +29361,7 @@ model OrderInvoice {
     const selectedItem =
       returnModalOrder.items.find(i => i.partId === retPartId) || returnModalOrder.items[0];
 
-    const handleSubmitReturn = (e) => {
+    const handleSubmitReturn = async (e) => {
       e.preventDefault();
       const newRet = {
         id: `RET-${Date.now().toString().slice(-6)}`,
@@ -29351,9 +29379,15 @@ model OrderInvoice {
         adminResponse: '',
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
+      // Await the server write: on failure keep the form open and say so
+      // (fire-and-forget used to show success while nothing arrived).
+      const savedOk = await sbUpsert('returns_list', newRet);
+      if (!savedOk) {
+        showToast('معلش، طلب الإرجاع ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
       setReturnsList(prev => [newRet, ...prev]);
       markLocalUpsert('returnsList', newRet);
-      sbUpsert('returns_list', newRet);
       setNotifications(prev => [
         {
           id: `ntf_ret_${Date.now()}`,
@@ -30362,7 +30396,7 @@ model OrderInvoice {
                           title: 'مسح الطلب',
                           message: `هتمسح الطلب ${req.id} مع المحادثة نهائياً.`,
                           confirmText: 'امسح',
-                          onConfirm: () => { setSourcingRequests(prev => prev.filter(r => r.id !== req.id)); setConfirmDialog(null); }
+                          onConfirm: () => { setSourcingRequests(prev => prev.filter(r => r.id !== req.id)); sbDelete('sourcing_requests', req.id); setConfirmDialog(null); }
                         })
                       }
                       className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
@@ -33513,7 +33547,7 @@ ${footer}
   }, [sourcingFormOpen]);
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [clientTab, accountSubTab]);
+  }, [clientTab]);
   useEffect(() => {
     setSheetExpanded(false);
     setSheetDrag(0);
