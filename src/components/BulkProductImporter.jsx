@@ -77,7 +77,7 @@ export default function BulkProductImporter({
         const rawStock = String(parts[3] ?? '').trim();
         const stock = rawStock === '' ? (Number(defaultStock) || 5) : Math.max(0, Number(rawStock) || 0);
         const rawCat = parts[4] || '';
-        const urls = (parts.slice(5).join('|').split(/[\s|;]+/)).filter(isSafeHttpUrl).slice(0, 4);
+        const urls = (parts.slice(5).join('|').split(/[\s|;]+/)).filter(isSafeHttpUrl).slice(0, 8);
         const category = normalizePartCategory ? (normalizePartCategory(rawCat, name) || 'شواحن') : (rawCat || 'شواحن');
         return {
           tempId: `imp_${Date.now()}_${idx}`,
@@ -96,7 +96,7 @@ export default function BulkProductImporter({
       } else {
         // Pure URL(s) on a line (optionally with "Title | url1 | url2")
         const tokens = line.split(/[\s|;]+/).filter(Boolean);
-        const urls = tokens.filter(isSafeHttpUrl).slice(0, 4);
+        const urls = tokens.filter(isSafeHttpUrl).slice(0, 8);
         const nonUrlText = tokens.filter(t => !isSafeHttpUrl(t)).join(' ').trim();
         const urlSlug = urls[0]
           ? decodeURIComponent(urls[0].split('/').pop().split('?')[0].replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ')).trim()
