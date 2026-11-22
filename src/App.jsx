@@ -3505,6 +3505,49 @@ export default function App() {
 
   // --- Admin Login Credentials & Auth State (Persisted) ---
   const [adminAuthenticated, setAdminAuthenticated] = useState(() => loadPersisted('adminAuth', false));
+  // Security fix #7 (Stage B2.2): customer passwords are no longer fetched
+  // with the clients table. After an admin signs in, the dashboard loads
+  // them through the admin-gated server function admin_client_passwords
+  // (which verifies the admin credentials server-side) and merges them
+  // into the clients state, so the admin keeps full visibility/control
+  // while the public storefront never receives them.
+  const [adminPwMap, setAdminPwMap] = useState({});
+  useEffect(() => {
+    if (!adminAuthenticated) return;
+    const u = (adminCredentials.username || '').trim().toLowerCase();
+    const p = adminCredentials.password || '';
+    if (!u || !p) return;
+    (async () => {
+      try {
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (!isValid) return;
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/admin_client_passwords`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ p_username: u, p_password: p })
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (Array.isArray(rows)) {
+          const map = {};
+          rows.forEach(r => { if (r && r.id) map[r.id] = r.password || ''; });
+          setAdminPwMap(map);
+        }
+      } catch (err) {}
+    })();
+  }, [adminAuthenticated]);
+  useEffect(() => {
+    if (!adminAuthenticated || !Object.keys(adminPwMap).length) return;
+    setClients(prev => {
+      let changed = false;
+      const next = prev.map(c => {
+        const pw = adminPwMap[c.id];
+        if (pw !== undefined && pw !== c.password) { changed = true; return { ...c, password: pw }; }
+        return c;
+      });
+      return changed ? next : prev;
+    });
+  }, [adminPwMap, clients, adminAuthenticated]);
 
   // Global Ctrl+K / Cmd+K Command Palette & ESC shortcut in Admin Dashboard
   useEffect(() => {
@@ -4425,7 +4468,7 @@ ${adminLink}`;
       'usage_limit', 'used_count', 'expiry_date', 'description', 'active', 'data'
     ],
     clients: [
-      'id', 'name', 'owner', 'phone', 'email', 'password', 'address',
+      'id', 'name', 'owner', 'phone', 'email', 'address',
       'secondary_address', 'group_id', 'credit_limit', 'wallet_balance',
       'ledger', 'status', 'type', 'account_type', 'avatar', 'avatar_bg',
       'avatar_image', 'created_at', 'data'
@@ -4465,7 +4508,7 @@ ${adminLink}`;
       'accepted_terms_at', 'data'
     ],
     site_settings: [
-      'id', 'settings', 'credentials', 'currencies', 'notifications', 'updated_at'
+      'id', 'settings', 'currencies', 'notifications', 'updated_at'
     ]
   };
 
@@ -4572,6 +4615,10 @@ ${adminLink}`;
       rawSnake.phone = rawSnake.phone || '';
       rawSnake.email = rawSnake.email || '';
       rawSnake.password = rawSnake.password || '';
+      // Security fix #7 (Stage B2.2): never write an empty password back —
+      // client rows are no longer fetched with their password column, so an
+      // empty value here means "unchanged", not "set to empty".
+      if (!rawSnake.password) delete rawSnake.password;
       rawSnake.address = rawSnake.address || '';
       rawSnake.credit_limit = Number(rawSnake.credit_limit) || 0;
       rawSnake.wallet_balance = Number(rawSnake.wallet_balance) || 0;
@@ -4969,8 +5016,8 @@ ${adminLink}`;
     showcase_bars: 'id,title,subtitle,badge_color,part_ids,active,sort_order',
     promo_codes: 'id,code,type,value,max_discount_cap,min_order_amount,usage_limit,used_count,expiry_date,description,active',
     auto_templates: 'id,sku_prefix,category,name_pattern,quality_grade,colors,warranty_text,image_key,cost_price,base_price,default_stock,low_stock_threshold,max_order_qty,enabled',
-    site_settings: 'id,settings,credentials,currencies,notifications,updated_at',
-    clients: 'id,name,owner,phone,email,password,address,secondary_address,group_id,credit_limit,wallet_balance,ledger,status,type,account_type,avatar,avatar_bg,avatar_image,created_at,data',
+    site_settings: 'id,settings,currencies,notifications,updated_at',
+    clients: 'id,name,owner,phone,email,address,secondary_address,group_id,credit_limit,wallet_balance,ledger,status,type,account_type,avatar,avatar_bg,avatar_image,created_at,data',
     orders: 'id,client_id,client_name,group_id,currency,exchange_rate_used,status,payment_method,address,notes,items,delivery_fee_base,discount_base,wallet_used_base,admin_edited,admin_edit_note,created_at',
     complaints: 'id,client_id,client_name,type,subject,message,status,admin_reply,replies,created_at',
     returns_list: 'id,order_id,client_id,client_name,part_id,part_name,qty,refund_amount_base,reason,status,admin_response,resolution_type,warranty_confirmed,replies,closed,created_at',
@@ -5768,7 +5815,7 @@ ${adminLink}`;
         pendingDiffUpsertsRef.current.site_settings.main = {
           id: 'main',
           settings: siteSettings,
-          credentials: adminCredentials,
+          ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
           currencies: currencies,
           notifications: notifications,
           updated_at: new Date().toISOString()
@@ -8859,7 +8906,7 @@ ${adminLink}`;
             body: JSON.stringify([{
               id: 'main',
               settings: next,
-              credentials: adminCredentials,
+              ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
               currencies,
               notifications,
               updated_at: new Date().toISOString()
@@ -9822,7 +9869,7 @@ ${adminLink}`;
           body: JSON.stringify([{
             id: 'main',
             settings: siteSettings,
-            credentials: adminCredentials,
+            ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
             currencies,
             notifications: nextNotifs,
             updated_at: new Date().toISOString()
@@ -24594,7 +24641,7 @@ ${adminLink}`;
         owner: selectedAdminClient.owner,
         phone: selectedAdminClient.phone,
         email: selectedAdminClient.email || '',
-        password: selectedAdminClient.password || '123',
+        password: selectedAdminClient.password || '',
         address: selectedAdminClient.address || '',
         secondaryAddress: selectedAdminClient.secondaryAddress || '',
         birthDate: selectedAdminClient.birthDate || '',
@@ -27286,7 +27333,7 @@ model OrderInvoice {
           body: JSON.stringify([{
             id: 'main',
             settings: siteSettings,
-            credentials: adminCredentials,
+            ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
             currencies,
             notifications: [resetNotif, ...notifications].slice(0, 100),
             updated_at: new Date().toISOString()
