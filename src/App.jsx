@@ -129,6 +129,57 @@ const normalizePartCategory = (rawCat, partName = '') => {
     if (/(screen|glass|اسكرين|سكرين|عدسة|كاميرا)/i.test(full)) return 'اسكرينات وحماية كاميرا';
     return 'جرابات الموبايل';
   }
+
+  // English spare-parts / device leftovers -> unified Arabic taxonomy
+  const lowerCleaned = cleaned.toLowerCase();
+  const enMap = {
+    'screens': 'شاشات كاملة', 'screen': 'شاشات كاملة',
+    'batteries': 'بطاريات', 'battery': 'بطاريات',
+    'back glass': 'ظهر وشاسيه وبصمة', 'back cover': 'ظهر وشاسيه وبصمة',
+    'charging flex': 'فلاتات وبورد شحن', 'charging port': 'فلاتات وبورد شحن', 'flex': 'فلاتات وبورد شحن',
+    'cameras': 'كاميرات', 'camera': 'كاميرات',
+    'smartwatch': 'ساعات وأساور ذكية', 'smart watch': 'ساعات وأساور ذكية', 'apple watch': 'ساعات وأساور ذكية',
+    'health and fitness tracker': 'ساعات وأساور ذكية', 'fitness tracker': 'ساعات وأساور ذكية',
+    'ring light': 'إكسسوارات سيارة وحوامل وتصوير'
+  };
+  if (enMap[lowerCleaned]) return enMap[lowerCleaned];
+
+  // Arabic spare-parts synonyms -> unified spare categories
+  const arMap = {
+    'شاشات': 'شاشات كاملة', 'باغات وتتشات': 'شاشات كاملة', 'باغات': 'شاشات كاملة', 'تتشات': 'شاشات كاملة',
+    'هاوسينج': 'ظهر وشاسيه وبصمة', 'هاوسنج': 'ظهر وشاسيه وبصمة',
+    'فلاتات موصلة': 'فلاتات وبورد شحن', 'فلاتات بور': 'فلاتات وبورد شحن',
+    'فالاتات فوليوم': 'فلاتات وبورد شحن', 'فلاتات فوليوم': 'فلاتات وبورد شحن', 'سماعة وجرس': 'فلاتات وبورد شحن',
+    'اسكرينات': 'اسكرينات وحماية كاميرا', 'جرابات': 'جرابات الموبايل',
+    'وصلة شحن': 'كابلات ومحولات', 'عدسات': 'كاميرات'
+  };
+  if (arMap[cleaned]) return arMap[cleaned];
+
+  // Generic / foreign / model-name buckets carry no type information:
+  // classify from the product name so the product joins its cross-brand
+  // type group (e.g. any brand's headphones land in 'سماعات ومايكات').
+  const genericBuckets = ['أقسام عامة', 'اكسسوارات', '1', 'tools', 'iphone', 'macbook', 'samsung', 'xiaomi', 'huawei', 'oppo', 'realme', 'infinix', 'tecno', 'apple', 'general', 'other', 'misc', 'accessories'];
+  if (genericBuckets.includes(lowerCleaned) || genericBuckets.includes(cleaned)) {
+    const n = full.replace(/[ً-ْ]/g, '');
+    if (/(فلاتة|فلاتات|بورد شحن)/i.test(n)) return 'فلاتات وبورد شحن';
+    if (/(اسكرين|سكرين|واقي|screen protector|tempered|lens protector|حماية عدسة|حماية كاميرا)/i.test(n)) return 'اسكرينات وحماية كاميرا';
+    if (/(شاشة|شاشات|باغة|باغات|\blcd\b|\boled\b|تاتش)/i.test(n)) return 'شاشات كاملة';
+    if (/(بطارية|battery)/i.test(n)) return 'بطاريات';
+    if (/(ظهر|شاسيه|بصمة|هاوس|back glass)/i.test(n)) return 'ظهر وشاسيه وبصمة';
+    if (/(سماع|ايربود|إيربود|airpod|earbud|earphone|headphone|headset|مايك|microphone|\bbuds\b)/i.test(n)) return 'سماعات ومايكات';
+    if (/(سبيكر|مكبر صوت|speaker|soundbar)/i.test(n)) return 'سبيكر ومكبرات صوت';
+    if (/(ساعة|ساعات|سوار|smart ?watch|\bwatch\b|fitness tracker|تراكر|\bband\b|strap|whoop)/i.test(n)) return 'ساعات وأساور ذكية';
+    if (/(باور بانك|power ?bank)/i.test(n)) return 'باور بانك';
+    if (/(شاحن|charger|charging)/i.test(n)) return 'شواحن';
+    if (/(كابل|كيبل|وصلة|cable|otg|aux|hdmi|محول|adapter)/i.test(n)) return 'كابلات ومحولات';
+    if (/(جراب|كفر|غطاء|cover|\bcase\b|bumper)/i.test(n)) return 'جرابات الموبايل';
+    if (/(حامل|ستاند|holder|stand|mount|ring light|رينج لايت|سيلفي|selfie|tripod|ترايبود)/i.test(n)) return 'إكسسوارات سيارة وحوامل وتصوير';
+    if (/(ماوس|كيبورد|mouse|keyboard|جيمنج|gaming|يد تحكم|controller)/i.test(n)) return 'ماوس وكيبورد وجيمنج';
+    if (/(حلاقة|trimmer|shaver|قص شعر)/i.test(n)) return 'ماكينات حلاقة وعناية';
+    if (/(مشترك|\bhub\b|موزع|card reader|قارئ)/i.test(n)) return 'مشتركات وأجهزة ذكية ومكتبية';
+    if (/(كاميرا|camera)/i.test(n)) return 'كاميرات';
+    return '';
+  }
   return cleaned;
 };
 
@@ -1506,7 +1557,11 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false }
   );
 }
 
-  const localDayKey = (offset = 0) => {
+  // OR-catalog entries carry an "OR" prefix token (e.g. brand "OR - Anker").
+// A plain includes('OR') also matches Honor/Orange/Color — use a boundary.
+const isOrPrefixedName = v => /^OR[\s\-_]/.test(String(v || '').toUpperCase());
+
+const localDayKey = (offset = 0) => {
   const d = new Date();
   d.setDate(d.getDate() - offset);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1515,7 +1570,12 @@ const detectVisitSource = () => {
   try {
     const qs = new URLSearchParams(window.location.search);
     const u = (qs.get('utm_source') || qs.get('ref') || qs.get('src') || '').toLowerCase().trim();
-    if (u) return u.slice(0, 24);
+    if (u) {
+      // Normalize utm aliases to the canonical source keys so the same
+      // channel never splits into two counters (e.g. 'ig' vs 'instagram').
+      const alias = { ig: 'instagram', insta: 'instagram', instagram: 'instagram', fb: 'facebook', facebook: 'facebook', wa: 'whatsapp', whatsapp: 'whatsapp', tt: 'tiktok', tiktok: 'tiktok', yt: 'youtube', youtube: 'youtube', x: 'twitter', twitter: 'twitter', google: 'google' };
+      return alias[u] || u.slice(0, 24);
+    }
     const ref = document.referrer ? new URL(document.referrer).hostname.toLowerCase() : '';
     if (!ref || ref === window.location.hostname) return 'direct';
     if (/facebook|fb\.com|fb\.me/.test(ref)) return 'facebook';
@@ -1696,7 +1756,7 @@ const SRC_STATUS_STYLE = {
   'تم التسليم': 'bg-emerald-600 text-white',
   'ملغي': 'bg-surface2 text-muted'
 };
-const SRC_STEPS = ['جديد', 'قيد المراجعة', 'تم تحديد السعر', 'تم استلام العربون', 'جاري التوصيل', 'تم التسليم'];
+const SRC_STEPS = ['جديد', 'قيد المراجعة', 'تم تحديد السعر', 'تم استلام العربون', 'جاري التجهيز', 'جاري التوصيل', 'تم التسليم'];
 const SRC_DEPOSIT_LABEL = {
   none: 'لسه مفيش عربون',
   requested: 'مطلوب منك عربون',
@@ -3117,7 +3177,7 @@ export default function App() {
     const rawArr = Array.isArray(part?.images) && part.images.length > 0
       ? part.images.filter(Boolean)
       : (Array.isArray(part?.imageUrls) && part.imageUrls.length > 0 ? part.imageUrls.filter(Boolean) : []);
-    const combined = Array.from(new Set([...primarySplit, ...rawArr, ...cgpImages, ...metaImages].map(s => String(s || '').trim()).filter(Boolean))).slice(0, 4);
+    const combined = Array.from(new Set([...primarySplit, ...rawArr, ...cgpImages, ...metaImages].map(s => String(s || '').trim()).filter(Boolean))).slice(0, 8);
     if (combined.length > 1) {
       const withoutDefaultSvg = combined.filter(u => u !== PART_IMAGES.screen);
       if (withoutDefaultSvg.length > 0) return withoutDefaultSvg;
@@ -4548,7 +4608,7 @@ ${adminLink}`;
         (Array.isArray(row.images) && row.images.length > 0 ? row.images : (Array.isArray(rawSnake.images) && rawSnake.images.length > 0 ? rawSnake.images : (primaryUrl ? [primaryUrl] : [])))
           .map(u => String(u || '').trim())
           .filter(Boolean)
-      )).slice(0, 4);
+      )).slice(0, 8);
       rawSnake.images = cleanImgsArr;
       rawSnake.is_promoted_ad = Boolean(row.isPromotedAd || rawSnake.is_promoted_ad);
       const baseCgp = (rawSnake.custom_group_prices && typeof rawSnake.custom_group_prices === 'object' && !Array.isArray(rawSnake.custom_group_prices))
@@ -4725,7 +4785,7 @@ ${adminLink}`;
     if (out.desc_text && !out.desc) out.desc = out.desc_text;
     const cgpObj = (out.customGroupPrices && typeof out.customGroupPrices === 'object') ? out.customGroupPrices : {};
     if (Array.isArray(cgpObj._images) && cgpObj._images.length > 0 && (!Array.isArray(out.images) || out.images.length <= 1)) {
-      out.images = cgpObj._images.filter(Boolean).slice(0, 4);
+      out.images = cgpObj._images.filter(Boolean).slice(0, 8);
     }
     if (cgpObj._oldPrice !== undefined && out.oldPrice === undefined) {
       out.oldPrice = Number(cgpObj._oldPrice) || 0;
@@ -4774,10 +4834,10 @@ ${adminLink}`;
       out.images = [out.image];
     }
     if (Array.isArray(out.images) && out.images.length > 0 && out.image && !out.images.includes(out.image)) {
-      out.images = [out.image, ...out.images].slice(0, 4);
+      out.images = [out.image, ...out.images].slice(0, 8);
     }
-    if (Array.isArray(out.images) && out.images.length > 4) {
-      out.images = out.images.slice(0, 4);
+    if (Array.isArray(out.images) && out.images.length > 8) {
+      out.images = out.images.slice(0, 8);
     }
     if (!out.image && Array.isArray(out.images) && out.images[0]) {
       out.image = out.images[0];
@@ -5239,7 +5299,7 @@ ${adminLink}`;
 
     const rows = await sbFetchTable('spare_parts', cols, filterQuery, false);
     if (Array.isArray(rows) && rows.length > 0) {
-      incomingSyncUntilRef.current = Date.now() + 1000;
+      incomingSyncUntilRef.current = Date.now() + 250;
       isIncomingSyncRef.current = true;
       setParts(prev => {
         const map = new Map(prev.map(p => [String(p.id), p]));
@@ -5281,7 +5341,7 @@ ${adminLink}`;
         const rows = await res.json();
         if (Array.isArray(rows) && rows[0]) {
           const detail = toCamelCaseRow(rows[0]);
-          incomingSyncUntilRef.current = Date.now() + 800;
+          incomingSyncUntilRef.current = Date.now() + 250;
           isIncomingSyncRef.current = true;
           setParts(prev => prev.map(p => {
             if (String(p.id) !== String(partId)) return p;
@@ -5318,7 +5378,7 @@ ${adminLink}`;
         const rows = await res.json();
         if (Array.isArray(rows) && rows[0]) {
           const detail = toCamelCaseRow(rows[0]);
-          incomingSyncUntilRef.current = Date.now() + 800;
+          incomingSyncUntilRef.current = Date.now() + 250;
           isIncomingSyncRef.current = true;
           setSourcingRequests(prev => prev.map(r => (String(r.id) === String(srcId) ? { ...r, ...detail } : r)));
         }
@@ -5909,7 +5969,7 @@ ${adminLink}`;
           const data = JSON.parse(e.newValue);
           if (data.senderTabId === myTabId) return;
 
-          incomingSyncUntilRef.current = Date.now() + 800;
+          incomingSyncUntilRef.current = Date.now() + 250;
           isIncomingSyncRef.current = true;
 
           if (Array.isArray(data.clients)) {
@@ -5992,7 +6052,7 @@ ${adminLink}`;
           const parsed = JSON.parse(e.newValue);
           const nextSettingsObj = e.key === 'elzoghbi_live_flags_ping' ? parsed.settings : parsed;
           if (nextSettingsObj && typeof nextSettingsObj === 'object') {
-            incomingSyncUntilRef.current = Date.now() + 1000;
+            incomingSyncUntilRef.current = Date.now() + 250;
             isIncomingSyncRef.current = true;
             try { sessionStorage.removeItem('hm_local_settings_v8'); } catch (err) {}
             if (homeElRef && homeElRef.current) homeElRef.current = null;
@@ -6014,7 +6074,7 @@ ${adminLink}`;
         bc.onmessage = (ev) => {
           const msg = ev.data;
           if (msg && msg.type === 'SITE_SETTINGS_UPDATED' && msg.settings && msg.senderTabId !== myTabId) {
-            incomingSyncUntilRef.current = Date.now() + 1000;
+            incomingSyncUntilRef.current = Date.now() + 250;
             isIncomingSyncRef.current = true;
             try {
               sessionStorage.removeItem('hm_local_settings_v8');
@@ -6075,7 +6135,7 @@ ${adminLink}`;
 
       // Helper to apply incoming state safely without triggering false local mutation diffs
       const markIncomingWindow = () => {
-        incomingSyncUntilRef.current = Date.now() + 1500;
+        incomingSyncUntilRef.current = Date.now() + 250;
         isIncomingSyncRef.current = true;
       };
 
@@ -6484,7 +6544,7 @@ ${adminLink}`;
 
             const { table, type, record, old_record } = changeData;
             invalidateSessionTableCache(table);
-            incomingSyncUntilRef.current = Date.now() + 1200;
+            incomingSyncUntilRef.current = Date.now() + 250;
             isIncomingSyncRef.current = true;
 
             const applyRealtimeRow = (setter, storageKey, rowObj, isDelete, delId) => {
@@ -6973,7 +7033,7 @@ ${adminLink}`;
 
   const currentGroup = useMemo(() => {
     if (currentClient) {
-      return groups.find(g => g.id === currentClient.groupId) || groups[0];
+      return groups.find(g => g.id === currentClient.groupId) || groups.find(g => g.isDefault) || groups[0];
     }
     return groups.find(g => g.isDefault) || groups[0];
   }, [currentClient, groups]);
@@ -7026,7 +7086,7 @@ ${adminLink}`;
           if (!r || !r.key) return;
           nextMap[r.key] = { enabled: Boolean(r.enabled), config: r.config || {}, updatedAt: r.updated_at };
         });
-        incomingSyncUntilRef.current = Date.now() + 1000;
+        incomingSyncUntilRef.current = Date.now() + 250;
         isIncomingSyncRef.current = true;
         setServerFeatureFlags(nextMap);
         setSiteSettings(prev => {
@@ -7227,7 +7287,10 @@ ${adminLink}`;
       return undefined;
     }
     // Interval strictly between 20 and 40 seconds!
-    const randomGapMs = () => (20 + Math.floor(Math.random() * 21)) * 1000;
+    const randomGapMs = () => {
+      const baseSec = Number(siteSettings.socialProofIntervalSec) || 35;
+      return Math.max(5000, baseSec * (0.7 + Math.random() * 0.6) * 1000);
+    };
     let timerId = null;
 
     const scheduleNext = () => {
@@ -7336,8 +7399,8 @@ ${adminLink}`;
       code: prizeObj.code,
       type: prizeObj.type || (prizeObj.code.includes('FREE') ? 'free_delivery' : prizeObj.code.includes('OFF') ? 'percentage' : 'fixed'),
       value: Number(prizeObj.value) || (prizeObj.code.includes('FREE') ? 100 : prizeObj.code.includes('5OFF') ? 5 : 50),
-      maxDiscountCap: 400,
-      minOrderAmount: 0,
+      maxDiscountCap: Math.max(0, Number(siteSettings.spinMaxDiscountCap ?? 150)),
+      minOrderAmount: Math.max(0, Number(siteSettings.spinMinOrderAmount ?? 250)),
       usageLimit: 1,
       maxUsesPerUser: 1,
       assignedUserId: currentClient?.id || normalizeDigits(spinContactInput).trim(),
@@ -7538,6 +7601,24 @@ ${adminLink}`;
     return !Number.isNaN(n) && n > 0 ? Math.min(35, n) : (Number(siteSettings.defaultCashbackPct) || 2);
   };
 
+  const togglePartSoldOut = (partObj) => {
+    if (!partObj || !partObj.id) return;
+    const next = !partObj.soldOut;
+    let updatedPartRef = null;
+    setParts(prev =>
+      prev.map(p => {
+        if (p.id !== partObj.id) return p;
+        updatedPartRef = { ...p, soldOut: next };
+        return updatedPartRef;
+      })
+    );
+    if (updatedPartRef) {
+      markLocalUpsert('parts', updatedPartRef);
+      sbUpsert('spare_parts', updatedPartRef);
+    }
+    showToast(next ? `تم تعليم "${partObj.name}" كنافد` : `تم تعليم "${partObj.name}" كمتاح`, 'success');
+  };
+
   const togglePartCashback = (partObj, e) => {
     if (e) e.stopPropagation();
     if (!partObj || !partObj.id) return;
@@ -7646,7 +7727,7 @@ ${adminLink}`;
       nextCashbackMap[pid] = isAffordable;
       if (isAffordable) enabledCount += 1;
       if (nextExtraMeta[pid]) {
-        nextExtraMeta[pid] = { ...nextExtraMeta[pid], cashbackEnabled: isAffordable, cashbackPct: pct };
+        nextExtraMeta[pid] = { ...nextExtraMeta[pid], cashbackEnabled: isAffordable, cashbackPct: nextExtraMeta[pid].cashbackPct ?? pct };
       }
     });
 
@@ -7655,11 +7736,15 @@ ${adminLink}`;
         prev.map(p => {
           const price = Number(p.basePrice) || 0;
           const isAffordable = price > 0 && price <= cap;
+          // Preserve a product's own custom cashback rate — only products
+          // without one fall back to the default rate.
+          const customPct = p.customGroupPrices?._cashbackPct ?? siteSettings.partExtraMeta?.[String(p.id).trim()]?.cashbackPct;
+          const effPct = customPct !== undefined && customPct !== null && customPct !== '' ? Number(customPct) : pct;
           return {
             ...p,
             cashbackEnabled: isAffordable,
-            cashbackPct: pct,
-            customGroupPrices: { ...(p.customGroupPrices || {}), _cashbackEnabled: isAffordable, _cashbackPct: pct }
+            cashbackPct: effPct,
+            customGroupPrices: { ...(p.customGroupPrices || {}), _cashbackEnabled: isAffordable, _cashbackPct: effPct }
           };
         })
       );
@@ -7840,7 +7925,8 @@ ${adminLink}`;
       const params = new URLSearchParams(window.location.search);
       const vipParam = params.get('vip');
       const path = window.location.pathname.toLowerCase();
-      if (vipParam || path === '/vip' || path.endsWith('/vip')) {
+      const expectedToken = String(siteSettings.vipSecretToken || 'elzoghbi-vip');
+      if ((vipParam && vipParam === expectedToken) || path === '/vip' || path.endsWith('/vip')) {
         window.sessionStorage.setItem('elzoghbi_vip_secret_unlocked', '1');
         return true;
       }
@@ -8305,18 +8391,30 @@ ${adminLink}`;
   };
 
   const sendAdminRestockWhatsappToEntry = (entryObj) => {
-    if (!entryObj) return;
+    if (!entryObj) return false;
+    // Never tell a customer the product is back when its stock is still 0.
+    const partObj = parts.find(p => String(p.id) === String(entryObj.partId));
+    if (partObj && (Number(partObj.stock) || 0) <= 0) {
+      showToast(`⚠️ "${entryObj.partName}" لسه مخزونه صفر — زوّد المخزون الأول قبل ما تبعت للعملاء إنه اتوفر.`, 'error');
+      return false;
+    }
     const cleanP = String(entryObj.phone || '').replace(/[^0-9]/g, '');
     const waPhone = cleanP.startsWith('0') ? `2${cleanP}` : cleanP;
     const storeUrl = window.location.origin;
     const msg = `مرحباً ${entryObj.clientName} 👋، خبر سار من ${siteSettings.storeName || 'ELZOGHBI'}! المنتج الذي طلبت تنبيهك عند توفره (${entryObj.partName}) عاد للمخزن الآن بكمية محدودة 🔥. اطلبه الآن قبل نفاد الكمية: ${storeUrl}`;
-    window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    const win = window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    if (!win) {
+      // Browser blocked the popup — do NOT mark the entry as sent.
+      showToast('⚠️ المتصفح منع فتح نافذة الواتساب — العميل ده لسه متعلّمش كمُرسل. اسمح بالنوافذ المنبثقة أو ابعتله لوحده.', 'error');
+      return false;
+    }
     saveSiteSettingsImmediate(prev => ({
       ...prev,
       restockWaitlist: (Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : []).map(w =>
         w.id === entryObj.id ? { ...w, notified: true } : w
       )
     }));
+    return true;
   };
 
   // 11. Family Saved Models / Interests ("اختياراتي وعائلتي") State
@@ -8677,17 +8775,18 @@ ${adminLink}`;
 
   const handleSelectGmReportPreset = (presetKey) => {
     setGmReportPreset(presetKey);
-    const now = new Date();
-    const toStr = now.toISOString().slice(0, 10);
+    // Local (Egypt) calendar days — toISOString is UTC and shifts "today"
+    // around midnight; "last 7 days" is today + the 6 before it (= 7 days).
+    const toStr = localDayKey(0);
     if (presetKey === 'today') {
       setGmReportDateFrom(toStr);
       setGmReportDateTo(toStr);
     } else if (presetKey === 'yesterday') {
-      const y = new Date(now.getTime() - 86400000).toISOString().slice(0, 10);
+      const y = localDayKey(1);
       setGmReportDateFrom(y);
       setGmReportDateTo(y);
     } else if (presetKey === 'last7') {
-      const d7 = new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10);
+      const d7 = localDayKey(6);
       setGmReportDateFrom(d7);
       setGmReportDateTo(toStr);
     } else if (presetKey === 'month') {
@@ -8744,7 +8843,9 @@ ${adminLink}`;
       }
     }
 
-    // Margin Safety Guard: Prevent negative price, warn if below cost
+    // Margin Safety Guard: a group modifier must never push the price
+    // below zero (e.g. a flat −250 modifier on a cheap product).
+    if (baseEgpPrice < 0) baseEgpPrice = 0;
     const isBelowCost = baseEgpPrice < part.costPrice;
     const curr = currencies[groupObj.currency] || currencies.EGP;
     const displayPrice = Number((baseEgpPrice * curr.rateFromBase).toFixed(curr.code === 'EGP' ? 0 : 2));
@@ -9509,9 +9610,7 @@ ${adminLink}`;
             ? Math.min(rawDisc, Number(appliedPromo.maxDiscountCap), subtotalBase)
             : Math.min(rawDisc, subtotalBase);
         } else if (appliedPromo.type === 'free_delivery') {
-          effectiveDeliveryFeeBase = Number(appliedPromo.maxDiscountCap) > 0
-            ? Math.max(0, effectiveDeliveryFeeBase - Number(appliedPromo.maxDiscountCap))
-            : 0;
+          effectiveDeliveryFeeBase = 0;
         } else if (appliedPromo.type === 'delivery_discount') {
           const rawDelivDisc = Math.round(effectiveDeliveryFeeBase * (Number(appliedPromo.value) / 100));
           const cappedDelivDisc = Number(appliedPromo.maxDiscountCap) > 0
@@ -9640,27 +9739,59 @@ ${adminLink}`;
       return;
     }
 
-    // 2. Re-verify Applied Coupon at Order Creation (Expiry, Min Cart, Per-User Redemption UNIQUE(coupon_id, user_id))
+    // 2. Re-verify Applied Coupon at Order Creation — against the FRESH coupon
+    // record (not the snapshot taken when it was applied), with the same rules
+    // used at apply time: active, expiry, total usage limit, assigned user,
+    // and per-user uses up to maxUsesPerUser.
     if (appliedPromo) {
-      const todayStr = new Date().toISOString().slice(0, 10);
-      if (appliedPromo.expiryDate && appliedPromo.expiryDate < todayStr) {
+      const freshPromo = promoCodes.find(
+        pc => String(pc.code || '').trim().toUpperCase() === String(appliedPromo.code || '').trim().toUpperCase()
+      );
+      if (!freshPromo || freshPromo.active === false) {
         setAppliedPromo(null);
-        showToast(`تم رفض الكوبون (${appliedPromo.code}) عند إنشاء الطلب لانتهاء صلاحيته.`, 'error');
+        showToast(`تم رفض الكوبون (${appliedPromo.code}) عند إنشاء الطلب لأنه لم يعد مفعّلاً.`, 'error');
         return;
       }
-      if (cartSummary.subtotalBase < Number(appliedPromo.minOrderAmount || 0)) {
+      if (
+        freshPromo.type !== appliedPromo.type ||
+        Number(freshPromo.value) !== Number(appliedPromo.value) ||
+        Number(freshPromo.maxDiscountCap || 0) !== Number(appliedPromo.maxDiscountCap || 0) ||
+        Number(freshPromo.minOrderAmount || 0) !== Number(appliedPromo.minOrderAmount || 0)
+      ) {
+        setAppliedPromo(freshPromo);
+        showToast('⚠️ الإدارة عدّلت شروط الكوبون من لحظة ما فعّلته — راجع الإجمالي الجديد وبعدين أكّد الطلب تاني.', 'warning');
+        return;
+      }
+      const todayStr = new Date().toISOString().slice(0, 10);
+      if (freshPromo.expiryDate && freshPromo.expiryDate < todayStr) {
         setAppliedPromo(null);
-        showToast(`تم رفض الكوبون (${appliedPromo.code}) لأن إجمالي السلة أقل من الحد الأدنى (${appliedPromo.minOrderAmount} ج.م).`, 'error');
+        showToast(`تم رفض الكوبون (${freshPromo.code}) عند إنشاء الطلب لانتهاء صلاحيته.`, 'error');
+        return;
+      }
+      if (Number(freshPromo.usedCount || 0) >= Number(freshPromo.usageLimit || 10000)) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${freshPromo.code}) لأنه وصل للحد الأقصى من مرات الاستخدام الكلي.`, 'error');
+        return;
+      }
+      if (freshPromo.assignedUserId && String(freshPromo.assignedUserId) !== String(currentClient.id) && String(freshPromo.assignedUserId) !== String(currentClient.phone)) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${freshPromo.code}) لأنه مسجل باسم مستخدم آخر.`, 'error');
+        return;
+      }
+      if (cartSummary.subtotalBase < Number(freshPromo.minOrderAmount || 0)) {
+        setAppliedPromo(null);
+        showToast(`تم رفض الكوبون (${freshPromo.code}) لأن إجمالي السلة أقل من الحد الأدنى (${freshPromo.minOrderAmount} ج.م).`, 'error');
         return;
       }
       const redemptionsList = Array.isArray(siteSettings.couponRedemptions) ? siteSettings.couponRedemptions : [];
-      const alreadyRedeemed = redemptionsList.some(
-        r => (r.couponId === appliedPromo.id || r.couponCode === appliedPromo.code) &&
+      const userUsesCount = redemptionsList.filter(
+        r => (r.couponId === freshPromo.id || r.couponCode === freshPromo.code) &&
              (String(r.userId) === String(currentClient.id) || String(r.userId) === String(currentClient.phone))
-      );
-      if (alreadyRedeemed) {
+      ).length;
+      const maxPerUser = Math.max(1, Number(freshPromo.maxUsesPerUser) || 1);
+      if (userUsesCount >= maxPerUser) {
         setAppliedPromo(null);
-        showToast(`تم رفض الكوبون (${appliedPromo.code}) من السيرفر لأنه استُخدم مسبقاً على حسابك!`, 'error');
+        showToast(`تم رفض الكوبون (${freshPromo.code}) لأنك وصلت لحد استخدامه المسموح لحسابك (${maxPerUser}).`, 'error');
         return;
       }
     }
@@ -9760,7 +9891,7 @@ ${adminLink}`;
             updatedBalance -= cartSummary.walletDeductedBase;
             newLedgerEntries.unshift({
               id: `ldg_${Date.now()}_w`,
-              date: '2026-11-01 06:00',
+              date: new Date().toISOString().slice(0, 16).replace('T', ' '),
               type: 'wallet_deduct',
               ref: newOrderId,
               desc: `خصم من رصيدك الدائن لسداد فاتورة ${newOrderId}`,
@@ -9773,7 +9904,7 @@ ${adminLink}`;
             updatedBalance -= cartSummary.finalPayableBase;
             newLedgerEntries.unshift({
               id: `ldg_${Date.now()}_c`,
-              date: '2026-11-01 06:00',
+              date: new Date().toISOString().slice(0, 16).replace('T', ' '),
               type: 'invoice',
               ref: newOrderId,
               desc: `فاتورة مشتريات آجل على الحساب (${newOrderId})`,
@@ -9971,15 +10102,7 @@ ${adminLink}`;
       }
     });
 
-    if (violatingParts.length > 0) {
-      showToast(
-        `حماية هامش الربح: تنبيه! هذا التعديل يجعل ${violatingParts.length} صنف يُباع بأقل من سعر التكلفة.`,
-        'warning'
-      );
-    } else {
-      showToast('تم تحديث تسعير وعملة ورسوم توصيل المجموعة بنجاح!', 'success');
-    }
-
+    const doApplyGroupModifier = () => {
     if (overwriteCustom) {
       setParts(prev =>
         prev.map(p => {
@@ -10003,11 +10126,34 @@ ${adminLink}`;
           : g
       )
     );
+    };
+
+    // Profit shield: below-cost violations need an explicit confirmation —
+    // a warning toast alone must not let the modifier apply silently.
+    if (violatingParts.length > 0) {
+      setConfirmDialog({
+        title: '🛡️ حماية هامش الربح — بيع تحت التكلفة',
+        message: `هذا التعديل هيخلي ${violatingParts.length} صنف يتباع بأقل من تكلفته، منها: ${violatingParts.slice(0, 3).join(' • ')}${violatingParts.length > 3 ? ' • …' : ''} — متأكد إنك عايز تطبّقه رغم الخسارة؟`,
+        confirmText: 'أيوه، طبّق رغم الخسارة',
+        onConfirm: () => {
+          doApplyGroupModifier();
+          showToast('تم تحديث تسعير المجموعة (مع وجود أصناف تحت التكلفة كما أكّدت).', 'warning');
+          setConfirmDialog(null);
+        }
+      });
+    } else {
+      doApplyGroupModifier();
+      showToast('تم تحديث تسعير وعملة ورسوم توصيل المجموعة بنجاح!', 'success');
+    }
   };
 
   // --- Admin: Save Live Invoice Edits with Real-Time Stock & Client Ledger Sync ---
   const handleSaveLiveInvoiceEdit = (restockRemoved = true) => {
     if (!editingOrder) return;
+    if (!Array.isArray(editingOrder.items) || editingOrder.items.length === 0) {
+      showToast('⚠️ لا يمكن حفظ فاتورة فاضية — أضف صنفاً واحداً على الأقل، أو أغلق المحرر وألغِ الطلب.', 'error');
+      return;
+    }
     const originalOrder = orders.find(o => o.id === editingOrder.id);
     if (!originalOrder) return;
 
@@ -10021,16 +10167,23 @@ ${adminLink}`;
       editingOrder.deliveryFeeBase -
       editingOrder.discountBase;
 
+    if (newTotalBase < 0) {
+      showToast('⚠️ إجمالي الفاتورة سالب — راجع الخصم ورسوم التوصيل قبل الحفظ.', 'error');
+      return;
+    }
+
     const diffBase = newTotalBase - oldTotalBase;
 
     // 1. Adjust Warehouse Stock based on quantity deltas
     if (restockRemoved) {
       setParts(prevParts =>
         prevParts.map(part => {
-          const oldItem = originalOrder.items.find(i => i.partId === part.id);
-          const newItem = editingOrder.items.find(i => i.partId === part.id);
-          const oldQty = oldItem ? oldItem.qty : 0;
-          const newQty = newItem ? newItem.qty : 0;
+          const oldQty = originalOrder.items
+            .filter(i => i.partId === part.id)
+            .reduce((a, i) => a + (Number(i.qty) || 0), 0);
+          const newQty = editingOrder.items
+            .filter(i => i.partId === part.id)
+            .reduce((a, i) => a + (Number(i.qty) || 0), 0);
           const deltaQty = oldQty - newQty;
           if (deltaQty === 0) return part;
           return { ...part, stock: Math.max(0, part.stock + deltaQty) };
@@ -10073,8 +10226,8 @@ ${adminLink}`;
 
     const updatedOrder = {
       ...editingOrder,
-      adminEdited: shouldShowToClient,
-      adminEditNote: shouldShowToClient ? editingOrder.adminEditNote.trim() : ''
+      adminEdited: shouldShowToClient ? true : Boolean(originalOrder.adminEdited),
+      adminEditNote: shouldShowToClient ? editingOrder.adminEditNote.trim() : originalOrder.adminEditNote || ''
     };
 
     setOrders(prev => prev.map(o => (o.id === updatedOrder.id ? updatedOrder : o)));
@@ -10099,7 +10252,12 @@ ${adminLink}`;
     }
 
     setEditingOrder(null);
-    showToast('تم حفظ تعديلات الفاتورة وتحديث المخزون بنجاح (بدون أي مساس بمحفظة العميل)!', 'success');
+    showToast(
+      diffBase !== 0 && editingOrder.manualRefundToWallet
+        ? 'تم حفظ تعديلات الفاتورة وتحديث المخزون، وتمت تسوية الفرق على محفظة العميل كما طلبت.'
+        : 'تم حفظ تعديلات الفاتورة وتحديث المخزون بنجاح (بدون أي مساس بمحفظة العميل)!',
+      'success'
+    );
   };
 
   // --- Admin & Client: Change Order Status (with Restock & Ledger Refund on Cancel + Live Notification) ---
@@ -10135,7 +10293,7 @@ ${adminLink}`;
               ledger: [
                 {
                   id: `ldg_${Date.now()}_cancel`,
-                  date: '2026-11-01 08:05',
+                  date: new Date().toISOString().slice(0, 16).replace('T', ' '),
                   type: 'cancel_refund',
                   ref: orderId,
                   desc: `رد المبلغ / إلغاء قيد الفاتورة الملغاة (${orderId})`,
@@ -10456,12 +10614,12 @@ ${adminLink}`;
     if (wasApproved && decision !== 'مقبول') {
       if (wasRestocked) {
         setParts(prev =>
-          prev.map(p => (p.id === targetRet.partId ? { ...p, stock: Math.max(0, p.stock - targetRet.qty) } : p))
+          prev.map(p => (String(p.id) === String(targetRet.partId) ? { ...p, stock: Math.max(0, p.stock - targetRet.qty) } : p))
         );
       }
       setClients(prev =>
         prev.map(c => {
-          if (c.id !== targetRet.clientId) return c;
+          if (String(c.id) !== String(targetRet.clientId)) return c;
           const nextBal = c.walletBalance - targetRet.refundAmountBase;
           return {
             ...c,
@@ -10469,7 +10627,7 @@ ${adminLink}`;
             ledger: [
               {
                 id: `ldg_${Date.now()}_rev`,
-                date: '2026-11-01 08:10',
+                date: new Date().toISOString().slice(0, 16).replace('T', ' '),
                 type: 'adjustment',
                 ref: targetRet.id,
                 desc: `عكس قيد تعويض مرتجع (${targetRet.id}) بعد تغيير حالة القرار إلى ${decision}`,
@@ -10487,12 +10645,12 @@ ${adminLink}`;
     if (decision === 'مقبول' && !wasApproved) {
       if (restockHealthy) {
         setParts(prev =>
-          prev.map(p => (p.id === targetRet.partId ? { ...p, stock: p.stock + targetRet.qty } : p))
+          prev.map(p => (String(p.id) === String(targetRet.partId) ? { ...p, stock: p.stock + targetRet.qty } : p))
         );
       }
       setClients(prev =>
         prev.map(c => {
-          if (c.id !== targetRet.clientId) return c;
+          if (String(c.id) !== String(targetRet.clientId)) return c;
           const nextBal = c.walletBalance + targetRet.refundAmountBase;
           return {
             ...c,
@@ -10500,7 +10658,7 @@ ${adminLink}`;
             ledger: [
               {
                 id: `ldg_${Date.now()}`,
-                date: '2026-11-01 08:10',
+                date: new Date().toISOString().slice(0, 16).replace('T', ' '),
                 type: 'return_credit',
                 ref: targetRet.id,
                 desc: `تعويض مرتجع مقبول (${targetRet.partName}) - فاتورة ${targetRet.orderId}`,
@@ -10516,7 +10674,7 @@ ${adminLink}`;
       // Toggling between Healthy Restock and Defective while staying Approved
       setParts(prev =>
         prev.map(p =>
-          p.id === targetRet.partId
+          String(p.id) === String(targetRet.partId)
             ? { ...p, stock: Math.max(0, p.stock + (restockHealthy ? targetRet.qty : -targetRet.qty)) }
             : p
         )
@@ -10529,7 +10687,7 @@ ${adminLink}`;
           sender: 'admin',
           text: adminNote,
           statusSet: decision,
-          date: '2026-11-01 08:10'
+          date: new Date().toISOString().slice(0, 16).replace('T', ' ')
         }
       : null;
 
@@ -10572,14 +10730,14 @@ ${adminLink}`;
 
     validOrders.forEach(o => {
       o.items.forEach(i => {
-        totalRevenueBase += i.qty * i.unitPriceBase;
-        totalCostBase += i.qty * i.costPriceBase;
+        totalRevenueBase += (Number(i.qty) || 0) * (Number(i.unitPriceBase) || 0);
+        totalCostBase += (Number(i.qty) || 0) * (Number(i.costPriceBase) || 0);
       });
-      totalRevenueBase -= o.discountBase;
+      totalRevenueBase -= Number(o.discountBase) || 0;
     });
 
     const netProfitBase = totalRevenueBase - totalCostBase;
-    const lowStockParts = parts.filter(p => p.stock > 0 && p.stock <= p.lowStockThreshold);
+    const lowStockParts = parts.filter(p => p.stock > 0 && p.stock <= (Number(p.lowStockThreshold) || 5));
     const outOfStockParts = parts.filter(p => p.stock === 0);
     const totalWaitlist = parts.reduce((s, p) => s + (p.waitlistCount || 0), 0);
     const totalReceivablesBase = clients.reduce(
@@ -10653,9 +10811,9 @@ ${adminLink}`;
     const inCartQty = cart[part.id]?.qty || 0;
     const isOutOfStock = part.stock <= 0 || Boolean(part.soldOut);
     const isFav = isPartFavorited(part.id);
-    const partFitMode = part.imageFit || siteSettings.globalImageFit || 'contain';
+    const partFitMode = part.imageFit || siteSettings.productImageFit || siteSettings.globalImageFit || 'contain';
 
-    const showRealDiscount = priceInfo.hasDiscount && priceInfo.originalDisplayPrice > priceInfo.displayPrice;
+    const showRealDiscount = priceInfo.hasDiscount && priceInfo.displayOldPrice > priceInfo.displayPrice;
     const partCbOn = cashbackFlagOn && isPartCashbackEnabled(part);
     const partCbPct = getPartCashbackPct(part);
     const lowStockLimit = Number(part.lowStockThreshold) || 5;
@@ -10831,7 +10989,7 @@ ${adminLink}`;
             </div>
             {showRealDiscount && (
               <span className="text-xs font-bold font-mono text-muted line-through">
-                {priceInfo.originalDisplayPrice.toLocaleString()} {priceInfo.currencySymbol}
+                {priceInfo.displayOldPrice.toLocaleString()} {priceInfo.currencySymbol}
               </span>
             )}
           </div>
@@ -11453,11 +11611,20 @@ ${adminLink}`;
     const bannerText = (siteSettings.bannerText || '').trim();
     const tickerOn = !!siteSettings.tickerEnabled && tickerItems !== '';
     const bannerOn = !!siteSettings.bannerEnabled && bannerText !== '' && bannerClosedText !== bannerText;
+    const TICKER_COLORS = { blue: '#2563eb', green: '#16a34a', amber: '#d97706', red: '#be123c', dark: '#111827' };
+    const BANNER_THEMES = {
+      amber: { bg: '#fbbf24', fg: '#2b1d00' },
+      blue: { bg: '#2563eb', fg: '#ffffff' },
+      green: { bg: '#16a34a', fg: '#ffffff' },
+      red: { bg: '#dc2626', fg: '#ffffff' },
+      dark: { bg: '#111827', fg: '#ffffff' }
+    };
+    const bannerTheme = BANNER_THEMES[siteSettings.bannerColor] || BANNER_THEMES.amber;
     if (!tickerOn && !bannerOn) return null;
     return (
       <div>
         {bannerOn && (
-          <div style={{ backgroundColor: '#fbbf24', color: '#2b1d00' }} className="px-4 py-2.5 flex items-center justify-center gap-3 text-xs sm:text-sm font-extrabold">
+          <div style={{ backgroundColor: bannerTheme.bg, color: bannerTheme.fg }} className="px-4 py-2.5 flex items-center justify-center gap-3 text-xs sm:text-sm font-extrabold">
             <span className="whitespace-pre-line text-center">{bannerText}</span>
             <button
               type="button"
@@ -11465,7 +11632,7 @@ ${adminLink}`;
                 setBannerClosedText(bannerText);
                 try { sessionStorage.setItem('hm_banner_closed', bannerText); } catch (e) {}
               }}
-              style={{ color: '#2b1d00' }}
+              style={{ color: bannerTheme.fg }}
               className="shrink-0 w-7 h-7 rounded-full bg-black/15 hover:bg-black/25 flex items-center justify-center font-black"
               title="إغلاق"
             >
@@ -11475,12 +11642,12 @@ ${adminLink}`;
         )}
         {tickerOn && (
           <div
-            style={{ backgroundColor: siteSettings.tickerBgColor || '#be123c', color: '#ffffff' }}
+            style={{ backgroundColor: TICKER_COLORS[siteSettings.tickerColor] || siteSettings.tickerBgColor || '#be123c', color: '#ffffff' }}
             className="hm-ticker-wrap relative overflow-hidden py-2 text-xs sm:text-sm font-extrabold select-none border-b border-white/10"
           >
             <div
               className="hm-ticker-track flex items-center whitespace-nowrap w-max"
-              style={{ animationDuration: `${Number(siteSettings.tickerSpeedSeconds) || 26}s` }}
+              style={{ animationDuration: `${Number(siteSettings.tickerSpeed) || Number(siteSettings.tickerSpeedSeconds) || 26}s` }}
             >
               {[0, 1, 2, 3].map(repIdx => (
                 <span key={repIdx} className="inline-flex items-center px-6 gap-4">
@@ -11649,7 +11816,7 @@ ${adminLink}`;
     return (
       <div className="max-w-[1380px] mx-auto px-4 sm:px-8 py-5 sm:py-7 space-y-9 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {/* 1. ARCHITECTURAL HERO BANNER SHOWCASE + NON-OVERLAPPING CONTROLS + 4 TRUST PILLARS */}
-        {siteSettings.showHomeHeroAds !== false && (
+        {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
           <section className="rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1B2B4B] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
             <div
               {...swipeProps(
@@ -11757,7 +11924,7 @@ ${adminLink}`;
         )}
 
         {/* 2. COMPACT QUICK CATEGORY SHORTCUTS STRIP (Compact on Mobile + Scrolls Directly to Products!) */}
-        {siteSettings.showHomeShortcuts !== false && (() => {
+        {siteSettings.showHomeShortcuts !== false && siteSettings.showHomeModels !== false && (() => {
           const shortcutsList = (Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0
             ? siteSettings.homeShortcutIcons
             : DEFAULT_HOME_SHORTCUT_ICONS
@@ -11812,7 +11979,7 @@ ${adminLink}`;
         })()}
 
         {/* 2B. ORGANIZED BRANDS BAR UNDER CATEGORY ICONS (Full Dashboard Control: Order & Visibility) */}
-        {siteSettings.showHomeBrandsBar !== false && (() => {
+        {siteSettings.showHomeBrandsBar !== false && siteSettings.showHomeModels !== false && (() => {
           const configuredBrands = Array.isArray(siteSettings.homeFeaturedBrands) && siteSettings.homeFeaturedBrands.length > 0
             ? siteSettings.homeFeaturedBrands.filter(b => publicBrands.includes(b))
             : publicBrands;
@@ -11834,7 +12001,7 @@ ${adminLink}`;
                   }}
                   className="text-[11px] font-extrabold text-[#2563EB] dark:text-[#60A5FA] hover:underline"
                 >
-                  عرض كل البراندات ({publicBrands.length})
+                  عرض كل البراندات
                 </button>
               </div>
               <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto no-scrollbar pb-1">
@@ -11873,11 +12040,6 @@ ${adminLink}`;
                         </span>
                       )}
                       <span className="whitespace-nowrap">{cleanBrLabel}</span>
-                      {brCnt > 0 && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-surface2 group-hover:bg-white/20 text-muted group-hover:text-white font-black">
-                          {brCnt}
-                        </span>
-                      )}
                     </button>
                   );
                 })}
@@ -11970,41 +12132,30 @@ ${adminLink}`;
         {/* 5. ADMIN-CURATED SHOWCASE BARS */}
         {siteSettings.showHomeShowcaseBars !== false && activeBars.map((bar, barIdx) => {
           const rawIds = Array.isArray(bar.partIds) ? bar.partIds : [];
+          const barLimit = Math.max(1, Number(bar.maxItems) || 4);
           let barParts = [];
 
           if (bar.sourceType === 'category' && bar.sourceValue) {
-            barParts = publicParts.filter(p => p.category === bar.sourceValue).slice(0, 4);
+            barParts = publicParts.filter(p => p.category === bar.sourceValue).slice(0, barLimit);
           } else if (bar.sourceType === 'brand' && bar.sourceValue) {
             barParts = publicParts.filter(p => {
               const mObj = resolvePartModelObj(p);
               return (mObj?.brand || p.brand) === bar.sourceValue;
-            }).slice(0, 4);
+            }).slice(0, barLimit);
           } else if (bar.sourceType === 'model' && bar.sourceValue) {
             barParts = publicParts.filter(p => {
               const mObj = resolvePartModelObj(p);
               return String(mObj ? mObj.id : p.modelId) === String(bar.sourceValue);
-            }).slice(0, 4);
+            }).slice(0, barLimit);
           } else if (bar.sourceType === 'discounts') {
-            barParts = publicParts.filter(p => calculatePartPrice(p, currentGroup).hasDiscount).slice(0, 4);
+            barParts = publicParts.filter(p => calculatePartPrice(p, currentGroup).hasDiscount).slice(0, barLimit);
           } else {
             barParts = rawIds
               .map(pid => publicParts.find(p => String(p.id) === String(pid)))
               .filter(Boolean)
-              .slice(0, 4);
+              .slice(0, barLimit);
           }
 
-          if (barParts.length < 4 && publicParts.length > 0) {
-            const usedIds = new Set(barParts.map(p => String(p.id)));
-            const offset = ((barIdx + 1) * 4) % Math.max(1, publicParts.length);
-            const orderedPool = [...publicParts.slice(offset), ...publicParts.slice(0, offset)];
-            for (const candidate of orderedPool) {
-              if (barParts.length >= 4) break;
-              if (!usedIds.has(String(candidate.id))) {
-                barParts.push(candidate);
-                usedIds.add(String(candidate.id));
-              }
-            }
-          }
           if (barParts.length === 0) return null;
 
           return (
@@ -12025,7 +12176,7 @@ ${adminLink}`;
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {barParts.slice(0, 4).map((part, idx) => renderProductCard(part, idx))}
+                {barParts.slice(0, barLimit).map((part, idx) => renderProductCard(part, idx))}
               </div>
             </section>
           );
@@ -12389,10 +12540,10 @@ ${adminLink}`;
                   }}
                   className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#3B82F6]"
                 >
-                  <option value="ALL">كل البراندات ({publicBrands.length})</option>
+                  <option value="ALL">كل البراندات</option>
                   {publicBrands.map(br => (
                     <option key={br} value={br}>
-                      {br} ({publicModels.filter(m => m.brand === br && (publicPartCountByModelIdMap.get(String(m.id)) || 0) > 0).length} موديل)
+                      {br}
                     </option>
                   ))}
                 </select>
@@ -13039,10 +13190,20 @@ ${adminLink}`;
                   <span className="font-bold">{formatMoney(cartSummary.subtotalBase)}</span>
                 </div>
                 {cartSummary.discountBase > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-bold">
-                    <span>كوبون الخصم ({appliedPromo?.code}):</span>
-                    <span>-{formatMoney(cartSummary.discountBase)}</span>
-                  </div>
+                  <>
+                    {Math.min(cartSummary.loyaltyAutoDiscountBase || 0, cartSummary.discountBase) > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>🏆 خصم الولاء التلقائي:</span>
+                        <span>-{formatMoney(Math.min(cartSummary.loyaltyAutoDiscountBase || 0, cartSummary.discountBase))}</span>
+                      </div>
+                    )}
+                    {cartSummary.discountBase - Math.min(cartSummary.loyaltyAutoDiscountBase || 0, cartSummary.discountBase) > 0 && (
+                      <div className="flex justify-between text-emerald-600 font-bold">
+                        <span>كوبون الخصم{appliedPromo?.code ? ` (${appliedPromo.code})` : ''}:</span>
+                        <span>-{formatMoney(cartSummary.discountBase - Math.min(cartSummary.loyaltyAutoDiscountBase || 0, cartSummary.discountBase))}</span>
+                      </div>
+                    )}
+                  </>
                 )}
                 <div className="flex justify-between text-muted">
                   <span>مصاريف التوصيل السريع:</span>
@@ -13676,6 +13837,20 @@ ${adminLink}`;
                     {ret.adminResponse}
                   </div>
                 )}
+
+                {Array.isArray(ret.replies) && ret.replies.length > 0 && (
+                  <div className="space-y-1.5">
+                    <div className="text-[11px] font-extrabold text-muted">سجل الردود والمتابعة على هذا المرتجع:</div>
+                    {ret.replies.map(rep => (
+                      <div key={rep.id} className="text-xs bg-surface2 border border-line text-fg p-2.5 rounded-xl">
+                        <span className="font-bold">
+                          {rep.sender === 'admin' ? 'قسم الضمان والفحص الفني' : 'أنت'} • {rep.date}
+                        </span>
+                        <div className="mt-0.5 font-medium">{rep.text}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))
           )}
@@ -13730,7 +13905,7 @@ ${adminLink}`;
                     sender: 'client',
                     senderName: currentClient.name,
                     text: txt,
-                    date: '2026-11-01 08:20'
+                    date: new Date().toISOString().slice(0, 16).replace('T', ' ')
                   }
                 ]
               }
@@ -14522,7 +14697,7 @@ ${adminLink}`;
     const pendingReqCount = accountRequests.filter(r => r.status === 'pending').length;
     const pendingRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
     const openComplaintsCount = complaints.filter(c => c.status !== 'مغلق').length;
-    const newOrdersCount = orders.filter(o => o.status === 'جاري التجهيز').length;
+    const newOrdersCount = orders.filter(o => o.status === 'تم الاستلام').length;
     const newSourcingCount = sourcingRequests.filter(r => r.status === 'جديد' && !r.closed).length;
 
     if (!adminAuthenticated) {
@@ -14593,9 +14768,21 @@ ${adminLink}`;
       );
     }
 
-    const totalRestockAlertsCount =
-      (Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.length : 0) ||
-      parts.reduce((acc, p) => acc + (Number(p.waitlistCount) || 0), 0);
+    // Single source of truth for waitlist demand (sidebar badge + waitlist
+    // page header): registered entries plus anonymous per-part counters
+    // that exceed the registered entries for the same part.
+    const totalRestockAlertsCount = (() => {
+      const wl = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+      const entriesByPart = {};
+      wl.forEach(w => { const k = String(w.partId || ''); entriesByPart[k] = (entriesByPart[k] || 0) + 1; });
+      let total = wl.length;
+      parts.forEach(p => {
+        const c = Number(p.waitlistCount) || 0;
+        const e = entriesByPart[String(p.id)] || 0;
+        if (c > e) total += c - e;
+      });
+      return total;
+    })();
 
     const navGroups = [
       {
@@ -15501,12 +15688,23 @@ ${adminLink}`;
                 }}
                 onDuplicateParts={(ids) => {
                   const idSet = new Set(ids.map(String));
-                  const clones = parts.filter(p => idSet.has(String(p.id))).map((p, i) => ({
-                    ...p,
-                    id: `dup_${Date.now()}_${i}`,
-                    sku: `${p.sku || 'SKU'}-COPY`,
-                    name: `${p.name} (نسخة)`
-                  }));
+                  const usedSkus = new Set(parts.map(x => String(x.sku || '')));
+                  const clones = parts.filter(p => idSet.has(String(p.id))).map((p, i) => {
+                    const baseSku = `${p.sku || 'SKU'}-COPY`;
+                    let candidate = baseSku;
+                    let n = 2;
+                    while (usedSkus.has(candidate)) {
+                      candidate = `${baseSku}${n}`;
+                      n++;
+                    }
+                    usedSkus.add(candidate);
+                    return {
+                      ...p,
+                      id: `dup_${Date.now()}_${i}`,
+                      sku: candidate,
+                      name: `${p.name} (نسخة)`
+                    };
+                  });
                   setParts(prev => [...clones, ...prev]);
                   clones.forEach(c => {
                     markLocalUpsert('parts', c);
@@ -15522,7 +15720,7 @@ ${adminLink}`;
                 parts={parts}
                 categories={Array.from(new Set(parts.map(p => normalizePartCategory(p.category, p.name)).filter(Boolean)))}
                 normalizePartCategory={normalizePartCategory}
-                onApplyPricingMap={(priceMap) => {
+                onApplyPricingMap={async (priceMap) => {
                   const synced = [];
                   setParts(prev => prev.map(p => {
                     if (!priceMap[p.id]) return p;
@@ -15530,10 +15728,10 @@ ${adminLink}`;
                     synced.push(u);
                     return u;
                   }));
-                  synced.forEach(u => {
-                    markLocalUpsert('parts', u);
-                    sbUpsert('spare_parts', u);
-                  });
+                  synced.forEach(u => markLocalUpsert('parts', u));
+                  if (synced.length === 0) return true;
+                  const results = await Promise.all(synced.map(u => sbUpsert('spare_parts', u).catch(() => false)));
+                  return results.every(r => r !== false);
                 }}
                 showToast={showToast}
               />
@@ -15549,7 +15747,8 @@ ${adminLink}`;
                   const asDraft = opts.asDraft !== false;
                   setParts(prev => [...newParts, ...prev]);
                   newParts.forEach(np => markLocalUpsert('parts', np));
-                  sbUpsert('spare_parts', newParts);
+                  const savedOk = await sbUpsert('spare_parts', newParts).catch(() => false);
+                  if (savedOk === false) throw new Error('Supabase save failed');
                   if (asDraft && newParts.length > 0) {
                     saveSiteSettingsImmediate(prev => {
                       const cur = new Set((prev.hiddenPartIds || []).map(String));
@@ -15558,7 +15757,7 @@ ${adminLink}`;
                     });
                   }
                 }}
-                onApplyCatalogUpdates={(patchMap) => {
+                onApplyCatalogUpdates={async (patchMap) => {
                   const synced = [];
                   setParts(prev => prev.map(p => {
                     if (!patchMap[p.id]) return p;
@@ -15566,10 +15765,10 @@ ${adminLink}`;
                     synced.push(u);
                     return u;
                   }));
-                  synced.forEach(u => {
-                    markLocalUpsert('parts', u);
-                    sbUpsert('spare_parts', u);
-                  });
+                  synced.forEach(u => markLocalUpsert('parts', u));
+                  if (synced.length === 0) return true;
+                  const results = await Promise.all(synced.map(u => sbUpsert('spare_parts', u).catch(() => false)));
+                  return results.every(r => r !== false);
                 }}
                 showToast={showToast}
               />
@@ -16097,7 +16296,14 @@ ${adminLink}`;
                 {pm.type === 'custom' ? (
                   <button
                     type="button"
-                    onClick={() => updatePaymentMethods(list => list.filter(x => x.id !== pm.id))}
+                    onClick={() =>
+                      askConfirmDelete(
+                        'حذف طريقة دفع',
+                        `هل أنت متأكد من حذف طريقة الدفع "${pm.label || pm.id}"؟ هتختفي من خيارات الدفع للعملاء فوراً.`,
+                        () => updatePaymentMethods(list => list.filter(x => x.id !== pm.id)),
+                        'نعم، احذف الطريقة'
+                      )
+                    }
                     className="md:col-span-1 p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-500 flex items-center justify-center"
                     title="امسح الطريقة دي"
                   >
@@ -16484,7 +16690,8 @@ ${adminLink}`;
                     <label className="block font-extrabold text-muted text-[11px]">كود قناتك السري الخاص (لا تشاركه مع غير فريق العمل):</label>
                     <div className="flex items-center gap-2">
                       <input
-                        type="text"
+                        type="password"
+                        autoComplete="off"
                         dir="ltr"
                         value={pCfg.ntfyTopic}
                         onChange={e => updatePushCfg({ ntfyTopic: e.target.value.replace(/[^a-zA-Z0-9_-]/g, '_') })}
@@ -16541,7 +16748,8 @@ ${adminLink}`;
                     <div>
                       <label className="block font-bold text-muted text-[11px] mb-1">Telegram Bot Token:</label>
                       <input
-                        type="text"
+                        type="password"
+                        autoComplete="off"
                         dir="ltr"
                         value={pCfg.telegramBotToken}
                         onChange={e => updatePushCfg({ telegramBotToken: e.target.value, telegramEnabled: Boolean(e.target.value.trim()) })}
@@ -16615,7 +16823,15 @@ ${adminLink}`;
       return { k, u: (days[k] || {}).uniq || 0 };
     });
     const maxU = Math.max(1, ...bars.map(b => b.u));
-    const src = Object.entries((visitStats && visitStats.sources) || {}).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    // Merge legacy alias keys (e.g. 'ig') into their canonical source so
+    // historical counters display as one channel.
+    const srcAlias = { ig: 'instagram', insta: 'instagram', fb: 'facebook', wa: 'whatsapp', tt: 'tiktok', yt: 'youtube', x: 'twitter' };
+    const mergedSources = {};
+    Object.entries((visitStats && visitStats.sources) || {}).forEach(([k, n]) => {
+      const ck = srcAlias[k] || k;
+      mergedSources[ck] = (mergedSources[ck] || 0) + n;
+    });
+    const src = Object.entries(mergedSources).sort((a, b) => b[1] - a[1]).slice(0, 6);
     const srcTotal = src.reduce((a, [, n]) => a + n, 0) || 1;
     const retW = Math.max(0, w.u - w.nw);
     return (
@@ -16697,11 +16913,22 @@ ${adminLink}`;
   const renderAdminOverview = () => {
     const individualsCount = clients.filter(c => c.accountType === 'individual').length;
     const shopsCount = clients.length - individualsCount;
-    const newOrdersCount = orders.filter(o => o.status === 'جاري التجهيز').length;
+    const newOrdersCount = orders.filter(o => o.status === 'تم الاستلام').length;
     const pendingRegCount = accountRequests.filter(r => r.status === 'pending').length;
     const reviewRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
-    const lowStockCount = parts.filter(pt => pt.stock <= (pt.lowStockThreshold || 0)).length;
-    const restockAlertsCount = (Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.length : 0) || parts.reduce((s, p) => s + (Number(p.waitlistCount) || 0), 0);
+    const lowStockCount = parts.filter(pt => (Number(pt.stock) || 0) <= (Number(pt.lowStockThreshold) || 5)).length;
+    const restockAlertsCount = (() => {
+      const wl = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+      const entriesByPart = {};
+      wl.forEach(w => { const k = String(w.partId || ''); entriesByPart[k] = (entriesByPart[k] || 0) + 1; });
+      let total = wl.length;
+      parts.forEach(p => {
+        const c = Number(p.waitlistCount) || 0;
+        const e = entriesByPart[String(p.id)] || 0;
+        if (c > e) total += c - e;
+      });
+      return total;
+    })();
     const shortcuts = [
       { tab: 'orders', label: 'طلبات جديدة', n: newOrdersCount, hint: 'محتاجة تجهيز', tone: 'blue' },
       { tab: 'restock_alerts', label: '🔔 نبهني عند التوفر', n: restockAlertsCount, hint: 'عملاء منتظرين منتجات', tone: 'amber' },
@@ -16899,15 +17126,19 @@ ${adminLink}`;
                   <button
                     onClick={() => {
                       setParts(prev =>
-                        prev.map(item =>
-                          item.id === p.id ? { ...item, stock: 15, waitlistCount: 0 } : item
-                        )
+                        prev.map(item => {
+                          if (item.id !== p.id) return item;
+                          const up = { ...item, stock: 15, soldOut: false };
+                          markLocalUpsert('parts', up);
+                          sbUpsert('spare_parts', up);
+                          return up;
+                        })
                       );
-                      showToast(`تم توفير 15 قطعة من "${p.name}" وإرسال إشعارات للمحلات المنتظرة!`, 'success');
+                      showToast(`تم تزويد مخزون "${p.name}" إلى 15 قطعة ✓ — ابعت للمحلات المنتظرة من صفحة «نبّهني عند التوفر».`, 'success');
                     }}
                     className="px-3 py-1.5 rounded-xl bg-emerald-600 text-white font-bold"
                   >
-                    توفير 15 قطعة وإشعار المحلات
+                    توفير 15 قطعة
                   </button>
                 </div>
               ))
@@ -16935,17 +17166,21 @@ ${adminLink}`;
         return true;
       })
       .sort((a, b) => {
-        const totalA = a.items.reduce((s, i) => s + i.qty * i.unitPriceBase, 0) + a.deliveryFeeBase - a.discountBase;
-        const totalB = b.items.reduce((s, i) => s + i.qty * i.unitPriceBase, 0) + b.deliveryFeeBase - b.discountBase;
-        const qtyA = a.items.reduce((s, i) => s + i.qty, 0);
-        const qtyB = b.items.reduce((s, i) => s + i.qty, 0);
+        const itemsA = Array.isArray(a.items) ? a.items : [];
+        const itemsB = Array.isArray(b.items) ? b.items : [];
+        const totalA = itemsA.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unitPriceBase) || 0), 0) + (Number(a.deliveryFeeBase) || 0) - (Number(a.discountBase) || 0);
+        const totalB = itemsB.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unitPriceBase) || 0), 0) + (Number(b.deliveryFeeBase) || 0) - (Number(b.discountBase) || 0);
+        const qtyA = itemsA.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+        const qtyB = itemsB.reduce((s, i) => s + (Number(i.qty) || 0), 0);
+        const dateA = String(a.createdAt || '');
+        const dateB = String(b.createdAt || '');
 
-        if (adminOrderSort === 'date_asc') return a.createdAt.localeCompare(b.createdAt);
+        if (adminOrderSort === 'date_asc') return dateA.localeCompare(dateB);
         if (adminOrderSort === 'total_desc') return totalB - totalA;
         if (adminOrderSort === 'total_asc') return totalA - totalB;
         if (adminOrderSort === 'qty_desc') return qtyB - qtyA;
-        if (adminOrderSort === 'name_asc') return a.clientName.localeCompare(b.clientName, 'ar');
-        return b.createdAt.localeCompare(a.createdAt);
+        if (adminOrderSort === 'name_asc') return String(a.clientName || '').localeCompare(String(b.clientName || ''), 'ar');
+        return dateB.localeCompare(dateA);
       });
   }, [orders, adminOrderStatusFilter, adminOrderSearch, adminOrderSort]);
 
@@ -17049,7 +17284,15 @@ ${adminLink}`;
                         type="number"
                         value={item.unitPriceBase}
                         onChange={e => {
-                          const val = Math.max(0, Number(e.target.value));
+                          const raw = e.target.value;
+                          setEditingOrder(prev => {
+                            const nextItems = [...prev.items];
+                            nextItems[idx] = { ...nextItems[idx], unitPriceBase: raw === '' ? '' : Number(raw) };
+                            return { ...prev, items: nextItems };
+                          });
+                        }}
+                        onBlur={e => {
+                          const val = Math.max(0, Number(e.target.value) || 0);
                           setEditingOrder(prev => {
                             const nextItems = [...prev.items];
                             nextItems[idx] = { ...nextItems[idx], unitPriceBase: val };
@@ -17065,7 +17308,15 @@ ${adminLink}`;
                         min={1}
                         value={item.qty}
                         onChange={e => {
-                          const val = Math.max(1, Number(e.target.value));
+                          const raw = e.target.value;
+                          setEditingOrder(prev => {
+                            const nextItems = [...prev.items];
+                            nextItems[idx] = { ...nextItems[idx], qty: raw === '' ? '' : Number(raw) };
+                            return { ...prev, items: nextItems };
+                          });
+                        }}
+                        onBlur={e => {
+                          const val = Math.max(1, Number(e.target.value) || 1);
                           setEditingOrder(prev => {
                             const nextItems = [...prev.items];
                             nextItems[idx] = { ...nextItems[idx], qty: val };
@@ -17114,7 +17365,7 @@ ${adminLink}`;
                         .toLowerCase()
                         .includes(q.trim().toLowerCase())
                     );
-                    if (matches.length > 0) setAdminAddPartId(matches[0].id);
+                    setAdminAddPartId(matches.length > 0 ? matches[0].id : '');
                   }}
                   placeholder="ابحث هنا لتصفية الأصناف (مثال: شاشة 15 أو S24 أو بطارية)..."
                   className="w-64 px-3 py-2 rounded-xl border border-line bg-bg text-fg text-xs font-bold"
@@ -17141,28 +17392,34 @@ ${adminLink}`;
 
                 <button
                   type="button"
+                  disabled={!adminAddPartId}
                   onClick={() => {
                     const p = parts.find(x => x.id === adminAddPartId);
                     if (!p) return;
-                    setEditingOrder(prev => ({
-                      ...prev,
-                      items: [
-                        ...prev.items,
-                        {
-                          partId: p.id,
-                          sku: p.sku,
-                          name: p.name,
-                          qualityGrade: p.qualityGrade,
-                          color: p.colors[0] || 'قياسي',
-                          qty: 1,
-                          costPriceBase: p.costPrice,
-                          unitPriceBase: p.basePrice
-                        }
-                      ]
-                    }));
+                    setEditingOrder(prev => {
+                      const exists = (prev.items || []).some(i => i.partId === p.id);
+                      return {
+                        ...prev,
+                        items: exists
+                          ? prev.items.map(i => (i.partId === p.id ? { ...i, qty: (Number(i.qty) || 0) + 1 } : i))
+                          : [
+                              ...prev.items,
+                              {
+                                partId: p.id,
+                                sku: p.sku,
+                                name: p.name,
+                                qualityGrade: p.qualityGrade,
+                                color: (p.colors && p.colors[0]) || 'قياسي',
+                                qty: 1,
+                                costPriceBase: p.costPrice || 0,
+                                unitPriceBase: p.basePrice
+                              }
+                            ]
+                      };
+                    });
                     showToast(`تم إدراج "${p.name}" في الفاتورة!`, 'info');
                   }}
-                  className="px-4 py-2 rounded-xl bg-nav2 hover:bg-nav2 text-white text-xs font-extrabold"
+                  className="px-4 py-2 rounded-xl bg-nav2 hover:bg-nav2 text-white text-xs font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   + إدراج الصنف في الفاتورة
                 </button>
@@ -17334,6 +17591,12 @@ ${adminLink}`;
                         'حذف الطلب نهائياً من السيستم',
                         `هل أنت متأكد من حذف الطلب رقم #${order.id} للعميل "${order.clientName}" بشكل نهائي؟`,
                         () => {
+                          // Deleting a live order must first run the exact
+                          // cancellation reversal (restore stock + refund
+                          // wallet) so inventory and balances stay correct.
+                          if (order.status !== 'ملغي') {
+                            handleUpdateOrderStatus(order.id, 'ملغي');
+                          }
                           setOrders(prev => prev.filter(o => o.id !== order.id));
                           showToast(`تم حذف الطلب #${order.id} نهائياً بنجاح.`, 'info');
                         }
@@ -17459,7 +17722,10 @@ ${adminLink}`;
   const handleInjectMissingTemplatesIntoModel = (modelObj) => {
     const existingCategoriesAndGrades = new Set(
       parts
-        .filter(p => p.modelId === modelObj.id)
+        .filter(p => {
+          const mObj = resolvePartModelObj(p);
+          return mObj && String(mObj.id) === String(modelObj.id);
+        })
         .map(p => `${p.category}__${p.qualityGrade}`)
     );
     const allGenerated = generateTemplatePartsForModel(modelObj);
@@ -17520,10 +17786,10 @@ ${adminLink}`;
     }
     if (orCloudSyncState.busy) return;
     const orBrandsToSave = brands
-      .filter(b => String(b).toUpperCase().includes('OR'))
+      .filter(b => isOrPrefixedName(b))
       .map((br, idx) => ({ name: br, sort_order: 50 + idx, image_url: brandImages[br] || OR_BRAND_IMAGES[br] || '' }));
-    const orModelsToSave = models.filter(m => String(m?.id || '').startsWith('or_mdl_') || String(m?.brand || '').toUpperCase().includes('OR'));
-    const orPartsToSave = parts.filter(p => p?._isOrCatalog || String(p?.id || '').startsWith('or_prt_') || String(p?.name || '').toUpperCase().startsWith('OR'));
+    const orModelsToSave = models.filter(m => String(m?.id || '').startsWith('or_mdl_') || isOrPrefixedName(m?.brand));
+    const orPartsToSave = parts.filter(p => p?._isOrCatalog || String(p?.id || '').startsWith('or_prt_') || isOrPrefixedName(p?.name));
 
     setOrCloudSyncState({ busy: true, done: 0, total: orPartsToSave.length, msg: 'جاري تثبيت الماركات والموديلات...' });
     try {
@@ -17738,12 +18004,12 @@ ${adminLink}`;
         : nonDefaultGroups.filter(g => g.id === activeCatalogPricingGroupId);
 
     const searchQ = adminCatalogSearch.trim().toLowerCase();
-    const orPartsTotalCount = parts.filter(p => p?._isOrCatalog || String(p?.id || '').startsWith('or_prt_') || String(p?.name || '').toUpperCase().startsWith('OR')).length;
-    const orBrandsTotalCount = brands.filter(b => String(b).toUpperCase().includes('OR')).length;
-    const orModelsTotalCount = models.filter(m => String(m?.id || '').startsWith('or_mdl_') || String(m?.name || '').toUpperCase().includes('OR')).length;
+    const orPartsTotalCount = parts.filter(p => p?._isOrCatalog || String(p?.id || '').startsWith('or_prt_') || isOrPrefixedName(p?.name)).length;
+    const orBrandsTotalCount = brands.filter(b => isOrPrefixedName(b)).length;
+    const orModelsTotalCount = models.filter(m => String(m?.id || '').startsWith('or_mdl_') || isOrPrefixedName(m?.brand)).length;
 
     const visibleBrands = brands.filter(b => {
-      const isOrBrand = String(b).toUpperCase().includes('OR');
+      const isOrBrand = isOrPrefixedName(b);
       if (adminOrFilterMode === 'OR_ONLY' && !isOrBrand) return false;
       if (adminOrFilterMode === 'NON_OR' && isOrBrand) return false;
       if (adminCatalogBrand !== 'ALL' && b !== adminCatalogBrand) return false;
@@ -17774,7 +18040,9 @@ ${adminLink}`;
       setExpandedAdminModels(prev => ({ ...prev, [modelId]: willOpen }));
       if (willOpen && !fetchedModelPartsSetRef.current.has(String(modelId))) {
         fetchedModelPartsSetRef.current.add(String(modelId));
-        fetchSparePartsSliceOnDemand({ modelId, limit: 100 });
+        Promise.resolve(fetchSparePartsSliceOnDemand({ modelId, limit: 100 })).catch(() => {
+          fetchedModelPartsSetRef.current.delete(String(modelId));
+        });
       }
     };
 
@@ -17794,7 +18062,7 @@ ${adminLink}`;
                   OR CATALOG
                 </span>
                 <h3 className="text-sm sm:text-base font-extrabold text-white">
-                  كتالوج المنتجات المدمج من المتاجر الـ 5 (بادئة OR • كمية 5 قطع • نفس سعر المصدر)
+                  كتالوج المنتجات المدمج من المتاجر الـ 4 (بادئة OR • كمية 5 قطع • نفس سعر المصدر)
                 </h3>
               </div>
               <p className="text-xs text-slate-300">
@@ -17819,7 +18087,7 @@ ${adminLink}`;
                     : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
                 }`}
               >
-                {adminOrFilterMode === 'OR_ONLY' ? '✓ معروض: منتجات OR فقط (إظهار الكل)' : `🔍 فلتر منتجات OR فقط (${orBrandsTotalCount})`}
+                {adminOrFilterMode === 'OR_ONLY' ? '✓ معروض: منتجات OR فقط (إظهار الكل)' : `🔍 فلتر منتجات OR فقط (${orPartsTotalCount})`}
               </button>
 
               <button
@@ -17855,7 +18123,7 @@ ${adminLink}`;
                 className="px-3 py-2 rounded-xl bg-indigo-500/30 hover:bg-indigo-500/50 disabled:opacity-60 text-indigo-100 border border-indigo-400/40 text-xs font-extrabold flex items-center gap-1.5 transition"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${orLiveFetchState.busy ? 'animate-spin' : ''}`} />
-                <span>استكمال أي صفحات إضافية من المتاجر الـ 5</span>
+                <span>استكمال أي صفحات إضافية من المتاجر الـ 4</span>
               </button>
             </div>
           </div>
@@ -18204,7 +18472,7 @@ ${adminLink}`;
                         e.stopPropagation();
                         askConfirmDelete(
                           `حذف براند "${brandName}" بالكامل`,
-                          `هل أنت متأكد من حذف براند "${brandName}" وجميع الموديلات (${brandModels.length} موديل) والمنتجات (${brandPartsCount} منتج) التابعة له نهائياً؟`,
+                          `هل أنت متأكد من حذف براند "${brandName}" وجميع الموديلات (${models.filter(m => m.brand === brandName).length} موديل) والمنتجات (${partCountByBrandMap.get(brandName) || 0} منتج) التابعة له نهائياً؟`,
                           () => {
                             const affectedModelIds = new Set(models.filter(m => m.brand === brandName).map(m => String(m.id)));
                             const affectedPartIds = parts.filter(p => affectedModelIds.has(String(p.modelId))).map(p => p.id);
@@ -18245,7 +18513,7 @@ ${adminLink}`;
                               .filter(p => {
                                 const pMdl = resolvePartModelObj(p); if ((pMdl ? String(pMdl.id) : String(p.modelId || '').trim()) !== String(model.id)) return false;
                                 if (adminStockFilter === 'IN_STOCK' && p.stock <= 0) return false;
-                                if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > p.lowStockThreshold)) return false;
+                                if (adminStockFilter === 'LOW_STOCK' && (p.stock <= 0 || p.stock > (Number(p.lowStockThreshold) || 5))) return false;
                                 if (adminStockFilter === 'OUT_OF_STOCK' && p.stock > 0) return false;
                                 if (searchQ !== '') {
                                   const modelMatches = `${model.brand} ${model.name} ${model.aliases || ''}`.toLowerCase().includes(searchQ);
@@ -18461,7 +18729,7 @@ ${adminLink}`;
                                               className={`w-16 px-2 py-1 rounded-lg border font-extrabold ${
                                                 part.stock === 0
                                                   ? 'border-rose-500 bg-bg text-fg'
-                                                  : part.stock <= part.lowStockThreshold
+                                                  : part.stock <= (Number(part.lowStockThreshold) || 5)
                                                   ? 'border-amber-500 bg-bg text-fg'
                                                   : 'border-line'
                                               }`}
@@ -18685,6 +18953,7 @@ ${adminLink}`;
     setQuickStockPage(1);
     if (adminTab === 'quick_stock') {
       fetchSparePartsSliceOnDemand({
+        brand: quickStockBrand,
         modelId: quickStockModel,
         category: quickStockCat,
         search: quickStockSearch,
@@ -18758,13 +19027,13 @@ ${adminLink}`;
               <button
                 type="button"
                 onClick={() => {
-                  const shortages = filteredAuditParts.filter(p => p.stock <= (p.lowStockThreshold || 2));
+                  const shortages = filteredAuditParts.filter(p => p.stock <= (Number(p.lowStockThreshold) || 5));
                   if (shortages.length === 0) {
                     showToast('ممتاز! لا توجد نواقص حالياً ضمن الفلتر المحدد.', 'info');
                     return;
                   }
                   const lines = shortages.map((p, idx) => `${idx + 1}. ${p.name} [${p.sku}] — المتبقي: ${p.stock}`);
-                  const fullTxt = `📋 *كشف نواقص ومشتريات المخزن (${shortages.length} صنف) — ${new Date().toISOString().slice(0, 10)}*\n━━━━━━━━━━━━━━\n${lines.slice(0, 80).join('\n')}`;
+                  const fullTxt = `📋 *كشف نواقص ومشتريات المخزن (${shortages.length} صنف) — ${new Date().toISOString().slice(0, 10)}*\n━━━━━━━━━━━━━━\n${lines.join('\n')}`;
                   navigator.clipboard?.writeText(fullTxt);
                   showToast(`📋 تم نسخ كشف النواقص (${shortages.length} صنف) للحافظة! يمكنك لصقه مباشرة لموردك على واتساب.`, 'success');
                 }}
@@ -18789,7 +19058,12 @@ ${adminLink}`;
                     type="button"
                     onClick={() => {
                       const snap = lastBulkPriceSnapshot;
-                      setParts(prev => prev.map(p => (snap[p.id] !== undefined ? { ...p, basePrice: snap[p.id] } : p)));
+                      setParts(prev => prev.map(p => {
+                        if (snap[p.id] === undefined) return p;
+                        const restored = { ...p, basePrice: snap[p.id] };
+                        markLocalUpsert('parts', restored);
+                        return restored;
+                      }));
                       setLastBulkPriceSnapshot(null);
                       showToast('↩️ تم التراجع واستعادة الأسعار السابقة بنجاح!', 'info');
                     }}
@@ -18829,6 +19103,10 @@ ${adminLink}`;
                   type="button"
                   onClick={() => {
                     if (!bulkPriceValue || filteredAuditParts.length === 0) return;
+                    askConfirmDelete(
+                      'تطبيق تسعير جماعي',
+                      `سيتم تعديل سعر ${filteredAuditParts.length} صنف دفعة واحدة حسب الإعدادات الحالية.${bulkPriceMode === 'pct_down' && bulkPriceValue > 90 ? ' ملحوظة: أقصى خصم مسموح 90% وسيتم تطبيق 90% فقط مهما كانت النسبة المدخلة أكبر.' : ''} هل أنت متأكد؟`,
+                      () => {
                     const targetIds = new Set(filteredAuditParts.map(p => p.id));
                     const snapshot = {};
                     parts.forEach(p => { if (targetIds.has(p.id)) snapshot[p.id] = p.basePrice; });
@@ -18851,6 +19129,9 @@ ${adminLink}`;
                       })
                     );
                     showToast(`✅ تم تحديث أسعار ${targetIds.size} صنف بنجاح! اضغط «حفظ التعديلات» بالأعلى لمزامنتها للسيرفر.`, 'success');
+                      },
+                      'نعم، طبّق على الكل'
+                    );
                   }}
                   className="px-5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black shadow-sm transition"
                 >
@@ -18983,10 +19264,11 @@ ${adminLink}`;
                           const val = Math.max(0, Number(e.target.value));
                           setParts(prev => prev.map(p => (p.id === part.id ? { ...p, stock: val } : p)));
                         }}
+                        onBlur={() => markLocalUpsert('parts', part)}
                         className={`w-16 px-2 py-1 text-center rounded-lg border font-extrabold ${
                           part.stock === 0
                             ? 'border-rose-500 bg-rose-500/10 text-rose-500'
-                            : part.stock <= part.lowStockThreshold
+                            : part.stock <= (Number(part.lowStockThreshold) || 5)
                             ? 'border-amber-500 bg-amber-500/10 text-amber-500'
                             : 'border-line bg-bg text-fg'
                         }`}
@@ -19003,6 +19285,7 @@ ${adminLink}`;
                             prev.map(p => (p.id === part.id ? { ...p, lowStockThreshold: val } : p))
                           );
                         }}
+                        onBlur={() => markLocalUpsert('parts', part)}
                         className="w-14 px-1.5 py-1 text-center rounded-lg border border-line bg-bg text-fg font-bold"
                       />
                     </td>
@@ -19017,6 +19300,7 @@ ${adminLink}`;
                             prev.map(p => (p.id === part.id ? { ...p, costPrice: val } : p))
                           );
                         }}
+                        onBlur={() => markLocalUpsert('parts', part)}
                         className="w-20 px-2 py-1 text-center rounded-lg border border-line bg-bg text-fg font-mono"
                       />
                     </td>
@@ -19031,6 +19315,7 @@ ${adminLink}`;
                             prev.map(p => (p.id === part.id ? { ...p, basePrice: val } : p))
                           );
                         }}
+                        onBlur={() => markLocalUpsert('parts', part)}
                         className="w-20 px-2 py-1 text-center rounded-lg border border-line bg-bg text-fg font-extrabold"
                       />
                     </td>
@@ -19085,17 +19370,23 @@ ${adminLink}`;
                       </div>
                     </td>
                     <td className="py-2 px-1.5 text-center">
-                      <button
-                        type="button"
-                        onClick={() => setParts(prev => prev.map(p => (p.id === part.id ? { ...p, soldOut: !p.soldOut } : p)))}
-                        className={`px-2 py-1 rounded-lg border text-[11px] font-extrabold whitespace-nowrap ${
-                          part.soldOut
-                            ? 'bg-rose-600 text-white border-rose-600'
-                            : 'bg-surface text-emerald-500 border-emerald-500/30 hover:bg-surface2'
-                        }`}
-                      >
-                        {part.soldOut ? 'نفد ✓' : 'متاح'}
-                      </button>
+                      {(() => {
+                        const isOut = part.soldOut || Number(part.stock || 0) <= 0;
+                        return (
+                          <button
+                            type="button"
+                            onClick={() => togglePartSoldOut(part)}
+                            title={Number(part.stock || 0) <= 0 && !part.soldOut ? 'المخزون صفر — الحالة تتبع المخزون تلقائياً' : 'تبديل حالة التوفر يدوياً'}
+                            className={`px-2 py-1 rounded-lg border text-[11px] font-extrabold whitespace-nowrap ${
+                              isOut
+                                ? 'bg-rose-600 text-white border-rose-600'
+                                : 'bg-surface text-emerald-500 border-emerald-500/30 hover:bg-surface2'
+                            }`}
+                          >
+                            {isOut ? 'نفد ✓' : 'متاح'}
+                          </button>
+                        );
+                      })()}
                     </td>
                     <td className="py-2 px-2 text-center">
                       <button
@@ -19311,7 +19602,7 @@ ${adminLink}`;
                       {grp.currency} ({currencies[grp.currency]?.symbol})
                     </span>
                     <span className="text-[11px] font-extrabold text-accent-text mt-1 block">
-                      توصيل: {grp.deliveryFeeBase === 0 ? 'مجاني' : `${grp.deliveryFeeBase} ج.م`}
+                      توصيل: {(Number(grp.deliveryFeeBase) || 0) === 0 && grp.deliveryFeeBase !== undefined ? 'مجاني' : `${Number(grp.deliveryFeeBase) || 65} ج.م`}
                     </span>
                   </div>
                 </div>
@@ -19409,8 +19700,12 @@ ${adminLink}`;
                             'حذف مجموعة التسعير',
                             `هل أنت متأكد من حذف مجموعة التسعير "${grp.name}" نهائياً؟`,
                             () => {
+                              const fallbackGroupId = (groups.find(g => g.isDefault && g.id !== grp.id) || groups.find(g => g.id !== grp.id))?.id;
                               setGroups(prev => prev.filter(g => g.id !== grp.id));
-                              showToast(`تم حذف المجموعة "${grp.name}".`, 'info');
+                              if (fallbackGroupId) {
+                                setClients(prev => prev.map(c => (c.groupId === grp.id ? { ...c, groupId: fallbackGroupId } : c)));
+                              }
+                              showToast(`تم حذف المجموعة "${grp.name}" ونقل عملائها للمجموعة الافتراضية.`, 'info');
                             }
                           )
                         }
@@ -19461,6 +19756,10 @@ ${adminLink}`;
     e.preventDefault();
     const cleanCode = newPromoForm.code.trim().toUpperCase();
     if (!cleanCode) return;
+    if (promoCodes.some(p => String(p.code || '').trim().toUpperCase() === cleanCode)) {
+      showToast(`⚠️ الكود "${cleanCode}" موجود أصلاً في الكوبونات — اختر كوداً مختلفاً.`, 'error');
+      return;
+    }
 
     const autoDesc =
       newPromoForm.description.trim() ||
@@ -20042,6 +20341,7 @@ ${adminLink}`;
                     <option value="percentage">نسبة (%)</option>
                     <option value="fixed">مبلغ ثابت (ج.م)</option>
                     <option value="free_delivery">شحن مجاني</option>
+                    <option value="delivery_discount">خصم نسبة % على رسوم الدليفري</option>
                   </select>
                 </div>
                 <div>
@@ -20174,6 +20474,10 @@ ${adminLink}`;
       showToast('اكتب عنوان الإعلان الأول (أو اختر قالب بانر جاهز كامل مع صورة).', 'warning');
       return;
     }
+    if (adForm.startDate && adForm.endDate && String(adForm.startDate) > String(adForm.endDate)) {
+      showToast('⚠️ تاريخ بداية الإعلان بعد تاريخ نهايته — الإعلان مش هيظهر أبداً. صلّح التواريخ الأول.', 'error');
+      return;
+    }
     const clean = {
       ...adForm,
       title: adForm.title.trim(),
@@ -20300,7 +20604,7 @@ ${adminLink}`;
               🔔 مركز تنبيهات "نبّهني عند التوفر" الموحد
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-amber-300 mt-2">
-              جميع المنتجات المنتظرة وطلبات العملاء ({rawWaitlist.length} طلب مسجل في {groupedProducts.length} منتج)
+              جميع المنتجات المنتظرة وطلبات العملاء ({groupedProducts.reduce((a, g) => a + Math.max(g.entries.length, Number(g.partObj?.waitlistCount) || 0), 0)} طلب مسجل في {groupedProducts.length} منتج)
             </h2>
             <p className="text-xs text-muted mt-1">
               هنا تجد كل المنتجات التي نفدت كميتها وضغط العملاء عليها "نبّهني لما يرجع"، مع إمكانية تزويد المخزون وإرسال رسائل واتساب للعملاء بضغطة زر واحدة.
@@ -20400,14 +20704,20 @@ ${adminLink}`;
                       <button
                         type="button"
                         onClick={() => {
-                          saveSiteSettingsImmediate(prev => ({
-                            ...prev,
-                            restockWaitlist: (Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : []).filter(w => String(w.partId) !== String(grp.partId))
-                          }));
-                          if (pObj) {
-                            setParts(prev => prev.map(x => (String(x.id) === String(pObj.id) ? { ...x, waitlistCount: 0 } : x)));
-                          }
-                          showToast(`تم مسح قائمة الانتظار الخاصة بـ "${grp.partName}".`, 'info');
+                          askConfirmDelete(
+                            'مسح قائمة الانتظار',
+                            `هل أنت متأكد من مسح قائمة انتظار "${grp.partName}"؟ سيتم حذف كل طلبات التنبيه المسجلة لهذا المنتج.`,
+                            () => {
+                              saveSiteSettingsImmediate(prev => ({
+                                ...prev,
+                                restockWaitlist: (Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : []).filter(w => String(w.partId) !== String(grp.partId))
+                              }));
+                              if (pObj) {
+                                setParts(prev => prev.map(x => (String(x.id) === String(pObj.id) ? { ...x, waitlistCount: 0 } : x)));
+                              }
+                              showToast(`تم مسح قائمة الانتظار الخاصة بـ "${grp.partName}".`, 'info');
+                            }
+                          );
                         }}
                         className="px-3 py-2 rounded-xl bg-rose-500/15 text-rose-500 hover:bg-rose-600 hover:text-white font-bold text-[11px]"
                       >
@@ -20464,12 +20774,12 @@ ${adminLink}`;
     const inDateRange = (dateText) => {
       if (gmReportPreset === 'all') return true;
       const d = String(dateText || '').trim().slice(0, 10);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return true;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
       return d >= fromStr && d <= toStr;
     };
 
     const rawPeriodOrders = orders.filter(o => o && inDateRange(o.createdAt || o.date || o.created_at));
-    const periodAllOrders = rawPeriodOrders.length > 0 ? rawPeriodOrders : orders.filter(Boolean);
+    const periodAllOrders = rawPeriodOrders;
     const periodValidOrders = periodAllOrders.filter(o => {
       if (gmReportOrderFilter === 'delivered_only') return o.status === 'تم التسليم';
       if (gmReportOrderFilter === 'valid_all') return o.status !== 'ملغي';
@@ -21034,7 +21344,7 @@ ${adminLink}`;
               <div className="p-3 rounded-xl bg-surface2 border border-line">
                 <div className="text-[11px] text-muted font-bold">الكوبونات المستخدمة في الفترة</div>
                 <div className="text-base font-black text-accent-text">{formatMoney(rep.totalDiscountsGivenBase)}</div>
-                <div className="text-[10px] text-muted">إجمالي مرات استخدام الكوبونات: {Number(siteSettings.analyticsCouponsUsedCount) || promoCodes.reduce((a, p) => a + (Number(p.usedCount) || 0), 0)}</div>
+                <div className="text-[10px] text-muted">إجمالي مرات استخدام الكوبونات: {Math.max(Number(siteSettings.analyticsCouponsUsedCount) || 0, promoCodes.reduce((a, p) => a + (Number(p.usedCount) || 0), 0))}</div>
               </div>
               <div className="p-3 rounded-xl bg-surface2 border border-line">
                 <div className="text-[11px] text-muted font-bold">الكاش باك الممنوح للعملاء</div>
@@ -21714,10 +22024,18 @@ ${adminLink}`;
               <button
                 type="button"
                 onClick={() => {
-                  const nextState = {};
-                  flagSwitches.forEach(f => { nextState[f.key] = true; });
-                  saveSiteSettingsImmediate(prev => ({ ...prev, ...nextState }));
-                  showToast('🚀 تم تشغيل وتفعيل جميع الميزات الـ 18 بالكامل!', 'success');
+                  setConfirmDialog({
+                    title: 'تشغيل كل الميزات',
+                    message: `هيتم تفعيل كل الميزات الـ ${flagSwitches.length} مرة واحدة على المتجر كله. متأكد؟`,
+                    confirmText: 'أيوه، شغّل الكل',
+                    onConfirm: () => {
+                      const nextState = {};
+                      flagSwitches.forEach(f => { nextState[f.key] = true; });
+                      saveSiteSettingsImmediate(prev => ({ ...prev, ...nextState }));
+                      showToast(`🚀 تم تشغيل وتفعيل جميع الميزات الـ ${flagSwitches.length} بالكامل!`, 'success');
+                      setConfirmDialog(null);
+                    }
+                  });
                 }}
                 className="px-4 py-2 rounded-full bg-[#2563EB]/15 hover:bg-[#2563EB] text-[#2563EB] dark:text-[#60A5FA] hover:text-white border border-[#3B82F6]/35 font-black transition"
               >
@@ -21783,7 +22101,7 @@ ${adminLink}`;
             '⚡',
             '1. مفاتيح التشغيل والإيقاف الفوري للميزات الـ 18 (Feature Flags)',
             'اضغط على أي مفتاح لتشغيل أو إيقاف الميزة فوراً لدى جميع الزوار',
-            `${flagSwitches.filter(f => siteSettings[f.key] !== false).length} / 18 مفعّل`
+            `${flagSwitches.filter(f => siteSettings[f.key] !== false).length} / ${flagSwitches.length} مفعّل`
           )}
           {Boolean(openFeatureSections.flags) && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3 border-t border-line">
@@ -21861,14 +22179,28 @@ ${adminLink}`;
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <button
                   type="button"
-                  onClick={() => handleBulkDisableExpensiveCashback(siteSettings.cashbackMaxPartPrice || 1500)}
+                  onClick={() =>
+                    askConfirmDelete(
+                      'إيقاف الكاش باك عن المنتجات الغالية',
+                      `هيتم إيقاف الكاش باك عن كل منتج سعره أعلى من ${(siteSettings.cashbackMaxPartPrice || 1500).toLocaleString()} ج.م في الكتالوج كله. متأكد؟`,
+                      () => handleBulkDisableExpensiveCashback(siteSettings.cashbackMaxPartPrice || 1500),
+                      'نعم، نفّذ على الكل'
+                    )
+                  }
                   className="py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-sm"
                 >
                   🛡️ إيقاف الكاش باك فوراً عن الأغلى من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleBulkEnableAffordableCashback(siteSettings.cashbackMaxPartPrice || 1500)}
+                  onClick={() =>
+                    askConfirmDelete(
+                      'تفعيل الكاش باك للمنتجات المناسبة',
+                      `هيتم تفعيل الكاش باك على كل منتج سعره ${(siteSettings.cashbackMaxPartPrice || 1500).toLocaleString()} ج.م فأقل في الكتالوج كله (النسب المخصصة لكل منتج هتفضل زي ما هي). متأكد؟`,
+                      () => handleBulkEnableAffordableCashback(siteSettings.cashbackMaxPartPrice || 1500),
+                      'نعم، نفّذ على الكل'
+                    )
+                  }
                   className="py-3 px-4 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs shadow-sm"
                 >
                   ✅ تفعيل الكاش باك فوراً للأرخص من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م فقط
@@ -22694,7 +23026,12 @@ ${adminLink}`;
             'فكّر العميل بتجديد المنتج الذي اشتراه بضغطة زر على واتساب مع كوبون RENEW10',
             `${repurchaseCandidates.length} مرشح`
           )}
-          {Boolean(openFeatureSections.repurchase_waitlist) && (
+          {Boolean(openFeatureSections.repurchase_waitlist) && siteSettings.enableRepurchaseReminders === false && (
+            <div className="pt-3 border-t border-line text-center text-muted font-bold text-xs">
+              ⏸️ ميزة تذكير إعادة الشراء متوقفة حالياً من مفتاح «13. تذكير إعادة الشراء» في اللوحة السريعة بالأعلى — فعّلها لعرض المرشحين وأزرار الواتساب.
+            </div>
+          )}
+          {Boolean(openFeatureSections.repurchase_waitlist) && siteSettings.enableRepurchaseReminders !== false && (
             <div className="space-y-3 pt-3 border-t border-line">
               <div className="flex justify-end">
                 <button
@@ -23066,7 +23403,14 @@ ${adminLink}`;
                   </a>
                   <button
                     type="button"
-                    onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, headerConfig: {} }))}
+                    onClick={() =>
+                      askConfirmDelete(
+                        'إعادة ضبط الهيدر للافتراضي',
+                        'هيتم مسح كل تخصيصات الهيدر الحالية والرجوع للوضع الافتراضي. متأكد؟',
+                        () => saveSiteSettingsImmediate(prev => ({ ...prev, headerConfig: {} })),
+                        'نعم، إعادة الضبط'
+                      )
+                    }
                     className="px-3 py-2 rounded-xl bg-surface2 border border-line text-muted hover:text-fg font-bold text-xs"
                   >
                     ↺ الوضع الافتراضي
@@ -23305,7 +23649,14 @@ ${adminLink}`;
                   </button>
                   <button
                     type="button"
-                    onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, footerConfig: {} }))}
+                    onClick={() =>
+                      askConfirmDelete(
+                        'إعادة ضبط الفوتر للافتراضي',
+                        'هيتم مسح كل تخصيصات الفوتر الحالية والرجوع للوضع الافتراضي. متأكد؟',
+                        () => saveSiteSettingsImmediate(prev => ({ ...prev, footerConfig: {} })),
+                        'نعم، إعادة الضبط'
+                      )
+                    }
                     className="px-3 py-2 rounded-xl bg-surface2 border border-line text-muted hover:text-fg font-bold text-xs"
                   >
                     ↺ استعادة الافتراضي
@@ -24287,7 +24638,9 @@ ${adminLink}`;
                     sourceValue: newBarForm.sourceValue || '',
                     maxItems: Number(newBarForm.maxItems) || 8,
                     partIds: newBarForm.selectedPartIds,
-                    active: true
+                    active: newBarForm.editingId
+                      ? (showcaseBars.find(b => b.id === newBarForm.editingId)?.active ?? true)
+                      : true
                   };
                   if (newBarForm.editingId) {
                     setShowcaseBars(prev => prev.map(b => (b.id === newBarForm.editingId ? createdBar : b)));
@@ -24394,6 +24747,22 @@ ${adminLink}`;
                       <div className="text-[11px] text-muted">{bar.subtitle}</div>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => setNewBarForm({
+                          editingId: bar.id,
+                          title: bar.title || '',
+                          subtitle: bar.subtitle || '',
+                          badgeColor: bar.badgeColor || '',
+                          sourceType: bar.sourceType || 'manual',
+                          sourceValue: bar.sourceValue || '',
+                          maxItems: bar.maxItems || 8,
+                          selectedPartIds: Array.isArray(bar.partIds) ? bar.partIds : []
+                        })}
+                        className="px-3 py-1 rounded-full font-extrabold text-[11px] bg-[#2563EB]/15 text-[#2563EB] dark:text-[#60A5FA]"
+                      >
+                        تعديل
+                      </button>
                       <button
                         type="button"
                         onClick={() => setShowcaseBars(prev => prev.map(b => (b.id === bar.id ? { ...b, active: !b.active } : b)))}
@@ -24660,15 +25029,18 @@ ${adminLink}`;
     const uploadedUrl = await processAndUploadImage(file, 'avatars');
     if (!uploadedUrl) return;
     setAdminEditClientForm(prev => ({ ...prev, avatarImage: uploadedUrl }));
-    setClients(prev =>
-      prev.map(c => (c.id === adminEditClientForm.id ? { ...c, avatarImage: uploadedUrl } : c))
-    );
-    showToast('تم ضغط ورفع صورة حساب العميل بنجاح!', 'success');
+    showToast('تم ضغط ورفع الصورة بنجاح — اضغط "حفظ التعديلات" عشان تتطبق على حساب العميل.', 'success');
   };
 
   const handleAdminSaveClientFullEdits = (e) => {
     e.preventDefault();
     if (!adminEditClientForm) return;
+    const cleanEditPhone = normalizeDigits(adminEditClientForm.phone || '').trim().replace(/\s+/g, '');
+    const dupClient = clients.find(c => c.id !== adminEditClientForm.id && String(c.phone || '').trim() === cleanEditPhone && cleanEditPhone);
+    if (dupClient) {
+      showToast(`⚠️ الرقم ${cleanEditPhone} مسجّل أصلاً على حساب "${dupClient.name}" — مش هينفع عميلين بنفس رقم الدخول.`, 'error');
+      return;
+    }
     setClients(prev =>
       prev.map(c =>
         c.id === adminEditClientForm.id
@@ -24961,8 +25333,15 @@ ${adminLink}`;
                     <button
                       type="button"
                       onClick={() => {
-                        setAccountRequests(prev => prev.map(r => (r.id === req.id ? { ...r, status: 'rejected' } : r)));
-                        showToast(`تم رفض طلب الحساب الخاص بـ "${req.shopName || req.name}".`, 'info');
+                        askConfirmDelete(
+                          'رفض طلب فتح حساب',
+                          `هل أنت متأكد من رفض طلب فتح الحساب الخاص بـ "${req.shopName || req.name}"؟`,
+                          () => {
+                            setAccountRequests(prev => prev.map(r => (r.id === req.id ? { ...r, status: 'rejected' } : r)));
+                            showToast(`تم رفض طلب الحساب الخاص بـ "${req.shopName || req.name}".`, 'info');
+                          },
+                          'نعم، رفض الطلب'
+                        );
                       }}
                       className="py-2 px-3 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-500 hover:text-white font-bold transition"
                     >
@@ -25301,7 +25680,7 @@ ${adminLink}`;
                         onClick={() =>
                           askConfirmDelete(
                             'حذف حساب العميل نهائياً',
-                            `هل أنت متأكد من حذف حساب "${selectedClient.name}" (${selectedClient.phone}) نهائياً؟`,
+                            `هل أنت متأكد من حذف حساب "${selectedClient.name}" (${selectedClient.phone}) نهائياً؟${(Number(selectedClient.walletBalance) || 0) !== 0 ? `\n⚠️ تنبيه: العميل عنده رصيد محفظة غير صفري (${selectedClient.walletBalance} ج.م) — الحذف هيضيّع تتبّع المبلغ ده نهائياً.` : ''}${orders.some(o => String(o.clientId) === String(selectedClient.id) && !['تم التسليم', 'ملغي'].includes(o.status)) ? '\n⚠️ تنبيه: العميل عنده طلبات لسه مفتوحة (مش متسلمة ولا ملغية) وهتفضل فواتيرها يتيمة بعد الحذف.' : ''}`,
                             () => {
                               const remaining = clients.filter(c => c.id !== selectedClient.id);
                               setClients(remaining);
@@ -25365,6 +25744,10 @@ ${adminLink}`;
                             return;
                           }
                           const exactVal = Number(manualPayAmount);
+                          askConfirmDelete(
+                            'تثبيت رصيد العميل',
+                            `هل أنت متأكد من تثبيت رصيد "${selectedClient.name}" عند ${exactVal} ج.م؟ (الرصيد الحالي: ${selectedClient.walletBalance} ج.م — الفرق هيتسجل كحركة تسوية)`,
+                            () => {
                           setClients(prev =>
                             prev.map(c => {
                               if (c.id !== selectedClient.id) return c;
@@ -25390,6 +25773,9 @@ ${adminLink}`;
                           setManualPayAmount('');
                           setManualPayNote('');
                           showToast(`تم تثبيت رصيد العميل عند ${exactVal} ج.م ✓`, 'success');
+                            },
+                            'نعم، ثبّت الرصيد'
+                          );
                         }}
                         className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold transition"
                       >
@@ -25462,10 +25848,19 @@ ${adminLink}`;
                                       setClients(prev =>
                                         prev.map(c => {
                                           if (c.id !== selectedClient.id) return c;
+                                          const nextBal = c.walletBalance - Number(entry.amount || 0);
+                                          let runBal = nextBal;
+                                          const fixedLedger = (c.ledger || [])
+                                            .filter(l => l.id !== entry.id)
+                                            .map(l => {
+                                              const upd = { ...l, balanceAfter: runBal };
+                                              runBal -= Number(l.amount || 0);
+                                              return upd;
+                                            });
                                           return {
                                             ...c,
-                                            walletBalance: c.walletBalance - Number(entry.amount || 0),
-                                            ledger: (c.ledger || []).filter(l => l.id !== entry.id)
+                                            walletBalance: nextBal,
+                                            ledger: fixedLedger
                                           };
                                         })
                                       );
@@ -25565,7 +25960,7 @@ ${adminLink}`;
       <div className="space-y-4">
         <div>
           <h3 className="text-base font-extrabold text-fg">
-            طلبات استرجاع الضمان وفحص القطع ({returnsList.length})
+            طلبات استرجاع الضمان وفحص القطع ({returnsList.filter(r => showClosedItems || !r.closed).length} من {returnsList.length})
           </h3>
           <p className="text-xs text-muted">
             تحكم كامل: يمكنك القبول أو الرفض أو تعديل قرارك في أي وقت وإرسال أكثر من رد للعميل مع تسوية تلقائية للمخزن والحساب
@@ -25663,8 +26058,16 @@ ${adminLink}`;
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => {
-                    handleResolveReturn(ret.id, 'مقبول', true, returnAdminNotes[ret.id]);
-                    setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                    setConfirmDialog({
+                      title: 'قبول المرتجع وإرجاعه للمخزن',
+                      message: 'هيتم قبول المرتجع، إرجاع القطعة للمخزن كسليمة، وصرف التعويض لمحفظة العميل فوراً. متأكد؟',
+                      confirmText: 'أيوه، تنفيذ',
+                      onConfirm: () => {
+                        handleResolveReturn(ret.id, 'مقبول', true, returnAdminNotes[ret.id]);
+                        setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                        setConfirmDialog(null);
+                      }
+                    });
                   }}
                   className={`flex-1 py-2 px-3 rounded-xl text-white text-xs font-bold transition ${
                     ret.status === 'مقبول' && ret.resolutionType === 'مرتجع سليم للمخزن'
@@ -25676,8 +26079,16 @@ ${adminLink}`;
                 </button>
                 <button
                   onClick={() => {
-                    handleResolveReturn(ret.id, 'مقبول', false, returnAdminNotes[ret.id]);
-                    setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                    setConfirmDialog({
+                      title: 'قبول المرتجع كتالف',
+                      message: 'هيتم قبول المرتجع وتسجيله كتالف (مش هيرجع للمخزن) وصرف التعويض لمحفظة العميل فوراً. متأكد؟',
+                      confirmText: 'أيوه، تنفيذ',
+                      onConfirm: () => {
+                        handleResolveReturn(ret.id, 'مقبول', false, returnAdminNotes[ret.id]);
+                        setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                        setConfirmDialog(null);
+                      }
+                    });
                   }}
                   className={`flex-1 py-2 px-3 rounded-xl text-white text-xs font-bold transition ${
                     ret.status === 'مقبول' && ret.resolutionType === 'هالك / تالف'
@@ -25689,8 +26100,16 @@ ${adminLink}`;
                 </button>
                 <button
                   onClick={() => {
-                    handleResolveReturn(ret.id, 'مرفوض', false, returnAdminNotes[ret.id]);
-                    setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                    setConfirmDialog({
+                      title: 'رفض المرتجع',
+                      message: 'هيتم رفض المرتجع وعكس أي تعويض اتصرف للعميل قبل كده. متأكد؟',
+                      confirmText: 'أيوه، تنفيذ',
+                      onConfirm: () => {
+                        handleResolveReturn(ret.id, 'مرفوض', false, returnAdminNotes[ret.id]);
+                        setReturnAdminNotes(prev => ({ ...prev, [ret.id]: '' }));
+                        setConfirmDialog(null);
+                      }
+                    });
                   }}
                   className={`py-2 px-3 rounded-xl text-white text-xs font-bold transition ${
                     ret.status === 'مرفوض'
@@ -25745,7 +26164,7 @@ ${adminLink}`;
       <div className="space-y-4">
         <div>
           <h3 className="text-base font-extrabold text-fg">
-            الشكاوى ومقترحات توفير الأصناف ({complaints.length})
+            الشكاوى ومقترحات توفير الأصناف ({complaints.filter(c => showClosedItems || c.status !== 'مغلق').length} من {complaints.length})
           </h3>
           <p className="text-xs text-muted">
             يمكنك الرد أكثر من مرة في نفس التذكرة وتغيير حالتها في أي وقت
@@ -25831,6 +26250,7 @@ ${adminLink}`;
                 onClick={() => {
                   const replyText = (complaintReplies[tck.id] || '').trim();
                   if (!replyText) return;
+                  const doSendComplaintReply = () => {
                   setComplaints(prev =>
                     prev.map(c =>
                       c.id === tck.id
@@ -25845,7 +26265,7 @@ ${adminLink}`;
                                 sender: 'admin',
                                 senderName: 'إدارة الدعم والمشتريات',
                                 text: replyText,
-                                date: '2026-11-01 08:30'
+                                date: new Date().toISOString().slice(0, 16).replace('T', ' ')
                               }
                             ]
                           }
@@ -25854,6 +26274,20 @@ ${adminLink}`;
                   );
                   setComplaintReplies(prev => ({ ...prev, [tck.id]: '' }));
                   showToast('تم إرسال الرد وإضافته لسجل المحادثة مع التاجر!', 'success');
+                  };
+                  if (tck.status === 'مغلق') {
+                    setConfirmDialog({
+                      title: 'الشكوى دي مقفولة',
+                      msg: 'إرسال الرد هيعيد فتح الشكوى ويرجعها لحالة «تم الرد». تكمل؟',
+                      confirmLabel: 'أيوه، ابعت وافتحها',
+                      onConfirm: () => {
+                        doSendComplaintReply();
+                        setConfirmDialog(null);
+                      }
+                    });
+                  } else {
+                    doSendComplaintReply();
+                  }
                 }}
                 className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold"
               >
@@ -25906,7 +26340,7 @@ ${adminLink}`;
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-extrabold text-white">
-            مخطط قاعدة البيانات الإنتاجية (PostgreSQL / Prisma Schema)
+            مخطط مرجعي مقترح (Prisma) — ليس قاعدة البيانات الفعلية (الإنتاج يعمل على Supabase)
           </h2>
           <p className="text-xs text-muted">
             يغطي نظام العملات المتعددة، مجموعات التسعير، التوافق المشترك للموديلات، حركات المخزون، وكشف الحساب المالي (Ledger)
@@ -26018,6 +26452,8 @@ model OrderInvoice {
               <span>
                 {cartSummary.isDiamondFreeShip
                   ? 'شحن مجاني دائم مفعّل بفضل مستواك الألماسي 💎!'
+                  : cartSummary.deliveryFeeBase > 0
+                  ? `مبروك! حصلت على خصم توصيل — المتبقي عليك ${formatMoney(cartSummary.deliveryFeeBase)} فقط على هذا الطلب!`
                   : 'مبروك! حصلت على شحن مجاني بالكامل (0 ج.م) على هذا الطلب!'}
               </span>
             </div>
@@ -27406,7 +27842,7 @@ model OrderInvoice {
           if (Array.isArray(freshRows) && freshRows.length > 0) {
             const mappedClients = freshRows.map(toCamelCaseRow);
             currentClientsList = mappedClients;
-            incomingSyncUntilRef.current = Date.now() + 800;
+            incomingSyncUntilRef.current = Date.now() + 250;
             isIncomingSyncRef.current = true;
             setClients(mappedClients);
             try { window.localStorage.setItem('elzoghbi_v2_clients', JSON.stringify(mappedClients)); } catch (err) {}
@@ -28239,6 +28675,14 @@ model OrderInvoice {
 
     const handleConfirmApproval = (e) => {
       e.preventDefault();
+      // Login is by phone — never create a second account with a phone
+      // that already belongs to an existing client.
+      const cleanReqPhone = normalizeDigits(req.phone || '').trim().replace(/\s+/g, '');
+      const dupClient = clients.find(c => String(c.phone || '').trim() === cleanReqPhone && cleanReqPhone);
+      if (dupClient) {
+        showToast(`⚠️ الرقم ${cleanReqPhone} مسجّل أصلاً على حساب "${dupClient.name}" — مش هينفع إنشاء حساب تاني بنفس الرقم.`, 'error');
+        return;
+      }
       const newClientId = `cli_${Date.now()}`;
       const newClient = {
         id: newClientId,
@@ -28257,11 +28701,11 @@ model OrderInvoice {
         avatarBg: approvingRequestObj.avatarBg || 'from-emerald-600 to-teal-700',
         avatarImage: '',
         status: 'active',
-        createdAt: '2026-11-01',
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
         ledger: [
           {
             id: `ldg_${Date.now()}`,
-            date: '2026-11-01 06:55',
+            date: new Date().toISOString().slice(0, 16).replace('T', ' '),
             type: 'opening',
             ref: 'OPEN-ACC',
             desc: 'اعتماد وفتح الحساب التجاري بواسطة الإدارة',
@@ -28417,6 +28861,12 @@ model OrderInvoice {
     const handleCreateDirectClient = (e) => {
       e.preventDefault();
       if (!directClientForm.name.trim() || !directClientForm.phone.trim()) return;
+      const cleanNewPhone = normalizeDigits(directClientForm.phone).trim().replace(/\s+/g, '');
+      const dupClient = clients.find(c => String(c.phone || '').trim() === cleanNewPhone && cleanNewPhone);
+      if (dupClient) {
+        showToast(`⚠️ الرقم ${cleanNewPhone} مسجّل أصلاً على حساب "${dupClient.name}" — مش هينفع إنشاء حساب تاني بنفس الرقم.`, 'error');
+        return;
+      }
 
       const newId = `cli_${Date.now()}`;
       const created = {
@@ -28436,11 +28886,11 @@ model OrderInvoice {
         avatarBg: directClientForm.avatarBg,
         avatarImage: directClientForm.avatarImage || '',
         status: 'active',
-        createdAt: '2026-11-01',
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
         ledger: [
           {
             id: `ldg_${Date.now()}`,
-            date: '2026-11-01 07:00',
+            date: new Date().toISOString().slice(0, 16).replace('T', ' '),
             type: 'opening',
             ref: 'NEW-ACC',
             desc: 'إنشاء حساب تاجر جديد بواسطة الإدارة',
@@ -28920,8 +29370,15 @@ model OrderInvoice {
   const cloudSourcingUpdate = (mapper, extraNotif) => {
     isCustomerMutatingCloudRef.current = true;
     const updatedList = mapper(sourcingRequests);
-    if (Array.isArray(updatedList) && updatedList.length > 0) {
-      sbUpsert('sourcing_requests', updatedList[0]);
+    if (Array.isArray(updatedList)) {
+      // Upsert the rows the mapper actually changed — not the first row
+      // of the list (which used to overwrite an unrelated request).
+      const prevById = new Map((sourcingRequests || []).map(r => [String(r.id), r]));
+      updatedList.forEach(row => {
+        if (row && row.id && prevById.get(String(row.id)) !== row) {
+          sbUpsert('sourcing_requests', row);
+        }
+      });
     }
   };
 
@@ -28947,7 +29404,7 @@ model OrderInvoice {
     if (!srcForm.accept) { showToast('لازم توافق على شروط الخدمة عشان تكمّل.', 'warning'); return; }
     const stamp = nowStamp();
     const req = {
-      id: `SRC-${Date.now().toString().slice(-6)}`,
+      id: `SRC-${Date.now().toString()}-${Math.random().toString(36).slice(2, 6)}`,
       clientId: currentClient.id,
       clientName: currentClient.name,
       phone,
@@ -29084,6 +29541,7 @@ model OrderInvoice {
     const price = Number(d.price);
     const deposit = Number(d.deposit);
     if (!(price > 0)) { showToast('اكتب السعر.', 'warning'); return; }
+    if (deposit > price) { showToast('⚠️ العربون أكبر من سعر الطلب نفسه — راجع الأرقام قبل الحفظ.', 'error'); return; }
     const stamp = nowStamp();
     setSourcingRequests(prev =>
       prev.map(r =>
@@ -29108,7 +29566,19 @@ model OrderInvoice {
     const apply = () => {
       const stamp = nowStamp();
       setSourcingRequests(prev =>
-        prev.map(r => (r.id === req.id ? { ...r, status, updatedAt: stamp, unreadClient: true, closed: status === 'ملغي' || status === 'تم التسليم' ? r.closed : false } : r))
+        prev.map(r => {
+          if (r.id !== req.id) return r;
+          const isFinal = status === 'ملغي' || status === 'تم التسليم';
+          const wasFinal = r.status === 'ملغي' || r.status === 'تم التسليم';
+          const next = { ...r, status, updatedAt: stamp, unreadClient: true, closed: isFinal ? true : wasFinal ? false : r.closed };
+          if (status === 'ملغي') {
+            // Mirror the client-cancel path: a received deposit becomes
+            // refund-due so it is never forgotten; an unpaid request clears.
+            if (r.depositStatus === 'received') next.depositStatus = 'refund_due';
+            else if (r.depositStatus === 'requested') next.depositStatus = 'none';
+          }
+          return next;
+        })
       );
       setNotifications(prev => [clientNotify(req.clientId, `حالة طلبك (${req.name}) اتغيّرت`, `الحالة الجديدة: ${status}`), ...prev]);
     };
@@ -29119,19 +29589,48 @@ model OrderInvoice {
         confirmText: 'أيوه، حوّل',
         onConfirm: () => { apply(); setConfirmDialog(null); }
       });
+    } else if (status === 'ملغي' && req.status !== 'ملغي') {
+      setConfirmDialog({
+        title: 'إلغاء طلب الاستيراد',
+        message: req.depositStatus === 'received'
+          ? 'هيتم إلغاء الطلب وتحويل العربون المستلم لحالة «في انتظار الرد» عشان يترّد للعميل. متأكد؟'
+          : 'هيتم إلغاء طلب الاستيراد ده نهائياً. متأكد؟',
+        confirmText: 'أيوه، إلغاء الطلب',
+        onConfirm: () => { apply(); setConfirmDialog(null); }
+      });
     } else apply();
   };
 
   const adminSetDeposit = (req, depositStatus) => {
-    const stamp = nowStamp();
-    setSourcingRequests(prev =>
-      prev.map(r =>
-        r.id === req.id
-          ? { ...r, depositStatus, status: depositStatus === 'received' && ['جديد', 'قيد المراجعة', 'تم تحديد السعر'].includes(r.status) ? 'تم استلام العربون' : r.status, updatedAt: stamp, unreadClient: true }
-          : r
-      )
-    );
-    setNotifications(prev => [clientNotify(req.clientId, `تحديث العربون (${req.name})`, SRC_DEPOSIT_LABEL[depositStatus]), ...prev]);
+    // Financial state guards: a deposit can only be marked received after
+    // it was requested, and refunded only after it was received/refund-due.
+    if (depositStatus === 'received' && req.depositStatus !== 'requested') {
+      showToast('⚠️ مش هينفع تعليم العربون كمستلم قبل ما يكون مطلوباً من العميل.', 'error');
+      return;
+    }
+    if (depositStatus === 'refunded' && !['received', 'refund_due'].includes(req.depositStatus)) {
+      showToast('⚠️ مش هينفع تعليم العربون كمردود قبل استلامه أصلاً.', 'error');
+      return;
+    }
+    setConfirmDialog({
+      title: depositStatus === 'received' ? 'تأكيد استلام العربون' : 'تأكيد رد العربون',
+      message: depositStatus === 'received'
+        ? `متأكد إنك استلمت عربون طلب الاستيراد (${req.name}) من العميل؟`
+        : `متأكد إنك ردّيت عربون طلب الاستيراد (${req.name}) للعميل؟`,
+      confirmText: 'أيوه، متأكد',
+      onConfirm: () => {
+        const stamp = nowStamp();
+        setSourcingRequests(prev =>
+          prev.map(r =>
+            r.id === req.id
+              ? { ...r, depositStatus, status: depositStatus === 'received' && ['جديد', 'قيد المراجعة', 'تم تحديد السعر'].includes(r.status) ? 'تم استلام العربون' : r.status, updatedAt: stamp, unreadClient: true }
+              : r
+          )
+        );
+        setNotifications(prev => [clientNotify(req.clientId, `تحديث العربون (${req.name})`, SRC_DEPOSIT_LABEL[depositStatus]), ...prev]);
+        setConfirmDialog(null);
+      }
+    });
   };
 
   const renderSrcChat = (req, side) => {
@@ -29718,19 +30217,19 @@ model OrderInvoice {
     let pick = () => {};
     if (filterSheet === 'brand') {
       title = 'اختار الماركة';
-      rows = [{ id: 'ALL', label: `كل الماركات (${publicBrands.length})` }, ...publicBrands.map(b => ({ id: b, label: b, count: publicModels.filter(m => m.brand === b).length }))];
+      rows = [{ id: 'ALL', label: 'كل الماركات' }, ...publicBrands.map(b => ({ id: b, label: b }))];
       current = selectedBrand;
       pick = id => { setSelectedBrand(id); setSelectedModelId('ALL'); setSelectedCategory('ALL'); };
     } else if (filterSheet === 'category') {
       title = 'اختار التصنيف';
       const counts = {};
       publicParts.filter(pt => partPassesStoreFilters(pt, true)).forEach(pt => {
-        if (pt.category && !isCategoryHidden(pt.category)) {
-          counts[pt.category] = (counts[pt.category] || 0) + 1;
+        const nc = normalizePartCategory(pt.category, pt.name);
+        if (nc && !isCategoryHidden(nc)) {
+          counts[nc] = (counts[nc] || 0) + 1;
         }
       });
-      const total = Object.values(counts).reduce((a, b) => a + b, 0);
-      rows = [{ id: 'ALL', label: 'كل التصنيفات', count: total }, ...Object.keys(counts).map(c => ({ id: c, label: c, count: counts[c] }))];
+      rows = [{ id: 'ALL', label: 'كل التصنيفات' }, ...Object.keys(counts).map(c => ({ id: c, label: c }))];
       current = selectedCategory;
       pick = id => setSelectedCategory(id);
     } else {
@@ -29739,7 +30238,7 @@ model OrderInvoice {
         { id: 'ALL', label: 'كل الموديلات' },
         ...publicModels
           .filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand)
-          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen, count: publicPartCountByModelIdMap.get(String(m.id)) || 0 }))
+          .map(m => ({ id: m.id, label: m.name, sub: m.brand, image: m.image || PART_IMAGES.screen }))
       ];
       current = selectedModelId;
       pick = id => { setSelectedModelId(id); setSelectedCategory('ALL'); };
@@ -29779,14 +30278,13 @@ model OrderInvoice {
                   <span className="block text-sm font-extrabold text-fg truncate">{r.label}</span>
                   {r.sub && <span className="block text-[11px] text-muted">{r.sub}</span>}
                 </span>
-                {r.count !== undefined && <span className="text-[11px] font-bold text-muted shrink-0">{r.count}</span>}
                 {current === r.id && <span className="text-blue-600 font-black shrink-0">✓</span>}
               </button>
             ))}
           </div>
           <div className="shrink-0 p-3 border-t border-line" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
             <button type="button" onClick={() => setFilterSheet(null)} className="w-full py-3 rounded-xl bg-blue-600 text-white font-extrabold text-sm">
-              عرض النتايج ({filteredParts.length})
+              عرض النتايج
             </button>
           </div>
         </div>
@@ -30838,8 +31336,8 @@ ${footer}
 
     const handleAttemptDeleteBrand = (brandName) => {
       const brandModels = models.filter(m => m.brand === brandName);
-      const modelIds = new Set(brandModels.map(m => m.id));
-      const brandParts = parts.filter(p => modelIds.has(p.modelId));
+      const modelIds = new Set(brandModels.map(m => String(m.id)));
+      const brandParts = parts.filter(p => modelIds.has(String(p.modelId)));
 
       if (brandModels.length > 0 || brandParts.length > 0) {
         const fallbackBrand = brands.find(b => b !== brandName) || 'أخرى';
@@ -30912,9 +31410,9 @@ ${footer}
                   onClick={() => {
                     const bName = brandDeleteProtectionModal.brandName;
                     const affectedModelIds = new Set(
-                      models.filter(m => m.brand === bName).map(m => m.id)
+                      models.filter(m => m.brand === bName).map(m => String(m.id))
                     );
-                    setParts(prev => prev.filter(p => !affectedModelIds.has(p.modelId)));
+                    setParts(prev => prev.filter(p => !affectedModelIds.has(String(p.modelId))));
                     setModels(prev => prev.filter(m => m.brand !== bName));
                     setBrands(prev => prev.filter(b => b !== bName));
                     setBrandDeleteProtectionModal(null);
@@ -30927,9 +31425,14 @@ ${footer}
 
                 <button
                   type="button"
+                  disabled={!brands.some(b => b === brandDeleteProtectionModal.targetBrand)}
                   onClick={() => {
                     const bName = brandDeleteProtectionModal.brandName;
                     const targetB = brandDeleteProtectionModal.targetBrand;
+                    if (!brands.some(b => b === targetB)) {
+                      showToast('⚠️ اختر ماركة حقيقية للنقل إليها الأول (مفيش ماركة تانية متاحة).', 'error');
+                      return;
+                    }
                     setModels(prev =>
                       prev.map(m => (m.brand === bName ? { ...m, brand: targetB } : m))
                     );
@@ -30937,7 +31440,7 @@ ${footer}
                     setBrandDeleteProtectionModal(null);
                     showToast(`تم تعديل ونقل جميع الموديلات والقطع إلى ماركة "${targetB}" وحذف "${bName}" بأمان!`, 'success');
                   }}
-                  className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold"
+                  className="py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   2. تعديل ونقل للماركة المختارة
                 </button>
@@ -31162,6 +31665,34 @@ ${footer}
               >
                 + إضافة للتمبلت
               </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <input
+                type="text"
+                value={newTplSkuPrefix}
+                onChange={e => setNewTplSkuPrefix(e.target.value)}
+                placeholder="بادئة كود SKU (مثال: GLS-ORG)"
+                className="p-2 rounded-lg border border-line bg-surface font-bold"
+              />
+              <input
+                type="number"
+                min={0}
+                value={newTplStock}
+                onChange={e => setNewTplStock(e.target.value)}
+                placeholder="المخزون الافتراضي عند التوليد"
+                className="p-2 rounded-lg border border-line bg-surface font-bold"
+              />
+              <select
+                value={newTplImageKey}
+                onChange={e => setNewTplImageKey(e.target.value)}
+                className="p-2 rounded-lg border border-line bg-surface font-bold"
+              >
+                <option value="screen">صورة افتراضية: شاشة</option>
+                <option value="battery">صورة افتراضية: بطارية</option>
+                <option value="flex">صورة افتراضية: فلاتة</option>
+                <option value="camera">صورة افتراضية: كاميرا</option>
+                <option value="logo">صورة افتراضية: لوجو المتجر</option>
+              </select>
             </div>
           </form>
 
@@ -31710,11 +32241,11 @@ ${footer}
                     );
                     setAddingPartToModel(prev => ({
                       ...prev,
-                      category: prev.category || ai.category,
-                      qualityGrade: prev.qualityGrade || ai.qualityGrade,
-                      warrantyText: prev.warrantyText || ai.warrantyText,
-                      colorsText: prev.colorsText || ai.colorsText,
-                      compatibleText: prev.compatibleText || ai.compatibleText,
+                      category: ai.category || prev.category,
+                      qualityGrade: ai.qualityGrade || prev.qualityGrade,
+                      warrantyText: ai.warrantyText || prev.warrantyText,
+                      colorsText: ai.colorsText || prev.colorsText,
+                      compatibleText: ai.compatibleText || prev.compatibleText,
                       description: ai.description
                     }));
                     showToast('✨ تم توليد الوصف وتعبئة المواصفات والضمان بالذكاء الاصطناعي ✓', 'success');
@@ -32161,7 +32692,7 @@ ${footer}
                       compatibleText: prev.compatibleText || ai.compatibleText,
                       description: ai.description
                     }));
-                    showToast('✨ تم توليد الوصف وتعبئة الخانات بالذكاء الاصطناعي ✓', 'success');
+                    showToast('✨ تم توليد وصف جديد وتعبئة الخانات الفاضية فقط — بيانات المنتج الحالية لم تتغير.', 'success');
                   }}
                   className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2563EB] to-indigo-600 hover:from-[#3B82F6] hover:to-indigo-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
                 >
@@ -32267,6 +32798,31 @@ ${footer}
                       max="25"
                       value={editingPartObj.cashbackPct ?? 2}
                       onChange={e => setEditingPartObj(prev => ({ ...prev, cashbackPct: e.target.value }))}
+                      className="w-full p-2 rounded-xl border border-line font-mono font-black"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-surface border border-line font-black cursor-pointer">
+                  <span>👑 منتج VIP فقط (يظهر في قسم الـ VIP):</span>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(editingPartObj.isVipOnly)}
+                    onChange={e => setEditingPartObj(prev => ({ ...prev, isVipOnly: e.target.checked }))}
+                    className="w-4 h-4 accent-amber-500"
+                  />
+                </label>
+                {editingPartObj.isVipOnly && (
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-muted shrink-0">سعر الـ VIP الخاص (ج.م):</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editingPartObj.vipPrice ?? ''}
+                      onChange={e => setEditingPartObj(prev => ({ ...prev, vipPrice: e.target.value }))}
+                      placeholder="فارغ = السعر العادي"
                       className="w-full p-2 rounded-xl border border-line font-mono font-black"
                     />
                   </div>
