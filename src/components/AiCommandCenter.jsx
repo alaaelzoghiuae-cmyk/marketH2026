@@ -52,7 +52,17 @@ export default function AiCommandCenter({
 
   // Precompute REAL store analytics once per state change
   const liveMetrics = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const cairoDay = (d) => {
+      try { return d.toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }); } catch (e) { return d.toISOString().slice(0, 10); }
+    };
+    const parseOrderTs = (raw) => {
+      const c = String(raw || '').trim();
+      if (!c) return NaN;
+      let iso = c.replace(' ', 'T');
+      if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(iso) && !/(Z|[+-]\d{2}:?\d{2})$/.test(iso)) iso += 'Z';
+      return Date.parse(iso);
+    };
+    const todayStr = cairoDay(new Date());
     const weekAgoTs = Date.now() - 7 * 86400000;
     const soldQtyBySku = new Map();
     const soldRevBySku = new Map();
@@ -63,15 +73,16 @@ export default function AiCommandCenter({
     for (const o of orders) {
       const created = String(o.createdAt || o.created_at || o.date || '');
       const status = String(o.status || '');
-      if (created.startsWith(todayStr)) todayOrders.push(o);
-      const parsedTs = Date.parse(created.replace(' ', 'T'));
+      const parsedTs0 = parseOrderTs(created);
+      if (!Number.isNaN(parsedTs0) && cairoDay(new Date(parsedTs0)) === todayStr) todayOrders.push(o);
+      const parsedTs = parsedTs0;
       if (!Number.isNaN(parsedTs) && parsedTs >= weekAgoTs) weekOrders.push(o);
-      if (['جديد', 'قيد المراجعة', 'pending'].includes(status)) attentionOrders.push(o);
+      if (['تم الاستلام', 'جديد', 'قيد المراجعة', 'pending'].includes(status)) attentionOrders.push(o);
       if (status !== 'ملغي') {
         for (const it of (o.items || [])) {
           const sku = String(it.sku || it.partId || it.name || '');
           const qty = Number(it.qty || it.quantity || 1);
-          const price = Number(it.unitPrice || it.price || 0);
+          const price = Number(it.unitPriceBase || it.unitPrice || it.price || 0);
           soldQtyBySku.set(sku, (soldQtyBySku.get(sku) || 0) + qty);
           soldRevBySku.set(sku, (soldRevBySku.get(sku) || 0) + qty * price);
         }
@@ -96,12 +107,12 @@ export default function AiCommandCenter({
       return imgs.length <= 1;
     });
     const weakDesc = parts.filter(p => String(p.description || '').trim().length < 25);
-    const unsold = parts.filter(p => !soldQtyBySku.has(String(p.sku || p.id)));
+    const unsold = parts.filter(p => !soldQtyBySku.has(String(p.sku || '')) && !soldQtyBySku.has(String(p.id || '')));
     const topSellers = [...parts]
       .map(p => ({
         part: p,
         soldQty: soldQtyBySku.get(String(p.sku || '')) || soldQtyBySku.get(String(p.id || '')) || 0,
-        rev: soldRevBySku.get(String(p.sku || '')) || 0
+        rev: soldRevBySku.get(String(p.sku || '')) || soldRevBySku.get(String(p.id || '')) || 0
       }))
       .filter(x => x.soldQty > 0)
       .sort((a, b) => b.soldQty - a.soldQty)
@@ -132,6 +143,7 @@ export default function AiCommandCenter({
   const handleCommand = (rawQuery) => {
     const q = String(rawQuery || input).trim();
     if (!q) return;
+    setPendingAction(null);
     setInput('');
     const low = q.toLowerCase();
     const userMsg = { id: `u_${Date.now()}`, role: 'user', text: q };
@@ -147,7 +159,7 @@ export default function AiCommandCenter({
       reply.text = `جهّزت لك مسودة منتج جديد باستخدام الرابط المرفق. راجع التفاصيل واضغط تأكيد لإضافته للمخزن:`;
       setPendingAction({
         type: 'CREATE_PRODUCT',
-        label: `إضافة منتج: ${guessedTitle}`,
+        label: `إضافة منتج: ${guessedTitle} — سعر بيع 350 ج.م • تكلفة 250 ج.م • مخزون 5 (قيم افتراضية مؤقتة، عدّلها من إدارة المنتجات بعد الإنشاء)`,
         payload: {
           name: guessedTitle,
           image: isSafeImg ? imgUrl : '',
@@ -241,7 +253,7 @@ export default function AiCommandCenter({
     // 7. Missing images / incomplete descriptions
     else if (/(صور|وصف|ناقص|جودة|missing|image|description|incomplete)/i.test(low)) {
       reply.text = `نتائج فحص جودة الكتالوج (${parts.length} منتج): • بدون صور نهائياً: ${liveMetrics.missingImages.length} • بصورة واحدة فقط: ${liveMetrics.singleImage.length} • بوصف قصير أو ناقص: ${liveMetrics.weakDesc.length}.`;
-      reply.items = [...liveMetrics.missingImages, ...liveMetrics.weakDesc].slice(0, 8).map(p => ({
+      reply.items = [...new Map([...liveMetrics.missingImages, ...liveMetrics.weakDesc].map(p => [p.id, p])).values()].slice(0, 8).map(p => ({
         title: p.name,
         meta: `التصنيف: ${p.category || 'غير مصنف'} • الصور: ${(p.images || []).length || (p.image ? 1 : 0)}`,
         badge: 'يحتاج تحسين',
@@ -297,8 +309,14 @@ export default function AiCommandCenter({
         text: `✅ تم تحديث أسعار ${pendingAction.payload.ids.length} منتج بنسبة +${pendingAction.payload.pct}% بنجاح.`
       }]);
     }
+    const executed =
+      (pendingAction.type === 'CREATE_PRODUCT' && typeof onCreateProductFromAi === 'function') ||
+      (pendingAction.type === 'BULK_PRICE_PCT' && typeof onApplyBulkPriceChange === 'function');
     setPendingAction(null);
-    if (showToast) showToast('تم تنفيذ الإجراء بعد تأكيدك ✓', 'success');
+    if (showToast) {
+      if (executed) showToast('تم تنفيذ الإجراء بعد تأكيدك ✓', 'success');
+      else showToast('⚠️ تعذّر تنفيذ الإجراء — المعالج غير متاح حالياً.', 'error');
+    }
   };
 
   if (!open) return null;

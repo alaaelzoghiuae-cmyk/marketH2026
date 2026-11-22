@@ -30,6 +30,31 @@ export default function BulkProductImporter({
 
   const isSafeHttpUrl = (u) => /^https?:\/\/[^\s"'<>]+$/i.test(String(u || '').trim());
 
+  // Minimal CSV splitter that honors double-quoted fields: a comma inside
+  // quotes stays in the field and "" is an escaped quote. (A naive split(',')
+  // shifted every field after a product name containing a comma.)
+  const splitCsvLine = (line) => {
+    const out = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (line[i + 1] === '"') { cur += '"'; i++; }
+          else inQuotes = false;
+        } else cur += ch;
+      } else if (ch === '"') {
+        inQuotes = true;
+      } else if (ch === ',') {
+        out.push(cur.trim());
+        cur = '';
+      } else cur += ch;
+    }
+    out.push(cur.trim());
+    return out;
+  };
+
   const parseInputToRows = () => {
     const lines = rawInput.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) {
@@ -41,14 +66,16 @@ export default function BulkProductImporter({
       // Support CSV: Title, Price, Cost, Stock, Category, URL1 | URL2 | URL3 | URL4
       // OR pure URL lines (each line is 1 or more space/pipe-separated image URLs)
       const parts = line.includes(',') && !line.startsWith('http')
-        ? line.split(',').map(x => x.trim())
+        ? splitCsvLine(line)
         : null;
 
       if (parts && parts.length >= 2) {
         const name = parts[0] || `منتج جديد #${idx + 1}`;
         const basePrice = Math.max(0, Number(parts[1]) || 0);
-        const costPrice = Math.max(0, Number(parts[2]) || Math.round(basePrice * 0.78));
-        const stock = Math.max(0, Number(parts[3]) || Number(defaultStock) || 5);
+        const rawCost = String(parts[2] ?? '').trim();
+        const costPrice = rawCost === '' ? 0 : Math.max(0, Number(rawCost) || 0);
+        const rawStock = String(parts[3] ?? '').trim();
+        const stock = rawStock === '' ? (Number(defaultStock) || 5) : Math.max(0, Number(rawStock) || 0);
         const rawCat = parts[4] || '';
         const urls = (parts.slice(5).join('|').split(/[\s|;]+/)).filter(isSafeHttpUrl).slice(0, 4);
         const category = normalizePartCategory ? (normalizePartCategory(rawCat, name) || 'شواحن') : (rawCat || 'شواحن');
@@ -101,6 +128,7 @@ export default function BulkProductImporter({
 
   const handleCsvUpload = (e) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
@@ -148,6 +176,7 @@ export default function BulkProductImporter({
     const failed = [];
     for (const r of selectedRows) {
       const errs = validateRow(r);
+      if (!models.some(m => m.brand === r.brand)) errs.push('لا يوجد أي موديل لهذا البراند — أنشئ موديلاً من شاشة الكتالوج أولاً');
       if (errs.length > 0) failed.push({ name: r.name, reason: errs.join('، ') });
       else valid.push(r);
     }
@@ -157,9 +186,8 @@ export default function BulkProductImporter({
       return;
     }
 
-    const fallbackModelId = models.find(m => m.brand === defaultBrand)?.id || models[0]?.id || 'or_mdl_001';
     const newParts = valid.map((r, i) => {
-      const targetModel = models.find(m => m.brand === r.brand) || { id: fallbackModelId };
+      const targetModel = models.find(m => m.brand === r.brand);
       const id = `imp_prt_${Date.now()}_${i}`;
       return {
         id,
@@ -177,10 +205,10 @@ export default function BulkProductImporter({
         image: r.images[0] || '',
         imageUrl: r.images[0] || '',
         images: r.images,
-        stock: Number(r.stock) || 5,
-        lowStockThreshold: 2,
+        stock: r.stock === undefined || r.stock === null || r.stock === '' ? (Number(defaultStock) || 5) : Math.max(0, Number(r.stock) || 0),
+        lowStockThreshold: 5,
         maxOrderQty: 5,
-        costPrice: Number(r.costPrice) || Math.round(Number(r.basePrice) * 0.78),
+        costPrice: Math.max(0, Number(r.costPrice) || 0),
         basePrice: Number(r.basePrice),
         customGroupPrices: { _images: r.images },
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' '),
@@ -191,6 +219,8 @@ export default function BulkProductImporter({
     if (typeof onConfirmImport === 'function') {
       onConfirmImport(newParts);
     }
+    const unselectedCount = rows.length - selectedRows.length;
+    if (unselectedCount > 0) failed.push({ name: `${unselectedCount} صف`, reason: 'لم يتم تحديده للاستيراد' });
     setImportSummary({ imported: newParts.length, failed });
     setStep(4);
   };

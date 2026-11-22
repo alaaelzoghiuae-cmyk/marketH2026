@@ -18,6 +18,7 @@ export default function ProductQualityAndImages({
   const [editingPartId, setEditingPartId] = useState(null);
   const [pasteUrlsText, setPasteUrlsText] = useState('');
   const [brokenUrls, setBrokenUrls] = useState({});
+  const [visibleCount, setVisibleCount] = useState(80);
 
   // Audit every product transparently
   const audited = useMemo(() => {
@@ -112,9 +113,13 @@ export default function ProductQualityAndImages({
       return;
     }
     const merged = Array.from(new Set([...editingItem.imgs, ...urls])).slice(0, 8);
+    const actuallyAdded = merged.length - editingItem.imgs.length;
     saveImagesForPart(editingItem.part, merged);
     setPasteUrlsText('');
-    if (showToast) showToast(`تمت إضافة ${urls.length} رابط صورة للمنتج بنجاح ✓`, 'success');
+    if (showToast) {
+      if (actuallyAdded > 0) showToast(`تمت إضافة ${actuallyAdded} رابط صورة جديد للمنتج بنجاح ✓`, 'success');
+      else showToast('كل الروابط دي موجودة أصلاً أو المنتج وصل للحد الأقصى (8 صور) — لم يُضف شيء جديد.', 'info');
+    }
   };
 
   const handleAiFixDescription = (part) => {
@@ -156,7 +161,7 @@ export default function ProductQualityAndImages({
             <button
               key={k}
               type="button"
-              onClick={() => setIssueFilter(k)}
+              onClick={() => { setIssueFilter(k); setVisibleCount(80); }}
               className={`px-3 py-1.5 rounded-full font-extrabold border transition ${
                 issueFilter === k
                   ? 'bg-[#2563EB] text-white border-[#2563EB]'
@@ -259,7 +264,7 @@ export default function ProductQualityAndImages({
 
       {/* Audited Products List */}
       <div className="bg-surface rounded-3xl border border-line shadow-sm divide-y divide-line max-h-[520px] overflow-y-auto">
-        {visibleList.slice(0, 80).map(a => (
+        {visibleList.slice(0, visibleCount).map(a => (
           <div key={a.part.id} className="p-3.5 flex flex-wrap items-center justify-between gap-3 hover:bg-surface2/40 transition">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <div className="w-11 h-11 rounded-xl bg-white border border-line p-1 flex items-center justify-center shrink-0">
@@ -310,6 +315,20 @@ export default function ProductQualityAndImages({
             </div>
           </div>
         ))}
+        {visibleList.length > 0 && (
+          <div className="p-3 text-center space-y-2">
+            <div className="text-[11px] font-bold text-muted">المعروض {Math.min(visibleCount, visibleList.length)} من أصل {visibleList.length} منتج</div>
+            {visibleCount < visibleList.length && (
+              <button
+                type="button"
+                onClick={() => setVisibleCount(c => c + 80)}
+                className="px-5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs"
+              >
+                عرض 80 منتجاً إضافياً
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

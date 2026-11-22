@@ -117,6 +117,7 @@ export default function AiProductSourcingAgent({
 
   // Staged products, excluded products, and catalog update proposals
   const [stagedItems, setStagedItems] = useState([]);
+  const [resultsMode, setResultsMode] = useState('import');
   const [excludedItems, setExcludedItems] = useState([]);
   const [updateProposals, setUpdateProposals] = useState([]);
 
@@ -174,6 +175,7 @@ export default function AiProductSourcingAgent({
     if (workflow.pricing?.exchangeRate) {
       next.pricing.exchangeRate = workflow.pricing.exchangeRate;
       next.pricing.exchangeRateSource = workflow.pricing.exchangeRateSource;
+      next.pricing.exchangeRatePair = workflow.pricing.exchangeRatePair || null;
       next.pricing.exchangeRateDate = workflow.pricing.exchangeRateDate;
     }
     setWorkflow(next);
@@ -189,6 +191,7 @@ export default function AiProductSourcingAgent({
     if (workflow.pricing?.exchangeRate) {
       next.pricing.exchangeRate = workflow.pricing.exchangeRate;
       next.pricing.exchangeRateSource = workflow.pricing.exchangeRateSource;
+      next.pricing.exchangeRatePair = workflow.pricing.exchangeRatePair || null;
       next.pricing.exchangeRateDate = workflow.pricing.exchangeRateDate;
     }
     setWorkflow(next);
@@ -223,6 +226,7 @@ export default function AiProductSourcingAgent({
           pricing: {
             ...prev.pricing,
             exchangeRate: Number(data.rate.toFixed(4)),
+            exchangeRatePair: `${base}_${target}`,
             exchangeRateSource: data.source || 'Live Exchange API',
             exchangeRateDate: String(data.conversionDate || new Date().toISOString()).slice(0, 10)
           }
@@ -272,6 +276,7 @@ export default function AiProductSourcingAgent({
       if (workflow.pricing?.exchangeRate) {
         reparsed.pricing.exchangeRate = workflow.pricing.exchangeRate;
         reparsed.pricing.exchangeRateSource = workflow.pricing.exchangeRateSource;
+        reparsed.pricing.exchangeRatePair = workflow.pricing.exchangeRatePair || null;
         reparsed.pricing.exchangeRateDate = workflow.pricing.exchangeRateDate;
       }
       activeWorkflow = reparsed;
@@ -327,6 +332,9 @@ export default function AiProductSourcingAgent({
         pushLog('🧪 تشغيل وضع الاختبار المعزول (Isolated Test Fixture — 5 منتجات اختبارية؛ لا تُنشر تلقائياً).');
         discoveredRaw = ISOLATED_TEST_PRODUCTS.map(p => ({ ...p }));
       } else if (hasFeed) {
+        if (urlsToScan.length > 0) {
+          pushLog(`⚠️ تنبيه: خانة البيانات المنظمة (Feed) فيها محتوى، فهيتم تجاهل ${urlsToScan.length} رابط مصدر في التشغيلة دي. امسح نص الـ Feed لو عايز تفحص الروابط.`);
+        }
         pushLog('📄 تحليل البيانات المنظمة المرفقة (CSV / JSON Feed)...');
         const feedRes = parseStructuredSourceInput(structuredFeedText, 'uploaded_feed');
         if (!feedRes.ok) {
@@ -391,7 +399,10 @@ export default function AiProductSourcingAgent({
       }));
 
       // STAGE 2: Filtering
-      const { passed, excluded } = applyProductFilters(discoveredRaw, activeWorkflow.filters);
+      const { passed, excluded } = applyProductFilters(discoveredRaw, activeWorkflow.filters, {
+        rate: activeWorkflow.pricing?.exchangeRate,
+        pair: activeWorkflow.pricing?.exchangeRatePair || null
+      });
       pushLog(`🔎 نتائج الفلترة: ${passed.length} منتج مطابق، ${excluded.length} منتج مستبعد.`);
 
       setExecState(prev => ({
@@ -456,7 +467,7 @@ export default function AiProductSourcingAgent({
         const enriched = enrichProductData(p, {
           normalizePartCategory,
           existingCategories: categories,
-          language: workflow.enrichment?.language || 'ar'
+          language: activeWorkflow.enrichment?.language || 'ar'
         });
         const pricing = calculateProductPricing(p, activeWorkflow.pricing, enriched.matchedCategory);
         const idempotencyKey = computeIdempotencyKey({ ...p, enriched });
@@ -465,7 +476,7 @@ export default function AiProductSourcingAgent({
           ...p,
           stagedId: `stg_${taskId}_${i}`,
           idempotencyKey,
-          selected: workflow.mode !== 'analyze_only' && duplicate.status === DUPLICATE_STATUS.NEW_PRODUCT,
+          selected: activeWorkflow.mode !== 'analyze_only' && duplicate.status === DUPLICATE_STATUS.NEW_PRODUCT,
           duplicate,
           duplicateAction: duplicate.recommendedAction,
           analyzedImages,
@@ -482,13 +493,14 @@ export default function AiProductSourcingAgent({
       pushLog(`✨ تم إثراء وتجهيز ${staged.length} منتج للمراجعة (تكرارات مكتشفة: ${dupCount}).`);
 
       setStagedItems(staged);
+      setResultsMode(activeWorkflow.mode);
       setExcludedItems(extraExcluded);
       setReviewPage(1);
 
       setExecState(prev => ({
         ...prev,
         running: false,
-        stage: workflow.mode === 'analyze_only'
+        stage: activeWorkflow.mode === 'analyze_only'
           ? 'اكتمل التحليل والتوصيات (وضع استكشاف بدون استيراد)'
           : 'اكتمل التجهيز — بانتظار مراجعة وموافقة المدير قبل الاستيراد',
         duplicates: dupCount,
@@ -502,14 +514,14 @@ export default function AiProductSourcingAgent({
 
       setHistory(prev => [{
         id: taskId,
-        title: `${workflow.filters.brands.join(' / ') || 'استيراد ذكي'} (${staged.length} منتج)`,
-        mode: workflow.mode,
+        title: `${activeWorkflow.filters.brands.join(' / ') || 'استيراد ذكي'} (${staged.length} منتج)`,
+        mode: activeWorkflow.mode,
         instructions: instruction,
         sourceUrls: useIsolatedTest ? ['isolated_test_fixture'] : urlsToScan,
-        filters: workflow.filters,
-        pricing: workflow.pricing,
+        filters: activeWorkflow.filters,
+        pricing: activeWorkflow.pricing,
         counts: { discovered: discoveredRaw.length, filtered: passed.length, excluded: extraExcluded.length, duplicates: dupCount, prepared: staged.length, imported: 0, skipped: 0, failed: errors.length },
-        status: workflow.mode === 'analyze_only' ? 'analyzed' : 'awaiting_approval',
+        status: activeWorkflow.mode === 'analyze_only' ? 'analyzed' : 'awaiting_approval',
         logs: [...logs],
         errors: [...errors],
         createdAt: new Date().toISOString()
@@ -571,13 +583,37 @@ export default function AiProductSourcingAgent({
       return;
     }
 
-    const targets = stagedItems.filter(it =>
+    let targets = stagedItems.filter(it =>
       onlyIds ? onlyIds.includes(it.stagedId) : (it.selected && it.importState !== 'imported' && it.duplicateAction !== 'skip')
     );
     if (targets.length === 0) {
       showToast?.('اختر منتجاً واحداً على الأقل جاهزاً للاستيراد.', 'warning');
       return;
     }
+
+    // Never import a product whose pricing failed (e.g. missing exchange
+    // rate) or whose final price is 0 without an explicit manual price —
+    // it would land in the catalog selling at 0 EGP.
+    const priceBlocked = targets.filter(it => {
+      const eff = Number(it.customPrice ?? it.pricing?.finalPrice ?? 0) || 0;
+      return it.pricing?.ok === false || eff <= 0;
+    });
+    if (priceBlocked.length > 0) {
+      showToast?.(`⛔ تم منع استيراد ${priceBlocked.length} منتج بدون سعر نهائي صالح (سعر صرف ناقص أو سعر صفر) — حدّد لهم سعراً يدوياً من جدول المراجعة أولاً.`, 'error');
+      setStagedItems(prev => prev.map(it => priceBlocked.some(b => b.stagedId === it.stagedId) ? { ...it, importState: 'failed' } : it));
+      targets = targets.filter(it => !priceBlocked.includes(it));
+      if (targets.length === 0) return;
+    }
+
+    const manualReview = targets.filter(it => it.duplicateAction === 'manual_review');
+    if (manualReview.length > 0) {
+      showToast?.(`⏸️ تم إيقاف ${manualReview.length} منتج بإجراء «مراجعة يدوية» — راجعهم وغيّر الإجراء قبل الاستيراد.`, 'warning');
+      setStagedItems(prev => prev.map(it => manualReview.some(b => b.stagedId === it.stagedId) ? { ...it, importState: 'failed' } : it));
+      targets = targets.filter(it => !manualReview.includes(it));
+    }
+    const updateTargets = targets.filter(it => it.duplicateAction === 'update_existing' && it.duplicate?.matchedPart?.id);
+    targets = targets.filter(it => !updateTargets.includes(it));
+    if (targets.length === 0 && updateTargets.length === 0) return;
 
     const existingIdSet = new Set(parts.map(p => String(p.id)));
     const defaultModelId = models[0]?.id || 'mdl_general';
@@ -644,6 +680,47 @@ export default function AiProductSourcingAgent({
       }
     }
 
+    // Duplicate action "update_existing": patch the matched catalog product
+    // (price/cost/images) through the catalog-update channel instead of
+    // creating a second copy of it.
+    if (updateTargets.length > 0 && typeof onApplyCatalogUpdates === 'function') {
+      const patchMap = {};
+      for (const it of updateTargets) {
+        try {
+          const built = buildSafeImportPart(it, execState.activeTaskId, {
+            asDraft: false,
+            defaultModelId,
+            imageHandling: workflow.imageHandling
+          });
+          const patch = {};
+          const effPrice = Number(it.customPrice ?? it.pricing?.finalPrice ?? built.basePrice) || 0;
+          if (effPrice > 0) patch.basePrice = effPrice;
+          if (Number(built.costPrice) > 0) patch.costPrice = built.costPrice;
+          if (Array.isArray(built.images) && built.images.length > 0) {
+            patch.images = built.images;
+            patch.image = built.images[0];
+            patch.imageUrl = built.images[0];
+          }
+          if (Object.keys(patch).length > 0) patchMap[String(it.duplicate.matchedPart.id)] = patch;
+        } catch { /* leave the item unmarked */ }
+      }
+      if (Object.keys(patchMap).length > 0) {
+        let updOk = true;
+        try {
+          updOk = (await onApplyCatalogUpdates(patchMap)) !== false;
+        } catch {
+          updOk = false;
+        }
+        if (updOk) {
+          const updatedIds = new Set(updateTargets.filter(it => patchMap[String(it.duplicate.matchedPart.id)]).map(it => it.stagedId));
+          setStagedItems(prev => prev.map(it => updatedIds.has(it.stagedId) ? { ...it, importState: 'imported', selected: false } : it));
+          showToast?.(`تم تحديث ${Object.keys(patchMap).length} منتج موجود في الكتالوج بدل إنشاء نسخ مكررة ✓`, 'success');
+        } else {
+          showToast?.('⚠️ فشل حفظ تحديثات المنتجات الموجودة في قاعدة البيانات.', 'error');
+        }
+      }
+    }
+
     setStagedItems(prev => prev.map(it => {
       if (importedIds.has(it.stagedId)) return { ...it, importState: persistedOk ? 'imported' : 'failed', selected: false };
       if (skippedIds.has(it.stagedId)) return { ...it, importState: 'skipped', selected: false };
@@ -688,7 +765,7 @@ export default function AiProductSourcingAgent({
   };
 
   // Apply approved Catalog Update proposals (Phase 11 — per-field approval)
-  const handleApplyApprovedCatalogUpdates = () => {
+  const handleApplyApprovedCatalogUpdates = async () => {
     const patchMap = {};
     let approvedFields = 0;
     updateProposals.forEach(prop => {
@@ -713,12 +790,21 @@ export default function AiProductSourcingAgent({
       return;
     }
 
-    onApplyCatalogUpdates?.(patchMap);
+    let saveOk = true;
+    try {
+      saveOk = (await onApplyCatalogUpdates?.(patchMap)) !== false;
+    } catch {
+      saveOk = false;
+    }
+    if (!saveOk) {
+      showToast?.('⚠️ فشل حفظ تحديثات الكتالوج في قاعدة البيانات — لم يتم اعتمادها، حاول تاني.', 'error');
+      return;
+    }
     setUpdateProposals(prev => prev.map(p => ({
       ...p,
       changes: p.changes.map(c => c.approved ? { ...c, applied: true, approved: false } : c)
     })));
-    showToast?.(`تم تطبيق ${approvedFields} تحديث معتمد على الكتالوج ومزامنتها ✓`, 'success');
+    showToast?.(`تم تطبيق ${approvedFields} تحديث معتمد على الكتالوج وحفظها ✓`, 'success');
   };
 
   // Export staged results as CSV
@@ -1124,9 +1210,13 @@ export default function AiProductSourcingAgent({
                           setSourceUrlsText(prev => prev.includes(pr.website) ? prev : (prev ? `${prev}\n${pr.website}` : pr.website));
                           setWorkflow(prev => ({
                             ...prev,
-                            sourceUrls: Array.from(new Set([...prev.sourceUrls, pr.website]))
+                            sourceUrls: Array.from(new Set([...prev.sourceUrls, pr.website])),
+                            // Apply the profile's saved defaults, not just its URL:
+                            // its pricing rule and image handling travel with it.
+                            pricing: pr.defaultPricingRule ? { ...prev.pricing, ...pr.defaultPricingRule } : prev.pricing,
+                            imageHandling: pr.defaultImageHandling || prev.imageHandling
                           }));
-                          showToast?.(`تمت إضافة ${pr.name} لقائمة المصادر`, 'info');
+                          showToast?.(`تمت إضافة ${pr.name} لقائمة المصادر${pr.defaultPricingRule ? ' وتطبيق قاعدة التسعير ومعالجة الصور المحفوظة في ملفه' : ''}`, 'info');
                         }}
                         className="px-2.5 py-1 rounded-lg bg-surface hover:bg-blue-600 hover:text-white border border-line text-[11px] font-black shrink-0 transition"
                       >
@@ -1411,6 +1501,7 @@ export default function AiProductSourcingAgent({
                     pricing: {
                       ...p.pricing,
                       exchangeRate: e.target.value === '' ? null : Number(e.target.value),
+                      exchangeRatePair: null,
                       exchangeRateSource: 'محدد يدوياً بواسطة المدير',
                       exchangeRateDate: new Date().toISOString().slice(0, 10)
                     }
@@ -1505,7 +1596,7 @@ export default function AiProductSourcingAgent({
                 </div>
 
                 {/* Controlled Approval & Import Action Bar (Phase 12 & 14) */}
-                {workflow.mode !== 'analyze_only' && (
+                {resultsMode !== 'analyze_only' && (
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-3 border-t border-line bg-surface2/50 p-3 rounded-xl">
                     <div className="flex flex-wrap items-center gap-3 text-xs">
                       <span className="font-black text-fg">المحدد للاستيراد: <b className="text-blue-600">{selectedCount}</b> منتج</span>

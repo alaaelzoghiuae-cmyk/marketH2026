@@ -4,22 +4,37 @@ import {
   CheckCircle2, Clock, Truck, Ban, Sparkles, ArrowUpRight, Layers, Users, Package
 } from 'lucide-react';
 
+// Board stages MUST be the store's real order statuses (App.jsx
+// ORDER_STATUS_FLOW) — writing any other value breaks customer tracking.
 const ORDER_STAGES = [
-  { id: 'جديد', label: 'جديد', tone: 'blue' },
-  { id: 'قيد المراجعة', label: 'قيد المراجعة', tone: 'amber' },
+  { id: 'تم الاستلام', label: 'جديد — تم الاستلام', tone: 'blue' },
   { id: 'جاري التجهيز', label: 'جاري التجهيز', tone: 'violet' },
-  { id: 'جاري التوصيل', label: 'جاري التوصيل', tone: 'cyan' },
+  { id: 'جاهز للتسليم', label: 'جاهز للتسليم', tone: 'amber' },
+  { id: 'في الطريق (دليفري)', label: 'في الطريق (دليفري)', tone: 'cyan' },
   { id: 'تم التسليم', label: 'تم التسليم', tone: 'emerald' },
   { id: 'ملغي', label: 'ملغي', tone: 'rose' }
 ];
 
 const normalizeStage = (st) => {
   const s = String(st || '').trim();
-  if (!s || s === 'pending') return 'جديد';
+  // Legacy board values heal to the closest real status on read.
+  if (!s || s === 'pending' || s === 'جديد' || s === 'قيد المراجعة') return 'تم الاستلام';
   if (s === 'Delivered') return 'تم التسليم';
+  if (s === 'جاري التوصيل') return 'في الطريق (دليفري)';
   if (ORDER_STAGES.some(x => x.id === s)) return s;
-  return 'قيد المراجعة';
+  return 'تم الاستلام';
 };
+
+// Orders carry no total field — the invoice total is computed from items.
+const orderTotal = (o) => {
+  const direct = Number(o?.total || o?.grandTotal || 0);
+  if (direct > 0) return direct;
+  const itemsSum = (Array.isArray(o?.items) ? o.items : []).reduce(
+    (sum, i) => sum + (Number(i.qty) || 0) * (Number(i.unitPriceBase) || 0), 0);
+  return Math.max(0, itemsSum + (Number(o?.deliveryFeeBase) || 0) - (Number(o?.discountBase) || 0));
+};
+
+const orderPhone = (o) => o?.clientPhone || o?.phone || o?.customerPhone || '';
 
 /**
  * FEATURE 5 — ORDER WORKFLOW MANAGEMENT (Kanban + Table View + CSV Export)
@@ -35,7 +50,7 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
       const st = normalizeStage(o.status);
       if (stageFilter !== 'ALL' && st !== stageFilter) return false;
       if (!q) return true;
-      return `${o.id || ''} ${o.customerName || o.clientName || ''} ${o.phone || o.customerPhone || ''} ${o.address || ''}`
+      return `${o.id || ''} ${o.customerName || o.clientName || ''} ${orderPhone(o)} ${o.address || ''}`
         .toLowerCase()
         .includes(q);
     });
@@ -46,9 +61,9 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
     const rows = filteredOrders.map(o => [
       o.id || '',
       `"${String(o.customerName || o.clientName || '').replace(/"/g, '""')}"`,
-      o.phone || o.customerPhone || '',
+      orderPhone(o),
       normalizeStage(o.status),
-      Number(o.total || o.grandTotal || 0),
+      orderTotal(o),
       o.createdAt || ''
     ]);
     const csv = '\uFEFF' + [header.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -141,11 +156,11 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
                     <div key={o.id} className="p-3 rounded-xl bg-bg border border-line space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono font-black text-[#2563EB] dark:text-[#60A5FA]">#{o.id}</span>
-                        <span className="font-mono font-black text-fg">{Number(o.total || o.grandTotal || 0).toLocaleString()} ج.م</span>
+                        <span className="font-mono font-black text-fg">{orderTotal(o).toLocaleString()} ج.م</span>
                       </div>
                       <div className="font-extrabold text-fg truncate">{o.customerName || o.clientName || 'عميل'}</div>
                       <div className="text-[10px] text-muted flex items-center justify-between">
-                        <span>{o.phone || o.customerPhone || '—'}</span>
+                        <span>{orderPhone(o) || '—'}</span>
                         <span>{(o.items || []).length} صنف</span>
                       </div>
                       {typeof onUpdateOrderStatus === 'function' && (
@@ -182,9 +197,9 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
                 <tr key={o.id} className="hover:bg-surface2/40">
                   <td className="p-3 font-mono font-black text-[#2563EB]">#{o.id}</td>
                   <td className="p-3 font-extrabold text-fg">{o.customerName || o.clientName || 'عميل'}</td>
-                  <td className="p-3 font-mono text-muted">{o.phone || o.customerPhone || '—'}</td>
+                  <td className="p-3 font-mono text-muted">{orderPhone(o) || '—'}</td>
                   <td className="p-3 font-bold">{(o.items || []).length}</td>
-                  <td className="p-3 font-mono font-black">{Number(o.total || o.grandTotal || 0).toLocaleString()} ج.م</td>
+                  <td className="p-3 font-mono font-black">{orderTotal(o).toLocaleString()} ج.م</td>
                   <td className="p-3">
                     {typeof onUpdateOrderStatus === 'function' ? (
                       <select
@@ -214,8 +229,9 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
 
   const filteredOrders = useMemo(() => {
     const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
-    const thisMonthStr = now.toISOString().slice(0, 7);
+    const pad2 = n => String(n).padStart(2, '0');
+    const todayStr = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    const thisMonthStr = todayStr.slice(0, 7);
     const nowTs = now.getTime();
     return orders.filter(o => {
       if (dateRange === 'ALL') return true;
@@ -224,8 +240,8 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
       if (dateRange === 'THIS_MONTH') return d.startsWith(thisMonthStr);
       const ts = Date.parse(d.replace(' ', 'T'));
       if (Number.isNaN(ts)) return false;
-      if (dateRange === '7D') return nowTs - ts <= 7 * 86400000;
-      if (dateRange === '30D') return nowTs - ts <= 30 * 86400000;
+      if (dateRange === '7D') return ts <= nowTs && nowTs - ts <= 7 * 86400000;
+      if (dateRange === '30D') return ts <= nowTs && nowTs - ts <= 30 * 86400000;
       return true;
     });
   }, [orders, dateRange]);
@@ -234,7 +250,8 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
     const valid = filteredOrders.filter(o => normalizeStage(o.status) !== 'ملغي');
     const cancelled = filteredOrders.filter(o => normalizeStage(o.status) === 'ملغي');
     const delivered = filteredOrders.filter(o => normalizeStage(o.status) === 'تم التسليم');
-    const revenue = valid.reduce((s, o) => s + Number(o.total || o.grandTotal || 0), 0);
+    const revenue = valid.reduce((s, o) => s + orderTotal(o), 0);
+    const deliveredRevenue = delivered.reduce((s, o) => s + orderTotal(o), 0);
     const aov = valid.length ? Math.round(revenue / valid.length) : 0;
 
     // Category distribution & inventory value
@@ -251,7 +268,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
       const cost = Number(p.costPrice || 0);
       totalInventoryRetail += st * base;
       totalInventoryCost += st * cost;
-      if (st <= Number(p.lowStockThreshold || 2)) lowStockCount++;
+      if (st > 0 && st <= Number(p.lowStockThreshold || 5)) lowStockCount++;
       if (cost > 0 && base > 0 && ((base - cost) / base) * 100 < 15) weakMarginCount++;
       if (!catMap[c]) catMap[c] = { name: c, count: 0, stock: 0, value: 0 };
       catMap[c].count += 1;
@@ -269,6 +286,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
 
     return {
       revenue,
+      deliveredRevenue,
       aov,
       validCount: valid.length,
       deliveredCount: delivered.length,
@@ -319,9 +337,9 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
       {/* Real KPI Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-surface border border-line shadow-sm">
-          <div className="text-[11px] font-bold text-muted">إجمالي المبيعات الفعلية</div>
+          <div className="text-[11px] font-bold text-muted">قيمة الطلبات (غير الملغاة)</div>
           <div className="text-xl font-black text-[#2563EB] dark:text-[#60A5FA] font-mono mt-1">{bi.revenue.toLocaleString()} ج.م</div>
-          <div className="text-[10px] text-muted mt-1">{bi.validCount} طلب فعال • {bi.cancelledCount} ملغي</div>
+          <div className="text-[10px] text-muted mt-1">{bi.validCount} طلب فعال • {bi.cancelledCount} ملغي • منها مُسلّمة فعلياً: {bi.deliveredRevenue.toLocaleString()} ج.م</div>
         </div>
         <div className="p-4 rounded-2xl bg-surface border border-line shadow-sm">
           <div className="text-[11px] font-bold text-muted">متوسط قيمة الطلب (AOV)</div>
@@ -524,8 +542,8 @@ export function SmartNotificationsPopover({ open, onClose, parts = [], orders = 
   if (!open) return null;
 
   const outOfStock = parts.filter(p => Number(p.stock || 0) <= 0).length;
-  const lowStock = parts.filter(p => Number(p.stock || 0) > 0 && Number(p.stock || 0) <= Number(p.lowStockThreshold || 2)).length;
-  const newOrders = orders.filter(o => ['جديد', 'قيد المراجعة', 'pending'].includes(String(o.status || ''))).length;
+  const lowStock = parts.filter(p => Number(p.stock || 0) > 0 && Number(p.stock || 0) <= Number(p.lowStockThreshold || 5)).length;
+  const newOrders = orders.filter(o => normalizeStage(o.status) === 'تم الاستلام').length;
   const missingImages = parts.filter(p => (!Array.isArray(p.images) || p.images.length === 0) && !p.image && !p.imageUrl).length;
 
   const alerts = [

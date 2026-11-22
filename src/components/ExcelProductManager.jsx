@@ -25,6 +25,7 @@ export default function ExcelProductManager({
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState([]);
   const [undoSnapshot, setUndoSnapshot] = useState(null);
+  const [gridVersion, setGridVersion] = useState(0);
 
   // Bulk operation controls
   const [bulkMode, setBulkMode] = useState('price_pct'); // 'price_pct' | 'stock_set' | 'category'
@@ -42,7 +43,7 @@ export default function ExcelProductManager({
         if (q && !`${p.name || ''} ${p.sku || ''} ${p.brand || ''} ${p.category || ''}`.toLowerCase().includes(q)) return false;
         const normC = normalizePartCategory ? normalizePartCategory(p.category, p.name) : p.category;
         if (catFilter !== 'ALL' && normC !== catFilter) return false;
-        if (stockFilter === 'LOW' && Number(p.stock || 0) > Number(p.lowStockThreshold || 2)) return false;
+        if (stockFilter === 'LOW' && Number(p.stock || 0) > (Number(p.lowStockThreshold) || 5)) return false;
         if (stockFilter === 'OUT' && Number(p.stock || 0) > 0) return false;
         if (stockFilter === 'HIDDEN' && !hiddenSet.has(String(p.id))) return false;
         return true;
@@ -81,12 +82,16 @@ export default function ExcelProductManager({
     if (selectedIds.length === 0) return;
     const idSet = new Set(selectedIds);
     // Save snapshot for Undo
-    const snapshot = parts.filter(p => idSet.has(p.id)).map(p => ({
-      id: p.id,
-      basePrice: p.basePrice,
-      stock: p.stock,
-      category: p.category
-    }));
+    const fieldByMode = { price_pct: 'basePrice', stock_set: 'stock', category: 'category' };
+    const snapshot = {
+      field: fieldByMode[bulkMode] || 'basePrice',
+      items: parts.filter(p => idSet.has(p.id)).map(p => ({
+        id: p.id,
+        basePrice: p.basePrice,
+        stock: p.stock,
+        category: p.category
+      }))
+    };
     setUndoSnapshot(snapshot);
 
     const patches = {};
@@ -107,21 +112,20 @@ export default function ExcelProductManager({
       onBulkUpdateParts(patches);
     }
     setConfirmBulk(false);
+    setSelectedIds([]);
+    setGridVersion(v => v + 1);
     if (showToast) showToast(`تم تطبيق التعديل الجماعي على ${selectedIds.length} منتج ✓`, 'success');
   };
 
   const handleUndo = () => {
-    if (!undoSnapshot || undoSnapshot.length === 0) return;
+    if (!undoSnapshot || !undoSnapshot.items || undoSnapshot.items.length === 0) return;
     const patches = {};
-    for (const item of undoSnapshot) {
-      patches[item.id] = {
-        basePrice: item.basePrice,
-        stock: item.stock,
-        category: item.category
-      };
+    for (const item of undoSnapshot.items) {
+      patches[item.id] = { [undoSnapshot.field]: item[undoSnapshot.field] };
     }
     if (typeof onBulkUpdateParts === 'function') onBulkUpdateParts(patches);
     setUndoSnapshot(null);
+    setGridVersion(v => v + 1);
     if (showToast) showToast('تم التراجع عن آخر تعديل جماعي بنجاح ↺', 'info');
   };
 
@@ -144,7 +148,7 @@ export default function ExcelProductManager({
               className="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-white border border-amber-500/30 font-extrabold flex items-center gap-1.5 transition"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>تراجع عن آخر تعديل جماعي ({undoSnapshot.length})</span>
+              <span>تراجع عن آخر تعديل جماعي ({undoSnapshot.items?.length || 0})</span>
             </button>
           )}
         </div>
@@ -324,7 +328,7 @@ export default function ExcelProductManager({
                 const margin = base > 0 && cost > 0 ? Math.round(((base - cost) / base) * 100) : null;
                 const normCat = normalizePartCategory ? normalizePartCategory(p.category, p.name) : (p.category || '');
                 return (
-                  <tr key={p.id} className={`hover:bg-surface2/50 transition ${selectedIds.includes(p.id) ? 'bg-[#2563EB]/5' : ''}`}>
+                  <tr key={`${p.id}_${gridVersion}`} className={`hover:bg-surface2/50 transition ${selectedIds.includes(p.id) ? 'bg-[#2563EB]/5' : ''}`}>
                     <td className="p-2 text-center">
                       <input
                         type="checkbox"
@@ -402,7 +406,7 @@ export default function ExcelProductManager({
                         }}
                         className={`w-full px-2 py-1 rounded-lg bg-bg border font-mono font-black ${
                           Number(p.stock || 0) <= 0 ? 'border-rose-500 text-rose-500' :
-                          Number(p.stock || 0) <= Number(p.lowStockThreshold || 2) ? 'border-amber-500 text-amber-500' :
+                          Number(p.stock || 0) <= (Number(p.lowStockThreshold) || 5) ? 'border-amber-500 text-amber-500' :
                           'border-line text-fg'
                         }`}
                       />

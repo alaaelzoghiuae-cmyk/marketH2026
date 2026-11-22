@@ -47,19 +47,38 @@ export default function SmartPricingEngine({
         const curMargin = hasCost && cur > 0 ? ((cur - cost) / cur) * 100 : null;
         const curMarkup = hasCost ? ((cur - cost) / cost) * 100 : null;
 
+        // A rule value of 0 is a real value (0% markup/discount) — only a
+        // missing/non-numeric value falls back to the default.
+        const rv = ruleValue === '' || ruleValue === null || ruleValue === undefined || Number.isNaN(Number(ruleValue))
+          ? null
+          : Number(ruleValue);
+        // No cost basis (margin/markup) or no current price => the rule has
+        // nothing to compute from; never invent a price for such rows.
+        const applicable = cur > 0 && (ruleType === 'discount_pct' || hasCost);
+
         let rawProposed = cur;
         if (ruleType === 'target_margin' && hasCost) {
-          const m = Math.min(85, Math.max(1, Number(ruleValue) || 25)) / 100;
+          const m = Math.min(85, Math.max(0, rv ?? 25)) / 100;
           rawProposed = cost / (1 - m);
         } else if (ruleType === 'markup_pct' && hasCost) {
-          const mk = Math.max(0, Number(ruleValue) || 25) / 100;
+          const mk = Math.min(500, Math.max(0, rv ?? 25)) / 100;
           rawProposed = cost * (1 + mk);
         } else if (ruleType === 'discount_pct') {
-          const d = Math.min(80, Math.max(0, Number(ruleValue) || 10)) / 100;
+          const d = Math.min(80, Math.max(0, rv ?? 10)) / 100;
           rawProposed = cur * (1 - d);
         }
 
-        const proposed = Math.max(Number(priceFloor) || 0, roundPrice(rawProposed, roundStep));
+        let proposed;
+        if (!applicable) {
+          proposed = cur;
+        } else if (ruleType === 'discount_pct') {
+          // A discount must never raise the price: round DOWN to the step,
+          // skip the floor, and cap at the current price.
+          const s2 = Math.max(1, Number(roundStep) || 1);
+          proposed = Math.min(cur, Math.floor(rawProposed / s2) * s2);
+        } else {
+          proposed = Math.max(Number(priceFloor) || 0, roundPrice(rawProposed, roundStep));
+        }
         const newProfit = hasCost ? proposed - cost : null;
         const newMargin = hasCost && proposed > 0 ? ((proposed - cost) / proposed) * 100 : null;
         const delta = proposed - cur;
@@ -76,6 +95,7 @@ export default function SmartPricingEngine({
           newProfit,
           newMargin,
           delta,
+          applicable,
           isWeak: curMargin !== null && curMargin < weakThreshold
         };
       });
@@ -92,13 +112,13 @@ export default function SmartPricingEngine({
   }, [rows]);
 
   const toggleAllVisible = () => {
-    const ids = rows.slice(0, 100).map(r => r.part.id);
+    const ids = rows.slice(0, 100).filter(r => r.applicable && r.delta !== 0).map(r => r.part.id);
     const allSel = ids.every(id => selectedIds.includes(id));
     setSelectedIds(allSel ? [] : ids);
   };
 
-  const applyApprovedPrices = () => {
-    const targets = rows.filter(r => selectedIds.includes(r.part.id) && r.delta !== 0);
+  const applyApprovedPrices = async () => {
+    const targets = rows.filter(r => selectedIds.includes(r.part.id) && r.applicable && r.delta !== 0);
     if (targets.length === 0) {
       if (showToast) showToast('اختر منتجات لها فرق سعر مقترح أولاً', 'info');
       setConfirmApply(false);
@@ -108,12 +128,21 @@ export default function SmartPricingEngine({
     for (const r of targets) {
       priceMap[r.part.id] = { basePrice: r.proposed };
     }
+    let ok = true;
     if (typeof onApplyPricingMap === 'function') {
-      onApplyPricingMap(priceMap);
+      try {
+        ok = (await onApplyPricingMap(priceMap)) !== false;
+      } catch {
+        ok = false;
+      }
     }
     setConfirmApply(false);
-    setSelectedIds([]);
-    if (showToast) showToast(`تم اعتماد وتحديث أسعار ${targets.length} منتج بنجاح ✓`, 'success');
+    if (ok) {
+      setSelectedIds([]);
+      if (showToast) showToast(`تم اعتماد وتحديث أسعار ${targets.length} منتج وحفظها بنجاح ✓`, 'success');
+    } else if (showToast) {
+      showToast('⚠️ تم تحديث الأسعار على الشاشة لكن الحفظ في قاعدة البيانات فشل — تحقق من الاتصال وحاول تاني.', 'error');
+    }
   };
 
   return (
@@ -168,10 +197,10 @@ export default function SmartPricingEngine({
           </div>
           <div>
             <label className="block text-[10px] font-extrabold text-muted mb-1">النسبة (%):</label>
-            <input type="number" min="1" max="85" value={ruleValue} onChange={e => setRuleValue(Number(e.target.value))} className="w-full px-2.5 py-1.5 rounded-xl bg-surface border border-line font-mono font-black" />
+            <input type="number" min="0" max={ruleType === 'target_margin' ? 85 : ruleType === 'discount_pct' ? 80 : 500} value={ruleValue} onChange={e => setRuleValue(e.target.value === '' ? '' : Number(e.target.value))} className="w-full px-2.5 py-1.5 rounded-xl bg-surface border border-line font-mono font-black" />
           </div>
           <div>
-            <label className="block text-[10px] font-extrabold text-muted mb-1">تقريب السعر لأقرب:</label>
+            <label className="block text-[10px] font-extrabold text-muted mb-1">تقريب السعر لأعلى (لأقرب خطوة):</label>
             <select value={roundStep} onChange={e => setRoundStep(Number(e.target.value))} className="w-full px-2.5 py-1.5 rounded-xl bg-surface border border-line font-bold">
               <option value={1}>بدون تقريب (1 ج.م)</option>
               <option value={5}>أقرب 5 ج.م</option>
@@ -179,6 +208,10 @@ export default function SmartPricingEngine({
               <option value={25}>أقرب 25 ج.م</option>
               <option value={50}>أقرب 50 ج.م</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-[10px] font-extrabold text-muted mb-1">عتبة الهامش الضعيف (%):</label>
+            <input type="number" min="0" max="90" value={weakThreshold} onChange={e => setWeakThreshold(Number(e.target.value) || 0)} className="w-full px-2.5 py-1.5 rounded-xl bg-surface border border-line font-mono font-bold" />
           </div>
           <div>
             <label className="block text-[10px] font-extrabold text-muted mb-1">الحد الأدنى للسعر (Floor):</label>
@@ -228,6 +261,12 @@ export default function SmartPricingEngine({
         </div>
       </div>
 
+      {rows.length > 100 && (
+        <div className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-bold text-[11px]">
+          ⚠️ يُعرض أول 100 منتج فقط من أصل {rows.length} — صفِّ بالقسم أو ضعّف الهامش للوصول لباقي المنتجات.
+        </div>
+      )}
+
       {/* Comparison Table */}
       <div className="bg-surface rounded-3xl border border-line shadow-sm overflow-hidden">
         <div className="overflow-x-auto max-h-[520px] overflow-y-auto">
@@ -252,6 +291,7 @@ export default function SmartPricingEngine({
                   <td className="p-2 text-center">
                     <input
                       type="checkbox"
+                      disabled={!r.applicable || r.delta === 0}
                       checked={selectedIds.includes(r.part.id)}
                       onChange={() => setSelectedIds(prev => prev.includes(r.part.id) ? prev.filter(x => x !== r.part.id) : [...prev, r.part.id])}
                     />
@@ -268,7 +308,7 @@ export default function SmartPricingEngine({
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="p-2 font-mono font-black text-[#2563EB] dark:text-[#60A5FA]">{r.proposed.toLocaleString()} ج.م</td>
+                  <td className="p-2 font-mono font-black text-[#2563EB] dark:text-[#60A5FA]">{r.applicable ? `${r.proposed.toLocaleString()} ج.م` : <span className="text-amber-500 text-[10px] font-bold">يلزم تكلفة/سعر أولاً</span>}</td>
                   <td className="p-2 font-mono font-black">
                     <span className={r.delta > 0 ? 'text-emerald-500' : r.delta < 0 ? 'text-rose-500' : 'text-muted'}>
                       {r.delta > 0 ? `+${r.delta}` : r.delta} ج.م
