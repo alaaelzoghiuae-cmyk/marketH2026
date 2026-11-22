@@ -6254,8 +6254,12 @@ ${adminLink}`;
       setTimeout(async () => {
         try {
           // Single paginated catalog hydration (Cached in localStorage for 35m -> Zero redundant multi-query Egress!)
+          // Egress fix (2026-11-22): the extra 650-row catalog wave is admin-only now.
+          // Storefront visitors already get the 200 newest parts in Phase B and every
+          // brand/model/category/search navigation fetches its slice server-side via
+          // fetchSparePartsSliceOnDemand, so this wave (~665 KB) was pure waste for them.
           const [moreCustomDate, moreAsc] = await Promise.all([
-            sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=120', false),
+            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=120', false) : Promise.resolve([]),
             isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.asc&limit=650', false) : Promise.resolve([])
           ]);
           const moreCustomSku = [];
@@ -6541,7 +6545,13 @@ ${adminLink}`;
       } catch (e) {}
     };
 
-    connectRealtime();
+    // Egress fix (2026-11-22): Realtime is only needed in the admin panel (order alerts
+    // + cross-device sync). Storefront visitors were also subscribing to postgres_changes
+    // on 8 tables, so every bulk catalog edit broadcast full rows to every open shop tab
+    // and invalidated their table caches (refetch storms) — a major egress multiplier.
+    if (appPortal === 'admin' || adminAuthenticated) {
+      connectRealtime();
+    }
 
     return () => {
       isUnmounted = true;
