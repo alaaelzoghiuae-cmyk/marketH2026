@@ -4,8 +4,8 @@ import {
   Layers, Users, FileText, RotateCcw, MessageSquare, Plus, Minus, Check,
   X, Edit, Printer, Database, ChevronLeft, ChevronDown, Bell, Wallet,
   CreditCard, Truck, Eye, RefreshCw, Filter, DollarSign, Percent, Tag,
-  Smartphone, Cpu, Battery, Camera, Zap, CheckCircle2, Clock, Ban,
-  ArrowUpRight, ArrowDownLeft, Sparkles, Building2, Phone, MapPin,
+  Smartphone, Cpu, Camera, Zap, CheckCircle2, Clock, Ban,
+  Sparkles, Building2, Phone, MapPin,
   ClipboardList, Award, Lock, LogOut, Info, Upload, Trash2, Save,
   EyeOff, Menu, Globe, LayoutGrid, Share2, Megaphone, Download
 } from 'lucide-react';
@@ -908,7 +908,7 @@ We may amend these terms at any time; changes apply from the moment they are pub
 13) Governing law and disputes
 These terms are governed by Egyptian law. We try to resolve any dispute amicably first; otherwise it is referred to the competent authority (including the Consumer Protection Agency) or the competent Egyptian courts.`;
 
-const EN_DICT = {"اطلب منتجك":"Order your product","تم البيع":"Sold","إغلاق":"Close","🌍 اطلب منتجك من أي مكان":"🌍 Order any product from anywhere","ابعت طلبك":"Send your request","اسم المنتج *":"Product name *","وصف المنتج والمواصفات *":"Product description & specifications *","رقم الموبايل للتواصل *":"Contact phone *","صورة المنتج (اختياري — بتتضغط تلقائي)":"Product photo (optional — auto-compressed)","شروط الخدمة":"Service terms","قرأت شروط الخدمة وموافق عليها *":"I have read and agree to the service terms *","ابعت الطلب":"Send request","+ اطلب منتج جديد":"+ Request a new product","المحادثة":"Chat","إرسال":"Send","اكتب رسالتك...":"Write your message...","إلغاء الطلب":"Cancel request","جديد":"New","قيد المراجعة":"Under review","تم تحديد السعر":"Price set","تم استلام العربون":"Deposit received","جاري التوصيل":"Out for delivery","ملغي":"Cancelled","سعر المنتج المتفق عليه":"Agreed product price","العربون":"Deposit","طلباتي من برّه (":"My global requests (","🔥 الأكتر طلباً:":"🔥 Top picks:","☰ قايمة":"☰ List","▦ مربعات":"▦ Grid","طلبك مؤمّن":"Secure order","معاينة عند الاستلام":"Inspect on delivery","ضمان على المنتجات":"Product warranty","← كمّل تسوّق":"← Continue shopping","محتاج مساعدة؟ كلّمنا على واتساب":"Need help? Chat on WhatsApp","تحميل PDF":"Download PDF","إغلاق":"Close","مشاركة":"Share","تصفّح المنتجات (":"Browse products (","الرئيسية والعروض":"Home & offers","إشعارات":"Alerts","حسابي":"Account","خروج":"Log out","الماركة":"Brand","التصنيف":"Category","الموديل":"Model","الكل":"All","اختار الماركة":"Choose brand","اختار التصنيف":"Choose category","اختار الموديل":"Choose model","كل الماركات":"All brands","كل التصنيفات":"All categories","كل الموديلات":"All models","دوّر هنا...":"Search here...","عرض النتايج (":"Show results (","مفيش نتايج":"No results","الأقسام الأكتر طلباً":"Top categories","منتج متاح":"products available","شوف كل المنتجات ›":"All products ›","الأكتر طلباً":"Top seller","مشاركة":"Share","تصفّح":"Browse","طباعة الفاتورة":"Print invoice","إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","إغلاق":"Close","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك": "Welcome", "الأسعار والسلة اتحدّثت على حسابك.": "Prices and cart were updated for your account.", "إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).": "You are browsing as a guest (you can log in or request a new account).", "معلش، الكمية المتاحة في المخزن من": "Sorry, the available stock of", "معلش، المتاح في المخزن من": "Sorry, the available stock of", "قطع بس.": "pieces only.", "قياسي": "Standard", "سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.": "We added you to the waitlist! We'll notify you as soon as stock arrives.", "حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (": "Something went wrong while sending the order, please try again. (", "السلة فاضية! ضيف منتجات الأول.": "Your cart is empty! Add products first.", "اختار طريقة الدفع الأول.": "Please choose a payment method first.", "آجل / على الحساب": "Credit / On account", "قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.": "The order exceeds your available credit limit. Choose another payment method or settle part of your balance.", "اكتب عنوان التوصيل الأول.": "Please enter the delivery address first.", "تم الاستلام": "Received", "استلمنا طلبك": "Order received", "فاتورتك اتسجّلت وبنجهّز القطع في المخزن (": "Your invoice is registered and we are preparing your items (", "قطع).": "pcs).", "طلبك رقم": "Your order No.", "اتأكّد وبعتنا إشعار للإدارة والمخزن!": "is confirmed and the team has been notified!", "ضفنا": "Added", "أصناف متاحة للسلة (وعدّينا": "available items to the cart (skipped", "صنف مش متوفر دلوقتي).": "unavailable items).", "رجّعنا كل أصناف الفاتورة": "All invoice items were re-added", "للسلة!": "to the cart!", "الصورة السابقة": "Previous image", "الصورة التالية": "Next image", "عرض التفاصيل والصورة المكبرة": "View details and enlarged image", "الكمية خلصت": "Out of stock", "كمية محدودة: فاضل": "Limited stock: only", "متوفر في المخزن (": "In stock (", "في السلة:": "In cart:", "المتاح:": "Available:", "قطعة": "pcs", "التوافق:": "Compatible:", "اللون:": "Color:", "سعر الوحدة": "Unit price", "نبّهني لما يتوفر (": "Notify me when available (", "زوّد الكمية": "Increase quantity", "قلّل الكمية": "Decrease quantity", "كلّمنا على واتساب": "Chat on WhatsApp", "صفحتنا على فيسبوك": "Our Facebook page", "حسابنا على إنستجرام": "Our Instagram", "الرئيسية والعروض": "Home & offers", "دوّر في الكتالوج (": "Search the catalog (", "طلباتي": "My orders", "إشعارات الطلبات": "Order notifications", "إشعارات الطلبات اللحظية": "Live order notifications", "مفيش إشعارات جديدة": "No new notifications", "رصيد:": "Balance:", "مديونية:": "Debt:", "خرجت من حسابك.": "You have logged out.", "تسجيل الخروج": "Log out", "دخول": "Log in", "طلب فتح حساب": "Request an account", "السلة": "Cart", "دوّر في الكتالوج كله": "Search the whole catalog", "ابحث عن أي منتج أو قسم أو موديل في الكتالوج": "Search any product, accessory or phone model", "أكثر من": "More than", "صنف وموديل متوفر في المخزن وجاهز يتشحن على طول": "items and models in stock, ready to ship right away", "دوس هنا للبحث والفلترة...": "Tap here to search and filter...", "دوّر": "Search", "أكتر الأقسام طلباً:": "Top categories:", "شاشات": "Screens", "بطاريات": "Batteries", "فلاتات وبوردات": "Flex cables & boards", "كاميرات": "Cameras", "شواحن وكابلات": "Chargers & cables", "جرابات وحمايات": "Cases & protectors", "أكواد خصم شغّالة:": "Active discount codes:", "نسخنا الكود (": "Code copied (", "الإعلان السابق": "Previous ad", "الإعلان التالي": "Next ad", "إعلان": "Ad", "من": "of", "شوف تفاصيل العرض واطلب": "View offer details & order", "دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول": "Tap the ad to see details and order directly", "تصفّح التشكيلة حسب القسم أو الموديل": "Browse products by phone model", "اختر القسم أو الموديل لاستعراض كافة المنتجات المتاحة فوراً": "Tap any model to see all compatible products", "شوف كل الموديلات والبحث المتقدم": "All models & advanced search", "قطع متاحة": "pcs available", "قسم مميز": "Featured", "شوف الكل في صفحة البحث": "See all in search", "دوس عشان تفتح السلة وتراجع الأصناف": "Tap to open the cart and review items", "سلة المشتريات": "Shopping cart", "صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)": "Instant search & full catalog (cart saved automatically)", "دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق": "Search by model, product name, quality or compatibility code", "ارجع للرئيسية والعروض": "Back to home & offers", "دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن": "Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex", "، بطارية)...": ", battery)...", "امسح البحث": "Clear search", "الفلاتر الشغّالة:": "Active filters:", "موديل": "Model", "فلتر المخزون": "Stock filter", "بحث:": "Search:", "مسح كل الفلاتر": "Clear all filters", "الماركة:": "Brand:", "كل الماركات": "All brands", "التصنيف:": "Category:", "كل المنتجات (": "All products (", "الأقسام والموديلات:": "Phone models:", "كل الموديلات (": "All models (", "فلترة وترتيب:": "Filter & sort:", "الأحدث الأول": "Newest first", "الأقدم الأول": "Oldest first", "الاسم: (أ - ي)": "Name: (A - Z)", "الاسم: (ي - أ)": "Name: (Z - A)", "العدد: الأكتر كمية": "Stock: highest", "العدد: الأقل كمية": "Stock: lowest", "السعر: من الأقل للأعلى": "Price: low to high", "السعر: من الأعلى للأقل": "Price: high to low", "حالة المخزون: الكل": "Stock: all", "المتوفر في المخزن بس": "In stock only", "كميات محدودة": "Limited quantities", "النتايج:": "Results:", "منتج": "products", "مفيش منتجات مطابقة لبحثك": "No products match your search", "اعرض كل المنتجات": "Show all products", "سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك": "Log in first to complete your order and see your group prices", "أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.": "Once you log in with your trader account, cart prices and currency update automatically to your discount tier.", "سجّل دخول دلوقتي": "Log in now", "كمّل الطلب وادفع —": "Checkout —", "راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن": "Review the delivery address, choose a payment method and send the order", "ارجع ضيف قطع تانية": "Back to add more items", "عنوان توصيل الطلب (عناوين المحل المسجّلة)": "Delivery address (your saved addresses)", "العنوان الأساسي للمحل": "Main address", "عنوان الفرع الثاني": "Second branch address", "وصّل لعنوان تاني للفاتورة دي بس": "Deliver to another address for this invoice only", "اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...": "Write the full address and the receiver phone number...", "حالة المحفظة والآجل (ليك / عليك)": "Wallet & credit status", "رصيد حسابك دلوقتي:": "Current balance:", "دائن (ليك):": "Credit (yours):", "مدين (عليك):": "Debit (you owe):", "سقف الآجل المسموح:": "Credit limit:", "المتاح تسحبه آجل:": "Available on credit:", "استخدم رصيدك الدائن في المحفظة (": "Use your wallet credit (", "واخصمه من الفاتورة": "and deduct it from the invoice", "طريقة الدفع": "Payment method", "مش متاح: الفاتورة أكبر من سقف الآجل المتبقي": "Unavailable: invoice exceeds remaining credit", "ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:": "Invoice notes or packing instructions:", "مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...": "e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...", "ملخص الفاتورة (": "Invoice summary (", "قطع)": "pcs)", "الكمية:": "Qty:", "كود خصم (مثال:": "Discount code (e.g.", "أو": "or", "كود الخصم مش صالح أو خلصت مدته! جرّب": "Invalid or expired discount code! Try", "معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.": "Sorry, this code reached its maximum number of uses.", "أقل فاتورة عشان الكود يشتغل (": "Minimum order for this code (", "فعّلنا كود الخصم (": "Discount code applied (", "تطبيق": "Apply", "مفعل:": "Active:", "إلغاء": "Cancel", "إجمالي قيمة الأصناف:": "Items subtotal:", "كوبون الخصم (": "Discount coupon (", "مصاريف التوصيل السريع:": "Express delivery fee:", "متخصوم من رصيد المحفظة:": "Deducted from wallet:", "الصافي اللي هتدفعه:": "Net amount to pay:", "أكّد وابعت الطلب": "Confirm & send order", "الصورة اتحفظت!": "Photo saved!", "بياناتك وعناوينك اتحفظت!": "Your details and addresses were saved!", "كلمة المرور الحالية غلط!": "Current password is incorrect!", "اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).": "Enter a new password (at least 3 characters).", "كلمة المرور الجديدة والتأكيد مش زي بعض!": "New password and confirmation do not match!", "كلمة المرور اتغيّرت!": "Password changed!", "جاري التجهيز": "Preparing", "جاهز للتسليم": "Ready for delivery", "في الطريق (دليفري)": "On the way (delivery)", "تم التسليم": "Delivered", "سجل طلباتك وفواتيرك": "Your orders & invoices", "دوس على زرار": "Tap the button", "جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل": "next to any order to expand or collapse its details. You can search, filter and cancel before delivery", "افتح الكل": "Expand all", "اقفل الكل": "Collapse all", "دوّر برقم الفاتورة (": "Search by invoice number (", "أو اسم القطعة أو التاريخ...": "or product name or date...", "جميع الحالات (": "All statuses (", "الأعلى قيمة": "Highest value", "الأقل قيمة": "Lowest value", "مفيش طلبات مطابقة للفلتر ده": "No orders match this filter", "اعرض كل الطلبات": "Show all orders", "اقفل تفاصيل الطلب (-)": "Collapse order details (-)", "افتح تفاصيل الطلب (": "Expand order details (", "قطع •": "pcs •", "الحالة:": "Status:", "السداد:": "Payment:", "اطبع الفاتورة الرسمية": "Print official invoice", "ملغي": "Cancelled", "إلغي الطلب قبل الشحن": "Cancel order before shipping", "اطلب تاني": "Reorder", "اطلب استرجاع بالضمان": "Request warranty return", "تعديل من الإدارة على الفاتورة:": "Admin update on the invoice:", "الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.": "This order was cancelled; stock was returned and the account settled.", "الكود": "Code", "الصنف والجودة": "Item & quality", "اللون": "Color", "الكمية": "Qty", "الإجمالي": "Total", "عنوان التوصيل:": "Delivery address:", "ملاحظات:": "Notes:", "تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).": "You can print the official invoice once you confirm you received the order (Delivered).", "إجمالي الفاتورة شامل التوصيل:": "Invoice total incl. delivery:", "صافي رصيد المحفظة والحساب": "Net wallet & account balance", "رصيد دائن (ليك):": "Credit balance (yours):", "مديونية (عليك):": "Debt (you owe):", "بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات": "Updates automatically with invoices, payments and returns", "سقف الآجل المسموح": "Credit limit", "المتاح تسحبه آجل دلوقتي:": "Available on credit now:", "عملة التعامل في الفواتير": "Invoice currency", "كل الفواتير وكشف الحساب معروضة بعملة حسابك": "All invoices and statements are shown in your account currency", "كشف الحساب التفصيلي وحركات المحفظة": "Detailed statement & wallet transactions", "حركات مالية": "transactions", "التاريخ": "Date", "رقم المرجع": "Reference", "البيان والتفاصيل": "Description", "قيمة الحركة": "Amount", "الرصيد بعد الحركة": "Balance after", "له": "Credit", "عليه": "Debit", "الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)": "Returns & product warranty (within 7 days of delivery)", "عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي": "To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation", "قدّم طلب مرتجع جديد": "Submit a new return request", "مفيش طلبات استرجاع مسجّلة.": "No return requests yet.", "فاتورة رقم:": "Invoice No.:", "مقبول": "Accepted", "مرفوض": "Rejected", "حالة الطلب:": "Order status:", "القيمة:": "Value:", "سبب الاسترجاع:": "Return reason:", "رد قسم الضمان والفحص الفني:": "Warranty & technical inspection reply:", "مقترح توفير صنف": "Item request", "مفتوح": "Open", "رسالتك وصلت للإدارة وهنرد عليك قريب.": "Your message reached the admin; we will reply soon.", "ردّك اتبعت!": "Your reply was sent!", "ابعت شكوى أو اطلب صنف": "Send a complaint or request an item", "نوع الرسالة:": "Message type:", "شكوى شحن وتوصيل": "Shipping complaint", "استفسار مالي / فواتير": "Billing inquiry", "أخرى": "Other", "العنوان:": "Subject:", "عنوان مختصر للرسالة...": "Short subject...", "التفاصيل:": "Details:", "اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...": "Write the complaint details or the item you want us to stock...", "ابعت للإدارة": "Send to admin", "رسائلي وتذاكر الدعم السابقة": "My messages & previous tickets", "مفيش رسائل قبل كده.": "No previous messages.", "تم الرد": "Replied", "رد الإدارة": "Admin reply", "ضيف رد أو سؤال تاني في الرسالة دي...": "Add another reply or question...", "ابعت الرد": "Send reply", "البيانات الأساسية والصورة الشخصية والعناوين": "Basic details, photo & addresses", "عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن": "Edit shop name, photo, contact numbers and shipping addresses", "صورة الحساب / شعار المحل:": "Account photo / shop logo:", "ارفع صورة من جهازك": "Upload a photo", "استخدم الأيقونة الملوّنة": "Use colored icon", "أو اختار لون الشعار:": "Or pick a logo color:", "حروف الشعار": "Logo letters", "اسم المحل / الشركة / المركز:": "Shop / company name:", "اسم المسؤول / صاحب الحساب:": "Owner name:", "رقم الموبايل (المستخدم للدخول):": "Mobile (used to log in):", "البريد الإلكتروني:": "Email:", "العنوان الأساسي للتوصيل:": "Main delivery address:", "عنوان الفرع الثاني (اختياري):": "Second address (optional):", "احفظ التغييرات": "Save changes", "تغيير كلمة المرور والأمان": "Change password & security", "تقدر تغيّر كلمة السر في أي وقت": "You can change your password anytime", "كلمة المرور الحالية:": "Current password:", "اكتب كلمة المرور الحالية...": "Enter current password...", "كلمة المرور الجديدة:": "New password:", "اكتب كلمة المرور الجديدة...": "Enter new password...", "تأكيد كلمة المرور الجديدة:": "Confirm new password:", "اكتب كلمة المرور الجديدة تاني...": "Re-enter new password...", "غيّر كلمة المرور": "Change password", "سجّل دخولك عشان تفتح حسابك": "Log in to open your account", "البروفايل وإعدادات الحساب": "Profile & settings", "طلباتي وفواتيري": "My orders & invoices", "المحفظة وكشف الحساب": "Wallet & statement", "المرتجعات والضمان": "Returns & warranty", "الشكاوى وطلبات الأصناف": "Complaints & item requests", "حساب معتمد نشط ✓": "Active verified account ✓", "المسؤول:": "Owner:", "الجوال:": "Mobile:", "صافي رصيد المحفظة": "Net wallet balance", "رصيد ليك:": "Credit:", "اطلب منتجات جديدة": "Order new products", "لوحة تحكم الحساب": "Account dashboard", "سلة المشتريات (": "Shopping cart (", "السلة فاضية دلوقتي": "Your cart is empty", "السعر:": "Price:", "إجمالي السلة:": "Cart total:", "كمّل الطلب وادفع": "Checkout", "مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.": "No account found with this phone or email. You can request a new account.", "كلمة المرور غلط! اتأكد وجرّب تاني.": "Wrong password! Please check and try again.", "اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)": "Enter your full name (at least 5 characters)", "اكتب اسم المالك أو المسؤول ثنائي على الأقل": "Enter the owner name (first and last)", "اكتب اسم النشاط أو الحساب التجاري بشكل صحيح (3 حروف على الأقل)": "Enter the shop or center name (at least 3 characters)", "رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)": "Phone must be 11 digits starting with 010, 011, 012 or 015", "الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.": "This number is already registered! You can log in with it directly.", "اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح": "Enter the full address (governorate, city, street) so delivery is accurate", "كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل": "Password must be at least 6 characters", "كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط": "Passwords do not match, please retype them", "لازم توافق على الشروط والأحكام عشان تكمّل": "You must accept the Terms & Conditions to continue", "صحّح الحقول الحمرا في الفورم.": "Please fix the red fields in the form.", "حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (": "Something went wrong while sending your request, please try again. (", "عميل فردي (شخص عادي)": "Individual customer", "أهلاً بيك يا": "Welcome", "حسابك اتفتح وإنت دخلت عليه.": "your account is ready and you are logged in.", "طلب فتح حسابك (": "Your account request (", "اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.": "was sent to admin! We will verify and activate it soon.", "حسابات التجار والمحلات": "Trader & shop accounts", "سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة": "Log in or request a new account", "تسجيل الدخول لحسابي": "Log in to my account", "طلب فتح حساب جديد": "Request a new account", "رقم الموبايل أو الإيميل المسجّل:": "Registered phone or email:", "اكتب رقم الموبايل (مثلاً: 01012345678)...": "Enter phone number (e.g. 01012345678)...", "كلمة المرور (": "Password (", "اكتب كلمة المرور...": "Enter password...", "ادخل وحدّث الأسعار": "Log in & update prices", "لسه معندكش حساب؟": "Don't have an account?", "دوس هنا واطلب فتح حساب": "Tap here to request one", "في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.": "Some details are missing or wrong, please fix the red fields below.", "اختار نوع الحساب:": "Choose account type:", "شخص عادي (استخدام شخصي)": "Individual (personal use)", "عميل فردي (استخدام شخصي)": "Individual (personal use)", "تسوّق جميع المنتجات المختارة بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة": "Buy products and accessories at retail prices; your account opens instantly with no approval", "تاجر / موزع ومبيعات معتمد": "Repair center & product sales", "صاحب محل أو مركز صيانة": "Shop or repair center owner", "حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع": "Trader account for wholesale prices and distribution discounts", "اسم النشاط التجاري / المعرض / الشركة *": "Shop / repair center / company name *", "مثلاً: شركة أو معرض الأهرام للتجارة...": "e.g. Al-Ahram Mobile Repair Center...", "الاسم بالكامل (ثنائي أو ثلاثي) *": "Full name *", "اسم المالك أو الفني المسؤول *": "Owner / technician name *", "مثلاً: محمود أحمد حسن...": "e.g. Mahmoud Ahmed Hassan...", "مثلاً: م. محمد إبراهيم...": "e.g. Mohamed Ibrahim...", "رقم الموبايل (للتواصل والدخول) *": "Mobile number (for contact & login) *", "نوع النشاط التجاري:": "Business type:", "محل إكسسوارات وجوالات": "Mobile & accessories shop", "تاجر جملة وموزع محلي": "Wholesaler / local distributor", "فني صيانة مستقل": "Independent repair technician", "العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *": "Full address (governorate - city - street) *", "مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...": "e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...", "كلمة المرور (6 على الأقل) *": "Password (min. 6) *", "اختار كلمة مرور قوية...": "Choose a strong password...", "تأكيد كلمة المرور *": "Confirm password *", "اكتب نفس كلمة المرور تاني...": "Re-enter the same password...", "الشروط والأحكام": "Terms & Conditions", "قرأت الشروط والأحكام وموافق عليها *": "I have read and agree to the Terms & Conditions *", "اعمل الحساب وادخل على طول": "Create account & log in", "ابعت طلب فتح حساب المحل للإدارة": "Send shop account request to admin", "قيد المراجعة": "Under review", "طلب الاسترجاع والصور وصلوا لقسم الضمان!": "Your return request and photos reached the warranty department!", "طلب استرجاع بالضمان — فاتورة": "Warranty return request — invoice", "اختار القطعة اللي عايز ترجّعها:": "Choose the item to return:", "سعر الفاتورة:": "Invoice price:", "اشرح حالة القطعة والعيب:": "Describe the item condition and the defect:", "اكتب حالة القطعة والعيب اللي ظهر...": "Describe the condition and defect...", "صور للقطعة (اختياري — من 1 لـ 5):": "Photos (optional — 1 to 5):", "ابعت طلب الاسترجاع للمراجعة": "Submit return request for review", "ج.م)": "EGP)", "ج.م": "EGP", "شروطنا وسياسات الضمان والشحن عند": "Our terms, warranty & shipping policies at", "واتساب وخدمة العملاء:": "WhatsApp & customer service:", "مواعيد العمل:": "Working hours:", "تابعنا وتواصل معنا:": "Follow & contact us:", "جميع الحقوق محفوظة.": "All rights reserved.", "فاتورة مبيعات رسمية (": "Official sales invoice (", "إذن تحضير مخزني (بدون أسعار لعمال المخزن)": "Warehouse picking slip (no prices)", "نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)": "Official customer invoice copy (after delivery)", "فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:": "Sales & warranty invoice — WhatsApp / customer service:", "رقم الفاتورة:": "Invoice No.:", "التاريخ:": "Date:", "بيانات المحل / العميل المستلم:": "Customer details:", "تفاصيل الشحنة والسداد:": "Shipment & payment:", "طريقة الدفع:": "Payment method:", "إجمالي عدد القطع بالفاتورة:": "Total pieces:", "قطع": "pcs", "كود": "Code", "بيان الصنف ودرجة الجودة": "Item & quality", "مراجعة وفحص المخزن": "Warehouse check", "سليم ومختوم بختم الضمان": "OK & warranty-sealed", "شروط الضمان والاسترجاع (": "Warranty & return terms (", "الموقف المالي الحالي للحساب:": "Current account balance:", "رصيد دائن لكم": "Credit balance", "مديونية عليكم": "Debt", "الخصم المطبق:": "Discount applied:", "رسوم الشحن والتوصيل:": "Delivery fee:", "الصافي النهائي للفاتورة:": "Invoice net total:", "تحميل الفاتورة كملف": "Download invoice as", "مباشر (": "directly (", "طباعة ورقية فورية": "Print now", "دوس عشان تكبّر الصورة": "Tap to enlarge photo", "الموديل الأساسي:": "Main model:", "سعر الوحدة:": "Unit price:", "نفذت الكمية حالياً": "Currently out of stock", "متوفر بالمخزن (": "In stock (", "المواصفات الفنية والتفاصيل:": "Specifications & details:", "الموديلات المتوافقة معها القطعة:": "Compatible models:", "اختر اللون / النسخة:": "Choose color / version:", "🔔 نبّهني على واتساب فور توفر المنتج بالمخزن": "Notify me when it is back in stock", "تمت إضافة": "Added", "إلى سلة المشتريات!": "to your cart!", "تأكيد الكمية بالسلة (": "Confirm cart quantity (", "إضافة للسلة الآن": "Add to cart", "ملاحظة": "Note", "الصورة": "Image", "صورة": "Photo", "الفاتورة": "Invoice"};
+const EN_DICT = {"اطلب منتجك":"Order your product","تم البيع":"Sold","إغلاق":"Close","🌍 اطلب منتجك من أي مكان":"🌍 Order any product from anywhere","ابعت طلبك":"Send your request","اسم المنتج *":"Product name *","وصف المنتج والمواصفات *":"Product description & specifications *","رقم الموبايل للتواصل *":"Contact phone *","صورة المنتج (اختياري — بتتضغط تلقائي)":"Product photo (optional — auto-compressed)","شروط الخدمة":"Service terms","قرأت شروط الخدمة وموافق عليها *":"I have read and agree to the service terms *","ابعت الطلب":"Send request","+ اطلب منتج جديد":"+ Request a new product","المحادثة":"Chat","إرسال":"Send","اكتب رسالتك...":"Write your message...","إلغاء الطلب":"Cancel request","جديد":"New","قيد المراجعة":"Under review","تم تحديد السعر":"Price set","تم استلام العربون":"Deposit received","جاري التوصيل":"Out for delivery","ملغي":"Cancelled","سعر المنتج المتفق عليه":"Agreed product price","العربون":"Deposit","طلباتي من برّه (":"My global requests (","🔥 الأكتر طلباً:":"🔥 Top picks:","☰ قايمة":"☰ List","▦ مربعات":"▦ Grid","طلبك مؤمّن":"Secure order","معاينة عند الاستلام":"Inspect on delivery","ضمان على المنتجات":"Product warranty","← كمّل تسوّق":"← Continue shopping","محتاج مساعدة؟ كلّمنا على واتساب":"Need help? Chat on WhatsApp","تحميل PDF":"Download PDF","مشاركة":"Share","تصفّح المنتجات (":"Browse products (","الرئيسية والعروض":"Home & offers","إشعارات":"Alerts","حسابي":"Account","خروج":"Log out","الماركة":"Brand","التصنيف":"Category","الموديل":"Model","الكل":"All","اختار الماركة":"Choose brand","اختار التصنيف":"Choose category","اختار الموديل":"Choose model","كل الماركات":"All brands","كل التصنيفات":"All categories","كل الموديلات":"All models","دوّر هنا...":"Search here...","عرض النتايج (":"Show results (","مفيش نتايج":"No results","الأقسام الأكتر طلباً":"Top categories","منتج متاح":"products available","شوف كل المنتجات ›":"All products ›","الأكتر طلباً":"Top seller","تصفّح":"Browse","طباعة الفاتورة":"Print invoice","إضافة للسلة":"Add to cart","عرض السلة (":"View cart (","السعر":"Price","مفيش أقسام متاحة دلوقتي":"No categories available now","حساب جديد":"New account","الرئيسية":"Home","شارك المنتج مع صحابك":"Share this product","شارك المنتج":"Share product","أهلاً بيك":"Welcome","الأسعار والسلة اتحدّثت على حسابك.":"Prices and cart were updated for your account.","إنت دلوقتي داخل المتجر كزائر (تقدر تسجّل دخول أو تطلب فتح حساب جديد).":"You are browsing as a guest (you can log in or request a new account).","معلش، الكمية المتاحة في المخزن من":"Sorry, the available stock of","معلش، المتاح في المخزن من":"Sorry, the available stock of","قطع بس.":"pieces only.","قياسي":"Standard","سجّلنا طلبك في قايمة الانتظار! هنبعتلك إشعار أول ما الشحنة توصل المخزن.":"We added you to the waitlist! We'll notify you as soon as stock arrives.","حصلت مشكلة وإحنا بنبعت الطلب، جرّب تاني. (":"Something went wrong while sending the order, please try again. (","السلة فاضية! ضيف منتجات الأول.":"Your cart is empty! Add products first.","اختار طريقة الدفع الأول.":"Please choose a payment method first.","آجل / على الحساب":"Credit / On account","قيمة الطلب أكبر من الحد الائتماني المتاح لحسابك. اختار طريقة دفع تانية أو سدّد جزء من المديونية.":"The order exceeds your available credit limit. Choose another payment method or settle part of your balance.","اكتب عنوان التوصيل الأول.":"Please enter the delivery address first.","تم الاستلام":"Received","استلمنا طلبك":"Order received","فاتورتك اتسجّلت وبنجهّز القطع في المخزن (":"Your invoice is registered and we are preparing your items (","قطع).":"pcs).","طلبك رقم":"Your order No.","اتأكّد وبعتنا إشعار للإدارة والمخزن!":"is confirmed and the team has been notified!","ضفنا":"Added","أصناف متاحة للسلة (وعدّينا":"available items to the cart (skipped","صنف مش متوفر دلوقتي).":"unavailable items).","رجّعنا كل أصناف الفاتورة":"All invoice items were re-added","للسلة!":"to the cart!","الصورة السابقة":"Previous image","الصورة التالية":"Next image","عرض التفاصيل والصورة المكبرة":"View details and enlarged image","الكمية خلصت":"Out of stock","كمية محدودة: فاضل":"Limited stock: only","متوفر في المخزن (":"In stock (","في السلة:":"In cart:","المتاح:":"Available:","قطعة":"pcs","التوافق:":"Compatible:","اللون:":"Color:","سعر الوحدة":"Unit price","نبّهني لما يتوفر (":"Notify me when available (","زوّد الكمية":"Increase quantity","قلّل الكمية":"Decrease quantity","كلّمنا على واتساب":"Chat on WhatsApp","صفحتنا على فيسبوك":"Our Facebook page","حسابنا على إنستجرام":"Our Instagram","دوّر في الكتالوج (":"Search the catalog (","طلباتي":"My orders","إشعارات الطلبات":"Order notifications","إشعارات الطلبات اللحظية":"Live order notifications","مفيش إشعارات جديدة":"No new notifications","رصيد:":"Balance:","مديونية:":"Debt:","خرجت من حسابك.":"You have logged out.","تسجيل الخروج":"Log out","دخول":"Log in","طلب فتح حساب":"Request an account","السلة":"Cart","دوّر في الكتالوج كله":"Search the whole catalog","ابحث عن أي منتج أو قسم أو موديل في الكتالوج":"Search any product, accessory or phone model","أكثر من":"More than","صنف وموديل متوفر في المخزن وجاهز يتشحن على طول":"items and models in stock, ready to ship right away","دوس هنا للبحث والفلترة...":"Tap here to search and filter...","دوّر":"Search","أكتر الأقسام طلباً:":"Top categories:","شاشات":"Screens","بطاريات":"Batteries","فلاتات وبوردات":"Flex cables & boards","كاميرات":"Cameras","شواحن وكابلات":"Chargers & cables","جرابات وحمايات":"Cases & protectors","أكواد خصم شغّالة:":"Active discount codes:","نسخنا الكود (":"Code copied (","الإعلان السابق":"Previous ad","الإعلان التالي":"Next ad","إعلان":"Ad","من":"of","شوف تفاصيل العرض واطلب":"View offer details & order","دوس على الإعلان عشان تشوف التفاصيل وتطلب على طول":"Tap the ad to see details and order directly","تصفّح التشكيلة حسب القسم أو الموديل":"Browse products by phone model","اختر القسم أو الموديل لاستعراض كافة المنتجات المتاحة فوراً":"Tap any model to see all compatible products","شوف كل الموديلات والبحث المتقدم":"All models & advanced search","قطع متاحة":"pcs available","قسم مميز":"Featured","شوف الكل في صفحة البحث":"See all in search","دوس عشان تفتح السلة وتراجع الأصناف":"Tap to open the cart and review items","سلة المشتريات":"Shopping cart","صفحة البحث اللحظي والكتالوج الشامل (مع حفظ السلة تلقائياً)":"Instant search & full catalog (cart saved automatically)","دوّر بالموديل أو اسم القطعة أو درجة الجودة أو كود التوافق":"Search by model, product name, quality or compatibility code","ارجع للرئيسية والعروض":"Back to home & offers","دوّر دلوقتي على أي منتج أو موديل موبايل (مثلاً: شاشة ايفون 15 برو ماكس، فلاتة شحن":"Search any product or phone model (e.g. iPhone 15 Pro Max screen, charging flex","، بطارية)...":", battery)...","امسح البحث":"Clear search","الفلاتر الشغّالة:":"Active filters:","موديل":"Model","فلتر المخزون":"Stock filter","بحث:":"Search:","مسح كل الفلاتر":"Clear all filters","الماركة:":"Brand:","التصنيف:":"Category:","كل المنتجات (":"All products (","الأقسام والموديلات:":"Phone models:","كل الموديلات (":"All models (","فلترة وترتيب:":"Filter & sort:","الأحدث الأول":"Newest first","الأقدم الأول":"Oldest first","الاسم: (أ - ي)":"Name: (A - Z)","الاسم: (ي - أ)":"Name: (Z - A)","العدد: الأكتر كمية":"Stock: highest","العدد: الأقل كمية":"Stock: lowest","السعر: من الأقل للأعلى":"Price: low to high","السعر: من الأعلى للأقل":"Price: high to low","حالة المخزون: الكل":"Stock: all","المتوفر في المخزن بس":"In stock only","كميات محدودة":"Limited quantities","النتايج:":"Results:","منتج":"products","مفيش منتجات مطابقة لبحثك":"No products match your search","اعرض كل المنتجات":"Show all products","سجّل دخولك الأول عشان تكمّل الطلب وتشوف أسعار مجموعتك":"Log in first to complete your order and see your group prices","أول ما تدخل بحساب التاجر، أسعار السلة وعملتها هتتغيّر لوحدها على حسب شريحة الخصم بتاعتك.":"Once you log in with your trader account, cart prices and currency update automatically to your discount tier.","سجّل دخول دلوقتي":"Log in now","كمّل الطلب وادفع —":"Checkout —","راجع عنوان التوصيل واختار طريقة الدفع وابعت الطلب للمخزن":"Review the delivery address, choose a payment method and send the order","ارجع ضيف قطع تانية":"Back to add more items","عنوان توصيل الطلب (عناوين المحل المسجّلة)":"Delivery address (your saved addresses)","العنوان الأساسي للمحل":"Main address","عنوان الفرع الثاني":"Second branch address","وصّل لعنوان تاني للفاتورة دي بس":"Deliver to another address for this invoice only","اكتب العنوان بالتفصيل ورقم تليفون اللي هيستلم...":"Write the full address and the receiver phone number...","حالة المحفظة والآجل (ليك / عليك)":"Wallet & credit status","رصيد حسابك دلوقتي:":"Current balance:","دائن (ليك):":"Credit (yours):","مدين (عليك):":"Debit (you owe):","سقف الآجل المسموح:":"Credit limit:","المتاح تسحبه آجل:":"Available on credit:","استخدم رصيدك الدائن في المحفظة (":"Use your wallet credit (","واخصمه من الفاتورة":"and deduct it from the invoice","طريقة الدفع":"Payment method","مش متاح: الفاتورة أكبر من سقف الآجل المتبقي":"Unavailable: invoice exceeds remaining credit","ملاحظات على الفاتورة أو تعليمات التغليف للمخزن:":"Invoice notes or packing instructions:","مثلاً: ابعتلي لزق وتربروف مع الشاشات، أو كلّمني قبل ما المندوب يوصل بنص ساعة...":"e.g. include adhesive and tempered glass with the screens, or call me 30 minutes before the courier arrives...","ملخص الفاتورة (":"Invoice summary (","قطع)":"pcs)","الكمية:":"Qty:","كود خصم (مثال:":"Discount code (e.g.","أو":"or","كود الخصم مش صالح أو خلصت مدته! جرّب":"Invalid or expired discount code! Try","معلش، الكود ده وصل للحد الأقصى من مرات الاستخدام.":"Sorry, this code reached its maximum number of uses.","أقل فاتورة عشان الكود يشتغل (":"Minimum order for this code (","فعّلنا كود الخصم (":"Discount code applied (","تطبيق":"Apply","مفعل:":"Active:","إلغاء":"Cancel","إجمالي قيمة الأصناف:":"Items subtotal:","كوبون الخصم (":"Discount coupon (","مصاريف التوصيل السريع:":"Express delivery fee:","متخصوم من رصيد المحفظة:":"Deducted from wallet:","الصافي اللي هتدفعه:":"Net amount to pay:","أكّد وابعت الطلب":"Confirm & send order","الصورة اتحفظت!":"Photo saved!","بياناتك وعناوينك اتحفظت!":"Your details and addresses were saved!","كلمة المرور الحالية غلط!":"Current password is incorrect!","اكتب كلمة مرور جديدة (3 حروف أو أرقام على الأقل).":"Enter a new password (at least 3 characters).","كلمة المرور الجديدة والتأكيد مش زي بعض!":"New password and confirmation do not match!","كلمة المرور اتغيّرت!":"Password changed!","جاري التجهيز":"Preparing","جاهز للتسليم":"Ready for delivery","في الطريق (دليفري)":"On the way (delivery)","تم التسليم":"Delivered","سجل طلباتك وفواتيرك":"Your orders & invoices","دوس على زرار":"Tap the button","جنب أي طلب عشان تفتح أو تقفل تفاصيله، وتقدر تدوّر وتفلتر وتلغي الطلب قبل ما يتوصّل":"next to any order to expand or collapse its details. You can search, filter and cancel before delivery","افتح الكل":"Expand all","اقفل الكل":"Collapse all","دوّر برقم الفاتورة (":"Search by invoice number (","أو اسم القطعة أو التاريخ...":"or product name or date...","جميع الحالات (":"All statuses (","الأعلى قيمة":"Highest value","الأقل قيمة":"Lowest value","مفيش طلبات مطابقة للفلتر ده":"No orders match this filter","اعرض كل الطلبات":"Show all orders","اقفل تفاصيل الطلب (-)":"Collapse order details (-)","افتح تفاصيل الطلب (":"Expand order details (","قطع •":"pcs •","الحالة:":"Status:","السداد:":"Payment:","اطبع الفاتورة الرسمية":"Print official invoice","إلغي الطلب قبل الشحن":"Cancel order before shipping","اطلب تاني":"Reorder","اطلب استرجاع بالضمان":"Request warranty return","تعديل من الإدارة على الفاتورة:":"Admin update on the invoice:","الطلب ده اتلغى والكميات رجعت المخزن والحساب اتسوّى.":"This order was cancelled; stock was returned and the account settled.","الكود":"Code","الصنف والجودة":"Item & quality","اللون":"Color","الكمية":"Qty","الإجمالي":"Total","عنوان التوصيل:":"Delivery address:","ملاحظات:":"Notes:","تقدر تطبع الفاتورة الرسمية أول ما تأكّد إنك استلمت الطلب (تم التسليم).":"You can print the official invoice once you confirm you received the order (Delivered).","إجمالي الفاتورة شامل التوصيل:":"Invoice total incl. delivery:","صافي رصيد المحفظة والحساب":"Net wallet & account balance","رصيد دائن (ليك):":"Credit balance (yours):","مديونية (عليك):":"Debt (you owe):","بيتحدّث لوحده مع الفواتير والمدفوعات والمرتجعات":"Updates automatically with invoices, payments and returns","سقف الآجل المسموح":"Credit limit","المتاح تسحبه آجل دلوقتي:":"Available on credit now:","عملة التعامل في الفواتير":"Invoice currency","كل الفواتير وكشف الحساب معروضة بعملة حسابك":"All invoices and statements are shown in your account currency","كشف الحساب التفصيلي وحركات المحفظة":"Detailed statement & wallet transactions","حركات مالية":"transactions","التاريخ":"Date","رقم المرجع":"Reference","البيان والتفاصيل":"Description","قيمة الحركة":"Amount","الرصيد بعد الحركة":"Balance after","له":"Credit","عليه":"Debit","الاسترجاع وضمان المنتجات (في خلال 7 أيام من التسليم)":"Returns & product warranty (within 7 days of delivery)","عشان تستبدل أو ترجّع لازم القطعة تبقى زي ما جت من المصنع وعليها الختم الأصلي ومن غير لحام أو تركيب نهائي":"To exchange or return, the item must be in factory condition with the original seal, with no soldering or final installation","قدّم طلب مرتجع جديد":"Submit a new return request","مفيش طلبات استرجاع مسجّلة.":"No return requests yet.","فاتورة رقم:":"Invoice No.:","مقبول":"Accepted","مرفوض":"Rejected","حالة الطلب:":"Order status:","القيمة:":"Value:","سبب الاسترجاع:":"Return reason:","رد قسم الضمان والفحص الفني:":"Warranty & technical inspection reply:","مقترح توفير صنف":"Item request","مفتوح":"Open","رسالتك وصلت للإدارة وهنرد عليك قريب.":"Your message reached the admin; we will reply soon.","ردّك اتبعت!":"Your reply was sent!","ابعت شكوى أو اطلب صنف":"Send a complaint or request an item","نوع الرسالة:":"Message type:","شكوى شحن وتوصيل":"Shipping complaint","استفسار مالي / فواتير":"Billing inquiry","أخرى":"Other","العنوان:":"Subject:","عنوان مختصر للرسالة...":"Short subject...","التفاصيل:":"Details:","اكتب تفاصيل الشكوى أو الصنف اللي عايزه يتوفّر...":"Write the complaint details or the item you want us to stock...","ابعت للإدارة":"Send to admin","رسائلي وتذاكر الدعم السابقة":"My messages & previous tickets","مفيش رسائل قبل كده.":"No previous messages.","تم الرد":"Replied","رد الإدارة":"Admin reply","ضيف رد أو سؤال تاني في الرسالة دي...":"Add another reply or question...","ابعت الرد":"Send reply","البيانات الأساسية والصورة الشخصية والعناوين":"Basic details, photo & addresses","عدّل اسم المحل أو المركز والصورة وأرقام التواصل وعناوين الشحن":"Edit shop name, photo, contact numbers and shipping addresses","صورة الحساب / شعار المحل:":"Account photo / shop logo:","ارفع صورة من جهازك":"Upload a photo","استخدم الأيقونة الملوّنة":"Use colored icon","أو اختار لون الشعار:":"Or pick a logo color:","حروف الشعار":"Logo letters","اسم المحل / الشركة / المركز:":"Shop / company name:","اسم المسؤول / صاحب الحساب:":"Owner name:","رقم الموبايل (المستخدم للدخول):":"Mobile (used to log in):","البريد الإلكتروني:":"Email:","العنوان الأساسي للتوصيل:":"Main delivery address:","عنوان الفرع الثاني (اختياري):":"Second address (optional):","احفظ التغييرات":"Save changes","تغيير كلمة المرور والأمان":"Change password & security","تقدر تغيّر كلمة السر في أي وقت":"You can change your password anytime","كلمة المرور الحالية:":"Current password:","اكتب كلمة المرور الحالية...":"Enter current password...","كلمة المرور الجديدة:":"New password:","اكتب كلمة المرور الجديدة...":"Enter new password...","تأكيد كلمة المرور الجديدة:":"Confirm new password:","اكتب كلمة المرور الجديدة تاني...":"Re-enter new password...","غيّر كلمة المرور":"Change password","سجّل دخولك عشان تفتح حسابك":"Log in to open your account","البروفايل وإعدادات الحساب":"Profile & settings","طلباتي وفواتيري":"My orders & invoices","المحفظة وكشف الحساب":"Wallet & statement","المرتجعات والضمان":"Returns & warranty","الشكاوى وطلبات الأصناف":"Complaints & item requests","حساب معتمد نشط ✓":"Active verified account ✓","المسؤول:":"Owner:","الجوال:":"Mobile:","صافي رصيد المحفظة":"Net wallet balance","رصيد ليك:":"Credit:","اطلب منتجات جديدة":"Order new products","لوحة تحكم الحساب":"Account dashboard","سلة المشتريات (":"Shopping cart (","السلة فاضية دلوقتي":"Your cart is empty","السعر:":"Price:","إجمالي السلة:":"Cart total:","كمّل الطلب وادفع":"Checkout","مفيش حساب مسجّل بالرقم أو الإيميل ده. تقدر تطلب فتح حساب جديد.":"No account found with this phone or email. You can request a new account.","كلمة المرور غلط! اتأكد وجرّب تاني.":"Wrong password! Please check and try again.","اكتب اسمك بالكامل ثنائي أو ثلاثي (5 حروف على الأقل)":"Enter your full name (at least 5 characters)","اكتب اسم المالك أو المسؤول ثنائي على الأقل":"Enter the owner name (first and last)","اكتب اسم النشاط أو الحساب التجاري بشكل صحيح (3 حروف على الأقل)":"Enter the shop or center name (at least 3 characters)","رقم الموبايل لازم يبقى صح: 11 رقم ويبدأ بـ (010 أو 011 أو 012 أو 015)":"Phone must be 11 digits starting with 010, 011, 012 or 015","الرقم ده مسجّل على حساب تاني! تقدر تسجّل دخول بيه على طول.":"This number is already registered! You can log in with it directly.","اكتب العنوان بالتفصيل (المحافظة والمدينة والشارع) عشان الشحن يوصل صح":"Enter the full address (governorate, city, street) so delivery is accurate","كلمة المرور لازم تبقى 6 حروف أو أرقام على الأقل":"Password must be at least 6 characters","كلمتين المرور مش زي بعض، اكتبهم تاني بالظبط":"Passwords do not match, please retype them","لازم توافق على الشروط والأحكام عشان تكمّل":"You must accept the Terms & Conditions to continue","صحّح الحقول الحمرا في الفورم.":"Please fix the red fields in the form.","حصلت مشكلة وإحنا بنبعت طلبك، جرّب تاني. (":"Something went wrong while sending your request, please try again. (","عميل فردي (شخص عادي)":"Individual customer","أهلاً بيك يا":"Welcome","حسابك اتفتح وإنت دخلت عليه.":"your account is ready and you are logged in.","طلب فتح حسابك (":"Your account request (","اتبعت للإدارة! هنأكّد ونفعّل حسابك في أقرب وقت.":"was sent to admin! We will verify and activate it soon.","حسابات التجار والمحلات":"Trader & shop accounts","سجّل دخول بحسابك أو اطلب فتح حساب جديد من الإدارة":"Log in or request a new account","تسجيل الدخول لحسابي":"Log in to my account","طلب فتح حساب جديد":"Request a new account","رقم الموبايل أو الإيميل المسجّل:":"Registered phone or email:","اكتب رقم الموبايل (مثلاً: 01012345678)...":"Enter phone number (e.g. 01012345678)...","كلمة المرور (":"Password (","اكتب كلمة المرور...":"Enter password...","ادخل وحدّث الأسعار":"Log in & update prices","لسه معندكش حساب؟":"Don't have an account?","دوس هنا واطلب فتح حساب":"Tap here to request one","في بيانات ناقصة أو غلط، راجع الحقول الحمرا تحت وصحّحها.":"Some details are missing or wrong, please fix the red fields below.","اختار نوع الحساب:":"Choose account type:","شخص عادي (استخدام شخصي)":"Individual (personal use)","عميل فردي (استخدام شخصي)":"Individual (personal use)","تسوّق جميع المنتجات المختارة بأسعار القطاعي، والحساب بيتفتح فوراً من غير موافقة":"Buy products and accessories at retail prices; your account opens instantly with no approval","تاجر / موزع ومبيعات معتمد":"Repair center & product sales","صاحب محل أو مركز صيانة":"Shop or repair center owner","حساب تاجر عشان تاخد أسعار الجملة وخصومات التوزيع":"Trader account for wholesale prices and distribution discounts","اسم النشاط التجاري / المعرض / الشركة *":"Shop / repair center / company name *","مثلاً: شركة أو معرض الأهرام للتجارة...":"e.g. Al-Ahram Mobile Repair Center...","الاسم بالكامل (ثنائي أو ثلاثي) *":"Full name *","اسم المالك أو الفني المسؤول *":"Owner / technician name *","مثلاً: محمود أحمد حسن...":"e.g. Mahmoud Ahmed Hassan...","مثلاً: م. محمد إبراهيم...":"e.g. Mohamed Ibrahim...","رقم الموبايل (للتواصل والدخول) *":"Mobile number (for contact & login) *","نوع النشاط التجاري:":"Business type:","محل إكسسوارات وجوالات":"Mobile & accessories shop","تاجر جملة وموزع محلي":"Wholesaler / local distributor","فني صيانة مستقل":"Independent repair technician","العنوان بالتفصيل (المحافظة - المدينة - اسم الشارع) *":"Full address (governorate - city - street) *","مثلاً: الدقهلية، أجا، شارع الجيش جنب مسجد النور...":"e.g. Dakahlia, Aga, El-Geish St. next to El-Nour Mosque...","كلمة المرور (6 على الأقل) *":"Password (min. 6) *","اختار كلمة مرور قوية...":"Choose a strong password...","تأكيد كلمة المرور *":"Confirm password *","اكتب نفس كلمة المرور تاني...":"Re-enter the same password...","الشروط والأحكام":"Terms & Conditions","قرأت الشروط والأحكام وموافق عليها *":"I have read and agree to the Terms & Conditions *","اعمل الحساب وادخل على طول":"Create account & log in","ابعت طلب فتح حساب المحل للإدارة":"Send shop account request to admin","طلب الاسترجاع والصور وصلوا لقسم الضمان!":"Your return request and photos reached the warranty department!","طلب استرجاع بالضمان — فاتورة":"Warranty return request — invoice","اختار القطعة اللي عايز ترجّعها:":"Choose the item to return:","سعر الفاتورة:":"Invoice price:","اشرح حالة القطعة والعيب:":"Describe the item condition and the defect:","اكتب حالة القطعة والعيب اللي ظهر...":"Describe the condition and defect...","صور للقطعة (اختياري — من 1 لـ 5):":"Photos (optional — 1 to 5):","ابعت طلب الاسترجاع للمراجعة":"Submit return request for review","ج.م)":"EGP)","ج.م":"EGP","شروطنا وسياسات الضمان والشحن عند":"Our terms, warranty & shipping policies at","واتساب وخدمة العملاء:":"WhatsApp & customer service:","مواعيد العمل:":"Working hours:","تابعنا وتواصل معنا:":"Follow & contact us:","جميع الحقوق محفوظة.":"All rights reserved.","فاتورة مبيعات رسمية (":"Official sales invoice (","إذن تحضير مخزني (بدون أسعار لعمال المخزن)":"Warehouse picking slip (no prices)","نسخة الفاتورة الرسمية المعتمدة للعميل (بعد الاستلام)":"Official customer invoice copy (after delivery)","فاتورة مبيعات وضمان معتمدة — واتساب / خدمة العملاء:":"Sales & warranty invoice — WhatsApp / customer service:","رقم الفاتورة:":"Invoice No.:","التاريخ:":"Date:","بيانات المحل / العميل المستلم:":"Customer details:","تفاصيل الشحنة والسداد:":"Shipment & payment:","طريقة الدفع:":"Payment method:","إجمالي عدد القطع بالفاتورة:":"Total pieces:","قطع":"pcs","كود":"Code","بيان الصنف ودرجة الجودة":"Item & quality","مراجعة وفحص المخزن":"Warehouse check","سليم ومختوم بختم الضمان":"OK & warranty-sealed","شروط الضمان والاسترجاع (":"Warranty & return terms (","الموقف المالي الحالي للحساب:":"Current account balance:","رصيد دائن لكم":"Credit balance","مديونية عليكم":"Debt","الخصم المطبق:":"Discount applied:","رسوم الشحن والتوصيل:":"Delivery fee:","الصافي النهائي للفاتورة:":"Invoice net total:","تحميل الفاتورة كملف":"Download invoice as","مباشر (":"directly (","طباعة ورقية فورية":"Print now","دوس عشان تكبّر الصورة":"Tap to enlarge photo","الموديل الأساسي:":"Main model:","سعر الوحدة:":"Unit price:","نفذت الكمية حالياً":"Currently out of stock","متوفر بالمخزن (":"In stock (","المواصفات الفنية والتفاصيل:":"Specifications & details:","الموديلات المتوافقة معها القطعة:":"Compatible models:","اختر اللون / النسخة:":"Choose color / version:","🔔 نبّهني على واتساب فور توفر المنتج بالمخزن":"Notify me when it is back in stock","تمت إضافة":"Added","إلى سلة المشتريات!":"to your cart!","تأكيد الكمية بالسلة (":"Confirm cart quantity (","إضافة للسلة الآن":"Add to cart","ملاحظة":"Note","الصورة":"Image","صورة":"Photo","الفاتورة":"Invoice"};
 const EN_KEYS = Object.keys(EN_DICT).sort((a, b) => b.length - a.length);
 const AR_TEST = /[\u0600-\u06FF]/;
 const isArLetter = ch => !!ch && AR_TEST.test(ch);
@@ -2185,6 +2185,15 @@ const generateAiProductDetails = (rawName, modelName = '', brandName = '', exist
   return { category, qualityGrade, warrantyText, colorsText, compatibleText, description };
 };
 
+// HTML entity escaper for safe print/report HTML generation (prevents Stored XSS)
+const escapeHtml = (val) =>
+  String(val ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 // Standalone Clean A4 Print / PDF Export Window (Never prints a dark screen screenshot!)
 const openCleanA4PrintWindow = (docTitle, bodyHtml) => {
   const win = window.open('', '_blank', 'width=1024,height=840');
@@ -2197,7 +2206,7 @@ const openCleanA4PrintWindow = (docTitle, bodyHtml) => {
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <title>${docTitle}</title>
+  <title>${escapeHtml(docTitle)}</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     @page { size: A4 portrait; margin: 14mm 12mm; }
@@ -2830,7 +2839,6 @@ const AVATAR_PRESETS = [
   { id: 'av_amber', label: 'أيقونة موزع ذهبي (ذهبي)', bg: 'from-amber-500 to-orange-600', text: 'PRO' },
   { id: 'av_purple', label: 'أيقونة شركة/مؤسسة (بنفسجي)', bg: 'from-purple-600 to-fuchsia-700', text: 'CO' },
   { id: 'av_slate', label: 'أيقونة كلاسيكية (داكن)', bg: 'from-nav to-nav', text: 'SH' }
-  , ...OR_IMPORTED_PARTS
 ];
 
 const INITIAL_CLIENTS = [
@@ -3729,6 +3737,10 @@ export default function App() {
   // ============================================================================
   const hasCloudInitialPullCompletedRef = React.useRef(false);
   const isSavingRef = React.useRef(false);
+  const pendingReflushRef = React.useRef(false);
+  const ordersRef = React.useRef(orders);
+  ordersRef.current = orders;
+  const submittingCustomerActionRef = React.useRef(false);
   const pendingSaveBundleRef = React.useRef(null);
   const saveDebounceTimerRef = React.useRef(null);
   const lastLocalMutationAtRef = React.useRef(0);
@@ -4755,9 +4767,43 @@ ${adminLink}`;
     } else if (realTable === 'promo_codes') {
       rawSnake.value = Number(rawSnake.value) || 0;
       rawSnake.active = rawSnake.active !== undefined ? Boolean(rawSnake.active) : (rawSnake.is_active !== undefined ? Boolean(rawSnake.is_active) : true);
+    } else if (realTable === 'returns_list') {
+      rawSnake.qty = Number(rawSnake.qty) || 1;
+      rawSnake.refund_amount_base = Number(rawSnake.refund_amount_base) || 0;
+      rawSnake.status = rawSnake.status || 'قيد المراجعة';
+      rawSnake.photos = Array.isArray(rawSnake.photos) ? rawSnake.photos : [];
+      rawSnake.admin_response = rawSnake.admin_response || '';
+      rawSnake.resolution_type = rawSnake.resolution_type || '';
+      rawSnake.warranty_confirmed = Boolean(rawSnake.warranty_confirmed);
+      rawSnake.replies = Array.isArray(rawSnake.replies) ? rawSnake.replies : [];
+      rawSnake.closed = Boolean(rawSnake.closed);
+      rawSnake.created_at = rawSnake.created_at || new Date().toISOString().slice(0, 16).replace('T', ' ');
+    } else if (realTable === 'complaints') {
+      rawSnake.status = rawSnake.status || 'مفتوح';
+      rawSnake.admin_reply = rawSnake.admin_reply || '';
+      rawSnake.replies = Array.isArray(rawSnake.replies) ? rawSnake.replies : [];
+      rawSnake.created_at = rawSnake.created_at || new Date().toISOString().slice(0, 16).replace('T', ' ');
+    } else if (realTable === 'sourcing_requests') {
+      rawSnake.status = rawSnake.status || 'جديد';
+      rawSnake.deposit_status = rawSnake.deposit_status || 'none';
+      rawSnake.messages = Array.isArray(rawSnake.messages) ? rawSnake.messages : [];
+      rawSnake.images_allowed = Boolean(rawSnake.images_allowed);
+      rawSnake.unread_admin = Boolean(rawSnake.unread_admin);
+      rawSnake.unread_client = Boolean(rawSnake.unread_client);
+      rawSnake.closed = Boolean(rawSnake.closed);
+      const nowStamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      rawSnake.created_at = rawSnake.created_at || nowStamp;
+      rawSnake.updated_at = rawSnake.updated_at || nowStamp;
+    } else if (realTable === 'auto_templates') {
+      rawSnake.cost_price = Number(rawSnake.cost_price) || 0;
+      rawSnake.base_price = Number(rawSnake.base_price) || 0;
+      rawSnake.default_stock = Number(rawSnake.default_stock) || 0;
+      rawSnake.low_stock_threshold = Number(rawSnake.low_stock_threshold) || 5;
+      rawSnake.max_order_qty = Number(rawSnake.max_order_qty) || 10;
+      rawSnake.enabled = rawSnake.enabled !== false;
     }
 
-    // Store lightweight metadata in `data` JSONB (stripping heavy image/photos/messages/ledger/items so `data` never duplicates heavy columns!)
+    // Store lightweight metadata in `data` JSONB (stripping heavy fields AND secret auth/OTP keys so `data` never leaks secrets!)
     const cleanDataCopy = { ...row };
     delete cleanDataCopy.data;
     delete cleanDataCopy.image;
@@ -4768,6 +4814,19 @@ ${adminLink}`;
     delete cleanDataCopy.avatarImage;
     delete cleanDataCopy.items;
     delete cleanDataCopy.description;
+    if (realTable === 'clients') {
+      delete cleanDataCopy.password;
+      delete cleanDataCopy.resetOtp;
+      delete cleanDataCopy.reset_otp;
+      delete cleanDataCopy.resetOtpExpires;
+      delete cleanDataCopy.reset_otp_expires;
+      delete cleanDataCopy.requestedNewPassword;
+      delete cleanDataCopy.requested_new_password;
+    } else if (realTable === 'account_requests') {
+      delete cleanDataCopy.password;
+      delete cleanDataCopy.requestedPassword;
+      delete cleanDataCopy.requested_password;
+    }
     rawSnake.data = cleanDataCopy;
 
     const allowedList = TABLE_ALLOWED_COLUMNS[realTable];
@@ -5113,7 +5172,7 @@ ${adminLink}`;
     orders: 'id,client_id,client_name,group_id,currency,exchange_rate_used,status,payment_method,address,notes,items,delivery_fee_base,discount_base,wallet_used_base,admin_edited,admin_edit_note,created_at',
     complaints: 'id,client_id,client_name,type,subject,message,status,admin_reply,replies,created_at',
     returns_list: 'id,order_id,client_id,client_name,part_id,part_name,qty,refund_amount_base,reason,status,admin_response,resolution_type,warranty_confirmed,replies,closed,created_at',
-    account_requests: 'id,name,shop_name,owner,owner_name,phone,email,password,requested_password,address,type,account_category,shop_type,notes,status,assigned_group_id,credit_limit,created_at',
+    account_requests: 'id,name,shop_name,owner,owner_name,phone,email,requested_password,address,type,account_category,shop_type,notes,status,assigned_group_id,credit_limit,created_at',
     sourcing_requests: 'id,client_id,client_name,phone,client_phone,part_id,part_name,name,desc_text,notes,status,price,deposit,deposit_status,images_allowed,unread_admin,unread_client,closed,created_at,updated_at'
   };
 
@@ -5535,8 +5594,12 @@ ${adminLink}`;
   const flushPendingDiffsToSupabase = async (showSuccessToast = false) => {
     const { isValid } = getSupabaseConfig();
     if (!isValid) return false;
-    if (isSavingRef.current) return false;
+    if (isSavingRef.current) {
+      pendingReflushRef.current = true;
+      return false;
+    }
     isSavingRef.current = true;
+    pendingReflushRef.current = false;
 
     const SLICE_TO_TABLE = {
       parts: 'spare_parts',
@@ -5557,43 +5620,75 @@ ${adminLink}`;
 
     try {
       setCloudSyncStatus('syncing');
-      const tasks = [];
+      const taskEntries = [];
 
-      // 1. Process all pending deletes
+      // 1. Snapshot and process all pending deletes
       for (const [sliceKey, idMap] of Object.entries(pendingDiffDeletesRef.current)) {
         const tbl = SLICE_TO_TABLE[sliceKey];
         if (!tbl || !idMap) continue;
         const ids = Object.keys(idMap);
         delete pendingDiffDeletesRef.current[sliceKey];
         for (const id of ids) {
-          tasks.push(sbDelete(tbl, id));
+          taskEntries.push({ kind: 'delete', sliceKey, id, promise: sbDelete(tbl, id) });
         }
       }
 
-      // 2. Process all pending upserts
+      // 2. Snapshot and process all pending upserts
       for (const [sliceKey, itemMap] of Object.entries(pendingDiffUpsertsRef.current)) {
         if (sliceKey === 'site_settings') {
           const payload = itemMap.main;
           delete pendingDiffUpsertsRef.current.site_settings;
           if (payload) {
-            tasks.push(sbUpsert('site_settings', [payload]));
+            taskEntries.push({ kind: 'settings', sliceKey, payload, promise: sbUpsert('site_settings', [payload]) });
           }
           continue;
         }
         const tbl = SLICE_TO_TABLE[sliceKey];
         if (!tbl || !itemMap) continue;
-        const items = Object.values(itemMap);
+        const snapshotMap = { ...itemMap };
+        const items = Object.values(snapshotMap);
         delete pendingDiffUpsertsRef.current[sliceKey];
         if (items.length > 0) {
           const formatted = sliceKey === 'brands'
             ? items.map((b, i) => (typeof b === 'string' ? { name: b, sort_order: i, image_url: brandImages[b] || '' } : b))
             : items;
-          tasks.push(sbUpsert(tbl, formatted));
+          taskEntries.push({ kind: 'upsert', sliceKey, snapshotMap, promise: sbUpsert(tbl, formatted) });
         }
       }
 
-      if (tasks.length > 0) {
-        await Promise.all(tasks);
+      let anyFailed = false;
+      if (taskEntries.length > 0) {
+        const results = await Promise.all(taskEntries.map(t => t.promise));
+        results.forEach((ok, idx) => {
+          if (ok === true) return;
+          anyFailed = true;
+          const entry = taskEntries[idx];
+          // Re-queue failed mutations so they are never silently lost
+          if (entry.kind === 'delete') {
+            if (!pendingDiffDeletesRef.current[entry.sliceKey]) pendingDiffDeletesRef.current[entry.sliceKey] = {};
+            pendingDiffDeletesRef.current[entry.sliceKey][entry.id] = true;
+          } else if (entry.kind === 'settings') {
+            if (!pendingDiffUpsertsRef.current.site_settings) pendingDiffUpsertsRef.current.site_settings = {};
+            if (!pendingDiffUpsertsRef.current.site_settings.main) {
+              pendingDiffUpsertsRef.current.site_settings.main = entry.payload;
+            }
+          } else if (entry.kind === 'upsert') {
+            if (!pendingDiffUpsertsRef.current[entry.sliceKey]) pendingDiffUpsertsRef.current[entry.sliceKey] = {};
+            for (const [k, v] of Object.entries(entry.snapshotMap)) {
+              if (!(k in pendingDiffUpsertsRef.current[entry.sliceKey])) {
+                pendingDiffUpsertsRef.current[entry.sliceKey][k] = v;
+              }
+            }
+          }
+        });
+      }
+
+      if (anyFailed) {
+        setCloudSyncStatus('local_ready');
+        if (showSuccessToast) {
+          showToast('تعذر حفظ بعض التعديلات في السيرفر — هتتعاد المحاولة تلقائياً مع الاتصال.', 'error');
+        }
+        return false;
       }
 
       setCloudSyncStatus('cloud_synced');
@@ -5606,6 +5701,10 @@ ${adminLink}`;
       return false;
     } finally {
       isSavingRef.current = false;
+      if (pendingReflushRef.current) {
+        pendingReflushRef.current = false;
+        setTimeout(() => { flushPendingDiffsToSupabase(false); }, 150);
+      }
     }
   };
 
@@ -5644,7 +5743,6 @@ ${adminLink}`;
       };
 
       // Anti-Egress Smart Delta Save: Only upload modified rows + lightweight UI config unless customBundle.forceFullCatalog is explicitly requested!
-      await flushPendingDiffsToSupabase(false);
       const isFullCatalogSync = Boolean(customBundle && customBundle.forceFullCatalog);
       const tasks = [
         sbUpsert('store_ads', (b.storeAds || storeAds).map((ad, idx) => ({ ...ad, sortOrder: idx }))),
@@ -5666,6 +5764,9 @@ ${adminLink}`;
           sbUpsert('spare_parts', b.parts || parts),
           sbUpsert('clients', b.clients || clients),
           sbUpsert('orders', b.orders || orders),
+          sbUpsert('returns_list', b.returnsList || returnsList),
+          sbUpsert('complaints', b.complaints || complaints),
+          sbUpsert('account_requests', b.accountRequests || accountRequests),
           sbUpsert('auto_templates', b.autoTemplates || autoTemplates),
           sbUpsert('sourcing_requests', b.sourcingRequests || sourcingRequests)
         );
@@ -5810,7 +5911,9 @@ ${adminLink}`;
         window.localStorage.setItem('elzoghbi_v2_' + k, JSON.stringify(v));
       });
       window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(siteSettings));
-      window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+      if (adminAuthenticated && (adminCredentials.username || '').trim()) {
+        window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+      }
       window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(currencies));
       window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(notifications));
       window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(brandImages));
@@ -6735,7 +6838,7 @@ ${adminLink}`;
         if (!probeRes.ok) return;
         const probeRows = await probeRes.json();
         const latestId = Array.isArray(probeRows) && probeRows[0]?.id ? String(probeRows[0].id) : '';
-        if (!latestId || orders.some(o => String(o.id) === latestId)) return;
+        if (!latestId || (ordersRef.current || []).some(o => String(o.id) === latestId)) return;
         const ordRes = await fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=5`, {
           headers: sbHeaders(sbKey)
         });
@@ -7241,8 +7344,7 @@ ${adminLink}`;
     for (const c of knownCities) {
       if (raw.includes(c)) return c;
     }
-    const firstPart = raw.split(/[-،,]/)[0]?.trim();
-    return firstPart && firstPart.length >= 3 && firstPart.length <= 18 ? firstPart : 'المنصورة';
+    return 'مصر';
   };
 
   const getFirstLetterMaskedName = (fullName) => {
@@ -8579,12 +8681,14 @@ ${adminLink}`;
   const [warrantyPhoneQuery, setWarrantyPhoneQuery] = useState('');
   const [warrantyClaimNotes, setWarrantyClaimNotes] = useState({});
 
-  const handleRequestWarrantyReplacement = (orderObj, itemObj) => {
-    if (!orderObj || !itemObj) return;
+  const handleRequestWarrantyReplacement = async (orderObj, itemObj) => {
+    if (!orderObj || !itemObj || submittingCustomerActionRef.current) return;
+    submittingCustomerActionRef.current = true;
+    try {
     const key = `${orderObj.id}_${itemObj.partId}`;
     const noteText = String(warrantyClaimNotes[key] || '').trim() || 'طلب استبدال ضمن فترة الضمان السارية بالرقم';
     const newRet = {
-      id: `RET-WAR-${String(Date.now()).slice(-4)}`,
+      id: `RET-WAR-${Date.now().toString().slice(-6)}`,
       orderId: orderObj.id,
       clientId: orderObj.clientId || 'guest',
       clientName: orderObj.clientName || 'عميل ضمان بالرقم',
@@ -8594,15 +8698,21 @@ ${adminLink}`;
       refundAmountBase: Number(itemObj.unitPriceBase) || 0,
       reason: `[ضمان بالرقم] ${noteText}`,
       warrantyConfirmed: true,
+      replies: [],
+      closed: false,
       photos: [],
       status: 'قيد المراجعة',
       resolutionType: '',
       adminResponse: '',
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
     };
+    const savedOk = await sbUpsert('returns_list', newRet);
+    if (!savedOk) {
+      showToast('معلش، طلب الاستبدال ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+      return;
+    }
     setReturnsList(prev => [newRet, ...prev]);
     markLocalUpsert('returnsList', newRet);
-    sbUpsert('returns_list', newRet);
     setNotifications(prev => [
       {
         id: `ntf_war_${Date.now()}`,
@@ -8616,6 +8726,9 @@ ${adminLink}`;
       ...prev
     ]);
     showToast(`🛡️ تم إرسال طلب الاستبدال بالضمان (${newRet.id}) للإدارة بنجاح! سنتواصل معك فوراً.`, 'success');
+    } finally {
+      submittingCustomerActionRef.current = false;
+    }
   };
 
   // 13. Refer-a-Friend ("هات صاحبك") State — Strictly First-Order Only & Hidden After Use!
@@ -9064,7 +9177,9 @@ ${adminLink}`;
             }])
           }).then(r => {
             if (!r.ok) showToast('لم تُحفظ الإعدادات في السيرفر — هترجع زي ما كانت بعد التحديث. حاول تاني.', 'error');
-          }).catch(() => {});
+          }).catch(() => {
+            showToast('لم تُحفظ الإعدادات في السيرفر — تعذر الاتصال بالشبكة. حاول تاني.', 'error');
+          });
 
           // Also sync any changed feature flags to `public.feature_flags` table!
           const changedFlagRows = [];
@@ -9770,7 +9885,8 @@ ${adminLink}`;
       }, 0);
   }, [orders, siteSettings.salesCapPeriodStart, siteSettings.salesCapPeriodEnd]);
 
-  const placeOrderInner = () => {
+  const placeOrderInner = async () => {
+    if (submittingCustomerActionRef.current) return;
     if (!currentClient) {
       setLoginModalOpen(true);
       return;
@@ -9922,6 +10038,20 @@ ${adminLink}`;
       }))
     };
 
+    // Await server confirmation for the order before deducting stock or clearing the cart
+    submittingCustomerActionRef.current = true;
+    let orderSavedOk = false;
+    try {
+      orderSavedOk = await sbUpsert('orders', newOrder);
+    } finally {
+      submittingCustomerActionRef.current = false;
+    }
+    if (!orderSavedOk) {
+      showToast('معلش، طلبك ماوصلش للسيرفر. اتأكد من النت وجرّب تأكد الطلب تاني.', 'error');
+      return;
+    }
+    markLocalUpsert('orders', newOrder);
+
     // 1. Deduct Stock
     setParts(prevParts =>
       prevParts.map(p => {
@@ -10040,24 +10170,13 @@ ${adminLink}`;
     setExpandedClientOrders(prev => ({ ...prev, [newOrderId]: true }));
     setNotifications(prev => [adminOrderNotif, clientOrderNotif, ...prev]);
 
-    // Direct Normalized Table Operations + Instant Admin Notification Sync in site_settings
-    sbUpsert('orders', newOrder);
+    // Patch only notifications in site_settings so a customer tab never overwrites admin settings/currencies
     try {
-      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
-      if (isValid) {
-        const nextNotifs = [adminOrderNotif, clientOrderNotif, ...notifications].slice(0, 100);
-        fetch(`${sbUrl}/rest/v1/site_settings?on_conflict=id`, {
-          method: 'POST',
-          headers: sbHeaders(sbKey, { Prefer: 'resolution=merge-duplicates,return=minimal' }),
-          body: JSON.stringify([{
-            id: 'main',
-            settings: siteSettings,
-            currencies,
-            notifications: nextNotifs,
-            updated_at: new Date().toISOString()
-          }])
-        }).catch(() => {});
-      }
+      const nextNotifs = [adminOrderNotif, clientOrderNotif, ...notifications].slice(0, 100);
+      sbUpdate('site_settings', 'main', {
+        notifications: nextNotifs,
+        updated_at: new Date().toISOString()
+      });
     } catch (e) {}
     cartSummary.items.forEach(item => {
       const p = parts.find(x => x.id === item.part.id);
@@ -13140,16 +13259,7 @@ ${adminLink}`;
                         <button
                           type="button"
                           title="زوّد الكمية"
-                          onClick={() => {
-                            const pid = item.part.id;
-                            setCart(prev => {
-                              const cur = prev[pid];
-                              if (!cur) return prev;
-                              const maxQ = Math.max(1, Number(item.part.stock) || 1);
-                              const nq = Math.min(maxQ, (Number(cur.qty) || 1) + 1);
-                              return { ...prev, [pid]: { ...cur, qty: nq } };
-                            });
-                          }}
+                          onClick={() => updateCartQty(item.part.id, 1)}
                           className="w-6 h-6 rounded-lg bg-surface2 border border-line text-fg font-black flex items-center justify-center hover:bg-surface"
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -13997,63 +14107,67 @@ ${adminLink}`;
 
     const handleSendComplaint = async (e) => {
       e.preventDefault();
+      if (!currentClient || submittingCustomerActionRef.current) return;
       if (!newComplaintSubject.trim() || !newComplaintMsg.trim()) return;
-      const newTck = {
-        id: `TCK-${503 + complaints.length}`,
-        clientId: currentClient.id,
-        clientName: currentClient.name,
-        type: newComplaintType,
-        subject: newComplaintSubject,
-        message: newComplaintMsg,
-        status: 'مفتوح',
-        adminReply: '',
-        replies: [],
-        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
-      };
-      const savedOk = await sbUpsert('complaints', newTck);
-      if (!savedOk) {
-        showToast('معلش، رسالتك ماوصلتش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
-        return;
+      submittingCustomerActionRef.current = true;
+      try {
+        const newTck = {
+          id: `TCK-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 4).toUpperCase()}`,
+          clientId: currentClient.id,
+          clientName: currentClient.name,
+          type: newComplaintType,
+          subject: newComplaintSubject.trim(),
+          message: newComplaintMsg.trim(),
+          status: 'مفتوح',
+          adminReply: '',
+          replies: [],
+          createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+        };
+        const savedOk = await sbUpsert('complaints', newTck);
+        if (!savedOk) {
+          showToast('معلش، رسالتك ماوصلتش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+          return;
+        }
+        setComplaints(prev => [newTck, ...prev]);
+        markLocalUpsert('complaints', newTck);
+        setNotifications(prev => [
+          {
+            id: `ntf_tck_${Date.now()}`,
+            target: 'admin',
+            type: 'complaint',
+            title: `💬 رسالة عميل جديدة (${newTck.id})`,
+            msg: `${newTck.clientName}: ${newTck.subject}`,
+            time: 'الآن',
+            read: false
+          },
+          ...prev
+        ]);
+        setNewComplaintSubject('');
+        setNewComplaintMsg('');
+        showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
+      } finally {
+        submittingCustomerActionRef.current = false;
       }
-      setComplaints(prev => [newTck, ...prev]);
-      markLocalUpsert('complaints', newTck);
-      setNotifications(prev => [
-        {
-          id: `ntf_tck_${Date.now()}`,
-          target: 'admin',
-          type: 'complaint',
-          title: `💬 رسالة عميل جديدة (${newTck.id})`,
-          msg: `${newTck.clientName}: ${newTck.subject}`,
-          time: 'الآن',
-          read: false
-        },
-        ...prev
-      ]);
-      setNewComplaintSubject('');
-      setNewComplaintMsg('');
-      showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
     };
 
     const handleClientSendFollowup = async (ticketId) => {
       const txt = (clientFollowupText[ticketId] || '').trim();
-      if (!txt) return;
-      // Persist the updated ticket as well (was local-only, like the new
-      // complaint path) so the admin actually sees the follow-up.
+      if (!txt || !currentClient || submittingCustomerActionRef.current) return;
       const target = complaints.find(t => t.id === ticketId);
-      if (target) {
+      if (!target) return;
+      submittingCustomerActionRef.current = true;
+      try {
+        const replyObj = {
+          id: `rep_${Date.now()}`,
+          sender: 'client',
+          senderName: currentClient.name,
+          text: txt,
+          date: new Date().toISOString().slice(0, 16).replace('T', ' ')
+        };
         const updatedTck = {
           ...target,
           status: 'مفتوح',
-          replies: [
-            ...(target.replies || []),
-            {
-              id: `rep_${Date.now()}`,
-              sender: 'client',
-              senderName: currentClient.name,
-              text: txt,
-              date: new Date().toISOString().slice(0, 16).replace('T', ' ')
-            }
-          ]
+          replies: [...(target.replies || []), replyObj]
         };
         const savedOk = await sbUpsert('complaints', updatedTck);
         if (!savedOk) {
@@ -14061,29 +14175,18 @@ ${adminLink}`;
           return;
         }
         markLocalUpsert('complaints', updatedTck);
+        setComplaints(prev =>
+          prev.map(t =>
+            t.id === ticketId
+              ? { ...t, status: 'مفتوح', replies: [...(t.replies || []), replyObj] }
+              : t
+          )
+        );
+        setClientFollowupText(prev => ({ ...prev, [ticketId]: '' }));
+        showToast('ردّك اتبعت!', 'success');
+      } finally {
+        submittingCustomerActionRef.current = false;
       }
-      setComplaints(prev =>
-        prev.map(t =>
-          t.id === ticketId
-            ? {
-                ...t,
-                status: 'مفتوح',
-                replies: [
-                  ...(t.replies || []),
-                  {
-                    id: `rep_${Date.now()}`,
-                    sender: 'client',
-                    senderName: currentClient.name,
-                    text: txt,
-                    date: new Date().toISOString().slice(0, 16).replace('T', ' ')
-                  }
-                ]
-              }
-            : t
-        )
-      );
-      setClientFollowupText(prev => ({ ...prev, [ticketId]: '' }));
-      showToast('ردّك اتبعت!', 'success');
     };
 
     return (
@@ -14757,6 +14860,7 @@ ${adminLink}`;
         if (res.ok) {
           const ok = await res.json();
           if (ok === true) {
+            setAdminCredentials({ username: u, password: p });
             setAdminAuthenticated(true);
             showToast('دخلت لوحة تحكم الإدارة!', 'success');
           } else {
@@ -14767,11 +14871,15 @@ ${adminLink}`;
       }
     } catch (err) {}
 
-    // Transitional fallback (only while the RPC is unreachable): compare
-    // against the credentials synced from site_settings.
+    // Transitional fallback (only while the RPC is unreachable AND a non-empty local password exists):
+    const savedPass = String(adminCredentials.password || '');
+    if (!savedPass) {
+      showToast('تعذر الاتصال بسيرفر التحقق من بيانات الإدارة. اتأكد من النت وجرّب تاني.', 'error');
+      return;
+    }
     const isSyncedMatch =
       u === (adminCredentials.username || 'admin').trim().toLowerCase() &&
-      p === adminCredentials.password;
+      p === savedPass;
 
     if (isSyncedMatch) {
       setAdminAuthenticated(true);
@@ -15748,6 +15856,7 @@ ${adminLink}`;
                                   setAdminTab('clients');
                                 } else if (n.type === 'return' || n.type === 'complaint') {
                                   setAdminTab('returns');
+                                  setAdminReturnsSubTab(n.type === 'complaint' ? 'complaints' : 'returns');
                                 } else if (n.type === 'restock_waitlist') {
                                   setAdminTab('restock_alerts');
                                 } else {
@@ -16480,7 +16589,7 @@ ${adminLink}`;
                         'نعم، احذف الطريقة'
                       )
                     }
-                    className="md:col-span-1 p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-500 flex items-center justify-center"
+                    className="md:col-span-1 p-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-500 flex items-center justify-center"
                     title="امسح الطريقة دي"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -17513,7 +17622,7 @@ ${adminLink}`;
                             items: prev.items.filter((_, i) => i !== idx)
                           }));
                         }}
-                        className="p-1.5 rounded-lg bg-rose-500/15 text-rose-500 hover:bg-rose-500/150/25"
+                        className="p-1.5 rounded-lg bg-rose-500/15 text-rose-500 hover:bg-rose-500/25"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -17779,7 +17888,7 @@ ${adminLink}`;
                         }
                       );
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 text-xs font-bold flex items-center gap-1 border border-rose-200 transition"
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 text-xs font-bold flex items-center gap-1 border border-rose-200 transition"
                     title="حذف الطلب بشكل نهائي"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -21955,61 +22064,61 @@ ${adminLink}`;
                   const showSec = (k) => !gmReportSections || gmReportSections[k] !== false;
                   const invRows = (rep.detailedInvoices || []).slice(0, 80).map(o => `
                     <tr>
-                      <td>${o.id}</td>
-                      <td>${o.createdAt || ''}</td>
-                      <td>${o.clientName || 'زائر'}</td>
-                      <td>${o.paymentMethod || ''}</td>
-                      <td>${o.status || ''}</td>
+                      <td>${escapeHtml(o.id)}</td>
+                      <td>${escapeHtml(o.createdAt || '')}</td>
+                      <td>${escapeHtml(o.clientName || 'زائر')}</td>
+                      <td>${escapeHtml(o.paymentMethod || '')}</td>
+                      <td>${escapeHtml(o.status || '')}</td>
                       <td>${Number(o.netTotalBase || 0).toLocaleString()} ج.م</td>
                       <td>${Number(o.profitBase || 0).toLocaleString()} ج.م</td>
                     </tr>`).join('');
                   const topProdRows = (rep.topProductsByQty || []).slice(0, 20).map(tp => `
                     <tr>
-                      <td>${tp.name}</td>
-                      <td>${tp.qtySold || 0}</td>
+                      <td>${escapeHtml(tp.name)}</td>
+                      <td>${Number(tp.qtySold) || 0}</td>
                       <td>${Number(tp.revenueBase || 0).toLocaleString()} ج.م</td>
                       <td>${Number(tp.profitBase || 0).toLocaleString()} ج.م</td>
                     </tr>`).join('');
                   const catRows = (rep.categoriesBreakdown || []).slice(0, 15).map(c => `
                     <tr>
-                      <td>${c.category}</td>
-                      <td>${c.qtySold || 0}</td>
+                      <td>${escapeHtml(c.category)}</td>
+                      <td>${Number(c.qtySold) || 0}</td>
                       <td>${Number(c.revenueBase || 0).toLocaleString()} ج.م</td>
                       <td>${Number(c.profitBase || 0).toLocaleString()} ج.م</td>
                     </tr>`).join('');
                   const lowStockRows = [...(rep.outOfStockPartsList || []), ...(rep.lowStockPartsList || [])].slice(0, 35).map(p => `
                     <tr>
-                      <td>${p.sku || p.id}</td>
-                      <td>${p.name}</td>
-                      <td>${p.stock || 0}</td>
+                      <td>${escapeHtml(p.sku || p.id)}</td>
+                      <td>${escapeHtml(p.name)}</td>
+                      <td>${Number(p.stock) || 0}</td>
                       <td>${Number(p.basePrice || 0).toLocaleString()} ج.م</td>
                     </tr>`).join('');
                   const topClientsRows = (rep.topClientsInPeriod || []).slice(0, 15).map(cl => `
                     <tr>
-                      <td>${cl.clientName || cl.name || 'عميل'}</td>
-                      <td>${cl.ordersCount || 0}</td>
+                      <td>${escapeHtml(cl.clientName || cl.name || 'عميل')}</td>
+                      <td>${Number(cl.ordersCount) || 0}</td>
                       <td>${Number(cl.totalSpentBase || 0).toLocaleString()} ج.م</td>
                     </tr>`).join('');
-                  const insightsHtml = (rep.gmInsights || []).map(ins => `<li style="margin-bottom:4px;">${ins}</li>`).join('');
+                  const insightsHtml = (rep.gmInsights || []).map(ins => `<li style="margin-bottom:4px;">${escapeHtml(ins)}</li>`).join('');
                   const htmlBody = `
                     <div class="hdr">
                       <div class="brand">
                         <div class="brand-badge">E</div>
                         <div>
-                          <h1>${siteSettings.storeName || 'ELZOGHBI'} — التقرير التنفيذي للمدير العام</h1>
+                          <h1>${escapeHtml(siteSettings.storeName || 'ELZOGHBI')} — التقرير التنفيذي للمدير العام</h1>
                           <p>نموذج رسمي معتمد للطباعة والحفظ كـ PDF (A4)</p>
                         </div>
                       </div>
                       <div class="meta">
-                        <div><strong>الفترة:</strong> من ${rep.fromStr} إلى ${rep.toStr}</div>
-                        <div><strong>تاريخ الإصدار:</strong> ${new Date().toLocaleString('ar-EG')}</div>
+                        <div><strong>الفترة:</strong> من ${escapeHtml(rep.fromStr)} إلى ${escapeHtml(rep.toStr)}</div>
+                        <div><strong>تاريخ الإصدار:</strong> ${escapeHtml(new Date().toLocaleString('ar-EG'))}</div>
                       </div>
                     </div>
                     <div class="kpi-grid">
                       <div class="kpi-box"><div class="kpi-label">صافي المبيعات</div><div class="kpi-val">${Number(rep.netSalesAfterDiscountBase || 0).toLocaleString()} ج.م</div></div>
-                      <div class="kpi-box"><div class="kpi-label">صافي الأرباح (${rep.profitMarginPct || 0}%)</div><div class="kpi-val">${Number(rep.netOperatingProfitBase || 0).toLocaleString()} ج.م</div></div>
-                      <div class="kpi-box"><div class="kpi-label">الطلبات الصالحة / المسلّمة</div><div class="kpi-val">${(rep.periodValidOrders || []).length} طلب (${rep.deliveredOrdersCount || 0} مُسلّم)</div></div>
-                      <div class="kpi-box"><div class="kpi-label">قيمة المخزون الحالي</div><div class="kpi-val">${Number(rep.totalInventoryRetailValueBase || 0).toLocaleString()} ج.م (${rep.totalInventoryUnits || 0} قطعة)</div></div>
+                      <div class="kpi-box"><div class="kpi-label">صافي الأرباح (${Number(rep.profitMarginPct) || 0}%)</div><div class="kpi-val">${Number(rep.netOperatingProfitBase || 0).toLocaleString()} ج.م</div></div>
+                      <div class="kpi-box"><div class="kpi-label">الطلبات الصالحة / المسلّمة</div><div class="kpi-val">${(rep.periodValidOrders || []).length} طلب (${Number(rep.deliveredOrdersCount) || 0} مُسلّم)</div></div>
+                      <div class="kpi-box"><div class="kpi-label">قيمة المخزون الحالي</div><div class="kpi-val">${Number(rep.totalInventoryRetailValueBase || 0).toLocaleString()} ج.م (${Number(rep.totalInventoryUnits) || 0} قطعة)</div></div>
                     </div>
                     ${insightsHtml ? `<div class="sec"><div class="sec-title">ملخص وتوصيات المدير العام</div><ul style="margin:6px 0 0;padding-right:18px;">${insightsHtml}</ul></div>` : ''}
                     ${showSec('detailedInvoices') && invRows ? `<div class="sec"><div class="sec-title">سجل الفواتير والطلبات (${(rep.detailedInvoices || []).length})</div><table><thead><tr><th>رقم الفاتورة</th><th>التاريخ</th><th>العميل</th><th>الدفع</th><th>الحالة</th><th>الإجمالي</th><th>الربح</th></tr></thead><tbody>${invRows}</tbody></table></div>` : ''}
@@ -22019,7 +22128,7 @@ ${adminLink}`;
                     ${showSec('inventoryValuation') && lowStockRows ? `<div class="sec"><div class="sec-title">تنبيهات المخزون المنخفض والمنتهي</div><table><thead><tr><th>الكود</th><th>الصنف</th><th>الرصيد</th><th>سعر البيع</th></tr></thead><tbody>${lowStockRows}</tbody></table></div>` : ''}
                     <div class="footer-sign">
                       <span>توقيع المدير العام: _______________________</span>
-                      <span>اعتماد إدارة المتجر — ${siteSettings.storeName || 'ELZOGHBI'}</span>
+                      <span>اعتماد إدارة المتجر — ${escapeHtml(siteSettings.storeName || 'ELZOGHBI')}</span>
                     </div>`;
                   openCleanA4PrintWindow(`تقرير_ELZOGHBI_${rep.fromStr}_${rep.toStr}`, htmlBody);
                 }}
@@ -26324,7 +26433,7 @@ ${adminLink}`;
                     }
                   })
                 }
-                className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
+                className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
               >
                 مسح الطلب
               </button>
@@ -26498,7 +26607,7 @@ ${adminLink}`;
                     }
                   })
                 }
-                className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
+                className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
               >
                 مسح الشكوى
               </button>
@@ -28124,7 +28233,8 @@ model OrderInvoice {
     }
   };
 
-  const submitRegistrationRequestInner = () => {
+  const submitRegistrationRequestInner = async () => {
+    if (submittingCustomerActionRef.current) return;
 
     const cleanPhone = normalizeDigits(regForm.phone).trim().replace(/\s+/g, '');
     const isIndiv = regForm.accountCategory === 'individual';
@@ -28200,16 +28310,33 @@ model OrderInvoice {
         read: false
       };
 
+      submittingCustomerActionRef.current = true;
+      let regSavedOk = false;
+      try {
+        const [cliOk, reqOk] = await Promise.all([
+          sbUpsert('clients', newClientObj),
+          sbUpsert('account_requests', approvedReq)
+        ]);
+        regSavedOk = Boolean(cliOk && reqOk);
+      } finally {
+        submittingCustomerActionRef.current = false;
+      }
+      if (!regSavedOk) {
+        showToast('معلش، مقدرناش نسجّل حسابك على السيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
       isCustomerMutatingCloudRef.current = true;
+      markLocalUpsert('clients', newClientObj);
+      markLocalUpsert('accountRequests', approvedReq);
       setClients(prev => [newClientObj, ...prev]);
       setAccountRequests(prev => [approvedReq, ...prev]);
       setNotifications(prev => [autoNotif, ...prev]);
-      commitCustomerCloudTransaction(cloud => ({
-        ...cloud,
-        clients: [newClientObj, ...(Array.isArray(cloud.clients) ? cloud.clients : clients)],
-        accountRequests: [approvedReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
-        notifications: [autoNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-      }));
+      try {
+        sbUpdate('site_settings', 'main', {
+          notifications: [autoNotif, ...notifications].slice(0, 100),
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {}
 
       setActiveRole(newClientId);
       setLoginModalOpen(false);
@@ -28230,16 +28357,27 @@ model OrderInvoice {
       reqId: newReq.id
     };
 
+    submittingCustomerActionRef.current = true;
+    let reqSavedOk = false;
+    try {
+      reqSavedOk = await sbUpsert('account_requests', newReq);
+    } finally {
+      submittingCustomerActionRef.current = false;
+    }
+    if (!reqSavedOk) {
+      showToast('معلش، طلب فتح الحساب ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+      return;
+    }
     isCustomerMutatingCloudRef.current = true;
+    markLocalUpsert('accountRequests', newReq);
     setAccountRequests(prev => [newReq, ...prev]);
     setNotifications(prev => [newAdminNotif, ...prev]);
-
-    // Immediately merge into Supabase Cloud so Admin Dashboard receives it right away!
-    commitCustomerCloudTransaction(cloud => ({
-      ...cloud,
-      accountRequests: [newReq, ...(Array.isArray(cloud.accountRequests) ? cloud.accountRequests : accountRequests)],
-      notifications: [newAdminNotif, ...(Array.isArray(cloud.notifications) ? cloud.notifications : notifications)]
-    }));
+    try {
+      sbUpdate('site_settings', 'main', {
+        notifications: [newAdminNotif, ...notifications].slice(0, 100),
+        updated_at: new Date().toISOString()
+      });
+    } catch (e) {}
 
     setLoginModalOpen(false);
     setRegErrors({});
@@ -29363,6 +29501,9 @@ model OrderInvoice {
 
     const handleSubmitReturn = async (e) => {
       e.preventDefault();
+      if (!selectedItem || submittingCustomerActionRef.current) return;
+      submittingCustomerActionRef.current = true;
+      try {
       const newRet = {
         id: `RET-${Date.now().toString().slice(-6)}`,
         orderId: returnModalOrder.id,
@@ -29373,6 +29514,9 @@ model OrderInvoice {
         qty: 1,
         refundAmountBase: selectedItem.unitPriceBase,
         reason: retReason.trim() || 'مفيش وصف',
+        warrantyConfirmed: false,
+        replies: [],
+        closed: false,
         photos: retPhotos,
         status: 'قيد المراجعة',
         resolutionType: '',
@@ -29406,6 +29550,9 @@ model OrderInvoice {
       setClientTab('account');
       setAccountSubTab('returns');
       showToast('طلب الاسترجاع والصور وصلوا لقسم الضمان!', 'success');
+      } finally {
+        submittingCustomerActionRef.current = false;
+      }
     };
 
     return (
@@ -29601,44 +29748,61 @@ model OrderInvoice {
     setSourcingFormOpen(true);
   };
 
-  const submitSourcingRequest = e => {
+  const submitSourcingRequest = async e => {
     e.preventDefault();
-    if (!currentClient) return;
+    if (!currentClient || submittingCustomerActionRef.current) return;
     if (srcForm.name.trim().length < 2) { showToast('اكتب اسم المنتج.', 'warning'); return; }
     if (srcForm.desc.trim().length < 5) { showToast('اشرح المنتج والمواصفات اللي عايزها (المقاس، اللون، الموديل...).', 'warning'); return; }
     const phone = normalizeDigits(srcForm.phone).replace(/\s+/g, '');
     if (!/^01[0125][0-9]{8}$/.test(phone)) { showToast('اكتب رقم موبايل صحيح للتواصل (11 رقم).', 'warning'); return; }
     if (!srcForm.accept) { showToast('لازم توافق على شروط الخدمة عشان تكمّل.', 'warning'); return; }
-    const stamp = nowStamp();
-    const req = {
-      id: `SRC-${Date.now().toString()}-${Math.random().toString(36).slice(2, 6)}`,
-      clientId: currentClient.id,
-      clientName: currentClient.name,
-      phone,
-      name: srcForm.name.trim(),
-      desc: srcForm.desc.trim(),
-      image: srcForm.image || '',
-      status: 'جديد',
-      price: null,
-      deposit: null,
-      depositStatus: 'none',
-      createdAt: stamp,
-      updatedAt: stamp,
-      acceptedTermsAt: stamp,
-      messages: [],
-      unreadAdmin: true,
-      unreadClient: false,
-      closed: false
-    };
-    const notif = adminNotify(`طلب منتج من برّه: ${req.name}`, `${currentClient.name} (${phone}) بعت طلب جديد #${req.id}`, { srcId: req.id });
-    setSourcingRequests(prev => [req, ...prev]);
-    setNotifications(prev => [notif, ...prev]);
-    cloudSourcingUpdate(list => [req, ...list.filter(r => r.id !== req.id)], notif);
-    setSourcingFormOpen(false);
-    setClientTab('account');
-    setAccountSubTab('orders');
-    setOpenAdminCards(prev => ({ ...prev, [`src_${req.id}`]: true }));
-    showToast('طلبك وصل! هنراجعه ونكلمك في المحادثة جوه الطلب.', 'success');
+    submittingCustomerActionRef.current = true;
+    try {
+      const stamp = nowStamp();
+      const req = {
+        id: `SRC-${Date.now().toString()}-${Math.random().toString(36).slice(2, 6)}`,
+        clientId: currentClient.id,
+        clientName: currentClient.name,
+        phone,
+        name: srcForm.name.trim(),
+        desc: srcForm.desc.trim(),
+        image: srcForm.image || '',
+        status: 'جديد',
+        price: null,
+        deposit: null,
+        depositStatus: 'none',
+        createdAt: stamp,
+        updatedAt: stamp,
+        acceptedTermsAt: stamp,
+        messages: [],
+        unreadAdmin: true,
+        unreadClient: false,
+        closed: false
+      };
+      const savedOk = await sbUpsert('sourcing_requests', req);
+      if (!savedOk) {
+        showToast('معلش، طلب المنتج ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
+      const notif = adminNotify(`طلب منتج من برّه: ${req.name}`, `${currentClient.name} (${phone}) بعت طلب جديد #${req.id}`, { srcId: req.id });
+      isCustomerMutatingCloudRef.current = true;
+      markLocalUpsert('sourcingRequests', req);
+      setSourcingRequests(prev => [req, ...prev]);
+      setNotifications(prev => [notif, ...prev]);
+      try {
+        sbUpdate('site_settings', 'main', {
+          notifications: [notif, ...notifications].slice(0, 100),
+          updated_at: new Date().toISOString()
+        });
+      } catch (e) {}
+      setSourcingFormOpen(false);
+      setClientTab('account');
+      setAccountSubTab('orders');
+      setOpenAdminCards(prev => ({ ...prev, [`src_${req.id}`]: true }));
+      showToast('طلبك وصل! هنراجعه ونكلمك في المحادثة جوه الطلب.', 'success');
+    } finally {
+      submittingCustomerActionRef.current = false;
+    }
   };
 
   const handleSrcFormImage = async e => {
@@ -30149,7 +30313,7 @@ model OrderInvoice {
                           onConfirm: () => { cancelSourcingByClient(req); setConfirmDialog(null); }
                         })
                       }
-                      className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 border border-rose-500/30 font-extrabold"
+                      className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 border border-rose-500/30 font-extrabold"
                     >
                       إلغاء الطلب
                     </button>
@@ -30399,7 +30563,7 @@ model OrderInvoice {
                           onConfirm: () => { setSourcingRequests(prev => prev.filter(r => r.id !== req.id)); sbDelete('sourcing_requests', req.id); setConfirmDialog(null); }
                         })
                       }
-                      className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/150/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
+                      className="px-3.5 py-2 rounded-xl bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 border border-rose-500/30"
                     >
                       مسح الطلب
                     </button>
@@ -30666,7 +30830,7 @@ ${footer}
 
   const handlePrintInvoice = (order, effectiveMode) => {
     const { css, body, en } = buildInvoiceHtml(order, effectiveMode, false);
-    const html = `<!DOCTYPE html><html lang="${en ? 'en' : 'ar'}" dir="${en ? 'ltr' : 'rtl'}"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>${siteSettings.storeName || 'Invoice'} - ${order.id}</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>@page{size:A4;margin:10mm}html,body{margin:0;padding:0;background:#fff}.noprint{position:sticky;top:0;z-index:5;background:#0f172a;color:#fff;padding:10px;display:flex;gap:8px;justify-content:center;font-family:sans-serif}.noprint button{background:#22d3ee;color:#0f172a;border:0;border-radius:10px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer}@media print{.noprint{display:none}}${css}.hmi{margin:0 auto;max-width:794px;padding:12px}</style></head><body><div class="noprint"><button onclick="window.print()">${en ? 'Print / Save as PDF' : 'طباعة / حفظ PDF'}</button></div>${body}<script>window.addEventListener('load',function(){setTimeout(function(){window.print()},900)});<\/script></body></html>`;
+    const html = `<!DOCTYPE html><html lang="${en ? 'en' : 'ar'}" dir="${en ? 'ltr' : 'rtl'}"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>${escapeHtml(siteSettings.storeName || 'Invoice')} - ${escapeHtml(order.id)}</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet"/><style>@page{size:A4;margin:10mm}html,body{margin:0;padding:0;background:#fff}.noprint{position:sticky;top:0;z-index:5;background:#0f172a;color:#fff;padding:10px;display:flex;gap:8px;justify-content:center;font-family:sans-serif}.noprint button{background:#22d3ee;color:#0f172a;border:0;border-radius:10px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer}@media print{.noprint{display:none}}${css}.hmi{margin:0 auto;max-width:794px;padding:12px}</style></head><body><div class="noprint"><button onclick="window.print()">${en ? 'Print / Save as PDF' : 'طباعة / حفظ PDF'}</button></div>${body}<script>window.addEventListener('load',function(){setTimeout(function(){window.print()},900)});<\/script></body></html>`;
     const w = window.open('', '_blank');
     if (w) {
       w.document.open();
@@ -32190,13 +32354,13 @@ ${footer}
     };
 
     const handleUploadSlotImage = async (slotIdx, e) => {
-      const files = Array.from(e.target.files || []).slice(0, 4 - slotIdx);
+      const files = Array.from(e.target.files || []).slice(0, Math.max(0, 8 - slotIdx));
       if (files.length === 0) return;
       showToast('جاري ضغط وتجهيز الصورة محلياً...', 'info');
       for (let i = 0; i < files.length; i++) {
         const uploadedUrl = await processAndUploadImage(files[i], 'parts');
         if (uploadedUrl) {
-          setSlotUrl(Math.min(3, slotIdx + i), uploadedUrl);
+          setSlotUrl(Math.min(7, slotIdx + i), uploadedUrl);
         }
       }
       showToast('تم رفع وتجهيز الصورة بنجاح ✓', 'success');
@@ -32354,7 +32518,7 @@ ${footer}
                 />
                 <div>
                   <div className="font-extrabold text-fg">
-                    صور المنتج (4 صور لكل منتج — رابط خارجي مباشر `image_url` أو رفع محلي):
+                    صور المنتج (حتى 8 صور لكل منتج — رابط خارجي مباشر `image_url` أو رفع محلي):
                   </div>
                   <div className="text-[11px] text-muted">
                     الصق رابط الصورة الخارجي مباشرة (مثل علي بابا أو CDN بدون استهلاك تخزين) أو ارفع صورة من جهازك
@@ -32659,13 +32823,13 @@ ${footer}
     };
 
     const handleEditSlotUpload = async (slotIdx, e) => {
-      const files = Array.from(e.target.files || []).slice(0, 4 - slotIdx);
+      const files = Array.from(e.target.files || []).slice(0, Math.max(0, 8 - slotIdx));
       if (files.length === 0) return;
       showToast('جاري ضغط وتجهيز الصورة محلياً...', 'info');
       for (let i = 0; i < files.length; i++) {
         const uploadedUrl = await processAndUploadImage(files[i], 'parts');
         if (uploadedUrl) {
-          setEditSlotUrl(Math.min(3, slotIdx + i), uploadedUrl);
+          setEditSlotUrl(Math.min(7, slotIdx + i), uploadedUrl);
         }
       }
       showToast('تم رفع وتجهيز الصورة بنجاح ✓', 'success');
@@ -32780,7 +32944,7 @@ ${footer}
           className="bg-surface rounded-2xl max-w-2xl w-full p-5 sm:p-6 space-y-4 shadow-2xl text-xs max-h-[90vh] overflow-y-auto"
         >
           <div className="flex items-center justify-between border-b border-line pb-3">
-            <h3 className="text-base font-extrabold text-fg">تعديل بيانات وصور المنتج (حتى 4 صور)</h3>
+            <h3 className="text-base font-extrabold text-fg">تعديل بيانات وصور المنتج (حتى 8 صور)</h3>
             <button type="button" onClick={() => setEditingPartObj(null)} className="p-1.5 rounded-lg bg-surface2 hover:bg-rose-500/15 text-muted hover:text-rose-600">
               <X className="w-5 h-5" />
             </button>
@@ -32798,7 +32962,7 @@ ${footer}
               />
               <div>
                 <div className="font-extrabold text-fg">
-                  روابط وصور المنتج (4 صور — رابط خارجي مباشر `image_url` أو رفع محلي):
+                  روابط وصور المنتج (حتى 8 صور — رابط خارجي مباشر `image_url` أو رفع محلي):
                 </div>
                 <div className="text-[11px] text-muted">
                   الصق رابط الصورة الخارجي مباشرة (صفر استهلاك تخزين وEgress) أو ارفع صورة من جهازك
