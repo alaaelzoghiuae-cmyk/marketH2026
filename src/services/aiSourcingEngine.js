@@ -769,7 +769,7 @@ export function detectFilterConflicts(filters) {
   return conflicts;
 }
 
-export function applyProductFilters(products, filters = {}) {
+export function applyProductFilters(products, filters = {}, fx = {}) {
   const passed = [];
   const excluded = [];
   const combinator = filters.combinator === 'OR' ? 'OR' : 'AND';
@@ -804,12 +804,32 @@ export function applyProductFilters(products, filters = {}) {
       reasons.push('لا يوجد سعر مصدر موثق');
     }
 
-    // Price range
-    if (filters.minPrice !== null && filters.minPrice !== '' && Number(p.price) < Number(filters.minPrice)) {
-      reasons.push(`السعر (${p.price}) أقل من الحد الأدنى (${filters.minPrice})`);
+    // Price range — compared in the FILTER's currency. A raw number in USD
+    // must never be compared against an EGP bound (399 USD is not "< 500").
+    // Convert with the configured rate when its pair matches; when the
+    // currencies differ and no valid rate exists, the range check is skipped
+    // for this product instead of silently comparing across currencies.
+    const filterCur = String(filters.priceCurrency || '').toUpperCase();
+    const prodCur = String(p.currency || 'USD').toUpperCase();
+    let cmpPrice = Number(p.price);
+    let priceComparable = true;
+    if (filterCur && prodCur && filterCur !== prodCur && Number.isFinite(cmpPrice)) {
+      const fxRate = Number(fx.rate || 0);
+      if (fxRate > 0 && (!fx.pair || fx.pair === `${prodCur}_${filterCur}`)) {
+        cmpPrice = cmpPrice * fxRate;
+      } else if (fxRate > 0 && fx.pair === `${filterCur}_${prodCur}`) {
+        cmpPrice = cmpPrice / fxRate;
+      } else {
+        priceComparable = false;
+      }
     }
-    if (filters.maxPrice !== null && filters.maxPrice !== '' && Number(p.price) > Number(filters.maxPrice)) {
-      reasons.push(`السعر (${p.price}) أعلى من الحد الأقصى (${filters.maxPrice})`);
+    if (priceComparable) {
+      if (filters.minPrice !== null && filters.minPrice !== '' && cmpPrice < Number(filters.minPrice)) {
+        reasons.push(`السعر (${p.price} ${prodCur}) أقل من الحد الأدنى (${filters.minPrice} ${filterCur || prodCur})`);
+      }
+      if (filters.maxPrice !== null && filters.maxPrice !== '' && cmpPrice > Number(filters.maxPrice)) {
+        reasons.push(`السعر (${p.price} ${prodCur}) أعلى من الحد الأقصى (${filters.maxPrice} ${filterCur || prodCur})`);
+      }
     }
 
     // Min images
@@ -1234,6 +1254,21 @@ export function calculateProductPricing(product, pricingConfig = {}, matchedCate
     };
   }
 
+  if (needsConversion && pricingConfig.exchangeRatePair && pricingConfig.exchangeRatePair !== `${sourceCurrency}_${targetCurrency}`) {
+    return {
+      ok: false,
+      error: `سعر الصرف المضبوط خاص بزوج (${pricingConfig.exchangeRatePair}) لكن هذا المنتج يحتاج (${sourceCurrency}_${targetCurrency}) — اجلب أو أدخل سعر الصرف الصحيح لعملة المنتج.`,
+      sourcePrice,
+      sourceCurrency,
+      targetCurrency,
+      exchangeRate: null,
+      convertedPrice: null,
+      calculatedPrice: null,
+      finalPrice: null,
+      steps: [`سعر المصدر: ${sourcePrice} ${sourceCurrency}`, `⚠️ سعر الصرف المضبوط لا يطابق عملة هذا المنتج (${pricingConfig.exchangeRatePair})`]
+    };
+  }
+
   if (needsConversion && (!rate || rate <= 0)) {
     return {
       ok: false,
@@ -1292,10 +1327,12 @@ export function calculateProductPricing(product, pricingConfig = {}, matchedCate
     markupLabel = `-${effVal} ${targetCurrency}`;
     steps.push(`خصم ثابت: -${effVal} ${targetCurrency} → ${Math.round(calculatedPrice).toLocaleString('en-US')} ${targetCurrency}`);
   } else if (effMode === 'ai_suggested') {
-    // Suggested competitive margin (15%) — NEVER auto-applied without approval
+    // Suggested competitive margin (15%) — applied as the calculated price;
+    // the admin's approval happens in the review screen before import.
     aiSuggestedPrice = roundToStep(convertedPrice * 1.15, pricingConfig.roundingStep || 50);
-    markupLabel = 'اقتراح AI (+15% بانتظار الموافقة)';
-    steps.push(`السعر المقترح من AI: ${aiSuggestedPrice.toLocaleString('en-US')} ${targetCurrency} (غير مطبّق تلقائياً)`);
+    calculatedPrice = aiSuggestedPrice;
+    markupLabel = 'اقتراح AI (+15% — يُعتمد في شاشة المراجعة)';
+    steps.push(`السعر المقترح من AI: ${aiSuggestedPrice.toLocaleString('en-US')} ${targetCurrency} (هيتطبق لو اعتمدت الاستيراد في شاشة المراجعة)`);
   }
 
   let finalPrice = roundToStep(calculatedPrice, pricingConfig.roundingStep || 0);
