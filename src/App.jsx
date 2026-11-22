@@ -3522,7 +3522,7 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [appPortal, adminAuthenticated]);
   const [adminCredentials, setAdminCredentials] = useState(() =>
-    loadPersisted('adminCredentials', { username: 'admin', password: '123' })
+    loadPersisted('adminCredentials', { username: '', password: '' })
   );
   const [adminLoginUser, setAdminLoginUser] = useState('');
   const [adminLoginPass, setAdminLoginPass] = useState('');
@@ -9096,9 +9096,19 @@ ${adminLink}`;
   };
 
   // Public (Customer-Visible) Brands, Models & Parts (Excludes any hidden Brand, Model, Product, or Category!)
+  // Brands with zero customer-visible products are also excluded so shoppers never land on an empty brand.
   const publicBrands = useMemo(
-    () => brands.filter(b => !isBrandHidden(b)),
-    [brands, hiddenBrandsSet]
+    () => brands.filter(b => {
+      if (isBrandHidden(b)) return false;
+      for (let i = 0; i < parts.length; i++) {
+        const p = parts[i];
+        if (!p || isPartHidden(p)) continue;
+        const bName = resolvePartModelObj(p)?.brand || p.brand;
+        if (bName === b) return true;
+      }
+      return false;
+    }),
+    [brands, parts, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore, siteSettings.keepOutOfStockVisible]
   );
 
   const publicModels = useMemo(
@@ -12061,7 +12071,7 @@ ${adminLink}`;
       dynamicCategories.push(selectedCategory);
     }
 
-    const modelsForSelectedBrand = publicModels.filter(m => selectedBrand === 'ALL' || m.brand === selectedBrand);
+    const modelsForSelectedBrand = publicModels.filter(m => (selectedBrand === 'ALL' || m.brand === selectedBrand) && (publicPartCountByModelIdMap.get(String(m.id)) || 0) > 0);
     const hasActiveFilters =
       selectedBrand !== 'ALL' || selectedModelId !== 'ALL' || selectedCategory !== 'ALL' || searchQuery.trim() !== '' || storeStockFilter !== 'ALL';
     const clearAllStoreFilters = () => {
@@ -12335,7 +12345,7 @@ ${adminLink}`;
                   <option value="ALL">كل البراندات ({publicBrands.length})</option>
                   {publicBrands.map(br => (
                     <option key={br} value={br}>
-                      {br} ({publicModels.filter(m => m.brand === br).length} موديل)
+                      {br} ({publicModels.filter(m => m.brand === br && (publicPartCountByModelIdMap.get(String(m.id)) || 0) > 0).length} موديل)
                     </option>
                   ))}
                 </select>
@@ -14317,21 +14327,22 @@ ${adminLink}`;
 
   const [adminSecurityModalOpen, setAdminSecurityModalOpen] = useState(false);
   const [adminNewUsername, setAdminNewUsername] = useState('admin');
-  const [adminNewPassword, setAdminNewPassword] = useState('123');
+  const [adminNewPassword, setAdminNewPassword] = useState('');
 
   const handleAdminLoginSubmit = (e) => {
     e.preventDefault();
     const u = adminLoginUser.trim().toLowerCase();
     const p = adminLoginPass;
 
-    // Accept synced adminCredentials OR emergency master recovery credentials ('admin' / '123' or 'admin123')
+    // Admin login accepts ONLY the credentials synced from site_settings.
+    // (Removed 2026-11-22, security fix #7: the hardcoded emergency master
+    // fallback 'admin'/'123'/'admin123' shipped in the public JS bundle let
+    // anyone who read the file sign in as admin.)
     const isSyncedMatch =
       u === (adminCredentials.username || 'admin').trim().toLowerCase() &&
       p === adminCredentials.password;
-    const isMasterFallback =
-      u === 'admin' && (p === '123' || p === 'admin123');
 
-    if (isSyncedMatch || isMasterFallback) {
+    if (isSyncedMatch) {
       setAdminAuthenticated(true);
       showToast('دخلت لوحة تحكم الإدارة!', 'success');
     } else {
@@ -30493,6 +30504,7 @@ ${footer}
                     {priceInfo.displayPrice.toLocaleString()} <span className="text-accent-text text-xs">{priceInfo.currencySymbol}</span>
                   </div>
                 </div>
+                {inCartQty > 0 && (
                 <div className="flex items-center bg-surface2 rounded-xl border border-line shrink-0">
                   <button
                     type="button"
@@ -30519,6 +30531,7 @@ ${footer}
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
+                )}
                 {inCartQty === 0 ? (
                   <button
                     type="button"
