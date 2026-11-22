@@ -1131,7 +1131,7 @@ export function Bidi({ text }) {
   return out;
 }
 
-function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false }) {
+function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false, heroFixed = false }) {
   const th = getAdTheme(ad);
   const rawLayout = ad.layout || (ad.image ? 'editorial_split' : 'icon_3d_studio');
 
@@ -1187,7 +1187,11 @@ function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = false }
       : 'rounded-[24px]';
 
   const bannerHeightMode = ad.bannerHeight || 'standard';
-  const heightCls = compact
+  // Hero carousel: one fixed height for every slide so flipping between ads
+  // never resizes the banner (each ad's own bannerHeight used to win).
+  const heightCls = heroFixed
+    ? 'h-[270px] sm:h-[320px]'
+    : compact
     ? 'min-h-[110px]'
     : isPromoCard
     ? 'min-h-[145px] sm:min-h-[195px]'
@@ -3121,6 +3125,34 @@ const loadPersisted = (key, fallbackVal) => {
   } catch (err) {}
   return fallbackVal;
 };
+
+// Product specs/description in the detail modal: clamped to 4 lines by
+// default (owner request — imported descriptions are walls of text), with
+// an expand toggle when the text is actually long.
+function ClampedSpecsText({ text }) {
+  const [expanded, setExpanded] = useState(false);
+  const str = String(text || '');
+  const isLong = str.length > 320;
+  return (
+    <div>
+      <p
+        className="text-muted leading-relaxed bg-surface p-3 rounded-xl border border-line"
+        style={!expanded && isLong ? { display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden' } : undefined}
+      >
+        {str}
+      </p>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          className="mt-1.5 text-[11px] font-extrabold text-accent-text hover:underline"
+        >
+          {expanded ? 'عرض أقل' : 'عرض كل المواصفات'}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function App() {
   // --- Universal Delete Confirmation Dialog State ---
@@ -5623,7 +5655,6 @@ ${adminLink}`;
         sbUpsert('site_settings', [{
           id: 'main',
           settings: b.siteSettings || siteSettings,
-          credentials: b.adminCredentials || adminCredentials,
           currencies: b.currencies || currencies,
           notifications: (b.notifications || notifications || []).slice(0, 50),
           updated_at: new Date().toISOString()
@@ -5640,7 +5671,12 @@ ${adminLink}`;
         );
       }
 
-      await Promise.all(tasks);
+      const syncResults = await Promise.all(tasks);
+      if (syncResults.some(r => r === false)) {
+        setCloudSyncStatus('local_ready');
+        showToast('بعض البيانات لم تُحفظ في السيرفر — راجع الاتصال وحاول الحفظ مرة أخرى.', 'error');
+        return false;
+      }
       setCloudSyncStatus('cloud_synced');
       if (showSuccessToast) {
         showToast('تم تأكيد وحفظ كافة الجداول والتعديلات في السيرفر السحابي بنجاح ✓', 'success');
@@ -5875,7 +5911,6 @@ ${adminLink}`;
         pendingDiffUpsertsRef.current.site_settings.main = {
           id: 'main',
           settings: siteSettings,
-          ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
           currencies: currencies,
           notifications: notifications,
           updated_at: new Date().toISOString()
@@ -6724,6 +6759,7 @@ ${adminLink}`;
   }, [appPortal, adminAuthenticated, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
 
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [placedOrderInfo, setPlacedOrderInfo] = useState(null);
 
   // --- Toast Notification Banner ---
   const [toast, setToast] = useState(null);
@@ -9007,11 +9043,12 @@ ${adminLink}`;
             body: JSON.stringify([{
               id: 'main',
               settings: next,
-              ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
               currencies,
               notifications,
               updated_at: new Date().toISOString()
             }])
+          }).then(r => {
+            if (!r.ok) showToast('لم تُحفظ الإعدادات في السيرفر — هترجع زي ما كانت بعد التحديث. حاول تاني.', 'error');
           }).catch(() => {});
 
           // Also sync any changed feature flags to `public.feature_flags` table!
@@ -10000,7 +10037,6 @@ ${adminLink}`;
           body: JSON.stringify([{
             id: 'main',
             settings: siteSettings,
-            ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
             currencies,
             notifications: nextNotifs,
             updated_at: new Date().toISOString()
@@ -10042,6 +10078,7 @@ ${adminLink}`;
     setOrderNotes('');
     setClientTab('account');
     setAccountSubTab('orders');
+    setPlacedOrderInfo({ id: newOrderId, total: cartSummary.finalPayableBase });
     showToast(`🔔 طلبك رقم ${newOrderId} اتأكّد وبعتنا إشعار للإدارة والمخزن!`, 'success');
   };
 
@@ -11830,7 +11867,7 @@ ${adminLink}`;
               style={{ background: currentHeroTheme.cssGrad }}
               className="relative cursor-pointer select-none overflow-hidden transition-all duration-500"
             >
-              <AdContent ad={currentSlide} rtl={!i18nActive} />
+              <AdContent ad={currentSlide} rtl={!i18nActive} heroFixed />
             </div>
 
             {/* Sleek Non-Overlapping Slider Navigation Bar (Only shown when > 1 slide exists — NEVER covers ad text or photo!) */}
@@ -12569,17 +12606,14 @@ ${adminLink}`;
                 >
                   <option value="ALL">
                     {selectedBrand === 'ALL'
-                      ? `اختر الموديل المناسب — كل الأجهزة (${modelsForSelectedBrand.length})`
-                      : `اختر الموديل المناسب — أجهزة ${selectedBrand} (${modelsForSelectedBrand.length})`}
+                      ? 'اختر الموديل المناسب — كل الأجهزة'
+                      : `اختر الموديل المناسب — أجهزة ${selectedBrand}`}
                   </option>
-                  {modelsForSelectedBrand.map(mdl => {
-                    const cnt = publicPartCountByModelIdMap.get(String(mdl.id)) || 0;
-                    return (
-                      <option key={mdl.id} value={mdl.id}>
-                        {mdl.name} ({cnt} منتج)
-                      </option>
-                    );
-                  })}
+                  {modelsForSelectedBrand.map(mdl => (
+                    <option key={mdl.id} value={mdl.id}>
+                      {mdl.name}
+                    </option>
+                  ))}
                 </select>
                 <ChevronDown className="w-4 h-4 text-muted absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
@@ -12594,10 +12628,10 @@ ${adminLink}`;
                   onChange={e => setSelectedCategory(e.target.value)}
                   className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#3B82F6]"
                 >
-                  <option value="ALL">كل التصنيفات ({facetTotal})</option>
+                  <option value="ALL">كل التصنيفات</option>
                   {dynamicCategories.filter(c => c !== 'ALL').map(cat => (
                     <option key={cat} value={cat}>
-                      {cat} ({catCounts[cat] || 0})
+                      {cat}
                     </option>
                   ))}
                 </select>
@@ -12867,7 +12901,7 @@ ${adminLink}`;
                   onClick={() => setCheckoutAddressChoice('primary')}
                   className={`p-3.5 rounded-xl border cursor-pointer transition ${
                     checkoutAddressChoice === 'primary'
-                      ? 'border-accent bg-accent/10'
+                      ? 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/20'
                       : 'border-line hover:bg-surface2'
                   }`}
                 >
@@ -12879,7 +12913,7 @@ ${adminLink}`;
                   onClick={() => setCheckoutAddressChoice('secondary')}
                   className={`p-3.5 rounded-xl border cursor-pointer transition ${
                     checkoutAddressChoice === 'secondary'
-                      ? 'border-accent bg-accent/10'
+                      ? 'border-violet-500 bg-violet-500/10 ring-2 ring-violet-500/20'
                       : 'border-line hover:bg-surface2'
                   }`}
                 >
@@ -12980,7 +13014,24 @@ ${adminLink}`;
                         : m.desc,
                     disabled: m.id === CREDIT_PAYMENT_ID && !cartSummary.canOrderOnCredit
                   }))
-                  .map(pm => (
+                  .map(pm => {
+                  // Distinct accent per payment kind (owner: checkout options
+                  // were all one color) — used for the selected ring/border
+                  // and a permanent color dot next to the label.
+                  const pmId = String(pm.id || '').toLowerCase();
+                  const pmAccent =
+                    pmId.includes('cod') || pmId.includes('cash') || pmId.includes('عند الاستلام')
+                      ? { sel: 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/25', dot: 'bg-emerald-500', check: 'text-emerald-500' }
+                      : pmId.includes('wallet') || pmId.includes('محفظة')
+                      ? { sel: 'border-violet-500 bg-violet-500/10 ring-2 ring-violet-500/25', dot: 'bg-violet-500', check: 'text-violet-500' }
+                      : pmId.includes('credit') || pmId.includes('آجل') || pmId.includes('اجل')
+                      ? { sel: 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/25', dot: 'bg-amber-500', check: 'text-amber-500' }
+                      : pmId.includes('bank') || pmId.includes('transfer') || pmId.includes('insta') || pmId.includes('تحويل')
+                      ? { sel: 'border-sky-500 bg-sky-500/10 ring-2 ring-sky-500/25', dot: 'bg-sky-500', check: 'text-sky-500' }
+                      : pmId.includes('card') || pmId.includes('visa') || pmId.includes('كارت')
+                      ? { sel: 'border-indigo-500 bg-indigo-500/10 ring-2 ring-indigo-500/25', dot: 'bg-indigo-500', check: 'text-indigo-500' }
+                      : { sel: 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/25', dot: 'bg-blue-500', check: 'text-blue-500' };
+                  return (
                   <button
                     key={pm.id}
                     disabled={pm.disabled}
@@ -12989,17 +13040,21 @@ ${adminLink}`;
                       pm.disabled
                         ? 'bg-surface2 border-line opacity-50 cursor-not-allowed'
                         : paymentMethod === pm.id
-                        ? 'border-accent bg-accent/10 ring-2 ring-accent/20'
+                        ? pmAccent.sel
                         : 'border-line hover:bg-surface2'
                     }`}
                   >
                     <div className="font-extrabold text-fg flex items-center justify-between">
-                      <span>{pm.label}</span>
-                      {paymentMethod === pm.id && <CheckCircle2 className="w-4 h-4 text-blue-600" />}
+                      <span className="flex items-center gap-1.5">
+                        <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${pmAccent.dot}`} />
+                        {pm.label}
+                      </span>
+                      {paymentMethod === pm.id && <CheckCircle2 className={`w-4 h-4 ${pmAccent.check}`} />}
                     </div>
                     <div className="text-[11px] text-muted mt-1">{pm.desc}</div>
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -13036,15 +13091,72 @@ ${adminLink}`;
                 {cartSummary.items.map(item => (
                   <div
                     key={item.part.id}
-                    className="flex items-center justify-between text-xs border-b border-line pb-2"
+                    className="flex items-center justify-between gap-2 text-xs border-b border-line pb-2"
                   >
-                    <div>
+                    <div className="min-w-0">
                       <div className="font-bold text-fg">{item.part.name}</div>
                       <div className="text-[11px] text-muted">
                         الكمية: {item.qty} × {formatMoney(item.priceInfo.baseEgpPrice)} ({item.color})
                       </div>
+                      {/* Owner request: the customer can adjust or remove
+                          items right from the checkout summary. */}
+                      <div className="flex items-center gap-1.5 mt-1.5">
+                        <button
+                          type="button"
+                          title="قلّل الكمية"
+                          onClick={() => {
+                            const pid = item.part.id;
+                            setCart(prev => {
+                              const cur = prev[pid];
+                              if (!cur) return prev;
+                              const nq = (Number(cur.qty) || 1) - 1;
+                              if (nq <= 0) {
+                                const { [pid]: _removed, ...rest } = prev;
+                                return rest;
+                              }
+                              return { ...prev, [pid]: { ...cur, qty: nq } };
+                            });
+                          }}
+                          className="w-6 h-6 rounded-lg bg-surface2 border border-line text-fg font-black flex items-center justify-center hover:bg-surface"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="font-black text-fg min-w-[1.25rem] text-center">{item.qty}</span>
+                        <button
+                          type="button"
+                          title="زوّد الكمية"
+                          onClick={() => {
+                            const pid = item.part.id;
+                            setCart(prev => {
+                              const cur = prev[pid];
+                              if (!cur) return prev;
+                              const maxQ = Math.max(1, Number(item.part.stock) || 1);
+                              const nq = Math.min(maxQ, (Number(cur.qty) || 1) + 1);
+                              return { ...prev, [pid]: { ...cur, qty: nq } };
+                            });
+                          }}
+                          className="w-6 h-6 rounded-lg bg-surface2 border border-line text-fg font-black flex items-center justify-center hover:bg-surface"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          title="امسح المنتج من الفاتورة"
+                          onClick={() => {
+                            const pid = item.part.id;
+                            setCart(prev => {
+                              const { [pid]: _removed, ...rest } = prev;
+                              return rest;
+                            });
+                          }}
+                          className="h-6 px-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 font-black flex items-center gap-1 hover:bg-rose-500/20 mr-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          مسح
+                        </button>
+                      </div>
                     </div>
-                    <div className="font-extrabold text-fg">
+                    <div className="font-extrabold text-fg shrink-0">
                       {formatMoney(item.lineTotalBase)}
                     </div>
                   </div>
@@ -13884,6 +13996,20 @@ ${adminLink}`;
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
       setComplaints(prev => [newTck, ...prev]);
+      markLocalUpsert('complaints', newTck);
+      sbUpsert('complaints', newTck);
+      setNotifications(prev => [
+        {
+          id: `ntf_tck_${Date.now()}`,
+          target: 'admin',
+          type: 'complaint',
+          title: `💬 رسالة عميل جديدة (${newTck.id})`,
+          msg: `${newTck.clientName}: ${newTck.subject}`,
+          time: 'الآن',
+          read: false
+        },
+        ...prev
+      ]);
       setNewComplaintSubject('');
       setNewComplaintMsg('');
       showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
@@ -13892,6 +14018,27 @@ ${adminLink}`;
     const handleClientSendFollowup = (ticketId) => {
       const txt = (clientFollowupText[ticketId] || '').trim();
       if (!txt) return;
+      // Persist the updated ticket as well (was local-only, like the new
+      // complaint path) so the admin actually sees the follow-up.
+      const target = complaints.find(t => t.id === ticketId);
+      if (target) {
+        const updatedTck = {
+          ...target,
+          status: 'مفتوح',
+          replies: [
+            ...(target.replies || []),
+            {
+              id: `rep_${Date.now()}`,
+              sender: 'client',
+              senderName: currentClient.name,
+              text: txt,
+              date: new Date().toISOString().slice(0, 16).replace('T', ' ')
+            }
+          ]
+        };
+        markLocalUpsert('complaints', updatedTck);
+        sbUpsert('complaints', updatedTck);
+      }
       setComplaints(prev =>
         prev.map(t =>
           t.id === ticketId
@@ -15572,8 +15719,12 @@ ${adminLink}`;
                                   setAdminTab('sourcing');
                                   setAdminSourcingSubTab('requests');
                                   if (n.srcId) setOpenAdminCards(prev => ({ ...prev, [`src_${n.srcId}`]: true }));
-                                } else if (n.type === 'account_request' || n.reqId) {
+                                } else if (n.type === 'account_request' || n.type === 'password_reset' || n.type === 'new_client' || n.reqId) {
                                   setAdminTab('clients');
+                                } else if (n.type === 'return' || n.type === 'complaint') {
+                                  setAdminTab('returns');
+                                } else if (n.type === 'restock_waitlist') {
+                                  setAdminTab('restock_alerts');
                                 } else {
                                   setAdminTab('orders');
                                 }
@@ -27769,7 +27920,6 @@ model OrderInvoice {
           body: JSON.stringify([{
             id: 'main',
             settings: siteSettings,
-            ...(adminCredentials && adminCredentials.password ? { credentials: adminCredentials } : {}),
             currencies,
             notifications: [resetNotif, ...notifications].slice(0, 100),
             updated_at: new Date().toISOString()
@@ -29080,34 +29230,43 @@ model OrderInvoice {
   // --- Admin Security Settings Modal (Change Admin Username & Password) ---
   const renderAdminSecurityModal = () => {
     if (!adminSecurityModalOpen) return null;
-    const handleSaveAdminCreds = (e) => {
+    const handleSaveAdminCreds = async (e) => {
       e.preventDefault();
       if (!adminNewUsername.trim() || !adminNewPassword.trim()) return;
       const nextCreds = {
         username: adminNewUsername.trim(),
         password: adminNewPassword
       };
+      // The credentials column is locked for the public key (security fix
+      // #7), so credentials are updated only through the server-side gated
+      // RPC, which first verifies the CURRENT credentials on the server.
+      try {
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (!isValid) throw new Error('no-config');
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/admin_update_credentials`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            p_current_username: adminCredentials.username || '',
+            p_current_password: adminCredentials.password || '',
+            p_new_username: nextCreds.username,
+            p_new_password: nextCreds.password
+          })
+        });
+        if (!res.ok) throw new Error('rpc-unreachable');
+        const ok = await res.json();
+        if (ok !== true) {
+          showToast('تعذّر تحديث بيانات الدخول: بيانات الدخول الحالية غير مطابقة على السيرفر.', 'error');
+          return;
+        }
+      } catch (err) {
+        showToast('تعذّر تحديث بيانات الدخول على السيرفر — تأكد من تشغيل SQL دالة admin_update_credentials أولاً.', 'error');
+        return;
+      }
       setAdminCredentials(nextCreds);
-      pushToSupabaseCloud({
-        siteSettings,
-        adminCredentials: nextCreds,
-        currencies,
-        groups,
-        brands,
-        autoTemplates,
-        models,
-        parts,
-        clients,
-        accountRequests,
-        orders,
-        returnsList,
-        complaints,
-        promoCodes,
-        storeAds,
-        showcaseBars
-      }, false);
-      setAdminLoginUser(adminNewUsername.trim());
-      setAdminLoginPass(adminNewPassword);
+      try { window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(nextCreds)); } catch (e2) {}
+      setAdminLoginUser(nextCreds.username);
+      setAdminLoginPass(nextCreds.password);
       setAdminSecurityModalOpen(false);
       showToast('تم تحديث اسم المستخدم وكلمة المرور الخاصة بلوحة تحكم الإدارة!', 'success');
     };
@@ -29177,7 +29336,7 @@ model OrderInvoice {
     const handleSubmitReturn = (e) => {
       e.preventDefault();
       const newRet = {
-        id: `RET-${303 + returnsList.length}`,
+        id: `RET-${Date.now().toString().slice(-6)}`,
         orderId: returnModalOrder.id,
         clientId: returnModalOrder.clientId,
         clientName: returnModalOrder.clientName,
@@ -29193,6 +29352,20 @@ model OrderInvoice {
         createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
       setReturnsList(prev => [newRet, ...prev]);
+      markLocalUpsert('returnsList', newRet);
+      sbUpsert('returns_list', newRet);
+      setNotifications(prev => [
+        {
+          id: `ntf_ret_${Date.now()}`,
+          target: 'admin',
+          type: 'return',
+          title: `↩️ طلب إرجاع جديد (${newRet.id})`,
+          msg: `العميل "${newRet.clientName}" طلب إرجاع "${newRet.partName}" من فاتورة ${newRet.orderId}.`,
+          time: 'الآن',
+          read: false
+        },
+        ...prev
+      ]);
       setReturnModalOrder(null);
       setRetReason('');
       setRetPhotos([]);
@@ -31026,9 +31199,7 @@ ${footer}
 
               <div className="space-y-1.5">
                 <div className="font-extrabold text-fg">المواصفات الفنية والتفاصيل:</div>
-                <p className="text-muted leading-relaxed bg-surface p-3 rounded-xl border border-line">
-                  {targetPart.description}
-                </p>
+                <ClampedSpecsText text={targetPart.description} />
               </div>
 
               <div className="space-y-1.5">
@@ -31963,8 +32134,8 @@ ${footer}
       if (list.length === 0 && (obj.image_url || obj.customImage)) {
         list.push(obj.image_url || obj.customImage);
       }
-      while (list.length < 4) list.push('');
-      return list.slice(0, 4);
+      while (list.length < 8) list.push('');
+      return list.slice(0, 8);
     };
 
     const fourSlots = getFourSlots(addingPartToModel);
@@ -32008,7 +32179,7 @@ ${footer}
         .map(s => s.trim())
         .filter(Boolean);
 
-      const cleanImages = fourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 4);
+      const cleanImages = fourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 8);
       const primaryImgUrl =
         cleanImages[0] ||
         (addingPartToModel.image_url || '').trim() ||
@@ -32159,7 +32330,7 @@ ${footer}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              {[0, 1, 2, 3].map(slotIdx => (
+              {[0, 1, 2, 3, 4, 5, 6, 7].map(slotIdx => (
                 <div key={slotIdx} className="p-2.5 rounded-xl bg-surface border border-line space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-[11px] text-fg">
@@ -32430,8 +32601,8 @@ ${footer}
       const baseArr = Array.isArray(obj.imagesList) && obj.imagesList.length > 0
         ? [...obj.imagesList]
         : [obj.image_url || obj.imageUrl || obj.image || ''].filter(Boolean);
-      while (baseArr.length < 4) baseArr.push('');
-      return baseArr.slice(0, 4);
+      while (baseArr.length < 8) baseArr.push('');
+      return baseArr.slice(0, 8);
     };
 
     const editFourSlots = getEditFourSlots(editingPartObj);
@@ -32477,7 +32648,7 @@ ${footer}
         .map(s => s.trim())
         .filter(Boolean);
 
-      const cleanImages = editFourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 4);
+      const cleanImages = editFourSlots.map(s => String(s || '').trim()).filter(Boolean).slice(0, 8);
       const primaryImgUrl = cleanImages[0] || editingPartObj.image_url || editingPartObj.image || PART_IMAGES.screen;
       const finalImgsList = cleanImages.length > 0 ? cleanImages : [primaryImgUrl];
       const parsedOldPrice = Number(editingPartObj.oldPrice) > 0 ? Number(editingPartObj.oldPrice) : 0;
@@ -32602,7 +32773,7 @@ ${footer}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {[0, 1, 2, 3].map(slotIdx => (
+              {[0, 1, 2, 3, 4, 5, 6, 7].map(slotIdx => (
                 <div key={slotIdx} className="p-2.5 rounded-xl bg-surface border border-line space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="font-extrabold text-[11px] text-fg">
@@ -33642,6 +33813,44 @@ ${footer}
       {renderProductOrAdDetailModal()}
       {renderPartGroupPricesModal()}
       {renderConfirmDialogModal()}
+
+      {/* Big order-success overlay (owner request): a small toast was easy
+          to miss — the customer now gets a full-screen confirmation. */}
+      {placedOrderInfo && (
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface rounded-[28px] border border-emerald-500/40 shadow-2xl max-w-md w-full p-8 text-center space-y-4">
+            <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/40">
+              <Check className="w-11 h-11 text-white" strokeWidth={3} />
+            </div>
+            <div className="text-2xl font-black text-fg">تم إرسال طلبك بنجاح! 🎉</div>
+            <p className="text-muted font-bold leading-relaxed">
+              طلبك رقم <span className="font-mono font-black text-fg">{placedOrderInfo.id}</span> وصل للإدارة والمخزن،
+              وهنواصل معاك بخصوص التأكيد والتوصيل.
+            </p>
+            {Number(placedOrderInfo.total) > 0 && (
+              <div className="inline-block px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 font-black">
+                إجمالي الطلب: {formatMoney(placedOrderInfo.total)}
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setPlacedOrderInfo(null)}
+                className="py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black transition"
+              >
+                متابعة طلباتي
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPlacedOrderInfo(null); setClientTab('home'); }}
+                className="py-3 rounded-2xl bg-surface2 hover:bg-surface text-fg border border-line font-black transition"
+              >
+                أكمّل تسوق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {renderFilterSheet()}
       {renderSourcingFormModal()}
       {renderLightbox()}
