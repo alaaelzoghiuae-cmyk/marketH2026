@@ -4571,7 +4571,7 @@ ${adminLink}`;
       rawSnake.owner = rawSnake.owner || rawSnake.name || 'عميل فردي';
       rawSnake.phone = rawSnake.phone || '';
       rawSnake.email = rawSnake.email || '';
-      rawSnake.password = rawSnake.password || '123';
+      rawSnake.password = rawSnake.password || '';
       rawSnake.address = rawSnake.address || '';
       rawSnake.credit_limit = Number(rawSnake.credit_limit) || 0;
       rawSnake.wallet_balance = Number(rawSnake.wallet_balance) || 0;
@@ -13116,10 +13116,28 @@ ${adminLink}`;
     showToast('بياناتك وتاريخ ميلادك وعناوينك اتحفظت بنجاح!', 'success');
   };
 
-  const handleChangeClientPassword = (e) => {
+  const handleChangeClientPassword = async (e) => {
     e.preventDefault();
     if (!currentClient) return;
-    if (passwordForm.current !== currentClient.password) {
+    // Security fix #7 (Stage B): verify the current password on the server
+    // via RPC instead of trusting a locally stored copy.
+    let currentOk = null;
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/client_login`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ p_phone: String(currentClient.phone || ''), p_password: String(passwordForm.current || '') })
+        });
+        if (res.ok) {
+          const rpcClient = await res.json();
+          currentOk = !!(rpcClient && rpcClient.id === currentClient.id);
+        }
+      }
+    } catch (err) {}
+    if (currentOk === null) currentOk = passwordForm.current === currentClient.password;
+    if (!currentOk) {
       showToast('كلمة المرور الحالية غلط!', 'error');
       return;
     }
@@ -14329,15 +14347,36 @@ ${adminLink}`;
   const [adminNewUsername, setAdminNewUsername] = useState('admin');
   const [adminNewPassword, setAdminNewPassword] = useState('');
 
-  const handleAdminLoginSubmit = (e) => {
+  const handleAdminLoginSubmit = async (e) => {
     e.preventDefault();
     const u = adminLoginUser.trim().toLowerCase();
     const p = adminLoginPass;
 
-    // Admin login accepts ONLY the credentials synced from site_settings.
-    // (Removed 2026-11-22, security fix #7: the hardcoded emergency master
-    // fallback 'admin'/'123'/'admin123' shipped in the public JS bundle let
-    // anyone who read the file sign in as admin.)
+    // Security fix #7 (Stage B): verify on the server via RPC so the app
+    // never needs the admin credentials downloaded to the browser.
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/verify_admin_login`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ p_username: u, p_password: p })
+        });
+        if (res.ok) {
+          const ok = await res.json();
+          if (ok === true) {
+            setAdminAuthenticated(true);
+            showToast('دخلت لوحة تحكم الإدارة!', 'success');
+          } else {
+            showToast('اسم المستخدم أو كلمة المرور غلط!', 'error');
+          }
+          return;
+        }
+      }
+    } catch (err) {}
+
+    // Transitional fallback (only while the RPC is unreachable): compare
+    // against the credentials synced from site_settings.
     const isSyncedMatch =
       u === (adminCredentials.username || 'admin').trim().toLowerCase() &&
       p === adminCredentials.password;
@@ -27273,7 +27312,40 @@ model OrderInvoice {
     const idClean = normalizeDigits(clientLoginIdentifier).trim().toLowerCase();
     const passClean = String(clientLoginPassword || '').trim();
 
-    // 1. Always fetch the latest clients list directly from Supabase (bypassing cache) so newly updated passwords work in 0.1s!
+    // Security fix #7 (Stage B): verify on the server via RPC — it returns
+    // the client row WITHOUT its password, so the app no longer downloads
+    // the whole clients table (with everyone's password) to sign in.
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/client_login`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' }),
+          body: JSON.stringify({ p_phone: idClean, p_password: passClean })
+        });
+        if (res.ok) {
+          const rpcClient = await res.json();
+          if (rpcClient && rpcClient.id) {
+            const mapped = toCamelCaseRow(rpcClient);
+            setClients(prev => {
+              const exists = prev.some(c => c.id === mapped.id);
+              const next = exists ? prev.map(c => (c.id === mapped.id ? { ...c, ...mapped } : c)) : [mapped, ...prev];
+              try { window.localStorage.setItem('elzoghbi_v2_clients', JSON.stringify(next)); } catch (err) {}
+              return next;
+            });
+            handleSwitchRole(mapped.id);
+            setLoginModalOpen(false);
+            setClientLoginIdentifier('');
+            setClientLoginPassword('');
+          } else {
+            showToast('مفيش حساب مطابق للبيانات دي. اتأكد من الرقم أو الإيميل وكلمة المرور.', 'error');
+          }
+          return;
+        }
+      }
+    } catch (err) {}
+
+    // 1. (Transitional fallback, only while the RPC is unreachable) fetch the latest clients list directly from Supabase so newly updated passwords work in 0.1s!
     let currentClientsList = clients;
     try {
       const { sbUrl, sbKey, isValid } = getSupabaseConfig();
