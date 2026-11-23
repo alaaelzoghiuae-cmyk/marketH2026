@@ -92,9 +92,13 @@ main {
   from { opacity: 0; transform: translateY(18px) scale(0.985); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes hmTickerScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(50%); }
+@keyframes hmTickerScrollRtl {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0%, 0, 0); }
+}
+@keyframes hmTickerScrollLtr {
+  0% { transform: translate3d(0%, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .elz-fade-in {
@@ -104,10 +108,17 @@ main {
   animation: elzSlideUp 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .hm-ticker-track {
-  animation: hmTickerScroll 26s linear infinite;
+  display: inline-flex;
+  width: max-content;
+  will-change: transform;
+  animation-name: hmTickerScrollRtl;
+  animation-duration: var(--hm-ticker-duration, 26s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-play-state: running;
 }
-.hm-ticker-wrap:hover .hm-ticker-track {
-  animation-play-state: paused;
+[dir='ltr'] .hm-ticker-track {
+  animation-name: hmTickerScrollLtr;
 }
 
 /* Focus-visible accessibility ring */
@@ -120,12 +131,17 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* Respect Reduced Motion Accessibility */
+/* Respect Reduced Motion Accessibility (keep announcement ticker running on desktop) */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *:not(.hm-ticker-track), *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .hm-ticker-track {
+    animation-duration: var(--hm-ticker-duration, 26s) !important;
+    animation-iteration-count: infinite !important;
+    animation-play-state: running !important;
   }
 }
