@@ -186,8 +186,170 @@ export const DEFAULT_SOURCING_PRESETS = [
     id: 'preset_catalog_refresh',
     title: 'Catalog Refresh — فحص تحديثات الكتالوج',
     badge: 'مراجعة تغييرات',
+    group: 'استكشاف وتحديث',
     mode: 'catalog_update',
     instruction: 'Compare this source with my existing catalog to detect price changes, availability changes, description changes, and image changes. Do not overwrite anything without approval.'
+  },
+  // --- 20 قوالب مهام جاهزة إضافية (v19.5) ---
+  {
+    id: 'preset_fast_chargers_ar',
+    title: 'شواحن سريعة أصلية (Anker / Ugreen / Apple / Samsung +20%)',
+    badge: 'شحن وطاقة',
+    group: 'شحن وطاقة',
+    mode: 'import_new',
+    instruction: 'استورد شواحن سريعة ورؤوس شحن أصلية (20W إلى 100W) فقط من الرابط ده.\n- تجاهل الجرابات والاسكرينات.\n- تجاهل المنتجات الموجودة بالفعل في متجري.\n- اكتب وصف عربي احترافي وزوّد السعر 20% وقرّب لأقرب 25 جنيه.\n- جهّز المنتجات كمسودات.'
+  },
+  {
+    id: 'preset_braided_cables_ar',
+    title: 'كابلات USB-C و Lightning مضفّرة سريعة (+25%)',
+    badge: 'كابلات',
+    group: 'شحن وطاقة',
+    mode: 'import_new',
+    instruction: 'استورد كابلات شحن ونقل بيانات (Type-C و Lightning و USB-C to C) فقط.\n- فقط المنتجات المتوفرة.\n- استخرج الصور والمواصفات واكتب وصف عربي واضح.\n- زوّد السعر 25% وقرّب لأقرب 10 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_powerbanks_ar',
+    title: 'باور بانك 10,000 إلى 30,000mAh (+18% وتقريب 50 ج.م)',
+    badge: 'باور بانك',
+    group: 'شحن وطاقة',
+    mode: 'import_new',
+    instruction: 'استورد باور بانك وشواحن محمولة فقط (Anker أو Baseus أو Oraimo أو Xiaomi أو Samsung).\n- تجاهل الكابلات والجرابات.\n- تجاهل المنتجات الموجودة في متجري.\n- زوّد السعر 18% وقرّب لأقرب 50 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_magsafe_cases_ar',
+    title: 'جرابات وكفرات MagSafe وسيليكون لـ iPhone (+35%)',
+    badge: 'جرابات',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد جرابات وكفرات موبايل (MagSafe / Silicone / Clear / Armor) فقط.\n- استخرج كل صور الألوان.\n- اكتب وصف عربي مرتب.\n- زوّد السعر 35% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_screen_protectors_ar',
+    title: 'اسكرينات حماية 9H وعدسات كاميرا (+40%)',
+    badge: 'حماية',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد اسكرينات حماية زجاج مقوّى (Tempered Glass / Privacy) وحماية عدسات الكاميرا فقط.\n- تجاهل الجرابات والشواحن.\n- زوّد السعر 40% وقرّب لأقرب 10 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_apple_airpods_ar',
+    title: 'سماعات Apple AirPods وإكسسوارات أبل الأصلية (+12%)',
+    badge: 'Apple',
+    group: 'سماعات وساعات',
+    mode: 'import_new',
+    instruction: 'استورد منتجات Apple الأصلية (AirPods و Apple Watch وشواحن MagSafe) فقط.\n- تجاهل المنتجات المستعملة أو المجددة.\n- تجاهل المنتجات الموجودة بالفعل.\n- زوّد السعر 12% وقرّب لأقرب 50 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_samsung_ecosystem_ar',
+    title: 'سماعات Samsung Galaxy Buds وساعات Galaxy Watch (+15%)',
+    badge: 'Samsung',
+    group: 'سماعات وساعات',
+    mode: 'import_new',
+    instruction: 'استورد سماعات وساعات Samsung الأصلية (Galaxy Buds / Galaxy Watch / S-Pen) فقط.\n- فقط المنتجات المتوفرة.\n- اكتب وصف عربي احترافي وزوّد السعر 15% وقرّب لأقرب 50 جنيه.\n- جهّز المنتجات كمسودات.'
+  },
+  {
+    id: 'preset_xiaomi_wearables_ar',
+    title: 'سماعات وساعات Xiaomi و Redmi و Amazfit الاقتصادية (+18%)',
+    badge: 'Xiaomi',
+    group: 'سماعات وساعات',
+    mode: 'import_new',
+    instruction: 'استورد سماعات وساعات Xiaomi و Redmi و Amazfit فقط.\n- استخرج الصور والمواصفات.\n- تجاهل المنتجات الموجودة في متجري.\n- زوّد السعر 18% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_oraimo_soundcore_jbl_ar',
+    title: 'سماعات Oraimo و Soundcore و JBL الأصلية (+20%)',
+    badge: 'صوتيات',
+    group: 'سماعات وساعات',
+    mode: 'import_new',
+    instruction: 'استورد سماعات الأذن والهيدفون من ماركات Oraimo و Soundcore و Anker و JBL فقط.\n- تجاهل الكابلات والجرابات.\n- زوّد السعر 20% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_mobile_gaming_ar',
+    title: 'إكسسوارات ألعاب الموبايل (مراوح تبريد وتريجرز وسماعات Gaming +25%)',
+    badge: 'ألعاب',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد إكسسوارات ألعاب الموبايل (مراوح تبريد، تريجرز، قفازات، سماعات Gaming) فقط.\n- فقط المنتجات المتوفرة.\n- زوّد السعر 25% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_car_accessories_ar',
+    title: 'إكسسوارات السيارة (حامل موبايل، شاحن سيارة سريع، FM +25%)',
+    badge: 'سيارة',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد إكسسوارات السيارة للموبايل (حامل مغناطيسي، شاحن سيارة سريع، مشغل FM بلوتوث) فقط.\n- اكتب وصف عربي واضح.\n- زوّد السعر 25% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_original_screens_ar',
+    title: 'شاشات أصلية و OLED و LCD للموبايلات (قطع غيار +20%)',
+    badge: 'شاشات',
+    group: 'قطع غيار',
+    mode: 'import_new',
+    instruction: 'استورد شاشات الموبايل (OLED / AMOLED / Original / LCD) فقط.\n- تجاهل الجرابات والاسكرينات.\n- تجاهل المنتجات الموجودة بالفعل.\n- زوّد السعر 20% وقرّب لأقرب 50 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_mobile_batteries_ar',
+    title: 'بطاريات أصلية للموبايلات (iPhone / Samsung / Xiaomi +25%)',
+    badge: 'بطاريات',
+    group: 'قطع غيار',
+    mode: 'import_new',
+    instruction: 'استورد بطاريات الموبايل الداخلية (Battery) فقط.\n- استخرج الموديل المتوافق والمواصفات بدقة.\n- زوّد السعر 25% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_flex_parts_ar',
+    title: 'فلاتات شحن وكاميرات وسماعات داخلية (قطع صيانة +30%)',
+    badge: 'فلاتات',
+    group: 'قطع غيار',
+    mode: 'import_new',
+    instruction: 'استورد فلاتات الشحن (Charging Port Flex) والكاميرات والسماعات الداخلية وقطع الصيانة.\n- استخرج الموديل المتوافق والصور.\n- زوّد السعر 30% وقرّب لأقرب 10 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_repair_tools_ar',
+    title: 'أدوات ومعدات صيانة الموبايل (مفكات، كاوية، هوت إير، لاصق +22%)',
+    badge: 'أدوات صيانة',
+    group: 'قطع غيار',
+    mode: 'import_new',
+    instruction: 'استورد أدوات ومعدات صيانة الهواتف (مفكات، لاصق شاشات B7000، كاوية لحام، هوت إير، فلكس) فقط.\n- زوّد السعر 22% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_bluetooth_speakers_ar',
+    title: 'سبيكرات بلوتوث محمولة (JBL / Anker / Oraimo +18%)',
+    badge: 'سبيكرات',
+    group: 'سماعات وساعات',
+    mode: 'import_new',
+    instruction: 'استورد سبيكرات بلوتوث محمولة ومقاومة للماء فقط.\n- استخرج الصور والمواصفات.\n- زوّد السعر 18% وقرّب لأقرب 50 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_storage_cards_ar',
+    title: 'ميموري كارد وفلاشات تخزين (SanDisk / Kingston / Samsung +15%)',
+    badge: 'تخزين',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد كروت ميموري MicroSD وفلاشات USB و OTG وهاردات SSD محمولة فقط.\n- تجاهل المنتجات غير المتوفرة.\n- زوّد السعر 15% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_creator_gear_ar',
+    title: 'ستاندات وترايبود ورينج لايت ومايكات لصنّاع المحتوى (+25%)',
+    badge: 'تصوير',
+    group: 'إكسسوارات',
+    mode: 'import_new',
+    instruction: 'استورد مايكات لاسلكية (Wireless Mic) وترايبود ورينج لايت وحوامل تصوير للموبايل فقط.\n- اكتب وصف عربي احترافي.\n- زوّد السعر 25% وقرّب لأقرب 25 جنيه وجهّزها كمسودات.'
+  },
+  {
+    id: 'preset_import_all_open_ar',
+    title: 'استيراد مفتوح لكل منتجات الموقع بدون قيود نوع (+15%)',
+    badge: 'الكل بدون فلتر',
+    group: 'استكشاف وتحديث',
+    mode: 'import_new',
+    instruction: 'استورد كل المنتجات المتوفرة من الرابط ده بدون استبعاد أي قسم أو ماركة.\n- تجاهل فقط المنتجات الموجودة بالفعل في متجري.\n- اكتب وصف عربي احترافي وزوّد السعر 15% وقرّب لأقرب 25 جنيه.\n- جهّز المنتجات كمسودات.'
+  },
+  {
+    id: 'preset_full_price_stock_audit_ar',
+    title: 'مراجعة شاملة لأسعار ومخزون كل كتالوج المتجر (+12% مقترح)',
+    badge: 'مراجعة شاملة',
+    group: 'استكشاف وتحديث',
+    mode: 'catalog_update',
+    instruction: 'راجع كل المنتجات الموجودة في متجري وقارن أسعارها وحالة توفرها بالمصدر ده.\n- طابق المنتجات بالاسم وSKU والموديل.\n- اقترح تحديث السعر بنسبة 12% فوق سعر المصدر.\n- لا تغير أي سعر بدون موافقتي.'
   }
 ];
 
@@ -627,15 +789,237 @@ export function buildExecutionPlan(workflow) {
 // PHASE 3 — CLIENT-SIDE COMPLIANT FEED / CSV / JSON / XML PARSER
 // ============================================================================
 
+export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
+  const items = [];
+  const seen = new Set();
+  const pushItem = (it) => {
+    const name = String(it.name || '').trim();
+    if (!name || name.length < 3) return;
+    const key = (it.sku || name).toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    items.push({
+      name,
+      brand: String(it.brand || '').trim(),
+      sku: String(it.sku || '').trim(),
+      price: Number(String(it.price || 0).replace(/[^0-9.]/g, '')) || 0,
+      originalPrice: Number(String(it.originalPrice || it.price || 0).replace(/[^0-9.]/g, '')) || 0,
+      currency: it.currency || (location.href.includes('egypt') || location.hostname.endsWith('.eg') ? 'EGP' : 'USD'),
+      category: String(it.category || document.querySelector('h1')?.innerText || '').trim().slice(0, 60),
+      images: (Array.isArray(it.images) ? it.images : [it.image]).filter(u => u && String(u).startsWith('http')).slice(0, 8),
+      productUrl: it.productUrl || location.href,
+      originalDescription: String(it.description || '').trim().slice(0, 500)
+    });
+  };
+  // 1) __NEXT_DATA__ (Noon / Next.js stores)
+  try {
+    const nd = document.getElementById('__NEXT_DATA__');
+    if (nd?.textContent) {
+      const data = JSON.parse(nd.textContent);
+      const walk = (n, d = 0) => {
+        if (!n || typeof n !== 'object' || d > 8 || items.length >= 200) return;
+        if (Array.isArray(n)) return n.forEach(x => walk(x, d + 1));
+        if ((n.name || n.title) && (n.sale_price || n.price || n.image_key || n.image_keys)) {
+          const imgs = Array.isArray(n.image_keys) ? n.image_keys.map(k => 'https://f.nooncdn.com/p/' + String(k).replace(/^\/+/, '') + '.jpg') : (n.image_key ? ['https://f.nooncdn.com/p/' + String(n.image_key).replace(/^\/+/, '') + '.jpg'] : (n.images || (n.image ? [n.image] : [])));
+          pushItem({ name: n.name || n.title, brand: n.brand || n.brand_name, sku: n.sku || n.offer_code, price: n.sale_price || n.price, originalPrice: n.price || n.was_price, images: imgs, category: n.category_name || n.category, productUrl: n.url ? new URL(n.url, location.origin).href : location.href });
+        }
+        Object.values(n).forEach(v => { if (v && typeof v === 'object') walk(v, d + 1); });
+      };
+      walk(data);
+    }
+  } catch (e) {}
+  // 2) JSON-LD Schema.org Products
+  document.querySelectorAll('script[type="application/ld+json"]').forEach(sc => {
+    try {
+      const parsed = JSON.parse(sc.textContent || '');
+      const q = Array.isArray(parsed) ? [...parsed] : [parsed];
+      while (q.length) {
+        const n = q.shift();
+        if (!n || typeof n !== 'object') continue;
+        if (Array.isArray(n['@graph'])) q.push(...n['@graph']);
+        if (Array.isArray(n.itemListElement)) n.itemListElement.forEach(el => q.push(el?.item || el));
+        const t = Array.isArray(n['@type']) ? n['@type'] : [n['@type']];
+        if (t.some(x => String(x || '').toLowerCase() === 'product')) {
+          const off = Array.isArray(n.offers) ? n.offers[0] : (n.offers || {});
+          pushItem({ name: n.name, brand: typeof n.brand === 'string' ? n.brand : n.brand?.name, sku: n.sku || n.mpn, price: off.price || off.lowPrice, currency: off.priceCurrency, images: Array.isArray(n.image) ? n.image : [n.image], category: n.category, description: n.description, productUrl: n.url || location.href });
+        }
+      }
+    } catch (e) {}
+  });
+  // 3) Visual DOM cards (Noon / Amazon / Jumia / Generic)
+  if (items.length < 3) {
+    const cards = document.querySelectorAll('[data-qa="product-name"], .productContainer, div[data-component-type="s-search-result"], article.prd, .product-card, .product-item, li.product');
+    cards.forEach(el => {
+      const root = el.closest('a, article, li, div[class*="product"], div[data-asin]') || el;
+      const name = (root.querySelector('h2, h3, [data-qa="product-name"], .name, .title')?.innerText || '').trim();
+      const priceTxt = (root.querySelector('.a-price-whole, .amount, .prc, [class*="price"], [data-qa*="price"]')?.innerText || '').trim();
+      const img = root.querySelector('img')?.src || root.querySelector('img')?.getAttribute('data-src') || '';
+      const link = root.querySelector('a[href]')?.href || location.href;
+      if (name && (priceTxt || img)) pushItem({ name, price: priceTxt, images: [img], productUrl: link });
+    });
+  }
+  const out = JSON.stringify({ products: items }, null, 2);
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(out).then(() => alert('تم نسخ ' + items.length + ' منتج! ارجع لمتجر ELZOGHBI واضغط لصق.')).catch(() => prompt('انسخ النص التالي (Ctrl+C):', out));
+  } else {
+    prompt('انسخ النص التالي (Ctrl+C):', out);
+  }
+})();`;
+
+function extractProductsFromRawHtml(html, sourceLabel) {
+  const found = [];
+  const seen = new Set();
+  const pushNorm = (it) => {
+    const name = String(it.name || '').trim();
+    if (!name || name.length < 2) return;
+    const key = `${name.toLowerCase()}|${it.sku || ''}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    const price = Number(String(it.price || 0).replace(/[^0-9.]/g, '')) || 0;
+    const orig = Number(String(it.originalPrice || price || 0).replace(/[^0-9.]/g, '')) || price;
+    found.push({
+      name,
+      brand: String(it.brand || '').trim(),
+      model: String(it.model || it.sku || '').trim(),
+      sku: String(it.sku || '').trim(),
+      gtin: String(it.gtin || '').trim(),
+      ean: '',
+      upc: '',
+      productUrl: String(it.productUrl || '').trim(),
+      sourceUrl: sourceLabel,
+      originalDescription: String(it.originalDescription || '').trim(),
+      images: (Array.isArray(it.images) ? it.images : [it.image]).filter(u => u && String(u).startsWith('http')).slice(0, 8),
+      price,
+      originalPrice: orig > price ? orig : price,
+      salePrice: orig > price ? price : 0,
+      currency: String(it.currency || 'EGP').toUpperCase(),
+      availability: it.availability === 'out_of_stock' ? 'out_of_stock' : 'in_stock',
+      stockStatus: it.availability === 'out_of_stock' ? 'غير متوفر' : 'متوفر',
+      category: String(it.category || '').trim(),
+      specifications: {},
+      variants: [],
+      color: String(it.color || '').trim(),
+      weight: '',
+      warranty: '',
+      rating: null,
+      reviewCount: null,
+      extractionMethod: 'pasted_html_extractor',
+      sourceVerifiedFields: ['name', ...(price ? ['price'] : [])]
+    });
+  };
+
+  // 1) __NEXT_DATA__ (Noon / Next.js)
+  const ndMatch = html.match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (ndMatch && ndMatch[1]) {
+    try {
+      const parsed = JSON.parse(ndMatch[1].trim());
+      const walk = (node, depth = 0) => {
+        if (!node || typeof node !== 'object' || depth > 8 || found.length >= 250) return;
+        if (Array.isArray(node)) { node.forEach(x => walk(x, depth + 1)); return; }
+        const title = node.name || node.title || node.product_title;
+        const pVal = node.sale_price ?? node.price ?? node.offer_price;
+        const imgs = Array.isArray(node.image_keys)
+          ? node.image_keys.slice(0, 8).map(k => `https://f.nooncdn.com/p/${String(k).replace(/^\/+/, '')}.jpg`)
+          : node.image_key
+            ? [`https://f.nooncdn.com/p/${String(node.image_key).replace(/^\/+/, '')}.jpg`]
+            : (Array.isArray(node.images) ? node.images : node.image ? [node.image] : []);
+        if (typeof title === 'string' && title.trim().length >= 4 && (pVal || imgs.length)) {
+          pushNorm({
+            name: title,
+            brand: node.brand || node.brand_name,
+            sku: node.sku || node.offer_code,
+            price: typeof pVal === 'object' ? (pVal?.value ?? pVal?.amount) : pVal,
+            originalPrice: node.price || node.was_price,
+            currency: node.currency || 'EGP',
+            category: node.category_name || node.category,
+            images: imgs,
+            productUrl: node.url || ''
+          });
+        }
+        Object.values(node).forEach(v => { if (v && typeof v === 'object') walk(v, depth + 1); });
+      };
+      walk(parsed);
+    } catch {
+      // ignore
+    }
+  }
+
+  // 2) JSON-LD
+  const ldRe = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = ldRe.exec(html)) !== null) {
+    try {
+      const parsed = JSON.parse(m[1].trim());
+      const q = Array.isArray(parsed) ? [...parsed] : [parsed];
+      while (q.length) {
+        const n = q.shift();
+        if (!n || typeof n !== 'object') continue;
+        if (Array.isArray(n['@graph'])) q.push(...n['@graph']);
+        if (Array.isArray(n.itemListElement)) n.itemListElement.forEach(el => q.push(el?.item || el));
+        const t = Array.isArray(n['@type']) ? n['@type'] : [n['@type']];
+        if (t.some(x => String(x || '').toLowerCase() === 'product')) {
+          const off = Array.isArray(n.offers) ? n.offers[0] : (n.offers || {});
+          pushNorm({
+            name: n.name,
+            brand: typeof n.brand === 'string' ? n.brand : n.brand?.name,
+            sku: n.sku || n.mpn,
+            price: off?.price ?? off?.lowPrice,
+            originalPrice: off?.highPrice ?? off?.price,
+            currency: off?.priceCurrency || 'EGP',
+            category: n.category,
+            images: Array.isArray(n.image) ? n.image : [n.image],
+            originalDescription: String(n.description || '').replace(/<[^>]+>/g, ' ').trim(),
+            productUrl: n.url || ''
+          });
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 3) OpenGraph single-product fallback
+  if (found.length === 0) {
+    const getMeta = (prop) => {
+      const re = new RegExp(`<meta[^>]*(?:property|name)=["']${prop}["'][^>]*content=["']([^"']+)["']`, 'i');
+      return html.match(re)?.[1]?.trim() || '';
+    };
+    const title = getMeta('og:title') || (html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1] || '').trim();
+    if (title) {
+      pushNorm({
+        name: title,
+        brand: getMeta('product:brand'),
+        price: getMeta('product:price:amount') || getMeta('og:price:amount'),
+        currency: getMeta('product:price:currency') || getMeta('og:price:currency') || 'EGP',
+        images: [getMeta('og:image') || getMeta('twitter:image')].filter(Boolean),
+        originalDescription: getMeta('og:description') || getMeta('description')
+      });
+    }
+  }
+
+  return found;
+}
+
 export function parseStructuredSourceInput(rawText, sourceLabel = 'manual_feed') {
   const txt = String(rawText || '').trim();
   if (!txt) return { ok: false, products: [], error: 'النص فارغ.' };
 
-  // JSON array or { products: [...] }
+  // Raw HTML page source (Noon / Amazon / Jumia / Any site)
+  if (/^<!doctype|^<html|<script[^>]*id=["']__NEXT_DATA__["']|<script[^>]*application\/ld\+json/i.test(txt)) {
+    const htmlProducts = extractProductsFromRawHtml(txt, sourceLabel);
+    if (htmlProducts.length > 0) {
+      return { ok: true, products: htmlProducts, method: 'pasted_html_extractor' };
+    }
+    return { ok: false, products: [], error: 'تم لصق كود HTML لكن لم يُعثر فيه على بيانات منتجات منظمة. جرب "أداة النسخ السريع من المتصفح (Bookmarklet)" من صفحة المتجر.' };
+  }
+
+  // JSON array, { products: [...] }, or Noon/Next.js nested JSON
   if (txt.startsWith('{') || txt.startsWith('[')) {
     try {
       const parsed = JSON.parse(txt);
-      const list = Array.isArray(parsed) ? parsed : parsed.products || parsed.items || [];
+      let list = Array.isArray(parsed)
+        ? parsed
+        : parsed.products || parsed.items || parsed.hits || parsed.catalog?.hits || parsed.props?.pageProps?.catalog?.hits || [];
       if (!Array.isArray(list) || list.length === 0) {
         return { ok: false, products: [], error: 'ملف JSON لا يحتوي على مصفوفة منتجات صالحة.' };
       }
@@ -699,7 +1083,7 @@ export function parseStructuredSourceInput(rawText, sourceLabel = 'manual_feed')
     return out;
   };
 
-  const headers = splitRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+  const headers = splitRow(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9_\u0600-\u06FF]/g, ''));
   const products = lines.slice(1).map((line) => {
     const cols = splitRow(line);
     const get = (...keys) => {
@@ -715,28 +1099,28 @@ export function parseStructuredSourceInput(rawText, sourceLabel = 'manual_feed')
     const availRaw = get('availability', 'stockstatus', 'stock').toLowerCase();
     const inStock = !availRaw || (!availRaw.includes('out') && availRaw !== '0' && availRaw !== 'false');
     return {
-      name: get('name', 'title', 'productname'),
-      brand: get('brand', 'vendor'),
-      model: get('model', 'mpn'),
-      sku: get('sku', 'id'),
+      name: get('name', 'title', 'productname', 'الاسم', 'اسم_المنتج', 'المنتج'),
+      brand: get('brand', 'vendor', 'الماركة', 'العلامة'),
+      model: get('model', 'mpn', 'الموديل'),
+      sku: get('sku', 'id', 'الكود'),
       gtin: get('gtin', 'barcode', 'ean', 'upc'),
       ean: get('ean'),
       upc: get('upc'),
-      productUrl: get('url', 'producturl', 'link'),
+      productUrl: get('url', 'producturl', 'link', 'الرابط'),
       sourceUrl: sourceLabel,
-      originalDescription: get('description', 'desc'),
+      originalDescription: get('description', 'desc', 'الوصف'),
       images,
       price,
       originalPrice: price,
       salePrice: 0,
-      currency: (get('currency') || 'USD').toUpperCase(),
+      currency: (get('currency', 'العملة') || 'USD').toUpperCase(),
       availability: inStock ? 'in_stock' : 'out_of_stock',
       stockStatus: inStock ? 'متوفر' : 'غير متوفر',
-      category: get('category', 'type'),
+      category: get('category', 'type', 'القسم', 'التصنيف'),
       specifications: {},
       variants: [],
-      color: get('color'),
-      weight: get('weight'),
+      color: get('color', 'اللون'),
+      weight: get('weight', 'الوزن'),
       warranty: '',
       rating: null,
       reviewCount: null,
@@ -745,7 +1129,53 @@ export function parseStructuredSourceInput(rawText, sourceLabel = 'manual_feed')
     };
   }).filter(p => p.name);
 
-  return { ok: products.length > 0, products, method: 'imported_csv_feed', error: products.length ? null : 'لم يتم العثور على منتجات صالحة في ملف CSV.' };
+  if (products.length > 0) {
+    return { ok: true, products, method: 'imported_csv_feed', error: null };
+  }
+
+  // Fallback: Smart Free-Text / WhatsApp Supplier List ("Product Name - 850" or "اسم المنتج | 850 جنيه")
+  const textProducts = lines.map((line, idx) => {
+    const priceMatch = line.match(/(?:[-|–—:]|\s)(\d+(?:[.,]\d+)?)\s*(?:جنيه|ج\.م|egp|usd|\$|ريال|sar|aed)?\s*$/i);
+    const price = priceMatch ? Number(priceMatch[1].replace(',', '.')) || 0 : 0;
+    const cleanName = (priceMatch ? line.slice(0, priceMatch.index) : line).replace(/^[-•*\d.)\s]+/, '').trim();
+    if (!cleanName || cleanName.length < 3) return null;
+    const curr = /\$|usd/i.test(line) ? 'USD' : /sar|ريال/i.test(line) ? 'SAR' : /aed|درهم/i.test(line) ? 'AED' : 'EGP';
+    return {
+      name: cleanName,
+      brand: '',
+      model: '',
+      sku: `TXT-${idx + 1}`,
+      gtin: '',
+      ean: '',
+      upc: '',
+      productUrl: '',
+      sourceUrl: sourceLabel,
+      originalDescription: '',
+      images: [],
+      price,
+      originalPrice: price,
+      salePrice: 0,
+      currency: curr,
+      availability: 'in_stock',
+      stockStatus: 'متوفر',
+      category: '',
+      specifications: {},
+      variants: [],
+      color: '',
+      weight: '',
+      warranty: '',
+      rating: null,
+      reviewCount: null,
+      extractionMethod: 'smart_text_list',
+      sourceVerifiedFields: ['name', ...(price ? ['price'] : [])]
+    };
+  }).filter(Boolean);
+
+  if (textProducts.length > 0) {
+    return { ok: true, products: textProducts, method: 'smart_text_list', error: null };
+  }
+
+  return { ok: false, products: [], method: 'imported_csv_feed', error: 'لم يتم العثور على منتجات صالحة في النص المدخل.' };
 }
 
 // ============================================================================
@@ -1327,12 +1757,10 @@ export function calculateProductPricing(product, pricingConfig = {}, matchedCate
     markupLabel = `-${effVal} ${targetCurrency}`;
     steps.push(`خصم ثابت: -${effVal} ${targetCurrency} → ${Math.round(calculatedPrice).toLocaleString('en-US')} ${targetCurrency}`);
   } else if (effMode === 'ai_suggested') {
-    // Suggested competitive margin (15%) — applied as the calculated price;
-    // the admin's approval happens in the review screen before import.
+    // Suggested competitive margin (15%) — NEVER auto-applied without approval
     aiSuggestedPrice = roundToStep(convertedPrice * 1.15, pricingConfig.roundingStep || 50);
-    calculatedPrice = aiSuggestedPrice;
-    markupLabel = 'اقتراح AI (+15% — يُعتمد في شاشة المراجعة)';
-    steps.push(`السعر المقترح من AI: ${aiSuggestedPrice.toLocaleString('en-US')} ${targetCurrency} (هيتطبق لو اعتمدت الاستيراد في شاشة المراجعة)`);
+    markupLabel = 'اقتراح AI (+15% بانتظار الموافقة)';
+    steps.push(`السعر المقترح من AI: ${aiSuggestedPrice.toLocaleString('en-US')} ${targetCurrency} (غير مطبّق تلقائياً)`);
   }
 
   let finalPrice = roundToStep(calculatedPrice, pricingConfig.roundingStep || 0);
