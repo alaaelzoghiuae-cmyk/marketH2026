@@ -650,6 +650,138 @@ function extractOpenGraphFallback(html, sourceUrl) {
   }];
 }
 
+function extractNextDataProducts(html, sourceUrl) {
+  const m = String(html || '').match(/<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i);
+  if (!m || !m[1]) return [];
+  try {
+    const json = JSON.parse(m[1].trim());
+    const found = [];
+    const seen = new Set();
+    const origin = new URL(sourceUrl).origin;
+    const visit = (node, depth = 0) => {
+      if (!node || typeof node !== 'object' || depth > 8 || found.length >= MAX_EXTRACTED_ITEMS) return;
+      if (Array.isArray(node)) {
+        for (const item of node) visit(item, depth + 1);
+        return;
+      }
+      const title = node.name || node.title || node.product_title || '';
+      const rawPrice = node.sale_price ?? node.price ?? node.offer_price ?? node.price_value;
+      const numPrice = Number(typeof rawPrice === 'object' ? (rawPrice?.value ?? rawPrice?.amount ?? 0) : rawPrice) || 0;
+      const rawImg = node.image_key
+        ? `https://f.nooncdn.com/p/${String(node.image_key).replace(/^\/+/, '')}.jpg`
+        : (node.image || node.image_url || node.thumbnail || (Array.isArray(node.image_keys) && node.image_keys[0] ? `https://f.nooncdn.com/p/${String(node.image_keys[0]).replace(/^\/+/, '')}.jpg` : ''));
+      if (typeof title === 'string' && title.trim().length >= 4 && (numPrice > 0 || rawImg)) {
+        const key = `${title.trim().toLowerCase()}|${node.sku || ''}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          const imgs = [];
+          if (Array.isArray(node.image_keys)) {
+            node.image_keys.slice(0, 8).forEach(k => imgs.push(`https://f.nooncdn.com/p/${String(k).replace(/^\/+/, '')}.jpg`));
+          } else if (Array.isArray(node.images)) {
+            imgs.push(...node.images);
+          } else if (rawImg) {
+            imgs.push(rawImg);
+          }
+          const origP = Number(node.price || node.was_price || numPrice) || numPrice;
+          const prodUrl = node.url
+            ? new URL(node.url, origin).toString()
+            : (node.sku && sourceUrl.includes('noon.com') ? `${origin}/egypt-en/${node.url || 'p'}/${node.sku}/p/` : sourceUrl);
+          found.push({
+            name: stripHtml(title),
+            brand: String(node.brand || node.brand_name || '').trim(),
+            model: String(node.model || node.sku || '').trim(),
+            sku: String(node.sku || node.offer_code || '').trim(),
+            gtin: '',
+            ean: '',
+            upc: '',
+            productUrl: prodUrl,
+            sourceUrl,
+            originalDescription: stripHtml(node.description || node.short_description || ''),
+            images: normalizeImageList(imgs, origin),
+            price: numPrice,
+            originalPrice: origP > numPrice ? origP : numPrice,
+            salePrice: origP > numPrice ? numPrice : 0,
+            currency: String(node.currency || (sourceUrl.includes('egypt') || sourceUrl.includes('.eg') ? 'EGP' : 'USD')).toUpperCase(),
+            availability: node.is_buyable === false || node.in_stock === false ? 'out_of_stock' : 'in_stock',
+            stockStatus: node.is_buyable === false || node.in_stock === false ? 'غير متوفر' : 'متوفر',
+            category: String(node.category || node.category_name || node.plp_specifications?.category || '').trim(),
+            specifications: {},
+            variants: [],
+            color: String(node.color || '').trim(),
+            weight: '',
+            warranty: '',
+            rating: Number(node.product_rating?.value || node.rating || 0) || null,
+            reviewCount: Number(node.product_rating?.count || node.review_count || 0) || null,
+            extractionMethod: 'next_data_json',
+            sourceVerifiedFields: ['name', 'productUrl', ...(numPrice ? ['price'] : []), ...(imgs.length ? ['images'] : [])]
+          });
+        }
+      }
+      for (const v of Object.values(node)) {
+        if (v && typeof v === 'object') visit(v, depth + 1);
+      }
+    };
+    visit(json, 0);
+    return found;
+  } catch {
+    return [];
+  }
+}
+
+function extractHtmlCategoryLinks(html, sourceUrl) {
+  const out = [];
+  const seen = new Set();
+  let origin = '';
+  try { origin = new URL(sourceUrl).origin; } catch { return []; }
+  const linkRe = /<a[^>]+href=["']([^"'#]+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let m;
+  while ((m = linkRe.exec(String(html || ''))) !== null && out.length < 40) {
+    const href = m[1].trim();
+    const label = stripHtml(m[2]).slice(0, 60);
+    if (!label || label.length < 2 || label.length > 50) continue;
+    if (!/(\/collections\/|\/category\/|\/product-category\/|\/categories\/|\/shop\/|\/c\/)/i.test(href)) continue;
+    if (/(\/all$|cart|login|account|checkout|wishlist|search)/i.test(href)) continue;
+    try {
+      const abs = new URL(href, origin).toString();
+      if (!abs.startsWith(origin) || seen.has(abs)) continue;
+      seen.add(abs);
+      out.push({ name: label, url: abs, count: 0, fetched: false });
+    } catch {
+      // ignore
+    }
+  }
+  return out;
+}
+
+function buildCategoriesSummary(products = [], remoteCategories = []) {
+  const byName = new Map();
+  for (const rc of remoteCategories) {
+    if (!rc?.name) continue;
+    const key = rc.name.trim().toLowerCase();
+    if (!byName.has(key)) {
+      byName.set(key, {
+        name: rc.name.trim(),
+        count: Number(rc.count) || 0,
+        url: rc.url || '',
+        handle: rc.handle || '',
+        fetched: Boolean(rc.fetched)
+      });
+    }
+  }
+  for (const p of products) {
+    const catName = String(p.category || '').trim() || 'منتجات عامة';
+    const key = catName.toLowerCase();
+    const existing = byName.get(key);
+    if (existing) {
+      existing.count = existing.fetched ? existing.count + 1 : Math.max(existing.count, 1);
+      existing.fetched = true;
+    } else {
+      byName.set(key, { name: catName, count: 1, url: '', handle: '', fetched: true });
+    }
+  }
+  return Array.from(byName.values()).sort((a, b) => (b.fetched ? 1 : 0) - (a.fetched ? 1 : 0) || b.count - a.count);
+}
+
 function classifySourceType(url, extractionMethod, count) {
   const low = url.toLowerCase();
   if (extractionMethod === 'xml_product_feed' || low.endsWith('.xml') || low.includes('feed')) return 'product_feed';
@@ -759,8 +891,8 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, results });
     }
 
-    // 3. DISCOVER & EXTRACT PRODUCTS FROM AUTHORIZED PUBLIC URL (PARALLEL FAST PROBE)
-    if (action === 'discover') {
+    // 3. DISCOVER & BROWSE SITE CATEGORIES + PRODUCTS (PARALLEL FAST PROBE)
+    if (action === 'discover' || action === 'browse-site') {
       const rawUrl = String(req.body?.url || req.query?.url || '').trim();
       const urlCheck = await validateSafePublicUrl(rawUrl);
       if (!urlCheck.ok) {
@@ -768,18 +900,27 @@ export default async function handler(req, res) {
       }
 
       const parsed = new URL(urlCheck.url);
+      const isRootLike = parsed.pathname === '/' || parsed.pathname === '' || parsed.pathname.length <= 4;
       const logs = [`تم التحقق الأمني من الرابط (SSRF + DNS): ${urlCheck.url}`];
 
-      // Build parallel probe list (robots.txt + Shopify/Woo JSON if applicable)
+      // Build parallel probe list (robots.txt + Shopify products/collections + WooCommerce store API)
       const shopifyProbeUrl = parsed.pathname.includes('/collections/')
         ? `${parsed.origin}${parsed.pathname.replace(/\/$/, '')}/products.json?limit=250`
-        : (parsed.pathname === '/' || parsed.pathname === '')
+        : isRootLike
           ? `${parsed.origin}/products.json?limit=250`
           : null;
+      const shopifyColsUrl = (isRootLike || parsed.pathname.includes('/collections'))
+        ? `${parsed.origin}/collections.json?limit=100`
+        : null;
+      const wooProbeUrl = isRootLike ? `${parsed.origin}/wp-json/wc/store/v1/products?per_page=100` : null;
+      const wooCatsUrl = isRootLike ? `${parsed.origin}/wp-json/wc/store/v1/products/categories?per_page=100` : null;
 
-      const [robotsRes, shopifyRes] = await Promise.allSettled([
+      const [robotsRes, shopifyRes, shopifyColsRes, wooRes, wooCatsRes] = await Promise.allSettled([
         checkRobotsAllowed(urlCheck.url),
-        shopifyProbeUrl ? safeFetch(shopifyProbeUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null)
+        shopifyProbeUrl ? safeFetch(shopifyProbeUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null),
+        shopifyColsUrl ? safeFetch(shopifyColsUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null),
+        wooProbeUrl ? safeFetch(wooProbeUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null),
+        wooCatsUrl ? safeFetch(wooCatsUrl, { timeoutMs: PROBE_TIMEOUT_MS }) : Promise.resolve(null)
       ]);
 
       const robots = robotsRes.status === 'fulfilled' ? robotsRes.value : { allowed: true };
@@ -787,8 +928,53 @@ export default async function handler(req, res) {
         return res.status(403).json({
           ok: false,
           error: robots.note,
-          alternatives: ['CSV', 'XML Product Feed', 'JSON API', 'Manual Paste']
+          alternatives: ['Browser Extractor (Noon/Amazon)', 'HTML Paste', 'CSV', 'XML Product Feed', 'JSON API']
         });
+      }
+
+      // Collect discovered remote categories (Shopify collections or WooCommerce categories)
+      const remoteCategories = [];
+      if (shopifyColsRes.status === 'fulfilled' && shopifyColsRes.value?.res?.ok) {
+        try {
+          const colsJson = JSON.parse(await readLimitedText(shopifyColsRes.value.res));
+          if (Array.isArray(colsJson?.collections)) {
+            colsJson.collections.forEach(col => {
+              if (col?.title && col?.handle) {
+                remoteCategories.push({
+                  name: String(col.title).trim(),
+                  handle: col.handle,
+                  count: Number(col.products_count) || 0,
+                  url: `${parsed.origin}/collections/${col.handle}`,
+                  fetched: false
+                });
+              }
+            });
+            if (remoteCategories.length) logs.push(`تم اكتشاف ${remoteCategories.length} قسم (Collection) في المتجر.`);
+          }
+        } catch {
+          // ignore
+        }
+      }
+      if (wooCatsRes.status === 'fulfilled' && wooCatsRes.value?.res?.ok) {
+        try {
+          const wCats = JSON.parse(await readLimitedText(wooCatsRes.value.res));
+          if (Array.isArray(wCats)) {
+            wCats.forEach(c => {
+              if (c?.name && (Number(c.count) || 0) > 0) {
+                remoteCategories.push({
+                  name: stripHtml(c.name),
+                  handle: c.slug || '',
+                  count: Number(c.count) || 0,
+                  url: c.permalink || `${parsed.origin}/wp-json/wc/store/v1/products?category=${c.id}&per_page=100`,
+                  fetched: false
+                });
+              }
+            });
+            if (remoteCategories.length) logs.push(`تم اكتشاف ${remoteCategories.length} قسم WooCommerce في المتجر.`);
+          }
+        } catch {
+          // ignore
+        }
       }
 
       // Check Shopify parallel probe result first
@@ -800,18 +986,47 @@ export default async function handler(req, res) {
             const json = JSON.parse(text);
             const items = extractShopifyProducts(json, urlCheck.url);
             if (items.length > 0) {
-              logs.push(`تم الاستخراج السريع عبر Shopify JSON API (${items.length} منتج).`);
+              const categories = buildCategoriesSummary(items, remoteCategories);
+              logs.push(`تم الاستخراج السريع عبر Shopify JSON API (${items.length} منتج في ${categories.length} قسم).`);
               return res.status(200).json({
                 ok: true,
                 sourceUrl: urlCheck.url,
                 sourceType: classifySourceType(urlCheck.url, 'shopify_json_api', items.length),
                 extractionMethod: 'shopify_json_api',
                 products: items,
+                categories,
                 logs
               });
             }
           } catch {
-            // fall through to direct fetch
+            // fall through to Woo/direct fetch
+          }
+        }
+      }
+
+      // Check WooCommerce parallel probe result
+      if (wooRes.status === 'fulfilled' && wooRes.value?.res?.ok) {
+        const wRes = wooRes.value.res;
+        if ((wRes.headers.get('content-type') || '').includes('json')) {
+          try {
+            const text = await readLimitedText(wRes);
+            const arr = JSON.parse(text);
+            const items = extractWooProducts(arr, urlCheck.url);
+            if (items.length > 0) {
+              const categories = buildCategoriesSummary(items, remoteCategories);
+              logs.push(`تم الاستخراج السريع عبر WooCommerce Store API (${items.length} منتج في ${categories.length} قسم).`);
+              return res.status(200).json({
+                ok: true,
+                sourceUrl: urlCheck.url,
+                sourceType: classifySourceType(urlCheck.url, 'woocommerce_store_api', items.length),
+                extractionMethod: 'woocommerce_store_api',
+                products: items,
+                categories,
+                logs
+              });
+            }
+          } catch {
+            // fall through
           }
         }
       }
@@ -884,6 +1099,7 @@ export default async function handler(req, res) {
             sourceType: 'product_feed',
             extractionMethod: 'json_feed',
             products: items,
+            categories: buildCategoriesSummary(items, remoteCategories),
             logs
           });
         } catch {
@@ -901,34 +1117,45 @@ export default async function handler(req, res) {
           sourceType: 'product_feed',
           extractionMethod: 'xml_product_feed',
           products: items,
+          categories: buildCategoriesSummary(items, remoteCategories),
           logs
         });
       }
 
-      // Structured JSON-LD from HTML
+      // Structured JSON-LD, __NEXT_DATA__ (Noon/Next.js), and HTML Category Links
+      const htmlCats = extractHtmlCategoryLinks(bodyText, finalUrl);
+      const allRemoteCats = [...remoteCategories, ...htmlCats];
+
       let products = extractJsonLdProducts(bodyText, finalUrl);
       let method = 'json_ld';
+      if (products.length === 0) {
+        products = extractNextDataProducts(bodyText, finalUrl);
+        method = 'next_data_json';
+      }
       if (products.length === 0) {
         products = extractOpenGraphFallback(bodyText, finalUrl);
         method = 'opengraph_meta';
       }
 
-      if (products.length === 0) {
+      const categories = buildCategoriesSummary(products, allRemoteCats);
+
+      if (products.length === 0 && categories.length === 0) {
         return res.status(200).json({
           ok: false,
-          error: 'لم يتم العثور على بيانات منتجات منظمة (JSON-LD / API / Feed) في هذه الصفحة. يمكنك استخدام ملف CSV أو XML Feed أو لصق بيانات المنتجات يدوياً.',
-          alternatives: ['CSV', 'XML Product Feed', 'JSON Feed', 'Manual Paste'],
+          error: 'لم يتم العثور على بيانات منتجات منظمة (JSON-LD / API / Feed) في هذه الصفحة. استخدم "أداة الاستخراج من نون/أمازون (Bookmarklet)" أو الصق كود HTML أو CSV/JSON.',
+          alternatives: ['Browser Extractor (Noon/Amazon)', 'HTML Paste', 'CSV', 'JSON Feed'],
           logs
         });
       }
 
-      logs.push(`تم استخراج ${products.length} منتج عبر ${method}.`);
+      logs.push(`تم استخراج ${products.length} منتج و${categories.length} قسم عبر ${method}.`);
       return res.status(200).json({
         ok: true,
         sourceUrl: finalUrl,
         sourceType: classifySourceType(finalUrl, method, products.length),
         extractionMethod: method,
         products: products.slice(0, MAX_EXTRACTED_ITEMS),
+        categories,
         logs
       });
     }
