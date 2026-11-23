@@ -811,23 +811,32 @@ export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
       originalDescription: String(it.description || '').trim().slice(0, 500)
     });
   };
-  // 1) __NEXT_DATA__ (Noon / Next.js stores)
+  // 1) Embedded JSON (__NEXT_DATA__ / Inertia data-page / application/json scripts)
+  const walkData = (data) => {
+    const walk = (n, d = 0) => {
+      if (!n || typeof n !== 'object' || d > 8 || items.length >= 200) return;
+      if (Array.isArray(n)) return n.forEach(x => walk(x, d + 1));
+      if ((n.name || n.title) && (n.sale_price || n.price || n.selling_price || n.wholesale_price || n.final_price || n.image_key || n.image_keys || n.image || n.image_url || n.thumbnail)) {
+        const imgsRaw = Array.isArray(n.image_keys) ? n.image_keys.map(k => 'https://f.nooncdn.com/p/' + String(k).replace(/^\\/+/, '') + '.jpg') : (n.image_key ? ['https://f.nooncdn.com/p/' + String(n.image_key).replace(/^\\/+/, '') + '.jpg'] : (n.images || (n.image ? [n.image] : [])));
+        const imgs = imgsRaw.map(u => { try { return new URL(u, location.origin).href; } catch (e) { return u; } });
+        pushItem({ name: n.name || n.title, brand: n.brand || n.brand_name, sku: n.sku || n.offer_code || n.code, price: n.sale_price || n.selling_price || n.wholesale_price || n.final_price || n.price, originalPrice: n.price || n.was_price || n.regular_price, images: imgs, category: n.category_name || n.category, productUrl: n.url ? new URL(n.url, location.origin).href : location.href });
+      }
+      Object.values(n).forEach(v => { if (v && typeof v === 'object') walk(v, d + 1); });
+    };
+    walk(data);
+  };
   try {
     const nd = document.getElementById('__NEXT_DATA__');
-    if (nd?.textContent) {
-      const data = JSON.parse(nd.textContent);
-      const walk = (n, d = 0) => {
-        if (!n || typeof n !== 'object' || d > 8 || items.length >= 200) return;
-        if (Array.isArray(n)) return n.forEach(x => walk(x, d + 1));
-        if ((n.name || n.title) && (n.sale_price || n.price || n.image_key || n.image_keys)) {
-          const imgs = Array.isArray(n.image_keys) ? n.image_keys.map(k => 'https://f.nooncdn.com/p/' + String(k).replace(/^\\/+/, '') + '.jpg') : (n.image_key ? ['https://f.nooncdn.com/p/' + String(n.image_key).replace(/^\\/+/, '') + '.jpg'] : (n.images || (n.image ? [n.image] : [])));
-          pushItem({ name: n.name || n.title, brand: n.brand || n.brand_name, sku: n.sku || n.offer_code, price: n.sale_price || n.price, originalPrice: n.price || n.was_price, images: imgs, category: n.category_name || n.category, productUrl: n.url ? new URL(n.url, location.origin).href : location.href });
-        }
-        Object.values(n).forEach(v => { if (v && typeof v === 'object') walk(v, d + 1); });
-      };
-      walk(data);
-    }
+    if (nd?.textContent) walkData(JSON.parse(nd.textContent));
   } catch (e) {}
+  try {
+    const dp = document.querySelector('[data-page]');
+    const dpTxt = dp?.getAttribute('data-page');
+    if (dpTxt) walkData(JSON.parse(dpTxt));
+  } catch (e) {}
+  document.querySelectorAll('script[type="application/json"]').forEach(sc => {
+    try { if (sc.textContent && sc.textContent.length > 20) walkData(JSON.parse(sc.textContent)); } catch (e) {}
+  });
   // 2) JSON-LD Schema.org Products
   document.querySelectorAll('script[type="application/ld+json"]').forEach(sc => {
     try {
@@ -846,23 +855,57 @@ export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
       }
     } catch (e) {}
   });
-  // 3) Visual DOM cards (Noon / Amazon / Jumia / Generic)
+  // 3) Visual DOM cards (Noon / Amazon / Jumia / Bootstrap cards / B2B tables / Generic)
   if (items.length < 3) {
-    const cards = document.querySelectorAll('[data-qa="product-name"], .productContainer, div[data-component-type="s-search-result"], article.prd, .product-card, .product-item, li.product');
-    cards.forEach(el => {
-      const root = el.closest('a, article, li, div[class*="product"], div[data-asin]') || el;
-      const name = (root.querySelector('h2, h3, [data-qa="product-name"], .name, .title')?.innerText || '').trim();
-      const priceTxt = (root.querySelector('.a-price-whole, .amount, .prc, [class*="price"], [data-qa*="price"]')?.innerText || '').trim();
+    const findPrice = (root) => {
+      const bySel = root.querySelector('.a-price-whole, .amount, .prc, [class*="price"], [data-qa*="price"]');
+      if (bySel && bySel.innerText && bySel.innerText.trim()) return bySel.innerText.trim();
+      const currWords = ['EGP', 'USD', 'SAR', 'AED', 'LE', 'ج.م', 'جنيه', 'ريال', 'درهم', '$', '€', '£'];
+      const els = root.querySelectorAll('span, div, p, td, strong, b, ins, h6');
+      for (const el of els) {
+        const t = (el.innerText || '').trim();
+        if (!t || t.length > 30) continue;
+        const digits = t.replace(/[^0-9.]/g, '');
+        const rest = t.replace(/[0-9.,]/g, '').trim();
+        const latin = /[A-Za-z]/.test(rest);
+        if (digits && digits.length >= 2 && Number(digits) > 0 && (!latin || currWords.includes(rest))) return t;
+      }
+      return '';
+    };
+    const findName = (root) => {
+      if (root.tagName === 'TR') {
+        const cells = Array.from(root.querySelectorAll('td, th')).map(c => (c.innerText || '').trim()).filter(t => t.length >= 3);
+        const named = cells.filter(t => !(t.replace(/[^0-9.]/g, '').length >= 2 && t.replace(/[0-9.,]/g, '').trim().length <= 3));
+        named.sort((a, b) => b.length - a.length);
+        if (named[0]) return named[0];
+      }
+      const bySel = root.querySelector('h2, h3, h4, h5, [data-qa="product-name"], .name, .title, [class*="title"], [class*="name"]');
+      if (bySel && bySel.innerText && bySel.innerText.trim().length >= 3) return bySel.innerText.trim();
+      const links = root.querySelectorAll('a[href]');
+      for (const a of links) { const t = (a.innerText || '').trim(); if (t.length >= 3) return t; }
+      const alt = root.querySelector('img')?.getAttribute('alt');
+      return alt && alt.trim().length >= 3 ? alt.trim() : '';
+    };
+    const cards = document.querySelectorAll('[data-qa="product-name"], .productContainer, div[data-component-type="s-search-result"], article.prd, .product-card, .product-item, li.product, .card, [class*="product-card"], [class*="product-box"], table tbody tr');
+    for (const el of cards) {
+      if (items.length >= 200) break;
+      const root = (el.tagName === 'TR' || el.classList.contains('card')) ? el : (el.closest('a, article, li, div[class*="product"], div[data-asin], .card') || el);
+      const name = findName(root);
+      const priceTxt = findPrice(root);
       const img = root.querySelector('img')?.src || root.querySelector('img')?.getAttribute('data-src') || '';
       const link = root.querySelector('a[href]')?.href || location.href;
       if (name && (priceTxt || img)) pushItem({ name, price: priceTxt, images: [img], productUrl: link });
-    });
+    }
   }
-  const out = JSON.stringify({ products: items }, null, 2);
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(out).then(() => alert('تم نسخ ' + items.length + ' منتج! ارجع لمتجر ELZOGHBI واضغط لصق.')).catch(() => prompt('انسخ النص التالي (Ctrl+C):', out));
+  if (items.length === 0) {
+    alert('لم يتم العثور على أي منتجات في الصفحة دي. اتأكد إنك فاتح صفحة قسم أو منتجات (مش الرئيسية أو صفحة تسجيل الدخول)، وإنك مسجل دخولك لو الموقع بيطلب حساب (زي مواقع الجملة)، ومرر الصفحة لتحت لو المنتجات بتتحمل مع التمرير، وبعدين شغل الكود تاني.');
   } else {
-    prompt('انسخ النص التالي (Ctrl+C):', out);
+    const out = JSON.stringify({ products: items }, null, 2);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(out).then(() => alert('تم نسخ ' + items.length + ' منتج! ارجع لمتجر ELZOGHBI واضغط لصق.')).catch(() => prompt('انسخ النص التالي (Ctrl+C):', out));
+    } else {
+      prompt('انسخ النص التالي (Ctrl+C):', out);
+    }
   }
 })();`;
 
