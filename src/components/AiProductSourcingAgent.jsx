@@ -12,6 +12,7 @@ import {
   PRICING_MODES,
   DEFAULT_SOURCE_PROFILES,
   DEFAULT_SOURCING_PRESETS,
+  BROWSER_EXTRACTOR_SCRIPT,
   ISOLATED_TEST_PRODUCTS,
   parseSourcingInstruction,
   buildExecutionPlan,
@@ -77,7 +78,28 @@ export default function AiProductSourcingAgent({
 
   // Saved profiles, presets, and history
   const [profiles, setProfiles] = useState(() => loadStored(STORAGE_PROFILES_KEY, DEFAULT_SOURCE_PROFILES));
-  const [presets, setPresets] = useState(() => loadStored(STORAGE_PRESETS_KEY, DEFAULT_SOURCING_PRESETS));
+  const [presets, setPresets] = useState(() => {
+    const stored = loadStored(STORAGE_PRESETS_KEY, []);
+    const defaultIds = new Set(DEFAULT_SOURCING_PRESETS.map(p => p.id));
+    const customOnly = Array.isArray(stored) ? stored.filter(p => p && p.id && !defaultIds.has(p.id)) : [];
+    return [...customOnly, ...DEFAULT_SOURCING_PRESETS];
+  });
+  const [presetGroupFilter, setPresetGroupFilter] = useState('الكل');
+  const [presetSearch, setPresetSearch] = useState('');
+  const [showProtectedGuide, setShowProtectedGuide] = useState(false);
+
+  // Interactive Site Explorer state (browse categories -> products -> pick & stage)
+  const [siteExplorer, setSiteExplorer] = useState({
+    loading: false,
+    sourceUrl: '',
+    categories: [],
+    products: [],
+    activeCategory: 'ALL',
+    search: '',
+    selectedKeys: {},
+    error: ''
+  });
+  const [lastDiscoveredRaw, setLastDiscoveredRaw] = useState([]);
   const [history, setHistory] = useState(() => loadStored(STORAGE_HISTORY_KEY, []));
 
   // Add new profile modal/form
@@ -91,8 +113,22 @@ export default function AiProductSourcingAgent({
     notes: ''
   });
 
+  // The NL parser returns filters.productTypes, while parts of this UI read
+  // filters.includeTypes. Normalize every workflow entering state so the
+  // array fields are always real arrays (this mismatch crashed the tab).
+  const normalizeWorkflow = (wf) => {
+    if (!wf || typeof wf !== 'object') return wf;
+    const f = { ...(wf.filters || {}) };
+    const asArr = (v) => (Array.isArray(v) ? v : v == null ? [] : [String(v)]);
+    f.brands = asArr(f.brands);
+    f.includeTypes = asArr(f.includeTypes && f.includeTypes.length ? f.includeTypes : f.productTypes);
+    f.includeKeywords = asArr(f.includeKeywords);
+    f.excludeKeywords = asArr(f.excludeKeywords);
+    return { ...wf, filters: f };
+  };
+
   // Parsed workflow (editable before execution)
-  const [workflow, setWorkflow] = useState(() => parseSourcingInstruction(DEFAULT_SOURCING_PRESETS[0].instruction, []));
+  const [workflow, setWorkflow] = useState(() => normalizeWorkflow(parseSourcingInstruction(DEFAULT_SOURCING_PRESETS[0].instruction, [])));
   const [planEdited, setPlanEdited] = useState(false);
 
   // Real execution state (never fabricated)
@@ -170,7 +206,7 @@ export default function AiProductSourcingAgent({
   const handleAnalyzeInstruction = (customText, customUrls) => {
     const txt = customText !== undefined ? customText : instruction;
     const urls = customUrls !== undefined ? customUrls : parsedUrls;
-    const next = parseSourcingInstruction(txt, urls);
+    const next = normalizeWorkflow(parseSourcingInstruction(txt, urls));
     // Preserve manually configured exchange rate if already set
     if (workflow.pricing?.exchangeRate) {
       next.pricing.exchangeRate = workflow.pricing.exchangeRate;
@@ -186,7 +222,7 @@ export default function AiProductSourcingAgent({
   // Apply preset
   const handleSelectPreset = (preset) => {
     setInstruction(preset.instruction);
-    const next = parseSourcingInstruction(preset.instruction, parsedUrls);
+    const next = normalizeWorkflow(parseSourcingInstruction(preset.instruction, parsedUrls));
     next.mode = preset.mode || next.mode;
     if (workflow.pricing?.exchangeRate) {
       next.pricing.exchangeRate = workflow.pricing.exchangeRate;
@@ -267,12 +303,197 @@ export default function AiProductSourcingAgent({
     showToast?.('تم إلغاء مهمة الاستيراد.', 'info');
   };
 
+
+  // Browse site categories & products interactively (Site Explorer)
+  const handleExploreSite = async (targetUrlOverride = null) => {
+    const targetUrl = (targetUrlOverride || parsedUrls[0] || '').trim();
+    const hasFeed = structuredFeedText.trim().length > 0;
+    if (!targetUrl && !hasFeed) {
+      showToast?.('حط رابط الموقع الأول (أو الصق بيانات من نون/أمازون) عشان أستكشف الأقسام والمنتجات.', 'warning');
+      return;
+    }
+    setSiteExplorer(prev => ({ ...prev, loading: true, error: '', sourceUrl: targetUrl || 'بيانات ملصقة' }));
+    setActiveView('site_browser');
+
+    if (!targetUrl && hasFeed) {
+      const parsed = parseStructuredSourceInput(structuredFeedText, 'manual_feed');
+      if (!parsed.ok) {
+        setSiteExplorer(prev => ({ ...prev, loading: false, error: parsed.error || 'تعذر قراءة البيانات الملصقة.' }));
+        return;
+      }
+      const catMap = new Map();
+      parsed.products.forEach(p => {
+        const c = String(p.category || '').trim() || 'منتجات عامة';
+        catMap.set(c, (catMap.get(c) || 0) + 1);
+      });
+      setLastDiscoveredRaw(parsed.products);
+      setSiteExplorer({
+        loading: false,
+        sourceUrl: 'بيانات مستخرجة (HTML / JSON / CSV)',
+        categories: Array.from(catMap.entries()).map(([name, count]) => ({ name, count, url: '', fetched: true })).sort((a, b) => b.count - a.count),
+        products: parsed.products,
+        activeCategory: 'ALL',
+        search: '',
+        selectedKeys: {},
+        error: ''
+      });
+      showToast?.(`تم استخراج ${parsed.products.length} منتج وتقسيمهم بالأقسام ✓`, 'success');
+      return;
+    }
+
+    try {
+      const resp = await fetch('/api/ai-sourcing?action=browse-site', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: targetUrl })
+      });
+      const data = await resp.json();
+      if (data?.ok) {
+        const prods = Array.isArray(data.products) ? data.products : [];
+        const cats = Array.isArray(data.categories) ? data.categories : [];
+        setLastDiscoveredRaw(prods);
+        setSiteExplorer({
+          loading: false,
+          sourceUrl: targetUrl,
+          categories: cats,
+          products: prods,
+          activeCategory: 'ALL',
+          search: '',
+          selectedKeys: {},
+          error: ''
+        });
+        showToast?.(`تم اكتشاف ${prods.length} منتج في ${cats.length} قسم ✓`, 'success');
+      } else {
+        setSiteExplorer(prev => ({
+          ...prev,
+          loading: false,
+          error: data?.error || 'الموقع محمي ضد الاستخراج المباشر — استخدم "استيراد من نون/أمازون (Bookmarklet)" أو الصق كود HTML.'
+        }));
+      }
+    } catch {
+      setSiteExplorer(prev => ({
+        ...prev,
+        loading: false,
+        error: 'تعذر الاتصال بخادم الاستكشاف — تأكد من النشر على Vercel أو استخدم أداة النسخ من المتصفح (Bookmarklet).'
+      }));
+    }
+  };
+
+  // Stage chosen products from Site Explorer (or recover from 0-match filter) directly into Review tab
+  const handleStageProductsDirect = (rawList, label = 'تحديد يدوي من الأقسام') => {
+    if (!Array.isArray(rawList) || rawList.length === 0) {
+      showToast?.('اختر منتجاً واحداً على الأقل أولاً.', 'warning');
+      return;
+    }
+    const taskId = `explore_${Date.now()}`;
+    let dupCount = 0;
+    const staged = rawList.map((p, i) => {
+      const duplicate = classifyDuplicate(p, parts);
+      if (duplicate.status !== DUPLICATE_STATUS.NEW_PRODUCT) dupCount++;
+      const analyzedImages = analyzeProductImages(p.images || []);
+      const enriched = enrichProductData(p, {
+        normalizePartCategory,
+        existingCategories: categories,
+        language: workflow.enrichment?.language || 'ar'
+      });
+      const pricing = calculateProductPricing(p, workflow.pricing, enriched.matchedCategory);
+      const idempotencyKey = computeIdempotencyKey({ ...p, enriched });
+      return {
+        ...p,
+        stagedId: `stg_${taskId}_${i}`,
+        idempotencyKey,
+        selected: duplicate.status !== DUPLICATE_STATUS.EXACT_DUPLICATE,
+        duplicate,
+        duplicateAction: duplicate.recommendedAction,
+        analyzedImages,
+        enriched,
+        pricing,
+        editedTitle: enriched.displayTitle,
+        editedDescription: enriched.displayDescription,
+        editedCategory: enriched.matchedCategory,
+        customPrice: null,
+        importState: 'prepared'
+      };
+    });
+    setStagedItems(staged);
+    setExcludedItems([]);
+    setReviewPage(1);
+    setExecState(prev => ({
+      ...prev,
+      running: false,
+      stage: `تم تجهيز ${staged.length} منتج (${label}) — جاهز للمراجعة والاعتماد`,
+      discovered: rawList.length,
+      filteredPassed: staged.length,
+      excluded: 0,
+      duplicates: dupCount,
+      enriched: staged.length,
+      prepared: staged.length,
+      progressPct: 100,
+      activeTaskId: taskId
+    }));
+    setActiveView('review');
+    showToast?.(`تم تجهيز ${staged.length} منتج للمراجعة والاعتماد ✓`, 'success');
+  };
+
+  // Clear all restrictive filters in 1 click so user never gets stuck with 0 matches
+  const handleClearFilters = () => {
+    setWorkflow(prev => ({
+      ...prev,
+      filters: {
+        ...prev.filters,
+        brands: [],
+        includeTypes: [],
+        includeKeywords: [],
+        excludeKeywords: [],
+        minPrice: null,
+        maxPrice: null,
+        inStockOnly: false
+      }
+    }));
+    setPlanEdited(true);
+    showToast?.('تم مسح الفلاتر — هيتم جلب وعرض كل المنتجات الموجودة في المصدر ✓', 'info');
+  };
+
+  // Upload CSV / JSON / HTML / XML / TXT file directly into feed input
+  const handleUploadFeedFile = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const content = String(reader.result || '');
+      setStructuredFeedText(content);
+      setShowFeedInput(true);
+      showToast?.(`تم تحميل الملف "${file.name}" بنجاح — اضغط "استكشاف الأقسام والمنتجات" أو "بدء تنفيذ الخطة" ✓`, 'success');
+    };
+    reader.readAsText(file, 'utf-8');
+  };
+
+  // Copy 1-click browser extractor script for Noon / Amazon / Jumia / protected sites
+  const handleCopyBrowserExtractor = () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(BROWSER_EXTRACTOR_SCRIPT);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = BROWSER_EXTRACTOR_SCRIPT;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast?.('تم نسخ كود الاستخراج! افتح نون أو أمازون ← F12 ← Console ← الصق واضغط Enter ✓', 'success');
+    } catch {
+      showToast?.('تعذر النسخ التلقائي — انسخ الكود يدوياً من الصندوق.', 'warning');
+    }
+  };
+
   // Core Pipeline Runner (Real URLs via /api/ai-sourcing, Structured Feed CSV/JSON, OR Explicit Isolated Test Mode)
   const runSourcingPipeline = async ({ useIsolatedTest = false } = {}) => {
-    // Auto-sync workflow if user edited the instruction text without clicking "تحليل الأمر" first
+    // Auto-sync workflow safely: preserve user's exchange rate & manual pricing/filter edits without conflict
     let activeWorkflow = workflow;
     if (instruction.trim() !== (workflow.rawInstruction || '').trim() && !planEdited) {
-      const reparsed = parseSourcingInstruction(instruction, parsedUrls);
+      const reparsed = normalizeWorkflow(parseSourcingInstruction(instruction, parsedUrls));
       if (workflow.pricing?.exchangeRate) {
         reparsed.pricing.exchangeRate = workflow.pricing.exchangeRate;
         reparsed.pricing.exchangeRateSource = workflow.pricing.exchangeRateSource;
@@ -282,13 +503,15 @@ export default function AiProductSourcingAgent({
       activeWorkflow = reparsed;
       setWorkflow(reparsed);
     }
-    if (filterConflicts.length > 0) {
+    const activeConflicts = detectFilterConflicts(activeWorkflow.filters);
+    if (activeConflicts.length > 0) {
       showToast?.('يوجد تعارض في قواعد الفلترة؛ يرجى تصحيحه أولاً قبل التنفيذ.', 'error');
       setActiveView('filters_pricing');
       return;
     }
 
-    const urlsToScan = activeWorkflow.sourceUrls.length ? activeWorkflow.sourceUrls : parsedUrls;
+    // Always prefer the explicit URLs currently typed in the URL box
+    const urlsToScan = parsedUrls.length ? parsedUrls : (activeWorkflow.sourceUrls || []);
     const hasFeed = structuredFeedText.trim().length > 0;
 
     if (!useIsolatedTest && urlsToScan.length === 0 && !hasFeed) {
@@ -398,6 +621,24 @@ export default function AiProductSourcingAgent({
         progressPct: 50
       }));
 
+      // Save raw discovered products so user can browse by category or bypass filters in 1 click if 0 matched
+      setLastDiscoveredRaw(discoveredRaw);
+      if (discoveredRaw.length > 0) {
+        const catCounts = new Map();
+        discoveredRaw.forEach(p => {
+          const c = String(p.category || '').trim() || 'منتجات عامة';
+          catCounts.set(c, (catCounts.get(c) || 0) + 1);
+        });
+        setSiteExplorer(prev => ({
+          ...prev,
+          sourceUrl: useIsolatedTest ? 'Isolated Sandbox Test' : (urlsToScan[0] || 'بيانات ملصقة'),
+          products: discoveredRaw,
+          categories: Array.from(catCounts.entries()).map(([name, count]) => ({ name, count, url: '', fetched: true })).sort((a, b) => b.count - a.count),
+          activeCategory: 'ALL',
+          error: ''
+        }));
+      }
+
       // STAGE 2: Filtering
       const { passed, excluded } = applyProductFilters(discoveredRaw, activeWorkflow.filters, {
         rate: activeWorkflow.pricing?.exchangeRate,
@@ -432,11 +673,11 @@ export default function AiProductSourcingAgent({
         setHistory(prev => [{
           id: taskId,
           title: `تحديث كتالوج (${proposals.length} مقترح)`,
-          mode: workflow.mode,
+          mode: activeWorkflow.mode,
           instructions: instruction,
           sourceUrls: useIsolatedTest ? ['isolated_test_fixture'] : urlsToScan,
-          filters: workflow.filters,
-          pricing: workflow.pricing,
+          filters: activeWorkflow.filters,
+          pricing: activeWorkflow.pricing,
           counts: { discovered: discoveredRaw.length, filtered: passed.length, excluded: excluded.length, imported: 0, skipped: 0, failed: errors.length },
           status: 'awaiting_approval',
           logs: [...logs],
@@ -914,11 +1155,12 @@ export default function AiProductSourcingAgent({
         {/* Navigation Sub-tabs */}
         <div className="flex flex-wrap gap-1.5 mt-4 pt-3 border-t border-line">
           {[
-            { id: 'command', label: '1. مركز الأوامر والمصادر والخطة', icon: Sparkles, count: null },
-            { id: 'filters_pricing', label: '2. الفلاتر والتسعير والعملة', icon: Filter, count: filterConflicts.length || null, urgent: filterConflicts.length > 0 },
-            { id: 'review', label: '3. مراجعة المنتجات والصور', icon: Package, count: stagedItems.length || null },
-            { id: 'catalog_update', label: '4. تحديث الكتالوج والمقارنة', icon: RefreshCw, count: updateProposals.length || null },
-            { id: 'history', label: '5. التنفيذ وسجل التدقيق', icon: Clock, count: history.length || null }
+            { id: 'command', label: '1. المصدر والقوالب (27)', icon: Sparkles, count: null },
+            { id: 'site_browser', label: '2. تصفح أقسام ومنتجات الموقع', icon: Globe, count: siteExplorer.products.length || null },
+            { id: 'filters_pricing', label: '3. الفلاتر والتسعير', icon: Filter, count: filterConflicts.length || null, urgent: filterConflicts.length > 0 },
+            { id: 'review', label: '4. مراجعة واعتماد الإضافة', icon: Package, count: stagedItems.length || null },
+            { id: 'catalog_update', label: '5. تحديث الأسعار', icon: RefreshCw, count: updateProposals.length || null },
+            { id: 'history', label: '6. السجل', icon: Clock, count: history.length || null }
           ].map(t => {
             const Icon = t.icon;
             const active = activeView === t.id;
@@ -946,7 +1188,73 @@ export default function AiProductSourcingAgent({
             );
           })}
         </div>
+
+        {/* Live Active Rules & Quick Actions Strip (eliminates confusion between filters & exchange rate) */}
+        <div className="mt-3 pt-2.5 border-t border-line/70 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="px-2 py-0.5 rounded-lg bg-surface2 border border-line font-bold text-fg">
+              الشروط النشطة: {workflow.filters.brands.length || (workflow.filters.includeTypes || workflow.filters.productTypes || []).length || workflow.filters.includeKeywords.length
+                ? `${[...workflow.filters.brands, ...(workflow.filters.includeTypes || workflow.filters.productTypes || []), ...workflow.filters.includeKeywords].slice(0, 4).join('، ')}`
+                : 'كل المنتجات (بدون تقييد)'}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-surface2 border border-line font-bold text-fg">
+              التسعير: {workflow.pricing.markupPct ? `+${workflow.pricing.markupPct}%` : 'بدون زيادة'}{workflow.pricing.roundTo ? ` • تقريب ${workflow.pricing.roundTo}` : ''}
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-surface2 border border-line font-bold text-fg">
+              سعر الصرف: {workflow.pricing.exchangeRate ? `${workflow.pricing.exchangeRate} ج.م` : 'تلقائي/جنيه'}
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => handleFetchExchangeRate('USD', 'EGP')}
+              disabled={fetchingFx}
+              className="px-2.5 py-1 rounded-lg bg-emerald-600/15 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 font-extrabold transition"
+            >
+              {fetchingFx ? 'جاري الجلب...' : '💱 جلب سعر الدولار'}
+            </button>
+            {(workflow.filters.brands.length > 0 || (workflow.filters.includeTypes || workflow.filters.productTypes || []).length > 0 || workflow.filters.includeKeywords.length > 0 || workflow.filters.excludeKeywords.length > 0) && (
+              <button
+                type="button"
+                onClick={handleClearFilters}
+                className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 hover:text-white text-amber-700 dark:text-amber-300 border border-amber-500/30 font-extrabold transition"
+              >
+                ✕ مسح الفلاتر (جلب الكل)
+              </button>
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Zero-match instant recovery banner */}
+      {!execState.running && execState.discovered > 0 && execState.filteredPassed === 0 && lastDiscoveredRaw.length > 0 && (
+        <div className="rounded-2xl border-2 border-amber-500/50 bg-amber-500/10 p-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="space-y-0.5">
+            <div className="font-black text-amber-800 dark:text-amber-300">
+              ⚠️ تم اكتشاف {execState.discovered} منتج من المصدر، لكن شروط الفلترة الحالية استبعدتهم كلهم!
+            </div>
+            <div className="text-muted font-bold">
+              بدل ما تعيد البحث من الأول، تقدر تتصفحهم بالأقسام فوراً أو تجهّزهم كلهم للمراجعة بضغطة واحدة.
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveView('site_browser')}
+              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black transition"
+            >
+              🗂️ تصفحهم بالأقسام ({lastDiscoveredRaw.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => handleStageProductsDirect(lastDiscoveredRaw, 'عرض كل المنتجات بدون فلتر')}
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black transition"
+            >
+              ✓ عرض الكل للمراجعة بدون فلتر
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Real-time Backend Execution Progress Panel (Phase 2) */}
       {(execState.running || execState.logs.length > 0) && (
@@ -1029,18 +1337,50 @@ export default function AiProductSourcingAgent({
                   حفظ الأمر كقالب
                 </button>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {presets.map(pr => (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {['الكل', 'شحن وطاقة', 'سماعات وساعات', 'إكسسوارات', 'قطع غيار', 'استكشاف وتحديث'].map(grp => (
                   <button
-                    key={pr.id}
+                    key={grp}
                     type="button"
-                    onClick={() => handleSelectPreset(pr)}
-                    className="px-2.5 py-1.5 rounded-xl bg-surface2/80 hover:bg-blue-500/15 border border-line text-[11px] font-bold text-fg transition flex items-center gap-1.5"
+                    onClick={() => setPresetGroupFilter(grp)}
+                    className={`px-2.5 py-1 rounded-lg text-[10.5px] font-extrabold border transition ${
+                      presetGroupFilter === grp
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-surface2 text-fg border-line hover:bg-blue-500/10'
+                    }`}
                   >
-                    <span className="px-1.5 py-0.2 rounded bg-blue-600/15 text-blue-700 dark:text-blue-300 text-[9.5px] font-black">{pr.badge}</span>
-                    <span>{pr.title}</span>
+                    {grp}
                   </button>
                 ))}
+                <input
+                  type="text"
+                  value={presetSearch}
+                  onChange={e => setPresetSearch(e.target.value)}
+                  placeholder="ابحث في القوالب (شاحن، سماعة، شاشة...)"
+                  className="flex-1 min-w-[140px] px-2.5 py-1 rounded-lg border border-line bg-bg text-fg text-[11px]"
+                />
+              </div>
+              <div className="flex flex-wrap gap-1.5 max-h-52 overflow-y-auto pr-1">
+                {presets
+                  .filter(pr => {
+                    if (presetGroupFilter !== 'الكل' && (pr.group || 'استكشاف وتحديث') !== presetGroupFilter) return false;
+                    if (presetSearch.trim()) {
+                      const q = presetSearch.trim().toLowerCase();
+                      return `${pr.title} ${pr.badge} ${pr.instruction}`.toLowerCase().includes(q);
+                    }
+                    return true;
+                  })
+                  .map(pr => (
+                    <button
+                      key={pr.id}
+                      type="button"
+                      onClick={() => handleSelectPreset(pr)}
+                      className="px-2.5 py-1.5 rounded-xl bg-surface2/80 hover:bg-blue-500/15 border border-line text-[11px] font-bold text-fg transition flex items-center gap-1.5 text-right"
+                    >
+                      <span className="px-1.5 py-0.2 rounded bg-blue-600/15 text-blue-700 dark:text-blue-300 text-[9.5px] font-black shrink-0">{pr.badge}</span>
+                      <span>{pr.title}</span>
+                    </button>
+                  ))}
               </div>
             </div>
 
@@ -1081,14 +1421,32 @@ export default function AiProductSourcingAgent({
                   <Globe className="w-4 h-4 text-emerald-600" />
                   روابط المصادر المصرح بها (رابط واحد في كل سطر)
                 </label>
-                <button
-                  type="button"
-                  onClick={() => setShowFeedInput(v => !v)}
-                  className="text-[11px] font-extrabold text-blue-600 hover:underline flex items-center gap-1"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  {showFeedInput ? 'إخفاء إدخال CSV/JSON' : 'أو الصق بيانات CSV / JSON Feed'}
-                </button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleExploreSite()}
+                    className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black flex items-center gap-1 transition"
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    استكشاف أقسام ومنتجات الموقع
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowProtectedGuide(v => !v); setShowFeedInput(true); }}
+                    className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 hover:text-white text-amber-700 dark:text-amber-300 border border-amber-500/30 text-[11px] font-black flex items-center gap-1 transition"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    استيراد من نون / أمازون / مواقع محمية
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowFeedInput(v => !v)}
+                    className="text-[11px] font-extrabold text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    {showFeedInput ? 'إخفاء اللصق' : 'لصق HTML/CSV/JSON'}
+                  </button>
+                </div>
               </div>
               <textarea
                 rows={3}
@@ -1103,17 +1461,47 @@ export default function AiProductSourcingAgent({
                 className="w-full p-2.5 rounded-xl border border-line bg-bg text-fg text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
 
+              {showProtectedGuide && (
+                <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/35 space-y-2.5 text-xs">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="font-black text-amber-800 dark:text-amber-300">
+                      ⚡ استيراد مضمون من نون (Noon) وأمازون وجوميا وأي موقع محمي:
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyBrowserExtractor}
+                      className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-black transition"
+                    >
+                      📋 نسخ كود الاستخراج السريع من المتصفح
+                    </button>
+                  </div>
+                  <ol className="list-decimal pr-4 space-y-1 text-[11px] text-fg font-bold">
+                    <li>افتح صفحة المنتجات أو القسم في <b>نون (Noon)</b> أو <b>أمازون</b> أو <b>جوميا</b> من متصفحك العادي.</li>
+                    <li>اضغط <b>F12</b> ← افتح تبويب <b>Console</b> ← الصق الكود واضغط <b>Enter</b> (هيسحب كل المنتجات بالصور والأسعار وينسخها تلقائياً).</li>
+                    <li>ارجع هنا واضغط <b>لصق (Ctrl+V)</b> في الصندوق بالأسفل ثم اضغط <b>«استكشاف أقسام ومنتجات الموقع»</b>!</li>
+                    <li>أو كبديل أسرع بدون Console: في صفحة نون/الموقع اضغط <b>Ctrl+U</b> ثم <b>Ctrl+A</b> ثم <b>Ctrl+C</b> والصق كود الـ HTML هنا مباشرة.</li>
+                  </ol>
+                </div>
+              )}
+
               {showFeedInput && (
-                <div className="space-y-1.5 pt-2 border-t border-line">
-                  <label className="text-[11px] font-black text-fg block">
-                    بديل متوافق عند وجود حماية Anti-Bot: الصق CSV أو JSON Feed مصرح به
-                  </label>
+                <div className="space-y-2 pt-2 border-t border-line">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label className="text-[11px] font-black text-fg">
+                      الصق هنا: ناتج كود المتصفح (JSON) أو كود صفحة HTML (من نون/أمازون) أو CSV أو قائمة أسعار واتساب:
+                    </label>
+                    <label className="px-2.5 py-1 rounded-lg bg-surface2 hover:bg-blue-600 hover:text-white border border-line text-[11px] font-extrabold cursor-pointer transition flex items-center gap-1">
+                      <Upload className="w-3 h-3" />
+                      <span>رفع ملف (CSV/JSON/HTML)</span>
+                      <input type="file" accept=".csv,.json,.html,.htm,.xml,.txt" onChange={handleUploadFeedFile} className="hidden" />
+                    </label>
+                  </div>
                   <textarea
                     rows={4}
                     dir="ltr"
                     value={structuredFeedText}
                     onChange={e => setStructuredFeedText(e.target.value)}
-                    placeholder={'name,brand,model,sku,price,currency,category,images\nGoogle Pixel Watch 3,Google,Pixel Watch 3,GA05785,399,USD,Smartwatches,https://...'}
+                    placeholder={'الصق JSON من كود المتصفح، أو كود HTML كامل، أو CSV، أو سطور أسعار مثل:\nAnker 20W Charger - 650\nAirPods Pro 2 - 9800'}
                     className="w-full p-2.5 rounded-xl border border-line bg-bg text-fg text-[11px] font-mono"
                   />
                 </div>
@@ -1308,6 +1696,195 @@ export default function AiProductSourcingAgent({
               </ol>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ==================================================================== */}
+      {/* VIEW 1.5: INTERACTIVE SITE EXPLORER (CATEGORIES -> PRODUCTS -> PICK) */}
+      {/* ==================================================================== */}
+      {activeView === 'site_browser' && (
+        <div className="rounded-2xl border border-line bg-surface p-4 sm:p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+            <div>
+              <h3 className="text-sm font-black text-fg flex items-center gap-2">
+                <Globe className="w-4 h-4 text-emerald-600" />
+                مستكشف أقسام ومنتجات الموقع
+              </h3>
+              <p className="text-[11px] text-muted mt-0.5">
+                اختر القسم اللي عايزه، حدّد المنتجات اللي تعجبك، واضغط «تجهيز المحدد للاستيراد» عشان تدخل مباشرة على التسعير والاعتماد.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleExploreSite()}
+                disabled={siteExplorer.loading}
+                className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 transition"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${siteExplorer.loading ? 'animate-spin' : ''}`} />
+                {siteExplorer.loading ? 'جاري استكشاف الموقع...' : 'تحديث / إعادة استكشاف'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const chosen = siteExplorer.products.filter((p, idx) => siteExplorer.selectedKeys[`${p.sku || p.name}_${idx}`]);
+                  handleStageProductsDirect(chosen, 'منتجات مختارة من مستكشف الأقسام');
+                }}
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition"
+              >
+                ✓ تجهيز المحدد للاستيراد ({Object.values(siteExplorer.selectedKeys).filter(Boolean).length})
+              </button>
+            </div>
+          </div>
+
+          {siteExplorer.error && (
+            <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs text-rose-700 dark:text-rose-300 space-y-2">
+              <div className="font-black">⚠️ {siteExplorer.error}</div>
+              <button
+                type="button"
+                onClick={() => { setShowProtectedGuide(true); setShowFeedInput(true); setActiveView('command'); }}
+                className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-[11px] font-black"
+              >
+                فتح أداة الاستيراد من نون / أمازون / المواقع المحمية ←
+              </button>
+            </div>
+          )}
+
+          {siteExplorer.categories.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-xs font-black text-fg">الأقسام المكتشفة ({siteExplorer.categories.length}):</div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setSiteExplorer(prev => ({ ...prev, activeCategory: 'ALL' }))}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ${
+                    siteExplorer.activeCategory === 'ALL'
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-surface2 text-fg border-line hover:bg-blue-500/10'
+                  }`}
+                >
+                  كل المنتجات ({siteExplorer.products.length})
+                </button>
+                {siteExplorer.categories.map((cat, cIdx) => (
+                  <button
+                    key={`${cat.name}_${cIdx}`}
+                    type="button"
+                    onClick={() => {
+                      if (!cat.fetched && cat.url) {
+                        handleExploreSite(cat.url);
+                      } else {
+                        setSiteExplorer(prev => ({ ...prev, activeCategory: cat.name }));
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition flex items-center gap-1.5 ${
+                      siteExplorer.activeCategory === cat.name
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-surface2 text-fg border-line hover:bg-blue-500/10'
+                    }`}
+                  >
+                    <span>{cat.name}</span>
+                    <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-black/10 font-black">
+                      {cat.fetched ? cat.count : (cat.count ? `${cat.count} ↓` : 'فتح ↓')}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {(() => {
+            const q = siteExplorer.search.trim().toLowerCase();
+            const visibleList = siteExplorer.products
+              .map((p, idx) => ({ p, idx, key: `${p.sku || p.name}_${idx}` }))
+              .filter(({ p }) => {
+                const catName = String(p.category || '').trim() || 'منتجات عامة';
+                if (siteExplorer.activeCategory !== 'ALL' && catName !== siteExplorer.activeCategory) return false;
+                if (q && !`${p.name} ${p.brand} ${p.sku} ${catName}`.toLowerCase().includes(q)) return false;
+                return true;
+              });
+
+            return (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <input
+                    type="text"
+                    value={siteExplorer.search}
+                    onChange={e => setSiteExplorer(prev => ({ ...prev, search: e.target.value }))}
+                    placeholder="ابحث داخل القسم بالاسم أو الماركة أو SKU..."
+                    className="flex-1 min-w-[200px] px-3 py-2 rounded-xl border border-line bg-bg text-fg text-xs"
+                  />
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSiteExplorer(prev => {
+                          const next = { ...prev.selectedKeys };
+                          visibleList.forEach(({ key }) => { next[key] = true; });
+                          return { ...prev, selectedKeys: next };
+                        });
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-surface2 hover:bg-blue-600 hover:text-white border border-line text-xs font-extrabold transition"
+                    >
+                      تحديد كل الظاهر ({visibleList.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSiteExplorer(prev => ({ ...prev, selectedKeys: {} }))}
+                      className="px-3 py-1.5 rounded-xl bg-surface2 hover:bg-rose-600 hover:text-white border border-line text-xs font-extrabold transition"
+                    >
+                      إلغاء التحديد
+                    </button>
+                  </div>
+                </div>
+
+                {visibleList.length === 0 ? (
+                  <div className="py-10 text-center text-xs text-muted font-bold border border-dashed border-line rounded-2xl">
+                    {siteExplorer.loading
+                      ? 'جاري استكشاف أقسام ومنتجات الموقع...'
+                      : 'حط رابط موقع في التبويب الأول واضغط «استكشاف أقسام ومنتجات الموقع» (أو الصق بيانات نون/أمازون) عشان تظهر المنتجات هنا.'}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[540px] overflow-y-auto pr-1">
+                    {visibleList.map(({ p, key }) => {
+                      const checked = Boolean(siteExplorer.selectedKeys[key]);
+                      const thumb = Array.isArray(p.images) && p.images[0] ? p.images[0] : '';
+                      return (
+                        <div
+                          key={key}
+                          onClick={() => setSiteExplorer(prev => ({ ...prev, selectedKeys: { ...prev.selectedKeys, [key]: !checked } }))}
+                          className={`p-2.5 rounded-xl border cursor-pointer transition flex items-start gap-2.5 ${
+                            checked ? 'bg-blue-500/10 border-blue-500 shadow-sm' : 'bg-surface2/50 border-line hover:border-blue-400'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {}}
+                            className="mt-1 w-4 h-4 accent-blue-600 shrink-0"
+                          />
+                          {thumb ? (
+                            <img src={thumb} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-12 h-12 rounded-lg object-contain bg-white border border-line shrink-0" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-surface border border-line flex items-center justify-center text-muted shrink-0">
+                              <Package className="w-5 h-5" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="text-xs font-extrabold text-fg line-clamp-2">{p.name}</div>
+                            <div className="flex flex-wrap items-center gap-1.5 text-[10.5px] font-bold">
+                              {p.price > 0 && <span className="text-emerald-600 font-black">{p.price} {p.currency || 'EGP'}</span>}
+                              {p.brand && <span className="px-1.5 py-0.2 rounded bg-surface border border-line text-muted">{p.brand}</span>}
+                              {p.category && <span className="text-blue-600 truncate max-w-[110px]">{p.category}</span>}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
 
