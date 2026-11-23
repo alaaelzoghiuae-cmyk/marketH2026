@@ -868,7 +868,8 @@ export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
         const digits = t.replace(/[^0-9.]/g, '');
         const rest = t.replace(/[0-9.,]/g, '').trim();
         const latin = /[A-Za-z]/.test(rest);
-        if (digits && digits.length >= 2 && Number(digits) > 0 && (!latin || currWords.includes(rest))) return t;
+        const hasCurr = currWords.some(w => t.includes(w));
+        if (digits && digits.length >= 2 && Number(digits) > 0 && (Number(digits) >= 10 || hasCurr) && (!latin || currWords.includes(rest))) return t;
       }
       return '';
     };
@@ -886,7 +887,25 @@ export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
       const alt = root.querySelector('img')?.getAttribute('alt');
       return alt && alt.trim().length >= 3 ? alt.trim() : '';
     };
-    const cards = document.querySelectorAll('[data-qa="product-name"], .productContainer, div[data-component-type="s-search-result"], article.prd, .product-card, .product-item, li.product, .card, [class*="product-card"], [class*="product-box"], table tbody tr');
+    // Product-link pass (Noon and other link-wrapped cards): the whole card is one <a href=".../p/">
+    const prodLinks = document.querySelectorAll('a[href*="/p/"]');
+    for (const a of prodLinks) {
+      if (items.length >= 200) break;
+      const nameEl = a.querySelector('h2, h3');
+      let linkName = nameEl ? (nameEl.innerText || '').trim() : '';
+      if (!linkName) {
+        const alt = a.querySelector('img')?.getAttribute('alt') || '';
+        linkName = alt.replace(/ - Image [0-9]+.*$/, '').trim();
+      }
+      if (!linkName || linkName.length < 3) continue;
+      const linkPrice = findPrice(a);
+      const linkImgs = Array.from(a.querySelectorAll('img')).map(im => im.src || im.getAttribute('data-src') || '').filter(u => u && u.startsWith('http'));
+      if (!linkPrice && !linkImgs.length) continue;
+      const hrefPath = (a.getAttribute('href') || '').split('?')[0];
+      const skuSeg = hrefPath.includes('/p/') ? hrefPath.split('/p/')[0].split('/').filter(Boolean).pop() : '';
+      pushItem({ name: linkName, price: linkPrice, images: linkImgs, productUrl: a.href, sku: skuSeg && skuSeg.length >= 4 ? skuSeg : '' });
+    }
+    const cards = items.length < 3 ? document.querySelectorAll('[data-qa="product-name"], .productContainer, div[data-component-type="s-search-result"], article.prd, .product-card, .product-item, li.product, .card, [class*="product-card"], [class*="product-box"], table tbody tr') : [];
     for (const el of cards) {
       if (items.length >= 200) break;
       const root = (el.tagName === 'TR' || el.classList.contains('card')) ? el : (el.closest('a, article, li, div[class*="product"], div[data-asin], .card') || el);
