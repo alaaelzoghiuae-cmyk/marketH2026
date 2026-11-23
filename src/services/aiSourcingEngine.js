@@ -1133,6 +1133,14 @@ export function parseStructuredSourceInput(rawText, sourceLabel = 'manual_feed')
     return { ok: true, products, method: 'imported_csv_feed', error: null };
   }
 
+  // Guard: pasted JavaScript (e.g. the browser-extractor code itself) is not a product list.
+  const codeMarkers = ['const ', 'let ', 'var ', 'function ', '=>', 'document.', 'window.', 'querySelector', 'addEventListener', 'JSON.stringify', 'console.log', 'pushItem', 'new Set(', 'new Map('];
+  const codeLineCount = lines.filter(l => codeMarkers.some(m => l.includes(m))).length;
+  const looksLikeExtractor = txt.includes('pushItem') && (txt.includes('nooncdn') || txt.includes('تم نسخ'));
+  if (looksLikeExtractor || codeLineCount >= 3) {
+    return { ok: false, products: [], method: 'code_paste_guard', error: 'اللي لصقته ده كود الاستخراج نفسه، مش ناتج الاستخراج. الكود بيتلصق في صفحة نون/أمازون/جوميا: اضغط F12 وافتح Console والصقه هناك واضغط Enter، وهو هينسخ ناتج المنتجات لوحده. بعدها ارجع هنا والصق الناتج (بيبدأ بـ products) مش الكود.' };
+  }
+
   // Fallback: Smart Free-Text / WhatsApp Supplier List ("Product Name - 850" or "اسم المنتج | 850 جنيه")
   const textProducts = lines.map((line, idx) => {
     const priceMatch = line.match(/(?:[-|–—:]|\s)(\d+(?:[.,]\d+)?)\s*(?:جنيه|ج\.م|egp|usd|\$|ريال|sar|aed)?\s*$/i);
