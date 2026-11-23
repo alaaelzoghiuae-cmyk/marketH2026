@@ -820,7 +820,7 @@ export const BROWSER_EXTRACTOR_SCRIPT = `(() => {
         if (!n || typeof n !== 'object' || d > 8 || items.length >= 200) return;
         if (Array.isArray(n)) return n.forEach(x => walk(x, d + 1));
         if ((n.name || n.title) && (n.sale_price || n.price || n.image_key || n.image_keys)) {
-          const imgs = Array.isArray(n.image_keys) ? n.image_keys.map(k => 'https://f.nooncdn.com/p/' + String(k).replace(/^\/+/, '') + '.jpg') : (n.image_key ? ['https://f.nooncdn.com/p/' + String(n.image_key).replace(/^\/+/, '') + '.jpg'] : (n.images || (n.image ? [n.image] : [])));
+          const imgs = Array.isArray(n.image_keys) ? n.image_keys.map(k => 'https://f.nooncdn.com/p/' + String(k).replace(/^\\/+/, '') + '.jpg') : (n.image_key ? ['https://f.nooncdn.com/p/' + String(n.image_key).replace(/^\\/+/, '') + '.jpg'] : (n.images || (n.image ? [n.image] : [])));
           pushItem({ name: n.name || n.title, brand: n.brand || n.brand_name, sku: n.sku || n.offer_code, price: n.sale_price || n.price, originalPrice: n.price || n.was_price, images: imgs, category: n.category_name || n.category, productUrl: n.url ? new URL(n.url, location.origin).href : location.href });
         }
         Object.values(n).forEach(v => { if (v && typeof v === 'object') walk(v, d + 1); });
