@@ -861,6 +861,23 @@ export default async function handler(req, res) {
       });
     }
 
+    // 1b. FETCH URL (host allowlist — used by the Karambo guide sync)
+    if (action === 'fetch-url') {
+      const target = String(req.query?.url || req.body?.url || '');
+      let host = '';
+      try { host = new URL(target).hostname; } catch (e) {}
+      if (host !== 'mobi3araby.com' && host !== 'www.mobi3araby.com') {
+        return res.status(400).json({ ok: false, error: 'الرابط غير مسموح به في أداة الجلب.' });
+      }
+      const { res: pageRes } = await safeFetch(target, { timeoutMs: 15000 });
+      if (!pageRes.ok) {
+        return res.status(200).json({ ok: false, error: `تعذر جلب الصفحة (${pageRes.status})` });
+      }
+      let html = await pageRes.text();
+      if (html.length > 2500000) html = html.slice(0, 2500000);
+      return res.status(200).json({ ok: true, html });
+    }
+
     // 2. VALIDATE IMAGES (SSRF-SAFE HEAD CHECK)
     if (action === 'validate-images') {
       const urls = Array.isArray(req.body?.urls) ? req.body.urls.slice(0, 40) : [];

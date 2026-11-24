@@ -57,7 +57,7 @@ export function renderAdminSubTabBar(ctx, tabs, activeId, onSelect) {
 
 export function renderAdminDashboard(ctx) {
   const { accountRequests, adminAuthenticated, adminCredentials, adminLoginPass, adminLoginUser, adminMenuOpen, adminNotifPanelOpen, adminSidebarMode, adminSidebarSearch, adminTab, aiCommandOpen, brands, clients, cloudSyncStatus, cmdPaletteOpen, complaints, floatingBottomMenuOpen, groups, handleAdminLoginSubmit, handleToggleSoundAndRequestPermission, handleUpdateOrderStatus, i18nActive, markLocalUpsert, models, notifications, openSidebarGroups, orders, parts, promoCodes, pullFromSupabaseCloud, pushToSupabaseCloud, renderAdminCatalog, renderAdminClients, renderAdminDatabaseSchema, renderAdminExecutiveReportsView, renderAdminFeatureFlagsDashboard, renderAdminGroups, renderAdminOrders, renderAdminOverview, renderAdminPromoCodes, renderAdminQuickStock, renderAdminRestockAlertsView, renderAdminReturnsAndComplaints, renderAdminSiteSettings, renderAdminSourcing, renderAdminStorefrontCms, returnsList, saveSiteSettingsImmediate, sbUpsert, setAdminAuthenticated, setAdminCmsSubTab, setAdminFlagsSubTab, setAdminLoginPass, setAdminLoginUser, setAdminMenuOpen, setAdminNewPassword, setAdminNewUsername, setAdminNotifPanelOpen, setAdminReturnsSubTab, setAdminSecurityModalOpen, setAdminSettingsSubTab, setAdminSidebarMode, setAdminSidebarSearch, setAdminSourcingSubTab, setAdminTab, setAiCommandOpen, setBulkPriceToolOpen, setCmdPaletteOpen, setFloatingBottomMenuOpen, setNotifications, setOpenAdminCards, setOpenSidebarGroups, setParts, setSmartNotifsOpen, showToast, siteSettings, smartNotifsOpen, soundAlertsEnabled, sourcingRequests, storeAds, switchPortal, toggleUiTheme, uiTheme } = ctx;
-  const { adminSession, isAdminOwner, canAdmin, renderAdminTeam, setAdminSession } = ctx;
+  const { adminSession, isAdminOwner, canAdmin, renderAdminTeam, renderAdminKarambo, setAdminSession } = ctx;
     const pendingReqCount = accountRequests.filter(r => r.status === 'pending').length;
     const pendingRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
     const openComplaintsCount = complaints.filter(c => c.status !== 'مغلق').length;
@@ -309,6 +309,15 @@ export function renderAdminDashboard(ctx) {
             keywords: 'اعلانات بنرات صور واجهة اختصارات بارات نشرة بريدية',
             icon: Sparkles,
             badge: storeAds.length,
+            urgent: false
+          },
+          {
+            id: 'karambo',
+            label: 'كرومبو الشغلانة',
+            desc: 'دليل الموبايلات، أدوات كرومبو، المزامنة والتنبيهات',
+            keywords: 'كرومبو دليل موبايلات اسعار سوق مقارنة تقسيط',
+            icon: Search,
+            badge: 'جديد',
             urgent: false
           },
           {
@@ -1022,6 +1031,7 @@ export function renderAdminDashboard(ctx) {
           {/* Active Module Content Container */}
           <div className="flex-1 w-full max-w-[1440px] mx-auto p-3 sm:p-6 pb-24 min-w-0">
             {adminTab === 'team' && isAdminOwner && renderAdminTeam()}
+            {adminTab === 'karambo' && canAdmin('karambo') && renderAdminKarambo()}
             {adminTab !== 'team' && !canAdmin(adminTab) && (
               <div className="bg-surface border border-line rounded-3xl p-10 text-center space-y-3">
                 <Shield className="w-10 h-10 mx-auto text-rose-500" />
@@ -2254,7 +2264,7 @@ const TEAM_PERMISSION_GROUPS = [
   { title: 'الملخص والتقارير', tabs: [['overview', 'الرئيسية والملخص'], ['bi_analytics', 'تحليلات الأعمال (BI)'], ['reports', 'تقارير المدير العام']] },
   { title: 'المبيعات والطلبات', tabs: [['orders', 'الطلبات والفواتير'], ['order_workflow', 'سير عمل الطلبات (Kanban)'], ['sourcing', 'طلبات الاستيراد (من برّه)'], ['returns', 'المرتجعات والشكاوى']] },
   { title: 'المنتجات والمخازن', tabs: [['catalog', 'الكتالوج والموديلات'], ['excel_products', 'جدول المنتجات (Excel)'], ['smart_pricing', 'محرك التسعير الذكي (AI)'], ['ai_product_sourcing', 'وكيل الاستيراد الذكي (AI)'], ['bulk_importer', 'المستورد الذكي بالروابط'], ['quality_images', 'جودة الكتالوج والصور'], ['quick_stock', 'الجرد السريع للمخزن'], ['restock_alerts', 'قائمة الانتظار (نبّهني)']] },
-  { title: 'تصميم المتجر والتسويق', tabs: [['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['promos', 'الكوبونات وحماية الربح']] },
+  { title: 'تصميم المتجر والتسويق', tabs: [['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
   { title: 'العملاء والإعدادات', tabs: [['clients', 'العملاء والحسابات'], ['groups', 'شرائح الأسعار والشحن'], ['site_settings', 'إعدادات المتجر والدفع'], ['schema', 'قاعدة البيانات السحابية']] }
 ];
 const TEAM_ALL_TABS = TEAM_PERMISSION_GROUPS.flatMap(g => g.tabs.map(t => t[0]));
@@ -2264,7 +2274,7 @@ const TEAM_ROLE_PRESETS = [
   { id: 'stock', label: 'مسؤول مخزن وكتالوج', permissions: ['catalog', 'excel_products', 'quick_stock', 'quality_images', 'restock_alerts', 'bulk_importer'] },
   { id: 'accountant', label: 'محاسب — تقارير ومبيعات', permissions: ['overview', 'bi_analytics', 'reports'] },
   { id: 'support', label: 'دعم ومتابعة عملاء', permissions: ['orders', 'returns', 'sourcing', 'clients'] },
-  { id: 'marketing', label: 'تسويق وواجهة المتجر', permissions: ['overview', 'storefront_cms', 'promos', 'feature_flags'] },
+  { id: 'marketing', label: 'تسويق وواجهة المتجر', permissions: ['overview', 'storefront_cms', 'promos', 'feature_flags', 'karambo'] },
   { id: 'full', label: 'كل الأقسام (صلاحيات كاملة)', permissions: TEAM_ALL_TABS }
 ];
 

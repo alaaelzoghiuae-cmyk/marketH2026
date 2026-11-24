@@ -1050,7 +1050,7 @@ export function renderRecentlyViewedStrip(ctx) {
 }
 
 export function renderHomeView(ctx) {
-  const { calculatePartPrice, cartSummary, currentGroup, fetchSparePartsSliceOnDemand, handleNewsletterSubscribe, heroAdIndex, i18nActive, isInitialCloudBooting, models, newsletterEmail, openSourcing, parts, pendingScrollToProductsRef, publicBrands, publicPartCountByBrandMap, publicParts, renderProductCard, renderRecentlyViewedStrip, renderStickyCartBar, resolvePartModelObj, setClientTab, setDetailImageIdx, setHeroAdIndex, setNewsletterEmail, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedDetailItem, setSelectedModelId, setStorePage, setStoreStockFilter, showcaseBars, siteSettings, storeAds, swipeProps, swipeSuppressRef, uiTheme } = ctx;
+  const { calculatePartPrice, cartSummary, currentGroup, fetchSparePartsSliceOnDemand, handleNewsletterSubscribe, heroAdIndex, i18nActive, isInitialCloudBooting, models, newsletterEmail, openSourcing, parts, pendingScrollToProductsRef, publicBrands, publicPartCountByBrandMap, publicParts, renderKaramboStrip, renderProductCard, renderRecentlyViewedStrip, renderStickyCartBar, resolvePartModelObj, setClientTab, setDetailImageIdx, setHeroAdIndex, setNewsletterEmail, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedDetailItem, setSelectedModelId, setStorePage, setStoreStockFilter, showcaseBars, siteSettings, storeAds, swipeProps, swipeSuppressRef, uiTheme } = ctx;
     const activeAds = storeAds.filter(a => a.active && adInSchedule(a));
     const heroAssignedAds = activeAds.filter(a => !a.placement || a.placement === 'hero' || a.placement === 'both');
     const promoSplitAds = activeAds.filter(a => a.placement === 'promo_split' || a.placement === 'both');
@@ -1252,6 +1252,9 @@ export function renderHomeView(ctx) {
             </div>
           </section>
         )}
+
+        {/* 1.5 KARAMBO EL-SHOGHLAANA STRIP (under the search layer) */}
+        {renderKaramboStrip && renderKaramboStrip()}
 
         {/* 2. COMPACT QUICK CATEGORY SHORTCUTS STRIP (Compact on Mobile + Scrolls Directly to Products!) */}
         {siteSettings.showHomeShortcuts !== false && siteSettings.showHomeModels !== false && (() => {

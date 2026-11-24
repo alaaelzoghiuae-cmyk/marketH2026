@@ -1,0 +1,1725 @@
+// ELZOGHBI App.jsx — key sections for external review (returns, sync, admin session)
+
+
+// ===== sbUpsert (lines 5422-5481) =====
+  const sbUpsert = async (tableName, recordOrArray) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid || !recordOrArray) return false;
+    const realTable = resolveActualTableName(tableName);
+    invalidateSessionTableCache(realTable);
+    if (!unsupportedColumnsRef.current[realTable]) {
+      unsupportedColumnsRef.current[realTable] = new Set();
+    }
+
+    try {
+      const cleanedInput = await externalizeBase64Deep(recordOrArray);
+      const rawList = Array.isArray(cleanedInput) ? cleanedInput : [cleanedInput];
+      if (rawList.length === 0) return true;
+
+      // Chunk large arrays into batches of 100 to prevent payload timeouts
+      const BATCH_SIZE = 100;
+      for (let b = 0; b < rawList.length; b += BATCH_SIZE) {
+        const chunk = rawList.slice(b, b + BATCH_SIZE);
+        let success = false;
+
+        for (let attempt = 0; attempt < 12; attempt++) {
+          const payload = chunk.map((r, idx) => toSnakeCaseRow(r, realTable, b + idx));
+          const res = await fetch(`${sbUrl}/rest/v1/${realTable}`, {
+            method: 'POST',
+            headers: sbHeaders(sbKey, {
+              Prefer: 'resolution=merge-duplicates,return=minimal'
+            }),
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            success = true;
+            break;
+          }
+
+          const errText = await res.text();
+          // Detect PGRST204 / 42703 missing column and strip it automatically!
+          const colMatch =
+            errText.match(/Could not find the '([^']+)' column/i) ||
+            errText.match(/column "([^"]+)" of relation/i);
+          if (colMatch && colMatch[1]) {
+            const badCol = colMatch[1];
+            unsupportedColumnsRef.current[realTable].add(badCol);
+            continue;
+          } else {
+            console.warn(`⚠️ [ELZOGHBI] تحذير حفظ جدول ${realTable} (${res.status}):`, errText);
+            break;
+          }
+        }
+
+        if (!success) return false;
+      }
+      return true;
+    } catch (err) {
+      console.error(`❌ [ELZOGHBI] خطأ اتصال أثناء حفظ ${realTable}:`, err);
+      return false;
+    }
+  };
+
+  const sbUpdate = async (tableName, id, patchObj) => {
+
+// ===== sbDelete + flush start (lines 5518-5541) =====
+  const sbDelete = async (tableName, id) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid || !id) return false;
+    const realTable = resolveActualTableName(tableName);
+    invalidateSessionTableCache(realTable);
+    const pkCol = realTable === 'brands' ? 'name' : 'id';
+    try {
+      const res = await fetch(`${sbUrl}/rest/v1/${realTable}?${pkCol}=eq.${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: sbHeaders(sbKey)
+      });
+      return res.ok;
+    } catch (err) {}
+    return false;
+  };
+
+  // Flush only the added/edited/deleted rows to Supabase (ultra-fast, <2KB per change!)
+  const flushPendingDiffsToSupabase = async (showSuccessToast = false) => {
+    const { isValid } = getSupabaseConfig();
+    if (!isValid) return false;
+    if (isSavingRef.current) return false;
+    isSavingRef.current = true;
+
+    const SLICE_TO_TABLE = {
+
+// ===== diff detector region (lines 5784-6921) =====
+  const APPEND_ONLY_SLICES = new Set(['returnsList', 'complaints', 'orders', 'accountRequests', 'sourcingRequests']);
+
+  // --- Automatic Per-Row Diff Detector & Instant Local Persistence ---
+  useEffect(() => {
+    const currentSlices = {
+      parts,
+      models,
+      brands,
+      groups,
+      storeAds,
+      showcaseBars,
+      promoCodes,
+      clients,
+      accountRequests,
+      orders,
+      returnsList,
+      complaints,
+      autoTemplates,
+      sourcingRequests
+    };
+
+    // 1. Non-blocking localStorage persistence (skips serializing >2,000 parts on every keystroke so 5,000+ products stay 60FPS!)
+    try {
+      Object.entries(currentSlices).forEach(([k, v]) => {
+        if (k === 'parts' && Array.isArray(v) && v.length > 2000) return;
+        if (prevSlicesRef.current && prevSlicesRef.current[k] === v) return;
+        window.localStorage.setItem('elzoghbi_v2_' + k, JSON.stringify(v));
+      });
+      window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(siteSettings));
+      window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+      window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(currencies));
+      window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(notifications));
+      window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(brandImages));
+    } catch (e) {}
+
+    // Initialize baseline snapshot on first mount without triggering network writes
+    if (!prevSlicesRef.current) {
+      prevSlicesRef.current = {
+        ...currentSlices,
+        siteSettings,
+        adminCredentials,
+        currencies,
+        notifications
+      };
+      return;
+    }
+
+    // If initial server pull hasn't completed yet, or this render was triggered by incoming server pull / cross-tab event, update baseline and skip diffing!
+    if (!hasCloudInitialPullCompletedRef.current || isIncomingSyncRef.current || Date.now() < incomingSyncUntilRef.current) {
+      isIncomingSyncRef.current = false;
+      prevSlicesRef.current = {
+        ...currentSlices,
+        siteSettings,
+        adminCredentials,
+        currencies,
+        notifications
+      };
+      return;
+    }
+
+    // 2. Compute exact row-level diffs (Added, Modified, Deleted) across all slices
+    let hasAnyMutation = false;
+    const prev = prevSlicesRef.current;
+
+    for (const [sliceKey, currArr] of Object.entries(currentSlices)) {
+      const prevArr = prev[sliceKey];
+      if (prevArr === currArr) continue;
+      if (!Array.isArray(currArr) || !Array.isArray(prevArr)) continue;
+
+      if (sliceKey === 'brands') {
+        const prevSet = new Set(prevArr);
+        const currSet = new Set(currArr);
+        currArr.forEach(b => {
+          if (!prevSet.has(b)) {
+            markLocalUpsert('brands', b);
+            hasAnyMutation = true;
+          }
+        });
+        prevArr.forEach(b => {
+          if (!currSet.has(b)) {
+            markLocalDelete('brands', b);
+            hasAnyMutation = true;
+          }
+        });
+        continue;
+      }
+
+      const prevMap = new Map();
+      prevArr.forEach((item, idx) => {
+        const id = String(item?.id || item?.code || item?.name || '');
+        if (id) prevMap.set(id, { item, idx });
+      });
+
+      const currIds = new Set();
+      currArr.forEach((item, idx) => {
+        const id = String(item?.id || item?.code || item?.name || '');
+        if (!id) return;
+        currIds.add(id);
+        const prevEntry = prevMap.get(id);
+        const itemWithOrder = (sliceKey === 'storeAds' || sliceKey === 'showcaseBars')
+          ? { ...item, sortOrder: idx }
+          : item;
+        const orderChanged = (sliceKey === 'storeAds' || sliceKey === 'showcaseBars') && prevEntry && prevEntry.idx !== idx;
+        if (prevEntry && prevEntry.item === item && !orderChanged) return;
+        if (!prevEntry || orderChanged || JSON.stringify(prevEntry.item) !== JSON.stringify(item)) {
+          markLocalUpsert(sliceKey, itemWithOrder);
+          hasAnyMutation = true;
+        }
+      });
+
+      prevMap.forEach((_, id) => {
+        if (!currIds.has(id)) {
+          if (APPEND_ONLY_SLICES.has(sliceKey)) return;
+          markLocalDelete(sliceKey, id);
+          hasAnyMutation = true;
+        }
+      });
+    }
+
+    // Check settings / credentials / currencies / notifications diff
+    if (
+      prev.siteSettings !== siteSettings ||
+      prev.adminCredentials !== adminCredentials ||
+      prev.currencies !== currencies ||
+      prev.notifications !== notifications
+    ) {
+      if (
+        JSON.stringify(prev.siteSettings) !== JSON.stringify(siteSettings) ||
+        JSON.stringify(prev.adminCredentials) !== JSON.stringify(adminCredentials) ||
+        JSON.stringify(prev.currencies) !== JSON.stringify(currencies) ||
+        JSON.stringify(prev.notifications) !== JSON.stringify(notifications)
+      ) {
+        if (!pendingDiffUpsertsRef.current.site_settings) pendingDiffUpsertsRef.current.site_settings = {};
+        pendingDiffUpsertsRef.current.site_settings.main = {
+          id: 'main',
+          settings: siteSettings,
+          currencies: currencies,
+          notifications: notifications,
+          updated_at: new Date().toISOString()
+        };
+        try {
+          sessionStorage.setItem('hm_local_settings_v8', JSON.stringify({
+            settings: siteSettings,
+            credentials: adminCredentials,
+            currencies: currencies,
+            ts: Date.now()
+          }));
+        } catch (e) {}
+        hasAnyMutation = true;
+      }
+    }
+
+    prevSlicesRef.current = {
+      ...currentSlices,
+      siteSettings,
+      adminCredentials,
+      currencies,
+      notifications
+    };
+
+    if (hasAnyMutation) {
+      const nowTs = Date.now();
+      lastLocalMutationAtRef.current = nowTs;
+
+      // Broadcast only when an actual user mutation occurred
+      try {
+        window.localStorage.setItem(
+          'elzoghbi_v2_master_bundle',
+          JSON.stringify({
+            ...currentSlices,
+            siteSettings,
+            adminCredentials,
+            currencies,
+            notifications,
+            senderTabId: myTabId,
+            senderRole: (appPortal === 'admin' && adminAuthenticated) ? 'admin' : 'client',
+            updatedAt: nowTs
+          })
+        );
+      } catch (e) {}
+
+      if (diffFlushTimerRef.current) clearTimeout(diffFlushTimerRef.current);
+      diffFlushTimerRef.current = setTimeout(() => {
+        diffFlushTimerRef.current = null;
+        flushPendingDiffsToSupabase(false);
+      }, 350);
+    }
+  }, [
+    siteSettings,
+    adminCredentials,
+    currencies,
+    groups,
+    brands,
+    autoTemplates,
+    models,
+    parts,
+    clients,
+    accountRequests,
+    orders,
+    returnsList,
+    complaints,
+    promoCodes,
+    storeAds,
+    showcaseBars,
+    sourcingRequests,
+    notifications,
+    adminAuthenticated,
+    appPortal
+  ]);
+
+  // Persist user session & cart across refreshes
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('elzoghbi_v2_activeClientRole', JSON.stringify(activeRole));
+      // Only an admin-authenticated tab persists the admin session. A
+      // storefront tab sharing this browser used to overwrite the saved
+      // admin login with its own logged-out state on any cart/role
+      // change, so refreshing the dashboard signed the admin out.
+      // Explicit logout writes 'false' itself (see the logout buttons).
+      if (adminAuthenticated) {
+        window.localStorage.setItem('elzoghbi_v2_adminAuth', 'true');
+        if ((adminCredentials.username || '').trim()) {
+          window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(adminCredentials));
+        }
+      }
+      window.localStorage.setItem('elzoghbi_v2_cart_v4', JSON.stringify(cart));
+    } catch (e) {}
+  }, [activeRole, adminAuthenticated, adminCredentials, cart]);
+
+  // Real-time Cross-Tab Synchronization (Only accepts genuine mutations from other tabs)
+  useEffect(() => {
+    const handleStorageEvent = (e) => {
+      if (!e.key || !e.newValue) return;
+      try {
+        if (e.key === 'elzoghbi_v2_master_bundle') {
+          const data = JSON.parse(e.newValue);
+          if (data.senderTabId === myTabId) return;
+
+          incomingSyncUntilRef.current = Date.now() + 250;
+          isIncomingSyncRef.current = true;
+
+          if (Array.isArray(data.clients)) {
+            data.clients.forEach(c => {
+              if (c && c.id && localModifiedMapRef.current?.clients?.[c.id]) {
+                localModifiedMapRef.current.clients[c.id] = { item: c, ts: Date.now() };
+              }
+            });
+            setClients(data.clients);
+          }
+          if (Array.isArray(data.accountRequests)) setAccountRequests(data.accountRequests);
+          if (Array.isArray(data.orders)) {
+            const statusRank = { 'تم الاستلام': 1, 'جاري التجهيز': 2, 'جاهز للتسليم': 3, 'في الطريق (دليفري)': 4, 'تم التسليم': 5, 'ملغي': 6 };
+            setOrders(prevOrders => {
+              const prevMap = new Map((Array.isArray(prevOrders) ? prevOrders : []).map(o => [String(o.id), o]));
+              const merged = data.orders.map(inc => {
+                const loc = prevMap.get(String(inc.id));
+                if (!loc) return inc;
+                const incTs = Number(inc.statusUpdatedAt || 0);
+                const locTs = Number(loc.statusUpdatedAt || 0);
+                const incRank = statusRank[inc.status] || 0;
+                const locRank = statusRank[loc.status] || 0;
+                const winner = (incTs >= locTs || incRank >= locRank || inc.cashbackAwarded) ? { ...loc, ...inc } : { ...inc, ...loc };
+                if (localModifiedMapRef.current?.orders?.[winner.id]) {
+                  localModifiedMapRef.current.orders[winner.id] = { item: winner, ts: Date.now() };
+                }
+                return winner;
+              });
+              try { persistMutationMaps(); } catch (e) {}
+              return merged;
+            });
+          }
+          if (Array.isArray(data.returnsList)) setReturnsList(data.returnsList);
+          if (Array.isArray(data.complaints)) setComplaints(data.complaints);
+          if (Array.isArray(data.notifications)) setNotifications(data.notifications);
+          if (Array.isArray(data.parts)) setParts(data.parts);
+          if (Array.isArray(data.sourcingRequests)) setSourcingRequests(data.sourcingRequests);
+
+          if (data.senderRole === 'admin') {
+            if (data.siteSettings) setSiteSettings(data.siteSettings);
+            if (data.adminCredentials) setAdminCredentials(data.adminCredentials);
+            if (data.currencies) setCurrencies(data.currencies);
+            if (Array.isArray(data.groups)) setGroups(data.groups);
+            if (Array.isArray(data.brands)) setBrands(data.brands);
+            if (Array.isArray(data.autoTemplates)) setAutoTemplates(data.autoTemplates);
+            if (Array.isArray(data.models)) setModels(data.models);
+            if (Array.isArray(data.promoCodes)) setPromoCodes(data.promoCodes);
+            if (Array.isArray(data.storeAds)) setStoreAds(data.storeAds);
+            if (Array.isArray(data.showcaseBars)) setShowcaseBars(data.showcaseBars);
+          } else if (data.siteSettings) {
+            // Sync customer-side additions (restockWaitlist, analytics counters) immediately to Admin tab!
+            setSiteSettings(prev => {
+              const incWaitlist = Array.isArray(data.siteSettings.restockWaitlist) ? data.siteSettings.restockWaitlist : [];
+              const curWaitlist = Array.isArray(prev.restockWaitlist) ? prev.restockWaitlist : [];
+              const seenW = new Set();
+              const mergedWaitlist = [];
+              [...incWaitlist, ...curWaitlist].forEach(w => {
+                if (!w || !w.id || seenW.has(w.id)) return;
+                seenW.add(w.id);
+                mergedWaitlist.push(w);
+              });
+              const nextS = {
+                ...prev,
+                restockWaitlist: mergedWaitlist,
+                analyticsRecoveredCartsCount: Math.max(Number(prev.analyticsRecoveredCartsCount) || 0, Number(data.siteSettings.analyticsRecoveredCartsCount) || 0),
+                analyticsRecoveredCartsValue: Math.max(Number(prev.analyticsRecoveredCartsValue) || 0, Number(data.siteSettings.analyticsRecoveredCartsValue) || 0),
+                analyticsCouponsUsedCount: Math.max(Number(prev.analyticsCouponsUsedCount) || 0, Number(data.siteSettings.analyticsCouponsUsedCount) || 0)
+              };
+              try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(nextS)); } catch (e) {}
+              return nextS;
+            });
+          }
+        }
+      } catch (err) {}
+    };
+    const handleDirectSettingsStorage = (e) => {
+      if (!e.key || !e.newValue) return;
+      if (e.key === 'elzoghbi_v2_siteSettings' || e.key === 'elzoghbi_live_flags_ping') {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          const nextSettingsObj = e.key === 'elzoghbi_live_flags_ping' ? parsed.settings : parsed;
+          if (nextSettingsObj && typeof nextSettingsObj === 'object') {
+            incomingSyncUntilRef.current = Date.now() + 250;
+            isIncomingSyncRef.current = true;
+            try { sessionStorage.removeItem('hm_local_settings_v8'); } catch (err) {}
+            if (homeElRef && homeElRef.current) homeElRef.current = null;
+            if (searchElRef && searchElRef.current) searchElRef.current = null;
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = nextSettingsObj;
+            setSiteSettings(nextSettingsObj);
+            if (nextSettingsObj.enableQualityTiers === false) {
+              setSelectedQualityTiers({});
+            }
+          }
+        } catch (err) {}
+      }
+    };
+
+    let bc = null;
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        bc = new BroadcastChannel('elzoghbi_live_flags_channel');
+        bc.onmessage = (ev) => {
+          const msg = ev.data;
+          if (msg && msg.type === 'SITE_SETTINGS_UPDATED' && msg.settings && msg.senderTabId !== myTabId) {
+            incomingSyncUntilRef.current = Date.now() + 250;
+            isIncomingSyncRef.current = true;
+            try {
+              sessionStorage.removeItem('hm_local_settings_v8');
+              window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(msg.settings));
+            } catch (err) {}
+            if (homeElRef && homeElRef.current) homeElRef.current = null;
+            if (searchElRef && searchElRef.current) searchElRef.current = null;
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = msg.settings;
+            setSiteSettings(msg.settings);
+            if (msg.settings.enableQualityTiers === false) {
+              setSelectedQualityTiers({});
+            }
+          }
+        };
+      }
+    } catch (err) {}
+
+    window.addEventListener('storage', handleStorageEvent);
+    window.addEventListener('storage', handleDirectSettingsStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorageEvent);
+      window.removeEventListener('storage', handleDirectSettingsStorage);
+      if (bc) {
+        try { bc.close(); } catch (err) {}
+      }
+    };
+  }, [myTabId]);
+
+  // --- Smart Normalized Table Pull with Automatic Legacy Enrichment & Local Edit Protection ---
+  const lastKnownTableTimestampsRef = useRef({});
+  const hasRestoredLegacyFallbackRef = useRef(false);
+
+  const pullFromSupabaseCloud = async (silent = false) => {
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) {
+      setIsInitialCloudBooting(false);
+      hasCloudInitialPullCompletedRef.current = true;
+      return;
+    }
+
+    const isInitialBoot = !hasCloudInitialPullCompletedRef.current;
+
+    // Never overwrite while a genuine user local save is in-flight (unless this is the very first boot pull!)
+    if (!isInitialBoot && silent && (isSavingRef.current || diffFlushTimerRef.current !== null || (Date.now() - lastLocalMutationAtRef.current < 5000))) {
+      return;
+    }
+
+    try {
+      const isAdmin = appPortal === 'admin' || adminAuthenticated;
+      if (!isInitialBoot && silent && hasInitialBootPullRanRef.current && (!isAdmin || hasAdminTablesPulledRef.current)) {
+        return;
+      }
+      hasInitialBootPullRanRef.current = true;
+      if (isAdmin) hasAdminTablesPulledRef.current = true;
+
+      setCloudSyncStatus('syncing');
+      const forceRefresh = !silent; // Respect 6h localStorage cache on normal boot/F5; force only on explicit manual sync
+
+      // Helper to apply incoming state safely without triggering false local mutation diffs
+      const markIncomingWindow = () => {
+        incomingSyncUntilRef.current = Date.now() + 250;
+        isIncomingSyncRef.current = true;
+      };
+
+      // =========================================================================
+      // PHASE A (ULTRA-FAST ~150ms): Launch Settings, Ads, Showcase Bars, Brands, Groups & Promos
+      // They apply to the screen IMMEDIATELY as soon as they resolve — NEVER blocked by spare_parts!
+      // =========================================================================
+      const fastUiPromise = Promise.all([
+        sbFetchTable('site_settings', null, '&limit=5', forceRefresh),
+        sbFetchTable('store_ads', null, '&order=sort_order.asc&limit=30', forceRefresh),
+        sbFetchTable('showcase_bars', null, '&order=sort_order.asc&limit=30', forceRefresh),
+        sbFetchTable('brands', null, '&order=sort_order.asc&limit=200', forceRefresh),
+        sbFetchTable('pricing_groups', null, '&limit=50', forceRefresh),
+        sbFetchTable('promo_codes', null, '&limit=100', forceRefresh)
+      ]).then(([settingsRows, adsRows, barsRows, brandsRows, groupsRows, promosRows]) => {
+        markIncomingWindow();
+
+        // 1. Apply site_settings immediately
+        const latestLocalSettings = (() => {
+          try {
+            const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');
+            if (raw) return JSON.parse(raw);
+          } catch (e) {}
+          return null;
+        })();
+        const cfgRow = (Array.isArray(settingsRows) && settingsRows.length > 0)
+          ? (settingsRows.find(r => r.id === 'main') || settingsRows[0])
+          : null;
+        if (cfgRow) {
+          const srvSettings = cfgRow.settings || {};
+          const localTs = Number(latestLocalSettings?._updatedAt || 0);
+          const srvTs = Number(srvSettings?._updatedAt || (cfgRow.updated_at ? Date.parse(cfgRow.updated_at) : 0) || 0);
+          const winningSettings = (latestLocalSettings && localTs > srvTs)
+            ? { ...srvSettings, ...latestLocalSettings }
+            : { ...(latestLocalSettings || {}), ...srvSettings };
+          if (winningSettings && typeof winningSettings === 'object' && Object.keys(winningSettings).length > 0) {
+            const mergedSettings = {
+              ...siteSettings,
+              ...winningSettings,
+              supabaseUrl: winningSettings.supabaseUrl || sbUrl,
+              supabaseAnonKey: winningSettings.supabaseAnonKey || sbKey
+            };
+            if (prevSlicesRef.current) prevSlicesRef.current.siteSettings = mergedSettings;
+            setSiteSettings(mergedSettings);
+            try { window.localStorage.setItem('elzoghbi_v2_siteSettings', JSON.stringify(mergedSettings)); } catch (e) {}
+          }
+          if (cfgRow.credentials && typeof cfgRow.credentials === 'object' && cfgRow.credentials.username) {
+            if (prevSlicesRef.current) prevSlicesRef.current.adminCredentials = cfgRow.credentials;
+            setAdminCredentials(cfgRow.credentials);
+            try { window.localStorage.setItem('elzoghbi_v2_adminCredentials', JSON.stringify(cfgRow.credentials)); } catch (e) {}
+          }
+          if (cfgRow.currencies && typeof cfgRow.currencies === 'object' && Object.keys(cfgRow.currencies).length > 0) {
+            if (prevSlicesRef.current) prevSlicesRef.current.currencies = cfgRow.currencies;
+            setCurrencies(cfgRow.currencies);
+            try { window.localStorage.setItem('elzoghbi_v2_currencies', JSON.stringify(cfgRow.currencies)); } catch (e) {}
+          }
+          if (Array.isArray(cfgRow.notifications) && cfgRow.notifications.length > 0) {
+            setNotifications(prev => {
+              const seen = new Set();
+              const combined = [];
+              [...cfgRow.notifications, ...(Array.isArray(prev) ? prev : [])].forEach(n => {
+                if (n && n.id && !seen.has(n.id)) {
+                  seen.add(n.id);
+                  combined.push(n);
+                }
+              });
+              const sliced = combined.slice(0, 120);
+              if (prevSlicesRef.current) prevSlicesRef.current.notifications = sliced;
+              try { window.localStorage.setItem('elzoghbi_v2_notifications', JSON.stringify(sliced)); } catch (e) {}
+              return sliced;
+            });
+          }
+        }
+
+        // 2. Apply store_ads immediately (replaces INITIAL_STORE_ADS right away!)
+        if (Array.isArray(adsRows) && adsRows.length > 0) {
+          setStoreAds(() => {
+            const cleanAds = adsRows.slice().sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+            if (prevSlicesRef.current) prevSlicesRef.current.storeAds = cleanAds;
+            try { window.localStorage.setItem('elzoghbi_v2_storeAds', JSON.stringify(cleanAds)); } catch (e) {}
+            return cleanAds;
+          });
+        }
+
+        // 3. Apply showcase_bars immediately (replaces INITIAL_SHOWCASE_BARS right away!)
+        if (Array.isArray(barsRows) && barsRows.length > 0) {
+          setShowcaseBars(() => {
+            const cleanBars = barsRows.slice().sort((a, b) => (Number(a.sortOrder) || 0) - (Number(b.sortOrder) || 0));
+            if (prevSlicesRef.current) prevSlicesRef.current.showcaseBars = cleanBars;
+            try { window.localStorage.setItem('elzoghbi_v2_showcaseBars', JSON.stringify(cleanBars)); } catch (e) {}
+            return cleanBars;
+          });
+        }
+
+        // 4. Apply brands & brand images immediately
+        if (Array.isArray(brandsRows) && brandsRows.length > 0) {
+          const fetchedBrandImgs = {};
+          brandsRows.forEach(b => {
+            if (b && typeof b === 'object' && b.name && (b.image_url || b.imageUrl || b.image)) {
+              fetchedBrandImgs[String(b.name).trim()] = b.image_url || b.imageUrl || b.image;
+            }
+          });
+          setBrandImages(prev => {
+            const next = { ...OR_BRAND_IMAGES, ...prev, ...fetchedBrandImgs };
+            try { window.localStorage.setItem('elzoghbi_v2_brandImages', JSON.stringify(next)); } catch (e) {}
+            return next;
+          });
+          const explicitBrands = brandsRows
+            .map(b => String(typeof b === 'object' && b !== null ? (b.name || b.id || '') : b).trim())
+            .filter(Boolean);
+          if (explicitBrands.length > 0) {
+            setBrands(() => {
+              const mergedB = mergeOrBrandsList(explicitBrands, deletedIdsMapRef.current.brands || {}, isOrCatalogDisabledInStorage());
+              if (prevSlicesRef.current) prevSlicesRef.current.brands = mergedB;
+              try { window.localStorage.setItem('elzoghbi_v2_brands', JSON.stringify(mergedB)); } catch (e) {}
+              return mergedB;
+            });
+          }
+        }
+
+        // 5. Apply pricing_groups & promo_codes immediately
+        if (Array.isArray(groupsRows) && groupsRows.length > 0) {
+          setGroups(prev => {
+            const merged = mergeServerWithLocal('groups', prev, groupsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.groups = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_groups', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(promosRows) && promosRows.length > 0) {
+          setPromoCodes(prev => {
+            const merged = mergeServerWithLocal('promoCodes', prev, promosRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.promoCodes = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_promoCodes', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+      }).catch(() => {});
+
+      // =========================================================================
+      // PHASE B (FAST CATALOG ~250ms): Fetch Models + First 100 Custom/Latest Products
+      // Renders the storefront products immediately without waiting for thousands of rows!
+      // =========================================================================
+      const normalizeAndLinkParts = (partsInput, modelsInput) => {
+        const rawModels = Array.isArray(modelsInput) ? [...modelsInput] : [];
+        const modelIdsSet = new Set(rawModels.map(m => String(m?.id || '')));
+        const linkedParts = (Array.isArray(partsInput) ? partsInput : []).map(p => {
+          const fixedPart = { ...p };
+          if (!fixedPart.basePrice || Number(fixedPart.basePrice) <= 0) {
+            fixedPart.basePrice = Number(fixedPart.costPrice) > 0 ? Math.round(Number(fixedPart.costPrice) * 1.25) : 450;
+          }
+          if (fixedPart.stock === undefined || fixedPart.stock === null) {
+            fixedPart.stock = 15;
+          }
+          const currMdlId = String(fixedPart.modelId || '').trim();
+          if (!currMdlId || !modelIdsSet.has(currMdlId)) {
+            const pName = String(fixedPart.name || '').toLowerCase();
+            const pCompat = Array.isArray(fixedPart.compatibleModels) ? fixedPart.compatibleModels.join(' ').toLowerCase() : '';
+            const pHaystack = `${currMdlId.toLowerCase()} ${pName} ${pCompat} ${String(fixedPart.sku || '').toLowerCase()}`;
+            const matchedMdl = rawModels.find(m => {
+              const mn = String(m?.name || '').trim().toLowerCase();
+              return mn.length >= 2 && (pHaystack.includes(mn) || currMdlId.toLowerCase() === mn);
+            });
+            if (matchedMdl) {
+              fixedPart.modelId = matchedMdl.id;
+            }
+          }
+          return fixedPart;
+        });
+        return { linkedParts, rawModels };
+      };
+
+      const [modelsRows, fastCustomParts, fastLatestParts] = await Promise.all([
+        sbFetchTable('mobile_models', null, '&order=id.asc&limit=500', forceRefresh),
+        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=120', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=id.desc&limit=80', forceRefresh),
+        fastUiPromise
+      ]);
+
+      const fastMap = new Map();
+      [fastCustomParts, fastLatestParts].forEach(arr => {
+        if (Array.isArray(arr)) {
+          arr.forEach(r => {
+            if (r && r.id !== undefined) {
+              const k = String(r.id).trim();
+              if (!fastMap.has(k)) fastMap.set(k, r);
+            }
+          });
+        }
+      });
+
+      const fastPartsList = Array.from(fastMap.values());
+      const { linkedParts: initialLinkedParts, rawModels: initialModels } = normalizeAndLinkParts(fastPartsList, modelsRows);
+
+      markIncomingWindow();
+      if (initialModels.length > 0) {
+        setModels(() => {
+          const mergedM = mergeOrModelsList(initialModels, deletedIdsMapRef.current.models || {}, isOrCatalogDisabledInStorage());
+          if (prevSlicesRef.current) prevSlicesRef.current.models = mergedM;
+          try { window.localStorage.setItem('elzoghbi_v2_models', JSON.stringify(mergedM)); } catch (e) {}
+          return mergedM;
+        });
+      }
+      if (initialLinkedParts.length > 0) {
+        setParts(prev => {
+          const mergedRaw = mergeServerWithLocal('parts', prev, initialLinkedParts);
+          const merged = mergeOrPartsList(mergedRaw, deletedIdsMapRef.current.parts || {}, isOrCatalogDisabledInStorage());
+          if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
+          try { window.localStorage.setItem('elzoghbi_v2_parts', JSON.stringify(merged)); } catch (e) {}
+          return merged;
+        });
+      }
+
+      // Immediately unlock the UI so the user sees the real ads & products in ~0.3s!
+      setIsInitialCloudBooting(false);
+      setCloudSyncStatus('cloud_synced');
+      hasCloudInitialPullCompletedRef.current = true;
+
+      // =========================================================================
+      // PHASE C (NON-BLOCKING BACKGROUND HYDRATION): Fetch remaining catalog items & Admin tables
+      // Runs quietly in the background without blocking the user or delaying ads/products!
+      // =========================================================================
+      setTimeout(async () => {
+        try {
+          // Single paginated catalog hydration (Cached in localStorage for 35m -> Zero redundant multi-query Egress!)
+          // Egress fix (2026-11-22): the extra 650-row catalog wave is admin-only now.
+          // Storefront visitors already get the 200 newest parts in Phase B and every
+          // brand/model/category/search navigation fetches its slice server-side via
+          // fetchSparePartsSliceOnDemand, so this wave (~665 KB) was pure waste for them.
+          const [moreCustomDate, moreAsc] = await Promise.all([
+            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=120', false) : Promise.resolve([]),
+            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.asc&limit=650', false) : Promise.resolve([])
+          ]);
+          const moreCustomSku = [];
+          const bgMap = new Map(initialLinkedParts.map(p => [String(p.id).trim(), p]));
+          [moreCustomDate, moreCustomSku, moreAsc].forEach(arr => {
+            if (Array.isArray(arr)) {
+              arr.forEach(r => {
+                if (r && r.id !== undefined) {
+                  const k = String(r.id).trim();
+                  if (!bgMap.has(k)) bgMap.set(k, r);
+                }
+              });
+            }
+          });
+          if (bgMap.size > initialLinkedParts.length) {
+            const { linkedParts: fullLinked } = normalizeAndLinkParts(Array.from(bgMap.values()), initialModels);
+            markIncomingWindow();
+            setParts(prev => {
+              const merged = mergeServerWithLocal('parts', prev, fullLinked);
+              if (prevSlicesRef.current) prevSlicesRef.current.parts = merged;
+              try { window.localStorage.setItem('elzoghbi_v2_parts', JSON.stringify(merged)); } catch (e) {}
+              return merged;
+            });
+          }
+        } catch (e) {}
+      }, 250);
+
+      if (isAdmin) {
+        const [clientsRows, ordersRows, complaintsRows, returnsRows, reqsRows, sourcingRows, templatesRows] = await Promise.all([
+          sbFetchTable('clients', null, '&limit=150', forceRefresh),
+          sbFetchTable('orders', null, '&order=created_at.desc&limit=80', forceRefresh),
+          sbFetchTable('complaints', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('returns_list', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('account_requests', null, '&order=created_at.desc&limit=50', forceRefresh),
+          sbFetchTable('sourcing_requests', null, '&order=created_at.desc&limit=40', forceRefresh),
+          sbFetchTable('auto_templates', null, '&limit=50', forceRefresh)
+        ]);
+        markIncomingWindow();
+        if (Array.isArray(templatesRows) && templatesRows.length > 0) {
+          setAutoTemplates(prev => {
+            const merged = mergeServerWithLocal('autoTemplates', prev, templatesRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.autoTemplates = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_autoTemplates', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(clientsRows) && clientsRows.length > 0) {
+          setClients(prev => {
+            const merged = mergeServerWithLocal('clients', prev, clientsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.clients = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_clients', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(ordersRows) && ordersRows.length > 0) {
+          setOrders(prev => {
+            const merged = mergeServerWithLocal('orders', prev, ordersRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.orders = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_orders', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(complaintsRows) && complaintsRows.length > 0) {
+          setComplaints(prev => {
+            const merged = mergeServerWithLocal('complaints', prev, complaintsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.complaints = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_complaints', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(returnsRows) && returnsRows.length > 0) {
+          setReturnsList(prev => {
+            const merged = mergeServerWithLocal('returnsList', prev, returnsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.returnsList = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_returnsList', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(reqsRows) && reqsRows.length > 0) {
+          setAccountRequests(prev => {
+            const merged = mergeServerWithLocal('accountRequests', prev, reqsRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.accountRequests = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_accountRequests', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+        if (Array.isArray(sourcingRows) && sourcingRows.length > 0) {
+          setSourcingRequests(prev => {
+            const merged = mergeServerWithLocal('sourcingRequests', prev, sourcingRows);
+            if (prevSlicesRef.current) prevSlicesRef.current.sourcingRequests = merged;
+            try { window.localStorage.setItem('elzoghbi_v2_sourcingRequests', JSON.stringify(merged)); } catch (e) {}
+            return merged;
+          });
+        }
+      }
+
+      if (!silent) showToast('تمت مزامنة وتحديث كافة الجداول من السيرفر بنجاح ✓', 'success');
+    } catch (err) {
+      setIsInitialCloudBooting(false);
+      hasCloudInitialPullCompletedRef.current = true;
+    }
+  };
+
+  // --- Supabase Realtime WebSocket Engine (Replaces Polling — 0 Periodic Egress!) ---
+  const [realtimeConnected, setRealtimeConnected] = useState(false);
+
+  useEffect(() => {
+    // Safety fallback: ensure initial boot loader never blocks for more than 1.8s even on slow/offline networks
+    const bootTimer = setTimeout(() => setIsInitialCloudBooting(false), 1800);
+    // 1. Single initial load on mount / portal switch
+    pullFromSupabaseCloud(true);
+
+    // 2. Establish lightweight Supabase Realtime Phoenix WebSocket for instant Order & SRC- notifications
+    const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+    if (!isValid) return undefined;
+
+    let ws = null;
+    let heartbeatTimer = null;
+    let reconnectTimer = null;
+    let refCounter = 1;
+    let isUnmounted = false;
+
+    const connectRealtime = () => {
+      if (isUnmounted) return;
+      try {
+        const wsBase = sbUrl.replace(/^http/i, 'ws');
+        const wsUrl = `${wsBase}/realtime/v1/websocket?apikey=${encodeURIComponent(sbKey)}&vsn=1.0.0`;
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          if (isUnmounted) return;
+          setRealtimeConnected(true);
+          const joinPayload = {
+            topic: 'realtime:public',
+            event: 'phx_join',
+            payload: {
+              config: {
+                broadcast: { self: false },
+                presence: { key: '' },
+                postgres_changes: [
+                  { event: '*', schema: 'public', table: 'orders' },
+                  { event: '*', schema: 'public', table: 'sourcing_requests' },
+                  { event: '*', schema: 'public', table: 'account_requests' },
+                  { event: '*', schema: 'public', table: 'returns_list' },
+                  { event: '*', schema: 'public', table: 'complaints' },
+                  { event: '*', schema: 'public', table: 'spare_parts' },
+                  { event: '*', schema: 'public', table: 'mobile_models' },
+                  { event: '*', schema: 'public', table: 'store_ads' }
+                ]
+              }
+            },
+            ref: String(refCounter++)
+          };
+          ws.send(JSON.stringify(joinPayload));
+
+          if (heartbeatTimer) clearInterval(heartbeatTimer);
+          heartbeatTimer = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                topic: 'phoenix',
+                event: 'heartbeat',
+                payload: {},
+                ref: String(refCounter++)
+              }));
+            }
+          }, 30000);
+        };
+
+        ws.onmessage = (evt) => {
+          if (isUnmounted || !evt.data) return;
+          try {
+            const msg = JSON.parse(evt.data);
+            const changeData = msg?.payload?.data;
+            if (!changeData || !changeData.table) return;
+
+            const { table, type, record, old_record } = changeData;
+            invalidateSessionTableCache(table);
+            incomingSyncUntilRef.current = Date.now() + 250;
+            isIncomingSyncRef.current = true;
+
+            const applyRealtimeRow = (setter, storageKey, rowObj, isDelete, delId) => {
+              setter(prev => {
+                const list = Array.isArray(prev) ? prev : [];
+                let next;
+                if (isDelete) {
+                  next = list.filter(item => String(item?.id) !== String(delId));
+                } else {
+                  if (storageKey === 'elzoghbi_v2_orders' && rowObj && rowObj.id) {
+                    const stamped = { ...rowObj, statusUpdatedAt: Date.now() };
+                    if (localModifiedMapRef.current?.orders) {
+                      localModifiedMapRef.current.orders[stamped.id] = { item: stamped, ts: Date.now() };
+                      try { persistMutationMaps(); } catch (e) {}
+                    }
+                    rowObj = stamped;
+                  }
+                  const exists = list.some(item => String(item?.id) === String(rowObj.id));
+                  next = exists
+                    ? list.map(item => (String(item?.id) === String(rowObj.id) ? { ...item, ...rowObj } : item))
+                    : [rowObj, ...list];
+                }
+                try { window.localStorage.setItem(storageKey, JSON.stringify(next)); } catch (e) {}
+                return next;
+              });
+            };
+
+            const isDel = type === 'DELETE';
+            const delId = old_record?.id || record?.id;
+            const camelRow = record ? toCamelCaseRow(record) : null;
+
+            if (table === 'orders' && (camelRow || isDel)) {
+              applyRealtimeRow(setOrders, 'elzoghbi_v2_orders', camelRow, isDel, delId);
+              if (type === 'INSERT' && camelRow) {
+                try {
+                  if (typeof window.__elzoghbiEnqueueSocialProof === 'function') {
+                    window.__elzoghbiEnqueueSocialProof(camelRow);
+                  }
+                } catch (e) {}
+                const notif = {
+                  id: `ntf_rt_${Date.now()}`,
+                  target: 'admin',
+                  type: 'new_order',
+                  title: `⚡ أوردر جديد فوري (${camelRow.id})`,
+                  msg: `العميل ${camelRow.clientName || 'زائر'} أرسل طلباً جديداً الآن عبر Realtime`,
+                  time: 'الآن',
+                  read: false,
+                  orderId: camelRow.id
+                };
+                setNotifications(prev => [notif, ...prev]);
+                if (appPortal === 'admin' || adminAuthenticated) {
+                  showToast(`⚡ وصل أوردر جديد الآن: ${camelRow.id} (${camelRow.clientName || ''})`, 'success');
+                }
+              }
+            } else if (table === 'sourcing_requests' && (camelRow || isDel)) {
+              applyRealtimeRow(setSourcingRequests, 'elzoghbi_v2_sourcingRequests', camelRow, isDel, delId);
+              if (type === 'INSERT' && camelRow) {
+                const notif = {
+                  id: `ntf_src_${Date.now()}`,
+                  target: 'admin',
+                  type: 'sourcing',
+                  title: `🌍 طلب توفير خاص جديد (${camelRow.id})`,
+                  msg: `${camelRow.clientName || 'عميل'}: ${camelRow.partName || camelRow.name || 'قطعة خاصة'}`,
+                  time: 'الآن',
+                  read: false
+                };
+                setNotifications(prev => [notif, ...prev]);
+                if (appPortal === 'admin' || adminAuthenticated) {
+                  showToast(`🌍 طلب توفير جديد (${camelRow.id}): ${camelRow.partName || camelRow.name}`, 'info');
+                }
+              }
+            } else if (table === 'account_requests' && (camelRow || isDel)) {
+              applyRealtimeRow(setAccountRequests, 'elzoghbi_v2_accountRequests', camelRow, isDel, delId);
+              if (type === 'INSERT' && camelRow && (appPortal === 'admin' || adminAuthenticated)) {
+                showToast(`👤 طلب فتح حساب جديد من: ${camelRow.shopName || camelRow.name}`, 'info');
+              }
+            } else if (table === 'returns_list' && (camelRow || isDel)) {
+              applyRealtimeRow(setReturnsList, 'elzoghbi_v2_returnsList', camelRow, isDel, delId);
+            } else if (table === 'complaints' && (camelRow || isDel)) {
+              applyRealtimeRow(setComplaints, 'elzoghbi_v2_complaints', camelRow, isDel, delId);
+            } else if (table === 'spare_parts' && (camelRow || isDel)) {
+              applyRealtimeRow(setParts, 'elzoghbi_v2_parts', camelRow, isDel, delId);
+            } else if (table === 'mobile_models' && (camelRow || isDel)) {
+              applyRealtimeRow(setModels, 'elzoghbi_v2_models', camelRow, isDel, delId);
+            } else if (table === 'store_ads' && (camelRow || isDel)) {
+              applyRealtimeRow(setStoreAds, 'elzoghbi_v2_storeAds', camelRow, isDel, delId);
+            }
+          } catch (e) {}
+        };
+
+        ws.onclose = () => {
+          setRealtimeConnected(false);
+          if (heartbeatTimer) {
+            clearInterval(heartbeatTimer);
+            heartbeatTimer = null;
+          }
+          if (!isUnmounted) {
+            reconnectTimer = setTimeout(connectRealtime, 5000);
+          }
+        };
+
+        ws.onerror = () => {
+          try { ws.close(); } catch (e) {}
+        };
+      } catch (e) {}
+    };
+
+    // Egress fix (2026-11-22): Realtime is only needed in the admin panel (order alerts
+    // + cross-device sync). Storefront visitors were also subscribing to postgres_changes
+    // on 8 tables, so every bulk catalog edit broadcast full rows to every open shop tab
+    // and invalidated their table caches (refetch storms) — a major egress multiplier.
+    if (appPortal === 'admin' || adminAuthenticated) {
+      connectRealtime();
+    }
+
+    return () => {
+      isUnmounted = true;
+      if (heartbeatTimer) clearInterval(heartbeatTimer);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      if (ws) {
+        try { ws.close(); } catch (e) {}
+      }
+    };
+  }, [siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey, adminAuthenticated, appPortal]);
+
+  // Ultra-Tiny 60s Admin Delta Check (~350 bytes only, paused when tab hidden, ZERO full-clients table Egress!)
+  useEffect(() => {
+    if (appPortal !== 'admin' && !adminAuthenticated) return undefined;
+    const pollAdminAlerts = async () => {
+      try {
+        if (typeof document !== 'undefined' && document.hidden) return;
+        const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+        if (!isValid) return;
+        // Step 1: Tiny ~80-byte ID probe; only fetch full order rows if a truly new order ID appeared!
+        const probeRes = await fetch(`${sbUrl}/rest/v1/orders?select=id&order=created_at.desc&limit=1`, {
+          headers: sbHeaders(sbKey)
+        });
+        if (!probeRes.ok) return;
+        const probeRows = await probeRes.json();
+        const latestId = Array.isArray(probeRows) && probeRows[0]?.id ? String(probeRows[0].id) : '';
+        if (!latestId || orders.some(o => String(o.id) === latestId)) return;
+        const ordRes = await fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=5`, {
+          headers: sbHeaders(sbKey)
+        });
+        if (ordRes.ok) {
+          const rawOrders = await ordRes.json();
+          if (Array.isArray(rawOrders) && rawOrders.length > 0) {
+            const freshOrders = rawOrders.map(toCamelCaseRow);
+            setOrders(prev => {
+              const prevIds = new Set(prev.map(o => String(o.id)));
+              const brandNew = freshOrders.filter(o => o && o.id && !prevIds.has(String(o.id)));
+              if (brandNew.length > 0) {
+                playNotificationSound();
+                brandNew.forEach(bo => {
+                  const notif = {
+                    id: `ntf_poll_${bo.id}_${Date.now()}`,
+                    target: 'admin',
+                    type: 'new_order',
+                    title: `🔔 طلبية جديدة #${bo.id} (${bo.clientName || 'عميل'})`,
+                    msg: `وصل الآن طلب جديد من "${bo.clientName || 'عميل'}" بقيمة ${(bo.items || []).reduce((s, i) => s + (Number(i.unitPriceBase) || 0) * (Number(i.qty) || 1), 0)} ج.م`,
+                    time: 'الآن',
+                    read: false,
+                    orderId: bo.id
+                  };
+                  setNotifications(nPrev => [notif, ...nPrev.filter(x => x.orderId !== bo.id)]);
+                  showToast(`🔔 وصل أوردر جديد الآن: #${bo.id} (${bo.clientName || ''})`, 'success');
+                });
+              }
+              return mergeServerWithLocal('orders', prev, freshOrders);
+            });
+          }
+        }
+      } catch (e) {}
+    };
+    const timer = setInterval(pollAdminAlerts, 300000); // 5 minutes (Realtime WS handles instant alerts)
+    return () => clearInterval(timer);
+  }, [appPortal, adminAuthenticated, siteSettings?.supabaseUrl, siteSettings?.supabaseAnonKey]);
+
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [placedOrderInfo, setPlacedOrderInfo] = useState(null);
+
+  // --- Toast Notification Banner ---
+  const [toast, setToast] = useState(null);
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 4200);
+  };
+
+  // --- Modals State ---
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [printModalOrder, setPrintModalOrder] = useState(null); // { order, mode: 'invoice' | 'thermal' | 'picking' }
+  const [editingOrder, setEditingOrder] = useState(null); // Deep copy of order for Live Invoice Editor
+  const [selectedAdminClientId, setSelectedAdminClientId] = useState('cli_1');
+  const [returnModalOrder, setReturnModalOrder] = useState(null);
+  const [newPartModalOpen, setNewPartModalOpen] = useState(false);
+  const [newModelModalOpen, setNewModelModalOpen] = useState(false);
+
+  // --- Checkout Form State ---
+  const [checkoutAddressChoice, setCheckoutAddressChoice] = useState('primary');
+  const [customAddressText, setCustomAddressText] = useState('');
+  const [orderNotes, setOrderNotes] = useState('');
+  const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState(null);
+  const [useWalletBalance, setUseWalletBalance] = useState(true);
+  const [paymentMethod, setPaymentMethod] = useState('كاش عند الاستلام');
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [paymentBoxOpen, setPaymentBoxOpen] = useState(false);
+  const [visibilityBoxOpen, setVisibilityBoxOpen] = useState(false);
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const [openAdminCards, setOpenAdminCards] = useState({});
+  const [showClosedItems, setShowClosedItems] = useState(false);
+  const toggleAdminCard = id => {
+    setOpenAdminCards(prev => {
+      const nextOpen = !prev[id];
+      if (nextOpen && String(id).startsWith('src_')) {
+        fetchSingleSourcingDetailsOnDemand(String(id).slice(4));
+      }
+      return { ...prev, [id]: nextOpen };
+    });
+  };
+  const [lang, setLang] = useState(() => {
+    try { return localStorage.getItem('hm_lang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; }
+  });
+  const changeLang = l => {
+    setLang(l);
+    try { localStorage.setItem('hm_lang', l); } catch (e) {}
+  };
+  const [announceBoxOpen, setAnnounceBoxOpen] = useState(false);
+  const [headerCompact, setHeaderCompact] = useState(false);
+  const [filterSheet, setFilterSheet] = useState(null);
+  const [gridLimit, setGridLimit] = useState(18);
+  const [storePage, setStorePage] = useState(1);
+  const [storeExtraEightShown, setStoreExtraEightShown] = useState(false);
+  const [quickStockPage, setQuickStockPage] = useState(1);
+  const [adminSelectedModelId, setAdminSelectedModelId] = useState('ALL');
+  const [adminClientsFilterType, setAdminClientsFilterType] = useState('ALL'); // 'ALL' | 'DEBT' | 'CREDIT' | 'PENDING'
+  const [adminClientsGroupFilter, setAdminClientsGroupFilter] = useState('ALL');
+  const [adminClientDossierTab, setAdminClientDossierTab] = useState('profile'); // 'profile' | 'wallet' | 'orders'
+
+  // Reset customer pagination to Page 1 AND ensure all parts for the selected Brand/Model are fetched whenever any filter changes
+  useEffect(() => {
+    setStorePage(1);
+    setStoreExtraEightShown(false);
+    setGridLimit(18);
+    if (selectedModelId && selectedModelId !== 'ALL') {
+      fetchSparePartsSliceOnDemand({ modelId: selectedModelId, limit: 300 });
+    } else if (selectedBrand && selectedBrand !== 'ALL') {
+      fetchSparePartsSliceOnDemand({ brand: selectedBrand, limit: 500 });
+    } else if (searchQuery && searchQuery.trim().length >= 2) {
+      fetchSparePartsSliceOnDemand({ search: searchQuery.trim(), limit: 200 });
+    }
+  }, [selectedBrand, selectedModelId, selectedCategory, searchQuery, storeStockFilter, storeQualityFilter, storeSortBy]);
+
+  // All catalog items & counts are already loaded in memory and cached in sessionStorage -> zero extra network calls needed on filter/page change!
+
+  // On-Demand Full Details & Secondary Images Fetch when customer opens a Product Detail Modal
+  useEffect(() => {
+    if (selectedDetailItem?.part?.id) {
+      fetchSinglePartFullDetailsOnDemand(selectedDetailItem.part.id);
+    }
+  }, [selectedDetailItem?.part?.id]);
+
+  // Smooth scroll to top of products grid whenever storePage changes
+  useEffect(() => {
+    if (clientTab === 'search') {
+      const timer = requestAnimationFrame(() => {
+        if (storeGridTopRef.current) {
+          const rect = storeGridTopRef.current.getBoundingClientRect();
+          const targetY = Math.max(0, rect.top + window.scrollY - 96);
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+      return () => cancelAnimationFrame(timer);
+    }
+    return undefined;
+  }, [storePage]);
+
+  // Toggle Star on a Product or Model for Ads
+  const handleToggleTargetedAdPart = (partObj, e) => {
+    if (e) e.stopPropagation();
+    const nextPromoted = !partObj.isPromotedAd;
+    setParts(prev => prev.map(p => (p.id === partObj.id ? { ...p, isPromotedAd: nextPromoted } : p)));
+    const targetUrl = `${window.location.origin}${window.location.pathname}#p-${encodeURIComponent(partObj.id)}`;
+    if (nextPromoted) {
+      try { navigator.clipboard && navigator.clipboard.writeText(targetUrl); } catch (err) {}
+      showToast(`⭐ تمت إضافة "${partObj.name}" لقائمة الإعلانات ونسخ الرابط المباشر ✓`, 'success');
+    } else {
+      showToast(`تمت إزالة "${partObj.name}" من قائمة الإعلانات.`, 'info');
+    }
+  };
+
+  const handleToggleTargetedAdModel = (modelObj, e) => {
+    if (e) e.stopPropagation();
+    const nextPromoted = !modelObj.isPromotedAd;
+    setModels(prev => prev.map(m => (m.id === modelObj.id ? { ...m, isPromotedAd: nextPromoted } : m)));
+    const targetUrl = `${window.location.origin}${window.location.pathname}#m-${encodeURIComponent(modelObj.id)}`;
+    if (nextPromoted) {
+      try { navigator.clipboard && navigator.clipboard.writeText(targetUrl); } catch (err) {}
+      showToast(`⭐ تمت إضافة موديل "${modelObj.name}" لقائمة الإعلانات ونسخ الرابط المباشر ✓`, 'success');
+    } else {
+      showToast(`تمت إزالة موديل "${modelObj.name}" من قائمة الإعلانات.`, 'info');
+    }
+  };
+  const [sheetExpanded, setSheetExpanded] = useState(false);
+  const [sheetDrag, setSheetDrag] = useState(0);
+  const [sheetDragging, setSheetDragging] = useState(false);
+  const sheetStartYRef = React.useRef(0);
+  const blankSrcForm = c => ({ name: '', desc: '', phone: (c && c.phone) || '', image: '', accept: false });
+  const [sourcingFormOpen, setSourcingFormOpen] = useState(false);
+  const [srcSheetExp, setSrcSheetExp] = useState(false);
+  const [srcSheetDrag, setSrcSheetDrag] = useState(0);
+  const [srcSheetDragging, setSrcSheetDragging] = useState(false);
+  const srcSheetStartRef = React.useRef(0);
+  const [srcForm, setSrcForm] = useState(() => blankSrcForm(null));
+  const [pendingSourcingOpen, setPendingSourcingOpen] = useState(false);
+  const [srcDrafts, setSrcDrafts] = useState({});
+  const [srcDraftImgs, setSrcDraftImgs] = useState({});
+  const [srcDraftPdf, setSrcDraftPdf] = useState({});
+  const [srcFilter, setSrcFilter] = useState('active');
+  const [srcSettingsOpen, setSrcSettingsOpen] = useState(false);
+  const [srcPriceDraft, setSrcPriceDraft] = useState({});
+  const [visitStats, setVisitStats] = useState(null);
+
+// ===== handleSubmitReturn (lines 29364-29411) =====
+    const handleSubmitReturn = async (e) => {
+      e.preventDefault();
+      const newRet = {
+        id: `RET-${Date.now().toString().slice(-6)}`,
+        orderId: returnModalOrder.id,
+        clientId: returnModalOrder.clientId,
+        clientName: returnModalOrder.clientName,
+        partId: selectedItem.partId,
+        partName: selectedItem.name,
+        qty: 1,
+        refundAmountBase: selectedItem.unitPriceBase,
+        reason: retReason.trim() || 'مفيش وصف',
+        photos: retPhotos,
+        status: 'قيد المراجعة',
+        resolutionType: '',
+        adminResponse: '',
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+      };
+      // Await the server write: on failure keep the form open and say so
+      // (fire-and-forget used to show success while nothing arrived).
+      const savedOk = await sbUpsert('returns_list', newRet);
+      if (!savedOk) {
+        showToast('معلش، طلب الإرجاع ماوصلش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
+      setReturnsList(prev => [newRet, ...prev]);
+      markLocalUpsert('returnsList', newRet);
+      setNotifications(prev => [
+        {
+          id: `ntf_ret_${Date.now()}`,
+          target: 'admin',
+          type: 'return',
+          title: `↩️ طلب إرجاع جديد (${newRet.id})`,
+          msg: `العميل "${newRet.clientName}" طلب إرجاع "${newRet.partName}" من فاتورة ${newRet.orderId}.`,
+          time: 'الآن',
+          read: false
+        },
+        ...prev
+      ]);
+      setReturnModalOrder(null);
+      setRetReason('');
+      setRetPhotos([]);
+      setClientTab('account');
+      setAccountSubTab('returns');
+      showToast('طلب الاسترجاع والصور وصلوا لقسم الضمان!', 'success');
+    };
+
+    return (
+
+// ===== complaints handlers (lines 13998-14037) =====
+    const handleSendComplaint = async (e) => {
+      e.preventDefault();
+      if (!newComplaintSubject.trim() || !newComplaintMsg.trim()) return;
+      const newTck = {
+        id: `TCK-${503 + complaints.length}`,
+        clientId: currentClient.id,
+        clientName: currentClient.name,
+        type: newComplaintType,
+        subject: newComplaintSubject,
+        message: newComplaintMsg,
+        status: 'مفتوح',
+        adminReply: '',
+        replies: [],
+        createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+      };
+      const savedOk = await sbUpsert('complaints', newTck);
+      if (!savedOk) {
+        showToast('معلش، رسالتك ماوصلتش للسيرفر. اتأكد من النت وجرّب تاني.', 'error');
+        return;
+      }
+      setComplaints(prev => [newTck, ...prev]);
+      markLocalUpsert('complaints', newTck);
+      setNotifications(prev => [
+        {
+          id: `ntf_tck_${Date.now()}`,
+          target: 'admin',
+          type: 'complaint',
+          title: `💬 رسالة عميل جديدة (${newTck.id})`,
+          msg: `${newTck.clientName}: ${newTck.subject}`,
+          time: 'الآن',
+          read: false
+        },
+        ...prev
+      ]);
+      setNewComplaintSubject('');
+      setNewComplaintMsg('');
+      showToast('رسالتك وصلت للإدارة وهنرد عليك قريب.', 'success');
+    };
+
+    const handleClientSendFollowup = async (ticketId) => {
+
+// ===== admin login (lines 14742-15142) =====
+  const handleAdminLoginSubmit = async (e) => {
+    e.preventDefault();
+    const u = adminLoginUser.trim().toLowerCase();
+    const p = adminLoginPass;
+
+    // Security fix #7 (Stage B): verify on the server via RPC so the app
+    // never needs the admin credentials downloaded to the browser.
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (isValid) {
+        const res = await fetch(`${sbUrl}/rest/v1/rpc/verify_admin_login`, {
+          method: 'POST',
+          headers: sbHeaders(sbKey, { 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ p_username: u, p_password: p })
+        });
+        if (res.ok) {
+          const ok = await res.json();
+          if (ok === true) {
+            setAdminAuthenticated(true);
+            showToast('دخلت لوحة تحكم الإدارة!', 'success');
+          } else {
+            showToast('اسم المستخدم أو كلمة المرور غلط!', 'error');
+          }
+          return;
+        }
+      }
+    } catch (err) {}
+
+    // Transitional fallback (only while the RPC is unreachable): compare
+    // against the credentials synced from site_settings.
+    const isSyncedMatch =
+      u === (adminCredentials.username || 'admin').trim().toLowerCase() &&
+      p === adminCredentials.password;
+
+    if (isSyncedMatch) {
+      setAdminAuthenticated(true);
+      showToast('دخلت لوحة تحكم الإدارة!', 'success');
+    } else {
+      showToast('اسم المستخدم أو كلمة المرور غلط!', 'error');
+    }
+  };
+
+  // --- Universal Modal for Confirming Delete Actions ---
+  const renderConfirmDialogModal = () => {
+    if (!confirmDialog) return null;
+    return (
+      <div className="fixed inset-0 bg-nav backdrop-blur-xs z-[70] flex items-center justify-center p-4">
+        <div className="bg-surface rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-line animate-in fade-in zoom-in-95 duration-200">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center shrink-0">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-base font-extrabold text-fg">{confirmDialog.title}</h3>
+              <p className="text-xs text-muted mt-0.5">أكّد عشان تكمّل، الإجراء ده نهائي.</p>
+            </div>
+          </div>
+          <div className="p-3.5 bg-surface2 rounded-2xl border border-line text-xs font-bold text-muted leading-relaxed">
+            {confirmDialog.message}
+          </div>
+          <div className="flex items-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={confirmDialog.onConfirm}
+              className="flex-1 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-md shadow-rose-600/20 transition flex items-center justify-center gap-1.5"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>{confirmDialog.confirmText}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmDialog(null)}
+              className="py-3 px-5 rounded-xl bg-surface2 hover:bg-surface2 text-muted font-extrabold text-xs transition"
+            >
+              إلغاء
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderAdminSubTabBar = (tabs, activeId, onSelect) => {
+    const tabPalettes = [
+      { idle: 'border-blue-500/25 bg-blue-500/5 text-fg hover:border-blue-500/60', act: 'bg-[#2563EB] text-white border-[#2563EB] shadow-md shadow-blue-600/20' },
+      { idle: 'border-violet-500/25 bg-violet-500/5 text-fg hover:border-violet-500/60', act: 'bg-violet-600 text-white border-violet-600 shadow-md shadow-violet-600/20' },
+      { idle: 'border-emerald-500/25 bg-emerald-500/5 text-fg hover:border-emerald-500/60', act: 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20' },
+      { idle: 'border-amber-500/30 bg-amber-500/5 text-fg hover:border-amber-500/60', act: 'bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/20' },
+      { idle: 'border-cyan-500/25 bg-cyan-500/5 text-fg hover:border-cyan-500/60', act: 'bg-cyan-600 text-white border-cyan-600 shadow-md shadow-cyan-600/20' },
+      { idle: 'border-rose-500/25 bg-rose-500/5 text-fg hover:border-rose-500/60', act: 'bg-rose-600 text-white border-rose-600 shadow-md shadow-rose-600/20' },
+      { idle: 'border-indigo-500/25 bg-indigo-500/5 text-fg hover:border-indigo-500/60', act: 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-600/20' }
+    ];
+    return (
+      <div className="bg-surface rounded-2xl p-2.5 border border-line shadow-xs flex flex-wrap items-center gap-2">
+        {tabs.map((tb, idx) => {
+          const isAct = activeId === tb.id;
+          const pal = tabPalettes[idx % tabPalettes.length];
+          return (
+            <button
+              key={tb.id}
+              type="button"
+              onClick={() => onSelect(tb.id)}
+              className={`px-3.5 py-2.5 rounded-xl border text-xs font-extrabold flex items-center gap-2 transition-all ${
+                isAct ? pal.act : pal.idle
+              }`}
+            >
+              {tb.icon && <span className="text-sm">{tb.icon}</span>}
+              <span>{tb.label}</span>
+              {tb.badge !== undefined && tb.badge !== null && (
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                    isAct ? 'bg-black/20 text-current' : 'bg-surface text-fg border border-line'
+                  }`}
+                >
+                  {tb.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderAdminDashboard = () => {
+    const pendingReqCount = accountRequests.filter(r => r.status === 'pending').length;
+    const pendingRetCount = returnsList.filter(r => r.status === 'قيد المراجعة' && !r.closed).length;
+    const openComplaintsCount = complaints.filter(c => c.status !== 'مغلق').length;
+    const newOrdersCount = orders.filter(o => o.status === 'تم الاستلام').length;
+    const newSourcingCount = sourcingRequests.filter(r => r.status === 'جديد' && !r.closed).length;
+
+    if (!adminAuthenticated) {
+      return (
+        <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+          <div className="bg-surface border border-line rounded-3xl max-w-md w-full p-8 shadow-2xl space-y-6 text-fg">
+            <div className="text-center space-y-2">
+              <img
+                src={ELZOGHBI_LOGO}
+                alt="ELZOGHBI Logo"
+                className="w-16 h-16 rounded-2xl object-contain mx-auto bg-[#050B1C] p-1 border border-[#3B82F6]/50 shadow-lg"
+              />
+              <h1 className="text-xl font-black tracking-tight text-fg">
+                بوابة الإدارة المركزية — ELZOGHBI ERP
+              </h1>
+              <p className="text-xs text-muted">أدخل بيانات المدير للوصول إلى لوحة التحكم</p>
+            </div>
+
+            <form onSubmit={handleAdminLoginSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="font-bold text-muted block mb-1.5">اسم المستخدم:</label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-muted absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    required
+                    value={adminLoginUser}
+                    onChange={e => setAdminLoginUser(e.target.value)}
+                    placeholder="admin"
+                    className="w-full pr-10 pl-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-muted block mb-1.5">كلمة المرور:</label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-muted absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <PasswordInput
+                    type="password"
+                    required
+                    value={adminLoginPass}
+                    onChange={e => setAdminLoginPass(e.target.value)}
+                    placeholder="••••••"
+                    className="w-full pr-10 pl-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs shadow-lg flex items-center justify-center gap-2 transition"
+              >
+                <Shield className="w-4 h-4" />
+                <span>دخول لوحة التحكم</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => switchPortal('storefront')}
+                className="w-full py-2.5 rounded-xl bg-surface2 hover:border-[#3B82F6] border border-line text-fg font-bold text-xs transition"
+              >
+                العودة إلى واجهة المتجر
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    // Single source of truth for waitlist demand (sidebar badge + waitlist
+    // page header): registered entries plus anonymous per-part counters
+    // that exceed the registered entries for the same part.
+    const totalRestockAlertsCount = (() => {
+      const wl = Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist : [];
+      const entriesByPart = {};
+      wl.forEach(w => { const k = String(w.partId || ''); entriesByPart[k] = (entriesByPart[k] || 0) + 1; });
+      let total = wl.length;
+      parts.forEach(p => {
+        const c = Number(p.waitlistCount) || 0;
+        const e = entriesByPart[String(p.id)] || 0;
+        if (c > e) total += c - e;
+      });
+      return total;
+    })();
+
+    const navGroups = [
+      {
+        groupTitle: 'الملخص والتقارير',
+        items: [
+          {
+            id: 'overview',
+            label: 'الرئيسية والملخص',
+            desc: 'مؤشرات الأداء والتنبيهات العاجلة والزيارات',
+            keywords: 'ملخص احصائيات زيارات ارباح رئيسية',
+            icon: TrendingUp,
+            badge: null,
+            urgent: false
+          },
+          {
+            id: 'bi_analytics',
+            label: 'تحليلات الأعمال (BI)',
+            desc: 'مبيعات فعلية، متوسط الطلب، أداء التصنيفات، وتوصيات AI',
+            keywords: 'تحليلات bi ارباح مبيعات احصائيات ذكاء اصطناعي',
+            icon: TrendingUp,
+            badge: 'BI',
+            urgent: false
+          },
+          {
+            id: 'reports',
+            label: 'تقارير المدير العام',
+            desc: 'بناء وطباعة تقارير A4 PDF وتصدير Excel',
+            keywords: 'تقارير طباعة pdf excel مبيعات جرد مديونيات',
+            icon: Printer,
+            badge: 'PDF',
+            urgent: false
+          }
+        ]
+      },
+      {
+        groupTitle: 'المبيعات والطلبات',
+        items: [
+          {
+            id: 'orders',
+            label: 'الطلبات والفواتير',
+            desc: 'مراجعة وتجهيز وطباعة طلبات العملاء',
+            keywords: 'طلبات فواتير اوردرات شحن تسليم',
+            icon: ClipboardList,
+            badge: newOrdersCount > 0 ? `${newOrdersCount} جديد` : orders.length,
+            urgent: newOrdersCount > 0
+          },
+          {
+            id: 'order_workflow',
+            label: 'سير عمل الطلبات (Kanban)',
+            desc: 'عرض المراحل Kanban والجدول وتحديث الحالات وتصدير CSV',
+            keywords: 'كانبان kanban مراحل شحن تجهيز طلبات',
+            icon: LayoutGrid,
+            badge: 'Kanban',
+            urgent: false
+          },
+          {
+            id: 'sourcing',
+            label: 'طلبات الاستيراد (من برّه)',
+            desc: 'الطلبات الخاصة من الخارج ومحادثات العملاء',
+            keywords: 'استيراد الصين من بره عربون طلب خاص',
+            icon: Globe,
+            badge: newSourcingCount > 0 ? `${newSourcingCount} جديد` : sourcingRequests.length || null,
+            urgent: newSourcingCount > 0
+          },
+          {
+            id: 'returns',
+            label: 'المرتجعات والشكاوى',
+            desc: 'طلبات الضمان والاستبدال وتذاكر الشكاوى',
+            keywords: 'مرتجعات ضمان استبدال شكاوى تذاكر',
+            icon: RotateCcw,
+            badge: pendingRetCount + openComplaintsCount > 0 ? pendingRetCount + openComplaintsCount : null,
+            urgent: pendingRetCount > 0
+          }
+        ]
+      },
+      {
+        groupTitle: 'المنتجات والمخازن',
+        items: [
+          {
+            id: 'catalog',
+            label: 'الكتالوج والموديلات',
+            desc: 'إدارة البراندات والموديلات والمنتجات والصور',
+            keywords: 'منتجات موديلات براندات ماركات صور اضافة قسم',
+            icon: Layers,
+            badge: models.length,
+            urgent: false
+          },
+          {
+            id: 'excel_products',
+            label: 'جدول المنتجات (Excel)',
+            desc: 'تعديل مباشر للأسعار والمخزون والتصنيف وتعديلات جماعية مع تراجع',
+            keywords: 'اكسل excel جدول منتجات تعديل جماعي اسعار مخزون',
+            icon: LayoutGrid,
+            badge: 'Excel',
+            urgent: false
+          },
+          {
+            id: 'smart_pricing',
+            label: 'محرك التسعير الذكي (AI)',
+            desc: 'حساب الهوامش ومحاكاة قواعد التسعير قبل الاعتماد',
+            keywords: 'تسعير هامش ربح تكلفة smart pricing ai',
+            icon: DollarSign,
+            badge: 'AI',
+            urgent: false
+          },
+          {
+            id: 'ai_product_sourcing',
+            label: 'وكيل الاستيراد الذكي (AI Sourcing)',
+            desc: 'اكتشاف، فلترة، كشف تكرار، إثراء عربي، تسعير، واستيراد كمسودات',
+            keywords: 'وكيل استيراد ذكي ai product sourcing مواقع موردين مسودات google pixel',
+            icon: Globe,
+            badge: 'Agent',
+            urgent: false
+          },
+          {
+            id: 'bulk_importer',
+            label: 'المستورد الذكي بالروابط',
+            desc: 'استيراد منتجات جماعي عبر لصق روابط الصور أو CSV',
+            keywords: 'استيراد روابط صور csv bulk importer',
+            icon: Upload,
+            badge: 'Bulk',
+            urgent: false
+          },
+          {
+            id: 'quality_images',
+            label: 'جودة الكتالوج والصور',
+            desc: 'فحص جودة المنتجات وإدارة روابط الصور المتعددة وكشف المعطوب',
+            keywords: 'جودة صور روابط معطوبة وصف تحسين',
+            icon: Camera,
+            badge: 'Audit',
+            urgent: false
+          },
+          {
+            id: 'quick_stock',
+            label: 'الجرد السريع للمخزن',
+            desc: 'تعديل الأسعار والكميات والكاش باك في جدول واحد',
+            keywords: 'مخزن جرد سريع كميات اسعار ستوك',
+            icon: Database,
+            badge: parts.length,
+            urgent: false
+          },
+          {
+            id: 'restock_alerts',
+            label: 'قائمة الانتظار (نبّهني)',
+            desc: 'العملاء المنتظرون للمنتجات النافدة عبر واتساب',
+            keywords: 'نبهني انتظار نفاد نواقص واتساب',
+            icon: Bell,
+            badge: totalRestockAlertsCount > 0 ? totalRestockAlertsCount : null,
+            urgent: totalRestockAlertsCount > 0
+          }
+        ]
+      },
+      {
+        groupTitle: 'تصميم المتجر والتسويق',
+        items: [
+          {
+            id: 'storefront_cms',
+            label: 'استوديو الواجهة والإعلانات',
+            desc: 'تصميم البنرات، التحكم الدقيق بالصور، الاختصارات، والنشرة',
+            keywords: 'اعلانات بنرات صور واجهة اختصارات بارات نشرة بريدية',
+            icon: Sparkles,
+            badge: storeAds.length,
+            urgent: false
+          },
+          {
+            id: 'feature_flags',
+            label: 'محرك المبيعات والولاء (18)',
+            desc: 'الكاش باك، عجلة الحظ، الجودة، الكاشير، والواتساب',
+            keywords: 'مميزات كاش باك عجلة الحظ جودة ولاء عيد ميلاد احالة vip ضمان',
+            icon: Zap,
+            badge: '18',
+            urgent: false
+          },
+          {
+            id: 'promos',
+            label: 'الكوبونات وحماية الربح',
+            desc: 'أكواد الخصم وسقف الخصومات والحد الأدنى للطلب',
+            keywords: 'كوبونات خصم اكواد حماية الربح شحن مجاني',
+            icon: Percent,
+            badge: promoCodes.length,
+            urgent: false
+          }
+        ]
+      },
+      {
+        groupTitle: 'العملاء والإعدادات',
+        items: [

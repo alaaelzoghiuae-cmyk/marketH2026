@@ -209,7 +209,10 @@ await test('Draft Import Builder & CSV Parser: builds draft spare_parts payload 
 
 // 10. Static Verification: Request Product Fix & Tailwind v3 / JSX Safety
 await test('Static Audit: Nike placeholder replaced with 40W iPhone charger & zero Tailwind v4 classes', async () => {
-  const appSrc = fs.readFileSync(new URL('../src/App.jsx', import.meta.url), 'utf8');
+  // After the monolith split, app content lives across App.jsx + section modules;
+  // the audit reads the combined source (same assertions, wider file set).
+  const appSrc = ['../src/App.jsx', '../src/sections/Sourcing.jsx', '../src/sections/AdminMain.jsx']
+    .map(u => fs.readFileSync(new URL(u, import.meta.url), 'utf8')).join('\n');
   assert.equal(appSrc.includes('حذاء رياضي نايك'), false);
   assert.equal(appSrc.includes('شاحن أيفون أصلي 40W سريع (USB-C PD)'), true);
   assert.equal(appSrc.includes("id: 'ai_product_sourcing'"), true);
