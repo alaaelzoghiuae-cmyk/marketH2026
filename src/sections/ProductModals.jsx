@@ -244,12 +244,12 @@ export function renderProductOrAdDetailModal(ctx) {
 
     return (
       <div
-        className="fixed inset-0 bg-nav/80 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center sm:p-4"
+        className="fixed inset-0 bg-black/45 backdrop-blur-md z-50 flex items-end sm:items-center justify-center sm:p-6 elz-modal-backdrop"
         onClick={() => setSelectedDetailItem(null)}
       >
         <div
           onClick={e => e.stopPropagation()}
-          className="bg-surface w-full sm:max-w-3xl rounded-t-3xl sm:rounded-3xl overflow-hidden shadow-2xl max-h-[72vh] sm:max-h-[90vh] flex flex-col"
+          className="bg-bg text-fg w-full sm:max-w-5xl rounded-t-[32px] sm:rounded-[32px] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] elz-modal-panel max-h-[72vh] sm:max-h-[90vh] flex flex-col"
           style={
             window.innerWidth < 640
               ? (() => {
@@ -289,16 +289,16 @@ export function renderProductOrAdDetailModal(ctx) {
           >
           <div className="sm:hidden pt-2.5 pb-1 flex justify-center"><span className="w-12 h-1.5 rounded-full bg-line" /></div>
           {/* Sticky top bar */}
-          <div className="flex items-center justify-between gap-2 px-4 py-2 sm:py-2.5 border-b border-line bg-surface">
+          <div className="flex items-center justify-between gap-2 px-5 sm:px-8 py-3 sm:py-4 border-b border-line/60 bg-bg/80 backdrop-blur">
             <div className="min-w-0">
               <div className="text-[11px] text-accent-text font-extrabold truncate">{targetPart.category}</div>
-              <div className="font-extrabold text-fg text-sm truncate">{targetPart.name}</div>
+              <div className="font-semibold text-fg text-[15px] sm:text-[17px] truncate">{targetPart.name}</div>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 shrink-0">
               <button
                 type="button"
                 onClick={() => handleShareProduct(targetPart)}
-                className="w-10 h-10 rounded-xl bg-surface2 hover:border-accent text-accent-text border border-line flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-surface hover:bg-surface2 text-fg flex items-center justify-center transition"
                 title="شارك المنتج"
               >
                 <Share2 className="w-4 h-4" />
@@ -306,7 +306,7 @@ export function renderProductOrAdDetailModal(ctx) {
               <button
                 type="button"
                 onClick={() => setSelectedDetailItem(null)}
-                className="w-10 h-10 rounded-xl bg-surface2 hover:bg-surface text-fg flex items-center justify-center"
+                className="w-10 h-10 rounded-full bg-surface hover:bg-surface2 text-fg flex items-center justify-center transition"
                 title="إغلاق"
               >
                 <X className="w-5 h-5" />
@@ -332,7 +332,7 @@ export function renderProductOrAdDetailModal(ctx) {
           {/* Scrollable body */}
           <div
             onScroll={e => { if (e.currentTarget.scrollTop > 30 && !sheetExpanded && window.innerWidth < 640) setSheetExpanded(true); }}
-            className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 items-start"
+            className="flex-1 overflow-y-auto p-5 sm:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-start"
           >
             {/* Large Product Image Preview */}
             <div className="space-y-3">
@@ -345,7 +345,7 @@ export function renderProductOrAdDetailModal(ctx) {
                   if (swipeSuppressRef.current) return;
                   setLightbox({ list: imagesList, index: safeIdx });
                 }}
-                className="relative rounded-2xl overflow-hidden bg-surface2 border border-line h-72 sm:h-80 p-3 shadow-md cursor-zoom-in flex items-center justify-center"
+                className="relative rounded-[28px] overflow-hidden bg-white dark:bg-white h-72 sm:h-[440px] p-4 cursor-zoom-in flex items-center justify-center"
               >
                 <BlurFitImage src={activeModalImg} alt={targetPart.name} fit={targetPart.imageFit || siteSettings.productImageFit || "contain"} draggable={false} imgClassName="select-none max-h-full max-w-full" />
                 <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-xl bg-nav/90 text-white text-[11px] font-bold flex items-center gap-1 shadow">

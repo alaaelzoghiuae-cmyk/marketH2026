@@ -5,7 +5,9 @@ import { DEFAULT_HOME_SHORTCUT_ICONS, ELZOGHBI_LOGO, PART_IMAGES, SHORTCUT_ICON_
 import { AdContent, BlurFitImage, ImageViewer } from '../components/widgets.jsx';
 import { Bidi } from '../i18n.jsx';
 import { adInSchedule, getAdTheme } from '../lib/utils.jsx';
+import { AppleHero, AppleAdMosaic } from '../components/AppleAds.jsx';
 import { normalizePartCategory } from '../lib/catalogUtils.js';
+import { mergeKaramboCfg, getOrderedKaramboServices } from '../data/karamboConfig.js';
 import { ServicesNav, AppleHomeShowcase } from '../components/AppleStore.jsx';
 
 export function renderVvipBrandEmblem(ctx, size = 'md', forceLightText = false) {
@@ -129,34 +131,34 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
           setDetailImageIdx(currentImgIdx);
           setSelectedDetailItem({ type: 'part', part });
         }}
-        className={`hm-card group bg-surface text-fg rounded-[24px] border p-3.5 sm:p-4 transition-all duration-300 flex flex-col justify-between cursor-pointer ${
+        className={`hm-card elz-pcard group bg-surface text-fg rounded-[28px] p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between cursor-pointer h-full ${
           inCartQty > 0
-            ? 'border-[#0071E3] ring-2 ring-[#0071E3]/25'
-            : 'border-transparent hover:border-line'
+            ? 'ring-2 ring-[#0071E3]'
+            : 'ring-0 hover:shadow-[0_14px_40px_-12px_rgba(0,0,0,0.18)]'
         }`}
       >
         {/* Top Studio Product Stage (Pure White Studio Card so white-bg & transparent product photos both look crisp!) */}
         <div>
-          <div className="relative h-48 sm:h-52 rounded-[18px] bg-white dark:bg-white border border-slate-100 dark:border-slate-800/40 p-3 flex items-center justify-center overflow-hidden mb-3 shadow-inner">
+          <div className="relative h-48 sm:h-56 rounded-[20px] bg-transparent dark:bg-white p-2 flex items-center justify-center overflow-hidden mb-4">
             <BlurFitImage
               key={`${part.id}_${currentImgIdx}_${partFitMode}`}
               src={currentDisplayImg}
               alt={part.name}
               fit={partFitMode}
               imgClassName={`${
-                partFitMode === 'cover' ? 'w-full h-full object-cover' : 'max-h-40 sm:max-h-44 w-auto object-contain p-1'
+                partFitMode === 'cover' ? 'w-full h-full object-cover' : 'max-h-40 sm:max-h-48 w-auto object-contain p-1 mix-blend-multiply dark:mix-blend-normal'
               } group-hover:scale-105 transition duration-500`}
             />
 
             {/* Top-Right Real Discount Badge (Shown ONLY when an actual discount exists!) */}
-            <div className="absolute top-2.5 right-2.5 flex flex-col items-start gap-1 z-10 pointer-events-none">
+            <div className="absolute top-1 end-1 flex flex-col items-end gap-1 z-10 pointer-events-none">
               {showRealDiscount && (
-                <span className="px-2.5 py-0.5 rounded-lg bg-[#DC2626] text-white text-[11px] font-black shadow-sm">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FF3B30] text-white text-[11px] font-semibold">
                   خصم {priceInfo.discountPercent}%
                 </span>
               )}
               {partCbOn && (
-                <span className="px-2 py-0.5 rounded-lg bg-emerald-600 text-white text-[10px] font-extrabold shadow-sm">
+                <span className="px-2 py-0.5 rounded-full bg-[#34C759]/15 text-[#248A3D] dark:text-[#30D158] text-[10px] font-semibold">
                   💰 كاش باك {partCbPct}%
                 </span>
               )}
@@ -166,7 +168,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             <button
               type="button"
               onClick={(e) => toggleFavoritePart(part.id, e)}
-              className={`absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 border z-10 ${
+              className={`absolute top-1 start-1 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 border z-10 ${
                 isFav
                   ? 'bg-rose-500 text-white border-rose-400 shadow-md scale-105'
                   : 'bg-white/95 text-slate-500 hover:text-rose-500 border-slate-200 shadow-sm'
@@ -182,7 +184,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             <button
               type="button"
               onClick={(e) => sharePartViaWhatsApp(part, e)}
-              className="absolute top-12 left-2.5 w-8 h-8 rounded-full bg-white/95 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-slate-200 shadow-sm flex items-center justify-center transition-all duration-200 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 z-10"
+              className="absolute top-11 start-1 w-8 h-8 rounded-full bg-white/95 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-slate-200 shadow-sm flex items-center justify-center transition-all duration-200 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 z-10"
               title="مشاركة المنتج والسعر عبر واتساب"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -197,7 +199,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                     e.stopPropagation();
                     setCardImageIdx(prev => ({ ...prev, [part.id]: (currentImgIdx - 1 + imagesList.length) % imagesList.length }));
                   }}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
+                  className="absolute start-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
                   title="الصورة السابقة"
                 >
                   ‹
@@ -208,12 +210,12 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                     e.stopPropagation();
                     setCardImageIdx(prev => ({ ...prev, [part.id]: (currentImgIdx + 1) % imagesList.length }));
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
+                  className="absolute end-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
                   title="الصورة التالية"
                 >
                   ›
                 </button>
-                <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-md bg-slate-900/75 text-white text-[10px] font-bold z-10" dir="ltr">
+                <span className="absolute bottom-1 start-1 px-2 py-0.5 rounded-full bg-black/55 backdrop-blur text-white text-[10px] font-bold z-10" dir="ltr">
                   {currentImgIdx + 1}/{imagesList.length}
                 </span>
               </>
@@ -222,7 +224,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             {/* Low-Stock / Out-of-Stock Pill */}
             {(isOutOfStock || (trustFlagOn && isLowStock)) && (
               <span
-                className={`absolute bottom-2 right-2 px-2 py-0.5 rounded-md text-[10px] font-extrabold z-10 ${
+                className={`absolute bottom-1 end-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold z-10 ${
                   isOutOfStock ? 'bg-slate-900/85 text-amber-300' : 'bg-amber-500 text-slate-950'
                 }`}
               >
@@ -232,12 +234,12 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
           </div>
 
           {/* Category + Title */}
-          <div className="space-y-1.5 px-0.5 text-right">
-            <div className="flex items-center justify-between gap-1.5 text-[11px] text-muted font-bold">
-              <span className="truncate">{part.category || 'منتج أصلي'}</span>
+          <div className="space-y-1.5 px-0.5 text-start">
+            <div className="flex items-center justify-between gap-1.5 text-[11px] text-muted font-medium">
+              <span className="truncate uppercase tracking-wide">{part.category || 'منتج أصلي'}</span>
               {part.sku && <span className="font-mono text-[10px] opacity-75 shrink-0">{part.sku}</span>}
             </div>
-            <h3 className="text-sm sm:text-[15px] font-extrabold text-fg leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#0066CC] dark:group-hover:text-[#2997FF] transition">
+            <h3 className="text-[15px] sm:text-[17px] font-semibold text-fg leading-snug tracking-tight line-clamp-2 min-h-[2.8rem] transition">
               <Bidi text={part.name} />
             </h3>
           </div>
@@ -246,7 +248,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
           {qualityFlagOn && qualityTiers.length > 1 && (
             <div
               onClick={e => e.stopPropagation()}
-              className="grid grid-cols-3 gap-1 mt-2.5 p-1 rounded-xl bg-surface2/80 border border-line"
+              className="grid grid-cols-3 gap-0.5 mt-3 p-0.5 rounded-full bg-surface2"
             >
               {qualityTiers.map(tier => {
                 const isSel = activeTierObj.id === tier.id;
@@ -264,9 +266,9 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                         }));
                       }
                     }}
-                    className={`py-1 px-1 rounded-lg text-[10px] font-extrabold truncate transition ${
+                    className={`py-1 px-1 rounded-full text-[10px] font-semibold truncate transition ${
                       isSel
-                        ? 'bg-[#0071E3] text-white shadow-xs'
+                        ? 'bg-bg text-fg shadow-sm'
                         : 'text-muted hover:text-fg'
                     }`}
                   >
@@ -279,18 +281,18 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
         </div>
 
         {/* Price + Unified CTA / Quantity Stepper */}
-        <div className="pt-3 mt-2 border-t border-line/60 space-y-2.5" onClick={e => e.stopPropagation()}>
+        <div className="pt-3 mt-3 space-y-3" onClick={e => e.stopPropagation()}>
           <div className="flex items-baseline justify-between gap-2 flex-wrap">
             <div className="flex items-baseline gap-1">
-              <span className="text-lg sm:text-xl font-black text-fg tracking-tight font-mono">
+              <span className="text-xl sm:text-2xl font-semibold text-fg tracking-tight tabular-nums">
                 {priceInfo.displayPrice.toLocaleString()}
               </span>
-              <span className="text-[11px] font-extrabold text-muted">
+              <span className="text-[12px] font-medium text-muted">
                 {priceInfo.currencySymbol}
               </span>
             </div>
             {showRealDiscount && (
-              <span className="text-xs font-bold font-mono text-muted line-through">
+              <span className="text-xs font-medium tabular-nums text-muted line-through">
                 {priceInfo.displayOldPrice.toLocaleString()} {priceInfo.currencySymbol}
               </span>
             )}
@@ -307,7 +309,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                   openCustomerRestockModal(part);
                 }
               }}
-              className="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-slate-950 border border-amber-500/40 text-xs font-extrabold flex items-center justify-center gap-1.5 transition"
+              className="w-full py-2.5 px-4 rounded-full bg-amber-500/15 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-slate-950 border border-amber-500/40 text-xs font-extrabold flex items-center justify-center gap-1.5 transition"
             >
               <Bell className="w-3.5 h-3.5" />
               <span>{hasCustomerRegisteredRestock(part) ? 'تم تسجيل تنبيهك ✓' : 'نبّهني عند التوفر'}</span>
@@ -319,17 +321,17 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                 e.stopPropagation();
                 updateCartQty(part.id, 1);
               }}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition"
+              className="w-full py-2.5 px-4 rounded-full bg-[#0071E3] hover:bg-[#0077ED] active:scale-[0.98] text-white text-[13px] sm:text-sm font-medium flex items-center justify-center gap-2 transition"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>أضف إلى السلة</span>
             </button>
           ) : (
-            <div className="flex items-center justify-between gap-2 bg-[#0071E3]/10 dark:bg-[#2C2C2E] border-2 border-[#0071E3] rounded-xl p-1">
+            <div className="flex items-center justify-between gap-2 bg-[#0071E3]/10 dark:bg-[#2C2C2E] rounded-full p-1">
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); updateCartQty(part.id, 1); }}
-                className="w-8 h-8 rounded-lg bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition"
                 title="زيادة الكمية"
               >
                 <Plus className="w-4 h-4" />
@@ -350,7 +352,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); updateCartQty(part.id, -1); }}
-                className="w-8 h-8 rounded-lg bg-surface text-fg border border-line hover:border-rose-500 hover:text-rose-500 flex items-center justify-center transition"
+                className="w-8 h-8 rounded-full bg-surface text-fg border border-line hover:border-rose-500 hover:text-rose-500 flex items-center justify-center transition"
                 title="تقليل الكمية"
               >
                 <Minus className="w-4 h-4" />
@@ -408,6 +410,8 @@ export function renderSocialIconsGroup(ctx) {
     </div>);
 }
 
+let _karamboNavMemo = { cfg: undefined, setter: null, items: [] };
+
 export function renderClientHeader(ctx) {
   const { categoryEmoji, fetchSparePartsSliceOnDemand, getTopCategories, publicBrands, publicModels, publicParts, publicPartCountByModelIdMap, resolvePartModelObj, selectedBrand, selectedCategory, setStorePage, activeFamilyDevices, cartSummary, changeLang, clientTab, currentClient, favoritePartIds, getHeaderConfig, headerInnerRef, lang, notifications, pendingScrollToProductsRef, renderVvipBrandEmblem, searchQuery, setAccountSubTab, setAuthModalTab, setCartDrawerOpen, setClientTab, setFamilyModalOpen, setLoginModalOpen, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedModelId, setSourcingFormOpen, setStoreStockFilter, setWarrantyModalOpen, siteSettings, storeStockFilter, toggleUiTheme, uiTheme, vipLinkUnlocked } = ctx;
     const hCfg = getHeaderConfig(siteSettings);
@@ -434,6 +438,32 @@ export function renderClientHeader(ctx) {
           ? hCfg.forceDarkHeader ? 'text-[#2997FF]' : 'text-[#0066CC] dark:text-white'
           : hCfg.forceDarkHeader ? 'text-slate-200 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-[#0066CC] dark:hover:text-white'
       }`;
+
+    const karamboNavItems = (() => {
+      if (_karamboNavMemo.cfg === ctx.karamboCfg && _karamboNavMemo.setter === ctx.setKaramboUi) return _karamboNavMemo.items;
+      let items = [];
+      try {
+        const kc = mergeKaramboCfg(ctx.karamboCfg);
+        const svcs = kc.enabled === false ? [] : getOrderedKaramboServices(kc).filter(x => x.enabled);
+        if (svcs.length) {
+        const goK = (page) => {
+          if (ctx.trackKaramboEvent) ctx.trackKaramboEvent('visit', page);
+          ctx.setKaramboUi(p => ({ ...p, page }));
+          ctx.setClientTab('karambo');
+          window.scrollTo({ top: 0 });
+        };
+        items = [{
+          id: 'karambo',
+          label: String(kc.title || 'كرومبو').split(' ')[0],
+          img: kc.mascotUrl || '/karambo.png',
+          go: () => goK(svcs[0].id),
+          children: () => svcs.map(x => ({ id: 'karambo>' + x.id, label: x.title, emoji: '✦', go: () => goK(x.id) })),
+        }];
+        }
+      } catch (e) { items = []; }
+      _karamboNavMemo = { cfg: ctx.karamboCfg, setter: ctx.setKaramboUi, items };
+      return items;
+    })();
 
     return (
       <header
@@ -874,6 +904,7 @@ export function renderClientHeader(ctx) {
         {siteSettings.showServicesNav !== false && (
           <ServicesNav
             rtl={!ctx.i18nActive}
+            extraItems={karamboNavItems}
             brands={publicBrands}
             models={publicModels}
             modelCounts={publicPartCountByModelIdMap}
@@ -1184,120 +1215,46 @@ export function renderHomeView(ctx) {
     const currentHeroTheme = getAdTheme(currentSlide);
 
     return (
-      <div className="max-w-[1380px] mx-auto px-4 sm:px-8 py-5 sm:py-7 space-y-9 w-full max-w-[100vw] overflow-x-hidden min-w-0">
-        {/* 1. ARCHITECTURAL HERO BANNER SHOWCASE + NON-OVERLAPPING CONTROLS + 4 TRUST PILLARS */}
+      <div className="elz-home max-w-[1380px] mx-auto px-4 sm:px-8 py-4 sm:py-6 space-y-12 sm:space-y-16 w-full max-w-[100vw] overflow-x-hidden min-w-0">
+        {/* 1. APPLE-STYLE HERO CAMPAIGN (dynamic ads from the admin dashboard) + WHY-SHOP ROW */}
         {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
-          <section className="elz-hero rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1D1D1F] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
-            <div
-              {...swipeProps(
+          <div className="space-y-6">
+            <AppleHero
+              slides={heroSlides}
+              index={currentSlideIdx}
+              setIndex={(v) => setHeroAdIndex(((v % heroSlides.length) + heroSlides.length) % heroSlides.length)}
+              onOpen={handleOpenAdDetails}
+              rtl={!i18nActive}
+              swipeProps={swipeProps(
                 () => setHeroAdIndex(prev => (prev + 1) % heroSlides.length),
                 () => setHeroAdIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length)
               )}
-              onClick={() => {
-                if (swipeSuppressRef.current) return;
-                handleOpenAdDetails(currentSlide);
-              }}
-              style={{ background: currentHeroTheme.cssGrad }}
-              className="relative cursor-pointer select-none overflow-hidden transition-all duration-500"
-            >
-              <AdContent ad={currentSlide} rtl={!i18nActive} heroFixed />
-            </div>
-
-            {/* Sleek Non-Overlapping Slider Navigation Bar (Only shown when > 1 slide exists — NEVER covers ad text or photo!) */}
-            {heroSlides.length > 1 && (
-              <div className="px-4 sm:px-8 py-2.5 bg-surface2/90 dark:bg-[#1D1D1F] border-t border-line flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setHeroAdIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
-                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
-                    title="الإعلان السابق"
-                  >
-                    ›
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHeroAdIndex(prev => (prev + 1) % heroSlides.length)}
-                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
-                    title="الإعلان التالي"
-                  >
-                    ‹
-                  </button>
-                  <span className="text-[11px] font-bold text-muted mr-1" dir="ltr">
-                    {currentSlideIdx + 1} / {heroSlides.length}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                  {heroSlides.slice(0, 8).map((sl, idx) => (
-                    <button
-                      key={sl.id || idx}
-                      type="button"
-                      onClick={() => setHeroAdIndex(idx)}
-                      className={`h-2 rounded-full transition-all ${
-                        idx === currentSlideIdx
-                          ? 'w-7 bg-[#0071E3]'
-                          : 'w-2 bg-slate-300 dark:bg-[#424245] hover:bg-[#0071E3]/60'
-                      }`}
-                      title={sl.title || `شريحة ${idx + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 4 Trust Pillars Strip (Compact on Mobile) */}
-            <div className="border-t border-line bg-surface dark:bg-[#161617] px-3 sm:px-8 py-2.5 sm:py-3.5">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
+              swipeSuppressRef={swipeSuppressRef}
+            />
+            <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 rounded-[28px] bg-surface px-6 py-6 sm:px-10">
+              {[
+                [CheckCircle2, 'ضمان حقيقي معتمد', 'استبدال وفحص فوري'],
+                [Truck, 'شحن سريع ومؤمّن', 'لجميع المحافظات'],
+                [Shield, 'معاينة ودفع آمن', 'عند الاستلام أو بالمحفظة'],
+                [Phone, 'دعم ومتابعة مستمرة', 'خدمة عملاء سريعة'],
+              ].map(([Icon, t, d]) => (
+                <li key={t} className="flex items-start gap-3">
+                  <Icon className="w-7 h-7 shrink-0 text-fg" strokeWidth={1.4} aria-hidden="true" />
                   <div>
-                    <div className="text-xs font-extrabold text-fg">ضمان حقيقي معتمد</div>
-                    <div className="text-[11px] text-muted">استبدال وفحص فوري</div>
+                    <div className="text-[14px] font-semibold text-fg leading-snug">{t}</div>
+                    <div className="text-[12px] text-muted leading-snug">{d}</div>
                   </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
-                    <Truck className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-extrabold text-fg">شحن سريع ومؤمّن</div>
-                    <div className="text-[11px] text-muted">لجميع المحافظات</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
-                    <Shield className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-extrabold text-fg">معاينة ودفع آمن</div>
-                    <div className="text-[11px] text-muted">عند الاستلام أو بالمحفظة</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-extrabold text-fg">دعم ومتابعة مستمرة</div>
-                    <div className="text-[11px] text-muted">خدمة عملاء سريعة</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {/* 1.5 KARAMBO EL-SHOGHLAANA STRIP (under the search layer) */}
         {renderKaramboStrip && renderKaramboStrip()}
 
         {/* 2. COMPACT QUICK CATEGORY SHORTCUTS STRIP (Compact on Mobile + Scrolls Directly to Products!) */}
-        {siteSettings.showHomeShortcuts !== false && siteSettings.showHomeModels !== false && (() => {
+        {siteSettings.showLegacyHomeStrips === true && siteSettings.showHomeShortcuts !== false && siteSettings.showHomeModels !== false && (() => {
           const shortcutsList = (Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0
             ? siteSettings.homeShortcutIcons
             : DEFAULT_HOME_SHORTCUT_ICONS
@@ -1352,7 +1309,7 @@ export function renderHomeView(ctx) {
         })()}
 
         {/* 2B. ORGANIZED BRANDS BAR UNDER CATEGORY ICONS (Full Dashboard Control: Order & Visibility) */}
-        {siteSettings.showHomeBrandsBar !== false && siteSettings.showHomeModels !== false && (() => {
+        {siteSettings.showLegacyHomeStrips === true && siteSettings.showHomeBrandsBar !== false && siteSettings.showHomeModels !== false && (() => {
           const configuredBrands = Array.isArray(siteSettings.homeFeaturedBrands) && siteSettings.homeFeaturedBrands.length > 0
             ? siteSettings.homeFeaturedBrands.filter(b => publicBrands.includes(b))
             : publicBrands;
@@ -1421,32 +1378,24 @@ export function renderHomeView(ctx) {
           );
         })()}
 
-        {/* 2C. COMPACT & CLEAR "اطلب منتجك" BAR ON HOMEPAGE (Visible Immediately Without Taking Much Space) */}
+        {/* 2C. "اطلب منتجك" — Apple-style service tile */}
         {siteSettings.showHomeSourcing !== false && (
           <section
+            role="button"
+            tabIndex={0}
             onClick={openSourcing}
-            className="cursor-pointer rounded-2xl bg-gradient-to-l from-[#1D1D1F] via-[#1D1D1F] to-[#1D1D1F] hover:from-[#0077ED] hover:to-[#0066CC] text-white px-3.5 py-2.5 sm:px-5 sm:py-3.5 border border-[#0071E3]/45 shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3"
+            onKeyDown={(e) => { if (e.key === 'Enter') openSourcing(); }}
+            className="elz-tile elz-tile-dark group rounded-[28px] px-6 py-7 sm:px-12 sm:py-9 flex flex-col sm:flex-row sm:items-center justify-between gap-5"
           >
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-lg sm:text-xl shrink-0">
-                🌍
-              </div>
+            <div className="flex items-center gap-5 min-w-0">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[20px] bg-white/10 flex items-center justify-center text-3xl shrink-0" aria-hidden="true">🌍</div>
               <div className="min-w-0">
-                <div className="text-xs sm:text-sm font-black text-white flex items-center gap-1.5 flex-wrap">
-                  <span>خدمة اطلب منتجك</span>
-                  <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black">استيراد وتوفير خاص</span>
-                </div>
-                <p className="text-[10px] sm:text-xs text-blue-100/90 font-semibold truncate">
-                  ملقتش المنتج اللي بتدور عليه؟ ابعتلنا اسمه أو صورته وهنوفرهولك بأفضل سعر!
-                </p>
+                <div className="text-[12px] font-semibold text-[#ffb340]">استيراد وتوفير خاص</div>
+                <div className="text-[22px] sm:text-[28px] font-semibold tracking-tight leading-tight text-white">خدمة اطلب منتجك</div>
+                <p className="text-[14px] sm:text-[16px] text-white/70 mt-1 line-clamp-2">ملقتش المنتج اللي بتدور عليه؟ ابعتلنا اسمه أو صورته وهنوفرهولك بأفضل سعر.</p>
               </div>
             </div>
-            <button
-              type="button"
-              className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white text-[#1D1D1F] hover:bg-amber-300 font-black text-[11px] sm:text-xs shadow transition whitespace-nowrap"
-            >
-              اطلب منتجك ←
-            </button>
+            <span className="shrink-0 self-start sm:self-center px-6 py-2.5 rounded-full bg-[#0071E3] group-hover:bg-[#0077ED] text-white text-[15px] font-medium whitespace-nowrap transition">اطلب منتجك</span>
           </section>
         )}
 
@@ -1484,23 +1433,9 @@ export function renderHomeView(ctx) {
           />
         )}
 
-        {/* 3. DUAL PROMOTIONAL SPLIT BANNERS (Rendered via Real Architectural AdContent Engine!) */}
+        {/* 3. PROMOTIONAL MOSAIC (large + small tiles, driven by ads with placement promo_split / both) */}
         {siteSettings.showHomePromoSplit !== false && promoSplitAds.length > 0 && (
-          <section className={`grid grid-cols-1 ${promoSplitAds.length > 1 ? 'lg:grid-cols-2' : ''} gap-5`}>
-            {promoSplitAds.slice(0, 4).map((promoAd) => {
-              const pTheme = getAdTheme(promoAd);
-              return (
-                <div
-                  key={promoAd.id}
-                  onClick={() => handleOpenAdDetails(promoAd)}
-                  style={{ background: pTheme.cssGrad }}
-                  className="relative rounded-[26px] overflow-hidden cursor-pointer border border-line shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <AdContent ad={promoAd} isPromoCard rtl={!i18nActive} />
-                </div>
-              );
-            })}
-          </section>
+          <AppleAdMosaic ads={promoSplitAds} onOpen={handleOpenAdDetails} rtl={!i18nActive} />
         )}
 
         {/* 4. BEST SELLERS 4-COLUMN PRODUCT GRID */}
@@ -1508,7 +1443,7 @@ export function renderHomeView(ctx) {
           <section className="space-y-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg sm:text-2xl font-black text-fg flex items-center gap-2">
+                <h3 className="elz-h3 text-fg flex items-center gap-2">
                   <span></span>
                   <span>الأكثر مبيعاً وطلباً</span>
                 </h3>
@@ -1523,7 +1458,7 @@ export function renderHomeView(ctx) {
                   setStoreStockFilter('BEST_SELLERS');
                   setClientTab('search');
                 }}
-                className="px-4 py-2 rounded-xl bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
+                className="elz-link text-[15px] font-medium inline-flex items-center gap-0.5"
               >
                 <span>عرض الكل</span>
                 <ChevronLeft className="w-4 h-4" />
@@ -1570,14 +1505,14 @@ export function renderHomeView(ctx) {
           return (
             <section key={bar.id} className="space-y-5">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-lg sm:text-2xl font-black text-fg flex items-center gap-2">
+                <h3 className="elz-h3 text-fg flex items-center gap-2">
                   <span className="text-[#0066CC]">✦</span>
                   <span>{bar.title}</span>
                 </h3>
                 <button
                   type="button"
                   onClick={() => setClientTab('search')}
-                  className="px-4 py-2 rounded-xl bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
+                  className="elz-link text-[15px] font-medium inline-flex items-center gap-0.5"
                 >
                   <span>عرض الكل</span>
                   <ChevronLeft className="w-4 h-4" />
@@ -1593,39 +1528,22 @@ export function renderHomeView(ctx) {
 
         {/* Compact Sourcing Bar is now prominently displayed near the top of Homepage */}
 
-        {/* 7. NEWSLETTER SUBSCRIPTION BANNER */}
+        {/* 7. NEWSLETTER */}
         {siteSettings.showHomeNewsletter !== false && (
-          <section className="relative rounded-[26px] overflow-hidden bg-gradient-to-r from-[#1D1D1F] via-[#1D1D1F] to-[#1D1D1F] text-white p-6 sm:p-9 border border-[#0066CC]/60 shadow-xl">
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4 text-right">
-                <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/25 border border-[#2997FF]/40 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-7 h-7 text-[#2997FF]" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-lg sm:text-2xl font-black text-white">اشترك في نشرتنا البريدية</h3>
-                  <p className="text-xs sm:text-sm text-blue-100/85 font-semibold">ليصلك أحدث العروض والمنتجات الجديدة وكوبونات الخصم أولاً بأول</p>
-                </div>
-              </div>
-
-              <form
-                onSubmit={handleNewsletterSubscribe}
-                className="w-full lg:w-auto flex-1 max-w-md flex items-center bg-white/95 dark:bg-[#161617] p-1.5 rounded-2xl border border-white/20"
-              >
-                <input
-                  type="text"
-                  value={newsletterEmail}
-                  onChange={(e) => setNewsletterEmail(e.target.value)}
-                  placeholder="أدخل بريدك الإلكتروني أو رقم واتساب..."
-                  className="flex-1 bg-transparent border-0 px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-xs sm:text-sm transition shrink-0"
-                >
-                  اشترك الآن
-                </button>
-              </form>
-            </div>
+          <section className="rounded-[28px] bg-surface px-6 py-10 sm:px-14 sm:py-14 text-center">
+            <h3 className="elz-display">اشترك في نشرتنا البريدية</h3>
+            <p className="text-[15px] sm:text-[17px] text-muted mt-3 max-w-xl mx-auto">ليصلك أحدث العروض والمنتجات الجديدة وكوبونات الخصم أولاً بأول.</p>
+            <form onSubmit={handleNewsletterSubscribe} className="mt-7 mx-auto w-full max-w-md flex items-center bg-bg p-1.5 rounded-full border border-line focus-within:ring-2 focus-within:ring-[#0071E3]/50 transition">
+              <input
+                type="text"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="بريدك الإلكتروني أو رقم واتساب"
+                aria-label="البريد الإلكتروني أو رقم واتساب"
+                className="flex-1 min-w-0 bg-transparent border-0 px-4 py-2 text-[15px] text-fg placeholder:text-muted focus:outline-none"
+              />
+              <button type="submit" className="px-6 py-2.5 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-[14px] font-medium transition shrink-0">اشترك</button>
+            </form>
           </section>
         )}
 
@@ -1731,7 +1649,29 @@ export function renderStorefront(ctx) {
     const showPageNavigator = (storeExtraEightShown && totalItems > FIRST_PAGE_INITIAL) || safePage > 1;
 
     return (
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-5 space-y-5 w-full max-w-[100vw] overflow-x-hidden min-w-0">
+      <div className="elz-catalog max-w-[1380px] mx-auto px-4 sm:px-8 py-6 sm:py-8 space-y-6 w-full max-w-[100vw] overflow-x-hidden min-w-0">
+        {/* Editorial page header: breadcrumb + large title + result count */}
+        {(() => {
+          const mdl = selectedModelId !== 'ALL' ? publicModels.find(m => String(m.id) === String(selectedModelId)) : null;
+          const crumbs = [];
+          if (selectedBrand !== 'ALL') crumbs.push(String(selectedBrand).replace(/^OR\s*-\s*/i, ''));
+          if (mdl) crumbs.push(mdl.name);
+          if (selectedCategory !== 'ALL') crumbs.push(selectedCategory);
+          const modeTitle = { FAVORITES: 'قائمة منتجاتك المفضلة', DISCOUNTS: 'العروض والخصومات', BEST_SELLERS: 'الأكثر مبيعاً وطلباً', IN_STOCK: 'متاح في المخزن فوراً' }[storeStockFilter];
+          const title = searchQuery.trim() ? ('نتائج البحث: ' + searchQuery.trim()) : (crumbs.length ? crumbs[crumbs.length - 1] : (modeTitle || 'كل المنتجات'));
+          return (
+            <header className="pt-2 pb-2">
+              <nav aria-label="breadcrumb" className="flex items-center flex-wrap gap-1.5 text-[13px] text-muted mb-3">
+                <button type="button" onClick={() => ctx.setClientTab('home')} className="elz-link">الرئيسية</button>
+                <span aria-hidden="true">›</span>
+                <button type="button" onClick={() => { clearAllStoreFilters(); }} className={crumbs.length || modeTitle ? 'elz-link' : 'text-fg'}>المتجر</button>
+                {crumbs.map((c, i) => (<React.Fragment key={c + i}><span aria-hidden="true">›</span><span className={i === crumbs.length - 1 ? 'text-fg' : ''}>{c}</span></React.Fragment>))}
+              </nav>
+              <h1 className="elz-display text-fg">{title}</h1>
+              <p className="text-[15px] sm:text-[17px] text-muted mt-2">{budgetFilteredParts.length.toLocaleString()} منتج {hasActiveFilters ? 'مطابق للفلاتر المختارة' : 'متاح للطلب بضمان وشحن لكل المحافظات'}</p>
+            </header>
+          );
+        })()}
         {siteSettings.showSearchSourcing !== false && renderSourcingBanner()}
 
         {/* VVIP Quick Mode Pills (كل المنتجات / الأكثر مبيعاً / العروض والخصومات / المفضلة / المتاح في المخزن) */}
@@ -1750,10 +1690,10 @@ export function renderStorefront(ctx) {
                 setStoreStockFilter(tab.id);
                 setStorePage(1);
               }}
-              className={`shrink-0 px-4 py-2 rounded-full text-xs font-extrabold border transition ${
+              className={`shrink-0 px-4 py-2 rounded-full text-[13px] font-medium transition ${
                 storeStockFilter === tab.id
-                  ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-md shadow-blue-600/25'
-                  : 'bg-surface text-fg border-line hover:border-[#0071E3]'
+                  ? 'bg-fg text-bg'
+                  : 'bg-surface text-fg hover:bg-surface2'
               }`}
             >
               {tab.label}
@@ -1762,7 +1702,7 @@ export function renderStorefront(ctx) {
         </div>
 
         {/* Compact Search & 1-Tap Quick Shortcuts Bar (Mobile-Friendly!) */}
-        <div className="bg-surface rounded-2xl sm:rounded-3xl p-3 sm:p-5 text-fg border border-line shadow-sm space-y-2.5">
+        <div className="bg-surface rounded-[28px] p-4 sm:p-6 text-fg space-y-3">
           <div className="flex items-center justify-between gap-2">
             <h2 className="text-sm sm:text-lg font-black text-fg truncate">
               {storeStockFilter === 'FAVORITES'

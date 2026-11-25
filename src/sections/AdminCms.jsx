@@ -2175,6 +2175,14 @@ export function renderAdminStorefrontCms(ctx) {
               />
               <span>إظهار شريط البراندات بالرئيسية</span>
             </label>
+            <label className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface2 border border-line cursor-pointer font-extrabold text-xs">
+              <input
+                type="checkbox"
+                checked={siteSettings.showLegacyHomeStrips === true}
+                onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, showLegacyHomeStrips: e.target.checked }))}
+              />
+              <span>إظهار شريط الأيقونات والبراندات الكلاسيكي بالرئيسية (بديله شريط الأقسام بالأعلى)</span>
+            </label>
           </div>
 
           {/* A. Homepage Brands Bar Manager */}

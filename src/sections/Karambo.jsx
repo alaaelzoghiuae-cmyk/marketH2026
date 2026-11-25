@@ -305,7 +305,6 @@ export function renderKaramboStrip(ctx) {
   const services = getOrderedKaramboServices(cfg).filter(s => s.enabled);
   if (!services.length) return null;
 
-  const barStyle = resolveKaramboBarStyle(cfg);
   const go = (page) => {
     if (ctx.trackKaramboEvent) ctx.trackKaramboEvent('visit', page);
     setKaramboUi(p => ({ ...p, page }));
@@ -313,74 +312,44 @@ export function renderKaramboStrip(ctx) {
     window.scrollTo({ top: 0 });
   };
 
-  if (cfg.layout === 'compact') {
-    return (
-      <section id="karambo-strip" style={barStyle} className="relative overflow-hidden rounded-[24px] border shadow-[0_14px_40px_-16px_rgba(37,99,235,0.45)] p-3.5 sm:p-4">
-        <div className="flex flex-col md:flex-row md:items-center gap-3">
-          <div className="flex items-center gap-2.5 shrink-0">
-            {cfg.showMascot !== false && <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-12 h-12 rounded-2xl object-cover border-2 border-white/50 bg-white/10" />}
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-base sm:text-lg font-black">{cfg.title}</span>
-                {cfg.badgeText && <span className="px-2 py-0.5 rounded-full bg-white/20 text-[9px] font-black">{cfg.badgeText}</span>}
-              </div>
-              <div className="text-[11px] font-bold opacity-90 line-clamp-1">{cfg.subtitle}</div>
-            </div>
-          </div>
-          <div className="flex-1 flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
-            {services.map(s => {
-              const Icon = ICONS[s.icon] || Sparkles;
-              return (
-                <button key={s.id} type="button" onClick={() => go(s.id)} className="shrink-0 inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 backdrop-blur-sm transition">
-                  <span className={`w-7 h-7 rounded-lg ${s.color} flex items-center justify-center`}><Icon className="w-4 h-4 text-white" /></span>
-                  <span className="text-xs font-black whitespace-nowrap">{s.title}</span>
-                  {s.badge && <span className="px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black">{s.badge}</span>}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
+  const rtlUi = !(ctx.i18nActive);
   return (
-    <section id="karambo-strip" style={barStyle} className="relative overflow-hidden rounded-[28px] border shadow-[0_18px_50px_-18px_rgba(37,99,235,0.55)]">
-      <div className="absolute -top-10 -start-10 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-      <div className="absolute -bottom-14 end-24 w-56 h-56 rounded-full bg-slate-300/20 blur-3xl pointer-events-none" />
-      <div className="relative flex flex-col lg:flex-row gap-4 p-4 sm:p-6">
-        <div className="flex lg:flex-col items-center gap-3 lg:w-52 shrink-0">
+    <section id="karambo-strip" aria-label={cfg.title} className="space-y-5">
+      <div className="flex items-end justify-between gap-4">
+        <div className="flex items-center gap-4 min-w-0">
           {cfg.showMascot !== false && (
-            <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-20 h-20 lg:w-28 lg:h-28 rounded-3xl object-cover border-2 border-white/50 shadow-lg bg-white/10" />
+            <img src={cfg.mascotUrl || '/karambo.png'} alt="" className="w-14 h-14 sm:w-16 sm:h-16 rounded-[20px] object-cover bg-surface shrink-0" />
           )}
-          <div className="text-start lg:text-center space-y-1">
-            {cfg.badgeText && <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/20 text-[10px] font-black">{cfg.badgeText}</span>}
-            <div className="text-xl sm:text-2xl font-black drop-shadow-sm">{cfg.title}</div>
-            <div className="text-[11px] sm:text-xs font-bold opacity-90 leading-relaxed">{cfg.subtitle}</div>
+          <div className="min-w-0">
+            {cfg.badgeText && <div className="text-[12px] font-semibold text-[#0066CC] dark:text-[#2997FF]">{cfg.badgeText}</div>}
+            <h3 className="elz-h3 text-fg leading-tight">{cfg.title}</h3>
+            {cfg.subtitle && <p className="text-[13px] sm:text-[15px] text-muted mt-0.5 line-clamp-2">{cfg.subtitle}</p>}
           </div>
-        </div>
-        <div className={`flex-1 grid gap-2.5 content-center ${cfg.layout === 'cards' ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3' : 'grid-cols-2 sm:grid-cols-3 xl:grid-cols-3'}`}>
-          {services.map(s => {
-            const Icon = ICONS[s.icon] || Sparkles;
-            return (
-              <button key={s.id} type="button" onClick={() => go(s.id)}
-                className="relative group flex items-center gap-2.5 p-3 rounded-2xl bg-white/12 hover:bg-white/22 border border-white/25 backdrop-blur-sm text-start transition hover:-translate-y-0.5">
-                {s.badge && <span className="absolute -top-1.5 end-2 px-1.5 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black shadow">{s.badge}</span>}
-                <span className={`w-10 h-10 rounded-xl ${s.color} flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition`}><Icon className="w-5 h-5 text-white" /></span>
-                <span className="min-w-0">
-                  <span className="block text-[13px] font-black leading-tight truncate">{s.title}</span>
-                  <span className="block text-[10px] font-bold opacity-85 leading-snug line-clamp-2">{s.desc}</span>
-                </span>
-              </button>
-            );
-          })}
         </div>
       </div>
+      <div className="elz-rail-track flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+        {services.map(s => {
+          const Icon = ICONS[s.icon] || Sparkles;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => go(s.id)}
+              className="group snap-start shrink-0 w-[220px] sm:w-[250px] min-h-[190px] rounded-[24px] bg-surface hover:bg-surface2 p-5 text-start flex flex-col transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_14px_36px_-14px_rgba(0,0,0,0.25)]"
+            >
+              <span className="flex items-start justify-between">
+                <span className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center shadow-sm`}><Icon className="w-6 h-6 text-white" strokeWidth={1.75} /></span>
+                {s.badge && <span className="px-2.5 py-0.5 rounded-full bg-[#FF9F0A]/15 text-[#b86e00] dark:text-[#ffb340] text-[11px] font-semibold">{s.badge}</span>}
+              </span>
+              <span className="mt-4 block text-[17px] font-semibold text-fg leading-snug">{s.title}</span>
+              <span className="mt-1 block text-[13px] text-muted leading-snug line-clamp-3">{s.desc}</span>
+              <span className="mt-auto pt-3 text-[14px] font-medium text-[#0066CC] dark:text-[#2997FF] group-hover:underline">{rtlUi ? 'افتح ›' : 'Open ›'}</span>
+            </button>
+          );
+        })}
+      </div>
       {cfg.disclaimer && (
-        <div className="relative px-5 py-2 bg-black/15 border-t border-white/15 flex items-center gap-2 text-[10px] font-bold opacity-90">
-          <Shield className="w-3.5 h-3.5 shrink-0" />
-          <span>{cfg.disclaimer}</span>
-        </div>
+        <p className="flex items-center gap-2 text-[12px] text-muted"><Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" /><span>{cfg.disclaimer}</span></p>
       )}
     </section>
   );

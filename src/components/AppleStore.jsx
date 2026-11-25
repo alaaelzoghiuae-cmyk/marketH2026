@@ -53,7 +53,7 @@ function Thumb({ node, size = 'md' }) {
 /* ------------------------------------------------------------------ */
 export function ServicesNav({
   rtl = true, brands = [], getBrandImg, models = [], parts = [], resolveModel, getTopCategories, categoryEmoji,
-  active = {}, actions, labels, modelCounts,
+  active = {}, actions, labels, modelCounts, extraItems = [],
 }) {
   const L = labels || (rtl
     ? { all: 'كل المنتجات', offers: 'العروض', best: 'الأكثر مبيعاً', cats: 'التصنيفات', viewAll: 'عرض الكل', back: 'رجوع', close: 'إغلاق', aria: 'خدمات وتصنيفات المتجر' }
@@ -141,10 +141,11 @@ export function ServicesNav({
       { id: 'best', label: L.best, icon: Flame, go: () => actionsRef.current.showFilter('BEST_SELLERS') },
     ];
     if (cats.length) out.push({ id: 'cats', label: L.cats, icon: Layers, go: () => actionsRef.current.showAll(), children: () => cats });
+    (extraItems || []).forEach((x) => out.push(x));
     brands.forEach((b) => out.push(brandNode(b)));
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brands, liveModels, parts, cache, rtl]);
+  }, [brands, liveModels, parts, cache, rtl, extraItems]);
 
   const kidsOf = useCallback((n) => (n && typeof n.children === 'function' ? n.children() : []), []);
 
@@ -223,6 +224,7 @@ export function ServicesNav({
 
   // keep the active item visible
   const activeId = (() => {
+    if (active.tab === 'karambo') return 'karambo';
     if (active.tab !== 'search') return '';
     if (active.filter === 'DISCOUNTS') return 'offers';
     if (active.filter === 'BEST_SELLERS') return 'best';
