@@ -5,7 +5,9 @@ import { DEFAULT_HOME_SHORTCUT_ICONS, ELZOGHBI_LOGO, PART_IMAGES, SHORTCUT_ICON_
 import { AdContent, BlurFitImage, ImageViewer } from '../components/widgets.jsx';
 import { Bidi } from '../i18n.jsx';
 import { adInSchedule, getAdTheme, getSourcingBanner } from '../lib/utils.jsx';
-import { AppleHero, AppleAdMosaic } from '../components/AppleAds.jsx';
+import { AppleAdMosaic } from '../components/AppleAds.jsx';
+import { AppleCardsCarousel, ClassicHeroBanner } from '../components/AdsShowcase.jsx';
+import { ADS_MODE_CLASSIC, resolveAdsMode, resolveCarouselCfg, resolveClassicCfg } from '../lib/adsDisplay.js';
 import { normalizePartCategory } from '../lib/catalogUtils.js';
 import { mergeKaramboCfg, getOrderedKaramboServices } from '../data/karamboConfig.js';
 import { ServicesNav, AppleHomeShowcase } from '../components/AppleStore.jsx';
@@ -1167,6 +1169,12 @@ export function renderHomeView(ctx) {
           ? [...heroAssignedAds, flagshipHeroSlide]
           : heroAssignedAds
         : [flagshipHeroSlide];
+    // Ads display system: Apple Cards Carousel (default) or the preserved Classic Hero Banner.
+    const adsMode = resolveAdsMode(siteSettings);
+    const adsCarouselCfg = resolveCarouselCfg(siteSettings);
+    const adsClassicCfg = resolveClassicCfg(siteSettings);
+    const heroSlideIds = new Set(heroSlides.map(a => a.id));
+    const cardPromoAds = promoSplitAds.filter(a => !heroSlideIds.has(a.id));
     const currentSlideIdx = heroAdIndex % heroSlides.length;
     const currentSlide = heroSlides[currentSlideIdx] || flagshipHeroSlide;
 
@@ -1221,34 +1229,58 @@ export function renderHomeView(ctx) {
         {/* 1. APPLE-STYLE HERO CAMPAIGN (dynamic ads from the admin dashboard) + WHY-SHOP ROW */}
         {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
           <div className="space-y-6">
-            <AppleHero
-              slides={heroSlides}
-              index={currentSlideIdx}
-              setIndex={(v) => setHeroAdIndex(((v % heroSlides.length) + heroSlides.length) % heroSlides.length)}
-              onOpen={handleOpenAdDetails}
-              rtl={!i18nActive}
-              swipeProps={swipeProps(
-                () => setHeroAdIndex(prev => (prev + 1) % heroSlides.length),
-                () => setHeroAdIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length)
-              )}
-              swipeSuppressRef={swipeSuppressRef}
-            />
-            <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 rounded-[28px] bg-surface px-6 py-6 sm:px-10">
-              {[
-                [CheckCircle2, 'ضمان حقيقي معتمد', 'استبدال وفحص فوري'],
-                [Truck, 'شحن سريع ومؤمّن', 'لجميع المحافظات'],
-                [Shield, 'معاينة ودفع آمن', 'عند الاستلام أو بالمحفظة'],
-                [Phone, 'دعم ومتابعة مستمرة', 'خدمة عملاء سريعة'],
-              ].map(([Icon, t, d]) => (
-                <li key={t} className="flex items-start gap-3">
-                  <Icon className="w-7 h-7 shrink-0 text-fg" strokeWidth={1.4} aria-hidden="true" />
-                  <div>
-                    <div className="text-[14px] font-semibold text-fg leading-snug">{t}</div>
-                    <div className="text-[12px] text-muted leading-snug">{d}</div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            {adsMode === ADS_MODE_CLASSIC ? (
+              <ClassicHeroBanner
+                slides={heroSlides}
+                index={currentSlideIdx}
+                setIndex={(v) => setHeroAdIndex(((v % heroSlides.length) + heroSlides.length) % heroSlides.length)}
+                onOpen={handleOpenAdDetails}
+                rtl={!i18nActive}
+                swipeProps={swipeProps(
+                  () => setHeroAdIndex(prev => (prev + 1) % heroSlides.length),
+                  () => setHeroAdIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length)
+                )}
+                swipeSuppressRef={swipeSuppressRef}
+                cfg={adsClassicCfg}
+              />
+            ) : (
+              <AppleCardsCarousel
+                ads={heroSlides}
+                cfg={adsCarouselCfg}
+                onOpen={handleOpenAdDetails}
+                rtl={!i18nActive}
+                label={i18nActive ? 'Featured campaigns' : 'العروض المميزة'}
+              />
+            )}
+            {(() => {
+              const heroCfg = Array.isArray(siteSettings?.homeSectionsConfig) ? siteSettings.homeSectionsConfig.find(s => s.id === 'hero_ads') : null;
+              if (heroCfg && heroCfg.content && heroCfg.content.showTrustStrip === false) return null;
+              const iconMap = { check: CheckCircle2, truck: Truck, shield: Shield, phone: Phone };
+              const customBadges = Array.isArray(siteSettings?.discoveredControls?.trustBadges) && siteSettings.discoveredControls.trustBadges.length > 0
+                ? siteSettings.discoveredControls.trustBadges.filter(b => b && b.visible !== false)
+                : [
+                    { id: 'tb1', icon: 'check', title: 'ضمان حقيقي معتمد', desc: 'استبدال وفحص فوري' },
+                    { id: 'tb2', icon: 'truck', title: 'شحن سريع ومؤمّن', desc: 'لجميع المحافظات' },
+                    { id: 'tb3', icon: 'shield', title: 'معاينة ودفع آمن', desc: 'عند الاستلام أو بالمحفظة' },
+                    { id: 'tb4', icon: 'phone', title: 'دعم ومتابعة مستمرة', desc: 'خدمة عملاء سريعة' }
+                  ];
+              return (
+                <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 rounded-[28px] bg-surface px-6 py-6 sm:px-10">
+                  {customBadges.map((b) => {
+                    const Icon = iconMap[b.icon] || CheckCircle2;
+                    return (
+                      <li key={b.id || b.title} className="flex items-start gap-3">
+                        <Icon className="w-7 h-7 shrink-0 text-fg" strokeWidth={1.4} aria-hidden="true" />
+                        <div>
+                          <div className="text-[14px] font-semibold text-fg leading-snug">{b.title}</div>
+                          <div className="text-[12px] text-muted leading-snug">{b.desc}</div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
           </div>
         )}
 
@@ -1437,8 +1469,18 @@ export function renderHomeView(ctx) {
         )}
 
         {/* 3. PROMOTIONAL MOSAIC (large + small tiles, driven by ads with placement promo_split / both) */}
-        {siteSettings.showHomePromoSplit !== false && promoSplitAds.length > 0 && (
+        {siteSettings.showHomePromoSplit !== false && adsMode === ADS_MODE_CLASSIC && adsClassicCfg.mosaic && promoSplitAds.length > 0 && (
           <AppleAdMosaic ads={promoSplitAds} onOpen={handleOpenAdDetails} rtl={!i18nActive} />
+        )}
+        {siteSettings.showHomePromoSplit !== false && adsMode !== ADS_MODE_CLASSIC && cardPromoAds.length > 0 && (
+          <AppleCardsCarousel
+            ads={cardPromoAds}
+            cfg={adsCarouselCfg}
+            onOpen={handleOpenAdDetails}
+            rtl={!i18nActive}
+            label={i18nActive ? 'Promotions' : 'عروض'}
+            eagerFirst={false}
+          />
         )}
 
         {/* 4. BEST SELLERS 4-COLUMN PRODUCT GRID */}
@@ -1530,6 +1572,71 @@ export function renderHomeView(ctx) {
         })}
 
         {/* Compact Sourcing Bar is now prominently displayed near the top of Homepage */}
+
+        {/* 6. CUSTOM SECTIONS ADDED VIA VISUAL EDITOR / SECTION BUILDER */}
+        {Array.isArray(siteSettings?.homeSectionsConfig) && siteSettings.homeSectionsConfig
+          .filter((s) => s && s.id && String(s.id).startsWith('custom_') && s.visible !== false)
+          .map((sec) => {
+            const dev = sec.devices || { desktop: true, tablet: true, mobile: true };
+            const devCls = [
+              dev.mobile === false ? 'hidden sm:block' : '',
+              dev.tablet === false ? 'sm:hidden lg:block' : '',
+              dev.desktop === false ? 'lg:hidden' : ''
+            ].filter(Boolean).join(' ');
+            return (
+              <section key={sec.id} className={`rounded-[28px] p-6 sm:p-10 border border-line ${devCls} ${sec.style?.bgMode === 'dark' ? 'bg-[#1D1D1F] text-white' : sec.style?.bgMode === 'accent' ? 'text-white' : 'bg-surface text-fg'}`} style={sec.style?.bgMode === 'accent' ? { backgroundColor: sec.style?.accentColor || '#0071E3' } : undefined}>
+                {sec.type === 'custom_banner' && (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="space-y-1">
+                      {sec.content?.eyebrow && <div className="text-xs font-bold opacity-80">{sec.content.eyebrow}</div>}
+                      <h3 className="text-xl sm:text-2xl font-black">{sec.content?.title}</h3>
+                      {sec.content?.subtitle && <p className="text-sm opacity-80">{sec.content.subtitle}</p>}
+                    </div>
+                    {sec.content?.ctaText && (
+                      <button type="button" onClick={() => setClientTab(sec.content.ctaAction || 'search')} className="px-6 py-2.5 rounded-full bg-white text-slate-900 text-sm font-bold shrink-0 self-start sm:self-center">
+                        {sec.content.ctaText}
+                      </button>
+                    )}
+                  </div>
+                )}
+                {sec.type === 'custom_features' && (
+                  <div className="space-y-4">
+                    {sec.content?.title && <h3 className="elz-h3">{sec.content.title}</h3>}
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                      {(sec.content?.items || []).map((it, i) => (
+                        <div key={i} className="p-4 rounded-2xl bg-bg/80 text-fg border border-line space-y-1">
+                          <div className="text-xl">{it.icon}</div>
+                          <div className="font-black text-sm">{it.title}</div>
+                          <div className="text-xs text-muted">{it.desc}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {sec.type === 'custom_faq' && (
+                  <div className="space-y-3">
+                    {sec.content?.title && <h3 className="elz-h3">{sec.content.title}</h3>}
+                    <div className="space-y-2">
+                      {(sec.content?.items || []).map((it, i) => (
+                        <details key={i} className="p-4 rounded-2xl bg-bg text-fg border border-line">
+                          <summary className="font-black text-sm cursor-pointer">{it.q}</summary>
+                          <p className="text-xs text-muted mt-2">{it.a}</p>
+                        </details>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {sec.type === 'custom_products' && (
+                  <div className="space-y-4">
+                    {sec.content?.title && <h3 className="elz-h3">{sec.content.title}</h3>}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {publicParts.slice(0, Number(sec.content?.limit) || 4).map((part, idx) => renderProductCard(part, idx))}
+                    </div>
+                  </div>
+                )}
+              </section>
+            );
+          })}
 
         {/* 7. NEWSLETTER */}
         {siteSettings.showHomeNewsletter !== false && (

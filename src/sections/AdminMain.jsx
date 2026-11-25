@@ -1,5 +1,11 @@
 import AdminMarketplace from './AdminMarketplace.jsx';
-import { User, Lock, Shield, TrendingUp, Printer, ClipboardList, LayoutGrid, Globe, RotateCcw, Layers, DollarSign, Upload, Camera, Database, Bell, Sparkles, Zap, Percent, Users, Tag, Building2, Cpu, X, Search, ChevronLeft, LogOut, Menu, RefreshCw, Save, Eye, AlertTriangle, Trash2, Plus, Phone } from 'lucide-react';
+import AdminVisualEditor from '../components/AdminVisualEditor.jsx';
+import AdminThemeEditor from '../components/AdminThemeEditor.jsx';
+import AdminPageSectionBuilder from '../components/AdminPageSectionBuilder.jsx';
+import { AdminVersionHistoryPanel, AdminAdvancedRolesStudio } from '../components/AdminVersionAndRbac.jsx';
+import AdminDashboardCustomizer from '../components/AdminDashboardCustomizer.jsx';
+import { GLOBAL_CONTROL_SEARCH_INDEX, readVersionHistory } from '../lib/adminControlCenter.js';
+import { User, Lock, Shield, TrendingUp, Palette, History, MousePointerClick, FileText, Printer, ClipboardList, LayoutGrid, Globe, RotateCcw, Layers, DollarSign, Upload, Camera, Database, Bell, Sparkles, Zap, Percent, Users, Tag, Building2, Cpu, X, Search, ChevronLeft, LogOut, Menu, RefreshCw, Save, Eye, AlertTriangle, Trash2, Plus, Phone } from 'lucide-react';
 import { BusinessIntelligenceView, OrderWorkflowBoard, AdminCommandPalette, SmartNotificationsPopover } from '../components/OrderWorkflowAndBI';
 import ExcelProductManager from '../components/ExcelProductManager';
 import SmartPricingEngine from '../components/SmartPricingEngine';
@@ -304,6 +310,33 @@ export function renderAdminDashboard(ctx) {
         groupTitle: 'تصميم المتجر والتسويق',
         items: [
           {
+            id: 'visual_editor',
+            label: 'المحرر المرئي للموقع',
+            desc: 'تعديل مباشر للبانرات والأقسام والنصوص مع معاينة حية',
+            keywords: 'محرر مرئي visual editor بانر تصميم معاينة تعديل مباشر',
+            icon: MousePointerClick,
+            badge: 'Live',
+            urgent: false
+          },
+          {
+            id: 'theme_editor',
+            label: 'محرر الهوية والألوان',
+            desc: 'ألوان الوضع النهاري والليلي والخطوط والمكونات (Design Tokens)',
+            keywords: 'الوان ثيم theme هوية بصرية خطوط dark mode light mode هيدر',
+            icon: Palette,
+            badge: 'Theme',
+            urgent: false
+          },
+          {
+            id: 'page_builder',
+            label: 'منشئ الصفحات والأقسام',
+            desc: 'ترتيب الأقسام بالسحب والإفلات، إنشاء صفحات SEO، وأدوات التحكم المكتشفة',
+            keywords: 'منشئ صفحات اقسام page builder section builder seo شارات نصوص',
+            icon: FileText,
+            badge: 'CMS',
+            urgent: false
+          },
+          {
             id: 'storefront_cms',
             label: 'استوديو الواجهة والإعلانات',
             desc: 'تصميم البنرات، التحكم الدقيق بالصور، الاختصارات، والنشرة',
@@ -381,6 +414,15 @@ export function renderAdminDashboard(ctx) {
             urgent: false
           },
           {
+            id: 'version_history',
+            label: 'سجل الإصدارات والنسخ',
+            desc: 'سجل التعديلات، مقارنة الفروقات، والنسخ الاحتياطي والاستعادة',
+            keywords: 'سجل تعديلات اصدارات نسخ احتياطي استعادة تراجع version backup',
+            icon: History,
+            badge: null,
+            urgent: false
+          },
+          {
             id: 'schema',
             label: 'قاعدة البيانات السحابية',
             desc: 'حالة الربط مع Supabase وأكواد الجداول SQL',
@@ -435,8 +477,22 @@ export function renderAdminDashboard(ctx) {
     ];
 
     const searchQ = adminSidebarSearch.trim().toLowerCase();
+    const allQuickTools = [
+      ...GLOBAL_CONTROL_SEARCH_INDEX.map(g => ({
+        label: g.label,
+        tab: g.tab,
+        sub: g.subTab ? () => { if (g.tab === 'storefront_cms') setAdminCmsSubTab(g.subTab); else if (g.tab === 'site_settings') setAdminSettingsSubTab(g.subTab); } : null,
+        kw: g.kw
+      })),
+      ...quickToolsIndex
+    ];
+    const scrollAdminTop = () => {
+      const el = document.getElementById('elz-admin-main-scroll');
+      if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
+      else scrollAdminTop();
+    };
     const matchedQuickTools = searchQ
-      ? quickToolsIndex.filter(t => `${t.label} ${t.kw}`.toLowerCase().includes(searchQ)).slice(0, 5)
+      ? allQuickTools.filter(t => `${t.label} ${t.kw}`.toLowerCase().includes(searchQ)).slice(0, 7)
       : [];
 
     const unreadAdminNotifs = notifications.filter(n => n.target === 'admin' && !n.read).length + pendingReqCount;
@@ -490,7 +546,7 @@ export function renderAdminDashboard(ctx) {
           {/* Top Brand + 1-Click Tuck/Collapse Button */}
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-line">
             <div
-              onClick={() => { setAdminTab('overview'); if (isMobileDrawer) setAdminMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              onClick={() => { setAdminTab('overview'); if (isMobileDrawer) setAdminMenuOpen(false); scrollAdminTop(); }}
               className="flex items-center gap-2 min-w-0 cursor-pointer"
             >
               <img
@@ -558,7 +614,7 @@ export function renderAdminDashboard(ctx) {
                     if (qt.sub) qt.sub();
                     setAdminSidebarSearch('');
                     if (isMobileDrawer) setAdminMenuOpen(false);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollAdminTop();
                   }}
                   className="w-full text-right px-2 py-1 rounded-lg hover:bg-[#0071E3] text-fg hover:text-white text-[10.5px] font-bold transition flex items-center justify-between gap-1"
                 >
@@ -609,7 +665,7 @@ export function renderAdminDashboard(ctx) {
                             onClick={() => {
                               setAdminTab(item.id);
                               if (isMobileDrawer) setAdminMenuOpen(false);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              scrollAdminTop();
                             }}
                             className={`w-full px-2 py-1.5 rounded-lg text-right border transition-all flex items-center justify-between gap-1.5 ${
                               active
@@ -714,7 +770,7 @@ export function renderAdminDashboard(ctx) {
                       type="button"
                       onClick={() => {
                         setAdminTab(item.id);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        scrollAdminTop();
                       }}
                       title={`${grp.groupTitle} — ${item.label}${item.badge !== null ? ` (${item.badge})` : ''}`}
                       className={`relative w-10 h-8 rounded-lg border flex items-center justify-center transition-all ${
@@ -762,12 +818,12 @@ export function renderAdminDashboard(ctx) {
       : (i18nActive ? 'lg:ml-[272px]' : 'lg:mr-[272px]');
 
     return (
-      <div className="min-h-screen w-full max-w-full bg-bg text-fg flex relative">
-        {/* Rock-Solid Fixed Full-Height Right Sidebar (Zero Vertical or Horizontal Scrollbars Guaranteed!) */}
+      <div className="elz-admin-shell">
+        {/* Full-Viewport Flex Sidebar (100dvh, zero overlapping fixed offset bugs) */}
         <aside
           id="elz-admin-sidebar"
-          className={`hidden lg:flex flex-col fixed top-0 bottom-0 ${i18nActive ? 'left-0 border-r' : 'right-0 border-l'} z-40 h-screen bg-surface dark:bg-[#161617] border-line overflow-y-auto overflow-x-hidden transition-[width] duration-300 ${
-            isDocked ? 'w-[70px]' : 'w-[272px]'
+          className={`hidden lg:flex flex-col elz-admin-sidebar-desktop ${i18nActive ? 'border-r' : 'border-l'} z-40 bg-surface dark:bg-[#161617] border-line transition-[width] duration-300 ${
+            isDocked ? 'w-[70px]' : 'w-[268px]'
           }`}
         >
           {isDocked ? renderDockedIconRail() : renderExpandedSidebar(false)}
@@ -786,10 +842,10 @@ export function renderAdminDashboard(ctx) {
           </div>
         )}
 
-        {/* Main Workspace Area (Offset cleanly by Fixed Sidebar width — Single Natural Browser Scrollbar Only!) */}
-        <div className={`flex-1 min-w-0 flex flex-col transition-[margin] duration-300 ${desktopContentMarginCls}`}>
-          {/* Clean Single-Row Sticky Top Header */}
-          <header className="sticky top-0 z-30 bg-surface/95 dark:bg-[#161617]/95 backdrop-blur-xl border-b border-line px-3 sm:px-6 py-3 shadow-2xs">
+        {/* Main Workspace Column — 100dvh Flex Column with ONE Single Main Scroll Container */}
+        <div className="elz-admin-workspace">
+          {/* Fixed-Top Header Bar (shrink-0, never scrolls away) */}
+          <header className="shrink-0 z-30 bg-surface/95 dark:bg-[#161617]/95 backdrop-blur-xl border-b border-line px-3 sm:px-6 py-2.5 shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {/* Right: Tuck/Expand Toggle + Colored Active Section Title */}
               <div className="flex items-center gap-2.5 min-w-0">
@@ -812,12 +868,22 @@ export function renderAdminDashboard(ctx) {
                   <span>{isDocked ? '◀ فرد القائمة' : 'ضم القائمة ▶'}</span>
                 </button>
 
-                <div className="min-w-0 flex items-center gap-2 flex-wrap">
-                  <span className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-black ${activeGroupTheme.headerCls}`}>
-                    <span>{activeGroupTheme.titleIcon}</span>
-                    <span>{currentNavItem.groupTitle}</span>
-                  </span>
-                  <h1 className="text-sm sm:text-lg font-black text-fg truncate">{currentNavItem.label}</h1>
+                <div className="min-w-0 flex flex-col">
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10.5px] font-bold text-muted">
+                    <span>مركز التحكم</span>
+                    <span>/</span>
+                    <span className="truncate">{currentNavItem.groupTitle}</span>
+                    <span>/</span>
+                    <span className="text-[#0071E3] font-extrabold truncate">{currentNavItem.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-sm sm:text-base font-black text-fg truncate">{currentNavItem.label}</h1>
+                    {adminSession?.displayName && (
+                      <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface2 border border-line text-[10px] font-bold text-muted">
+                        👤 {adminSession.displayName}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -861,7 +927,7 @@ export function renderAdminDashboard(ctx) {
                   onClick={() => {
                     setAdminTab('storefront_cms');
                     setAdminCmsSubTab('header_studio');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollAdminTop();
                   }}
                   className="h-9 px-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-600 text-slate-700 dark:text-slate-300 hover:text-white border border-slate-500/30 font-extrabold flex items-center gap-1 transition"
                   title="التحكم الكامل في الهيدر العلوي"
@@ -875,7 +941,7 @@ export function renderAdminDashboard(ctx) {
                   onClick={() => {
                     setAdminTab('storefront_cms');
                     setAdminCmsSubTab('footer_studio');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollAdminTop();
                   }}
                   className="h-9 px-2.5 rounded-xl bg-slate-500/10 hover:bg-slate-600 text-slate-700 dark:text-slate-300 hover:text-white border border-slate-500/30 font-extrabold flex items-center gap-1 transition"
                   title="التحكم الكامل في الفوتر (الجزء السفلي للموقع)"
@@ -889,7 +955,7 @@ export function renderAdminDashboard(ctx) {
                   onClick={() => {
                     setAdminTab('site_settings');
                     setAdminSettingsSubTab('mobile_push');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollAdminTop();
                   }}
                   className="h-9 px-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-300 hover:text-white border border-emerald-500/30 font-extrabold flex items-center gap-1 transition"
                   title="إشعارات الموبايل الفورية للطلبات"
@@ -1038,11 +1104,52 @@ export function renderAdminDashboard(ctx) {
             </div>
           </header>
 
-          {/* Active Module Content Container */}
-          <div className="flex-1 w-full max-w-[1440px] mx-auto p-3 sm:p-6 pb-24 min-w-0">
+          {/* SINGLE MAIN SCROLL AREA (100% remaining viewport height, zero competing scrollbars) */}
+          <div id="elz-admin-main-scroll" className="elz-admin-main-scroll">
+            <div className="w-full max-w-[1480px] mx-auto p-3 sm:p-5 pb-24 min-w-0">
             {adminTab === 'team' && isAdminOwner && renderAdminTeam()}
             {adminTab === 'karambo' && canAdmin('karambo') && renderAdminKarambo()}
-            {adminTab === 'marketplace' && canAdmin('marketplace') && (() => { const sc = ctx.getSupabaseConfig(); return <AdminMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} showToast={ctx.showToast} />; })()}
+            {adminTab === 'marketplace' && canAdmin('marketplace') && (() => { const sc = ctx.getSupabaseConfig(); return <AdminMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} showToast={ctx.showToast} adminCredentials={adminCredentials} adminSession={adminSession} />; })()}
+            {adminTab === 'visual_editor' && canAdmin('visual_editor') && (
+              <AdminVisualEditor
+                siteSettings={siteSettings}
+                setSiteSettings={ctx.setSiteSettings}
+                saveSiteSettingsImmediate={saveSiteSettingsImmediate}
+                storeAds={storeAds}
+                parts={parts}
+                adminSession={adminSession}
+                showToast={showToast}
+                onOpenStorefront={() => switchPortal('storefront')}
+                onNavigateTab={(t) => { setAdminTab(t); scrollAdminTop(); }}
+              />
+            )}
+            {adminTab === 'theme_editor' && canAdmin('theme_editor') && (
+              <AdminThemeEditor
+                siteSettings={siteSettings}
+                setSiteSettings={ctx.setSiteSettings}
+                saveSiteSettingsImmediate={saveSiteSettingsImmediate}
+                adminSession={adminSession}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'page_builder' && canAdmin('page_builder') && (
+              <AdminPageSectionBuilder
+                siteSettings={siteSettings}
+                setSiteSettings={ctx.setSiteSettings}
+                saveSiteSettingsImmediate={saveSiteSettingsImmediate}
+                adminSession={adminSession}
+                showToast={showToast}
+              />
+            )}
+            {adminTab === 'version_history' && canAdmin('version_history') && (
+              <AdminVersionHistoryPanel
+                siteSettings={siteSettings}
+                setSiteSettings={ctx.setSiteSettings}
+                saveSiteSettingsImmediate={saveSiteSettingsImmediate}
+                adminSession={adminSession}
+                showToast={showToast}
+              />
+            )}
             {adminTab !== 'team' && !canAdmin(adminTab) && (
               <div className="bg-surface border border-line rounded-3xl p-10 text-center space-y-3">
                 <Shield className="w-10 h-10 mx-auto text-rose-500" />
@@ -1246,6 +1353,7 @@ export function renderAdminDashboard(ctx) {
             {adminTab === 'returns' && renderAdminReturnsAndComplaints()}
             {adminTab === 'sourcing' && renderAdminSourcing()}
             {adminTab === 'schema' && renderAdminDatabaseSchema()}
+            </div>
           </div>
         </div>
 
@@ -1259,7 +1367,7 @@ export function renderAdminDashboard(ctx) {
           models={models}
           brands={brands}
           normalizePartCategory={normalizePartCategory}
-          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onNavigateTab={(t) => { setAdminTab(t); scrollAdminTop(); }}
           onCreateProductFromAi={(payload) => {
             const targetModel = models[0] || { id: 'or_mdl_001', brand: brands[0] || 'OR - Majentik' };
             const created = {
@@ -1313,7 +1421,7 @@ export function renderAdminDashboard(ctx) {
           parts={parts}
           orders={orders}
           clients={clients}
-          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onNavigateTab={(t) => { setAdminTab(t); scrollAdminTop(); }}
           onOpenAi={() => setAiCommandOpen(true)}
         />
 
@@ -1322,7 +1430,7 @@ export function renderAdminDashboard(ctx) {
           onClose={() => setSmartNotifsOpen(false)}
           parts={parts}
           orders={orders}
-          onNavigateTab={(t) => { setAdminTab(t); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          onNavigateTab={(t) => { setAdminTab(t); scrollAdminTop(); }}
         />
 
         {/* Sleek Responsive Floating Bottom Bar & Scrollable Mobile Popup (Zero Clipping on Any Phone!) */}
@@ -1338,7 +1446,7 @@ export function renderAdminDashboard(ctx) {
                     <button
                       type="button"
                       onClick={() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        scrollAdminTop();
                         setFloatingBottomMenuOpen(false);
                       }}
                       className="px-2.5 py-1 rounded-lg bg-[#0071E3] text-white text-[10px] sm:text-[11px] font-extrabold"
@@ -1375,7 +1483,7 @@ export function renderAdminDashboard(ctx) {
                               onClick={() => {
                                 setAdminTab(it.id);
                                 setFloatingBottomMenuOpen(false);
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                scrollAdminTop();
                               }}
                               className={`w-full px-2.5 py-1.5 rounded-xl text-right text-[11px] font-extrabold flex items-center justify-between gap-1.5 transition ${
                                 isAct ? gTheme.activeRow : 'hover:bg-surface2 text-fg'
@@ -1414,7 +1522,7 @@ export function renderAdminDashboard(ctx) {
                   onClick={() => {
                     setAdminTab(sc.id);
                     setFloatingBottomMenuOpen(false);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollAdminTop();
                   }}
                   className={`px-1.5 sm:px-3 py-1.5 rounded-xl sm:rounded-full flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 transition min-w-0 ${
                     isAct ? `${sc.activeCls} shadow` : 'bg-white/10 hover:bg-white/20 text-slate-100'
@@ -1601,8 +1709,26 @@ export function renderAdminOverview(ctx) {
       violet: 'border-slate-500/40 bg-slate-500/12 text-slate-700 dark:text-slate-300',
       cyan: 'border-slate-500/40 bg-slate-500/12 text-slate-700 dark:text-slate-300'
     };
+    const adminKey = (ctx.adminSession && ctx.adminSession.username) || 'owner';
+    const quickNavItems = [
+      { id: 'overview', label: 'الرئيسية', icon: TrendingUp },
+      { id: 'visual_editor', label: 'المحرر المرئي', icon: MousePointerClick },
+      { id: 'theme_editor', label: 'الهوية والألوان', icon: Palette },
+      { id: 'page_builder', label: 'الصفحات والأقسام', icon: FileText },
+      { id: 'orders', label: 'الطلبات', icon: ClipboardList },
+      { id: 'marketplace', label: 'مراجعة الإعلانات', icon: Sparkles },
+      { id: 'catalog', label: 'الكتالوج', icon: Layers },
+      { id: 'version_history', label: 'سجل الإصدارات', icon: History }
+    ];
     return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      <AdminDashboardCustomizer
+        adminKey={adminKey}
+        allNavItems={quickNavItems}
+        onNavigateTab={(t) => { setAdminTab(t); const el = document.getElementById('elz-admin-main-scroll'); if (el) el.scrollTo({ top: 0, behavior: 'smooth' }); }}
+        versionHistory={readVersionHistory(siteSettings)}
+        showToast={showToast}
+      />
       {/* Executive General Manager Report Banner */}
       <div className="bg-gradient-to-r from-nav via-nav2 to-nav text-white rounded-2xl p-5 border-2 border-amber-400/50 shadow-lg flex flex-wrap items-center justify-between gap-4">
         <div className="space-y-1">
@@ -2275,8 +2401,8 @@ const TEAM_PERMISSION_GROUPS = [
   { title: 'الملخص والتقارير', tabs: [['overview', 'الرئيسية والملخص'], ['bi_analytics', 'تحليلات الأعمال (BI)'], ['reports', 'تقارير المدير العام']] },
   { title: 'المبيعات والطلبات', tabs: [['orders', 'الطلبات والفواتير'], ['order_workflow', 'سير عمل الطلبات (Kanban)'], ['sourcing', 'طلبات الاستيراد (من برّه)'], ['returns', 'المرتجعات والشكاوى']] },
   { title: 'المنتجات والمخازن', tabs: [['catalog', 'الكتالوج والموديلات'], ['excel_products', 'جدول المنتجات (Excel)'], ['smart_pricing', 'محرك التسعير الذكي (AI)'], ['ai_product_sourcing', 'وكيل الاستيراد الذكي (AI)'], ['bulk_importer', 'المستورد الذكي بالروابط'], ['quality_images', 'جودة الكتالوج والصور'], ['quick_stock', 'الجرد السريع للمخزن'], ['restock_alerts', 'قائمة الانتظار (نبّهني)']] },
-  { title: 'تصميم المتجر والتسويق', tabs: [['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['marketplace', 'إعلانات بيع الموبايلات (بيع عندنا)'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
-  { title: 'العملاء والإعدادات', tabs: [['clients', 'العملاء والحسابات'], ['groups', 'شرائح الأسعار والشحن'], ['site_settings', 'إعدادات المتجر والدفع'], ['schema', 'قاعدة البيانات السحابية']] }
+  { title: 'تصميم المتجر والتسويق', tabs: [['visual_editor', 'المحرر المرئي للموقع'], ['theme_editor', 'محرر الهوية والألوان'], ['page_builder', 'منشئ الصفحات والأقسام'], ['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['marketplace', 'إعلانات بيع الموبايلات (بيع عندنا)'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
+  { title: 'العملاء والإعدادات', tabs: [['clients', 'العملاء والحسابات'], ['groups', 'شرائح الأسعار والشحن'], ['site_settings', 'إعدادات المتجر والدفع'], ['version_history', 'سجل الإصدارات والنسخ'], ['schema', 'قاعدة البيانات السحابية']] }
 ];
 const TEAM_ALL_TABS = TEAM_PERMISSION_GROUPS.flatMap(g => g.tabs.map(t => t[0]));
 const TEAM_TAB_LABELS = Object.fromEntries(TEAM_PERMISSION_GROUPS.flatMap(g => g.tabs));
@@ -2330,6 +2456,17 @@ export function renderAdminTeam(ctx) {
         )}
       </div>
 
+      <AdminAdvancedRolesStudio
+        siteSettings={ctx.siteSettings}
+        setSiteSettings={ctx.setSiteSettings}
+        saveSiteSettingsImmediate={ctx.saveSiteSettingsImmediate}
+        showToast={ctx.showToast}
+        onApplyRoleToEmployeeForm={(role) => setTeamForm({
+          ...blankForm,
+          roleLabel: role.nameAr,
+          permissions: role.pages.includes('*') ? [...TEAM_ALL_TABS] : [...role.pages]
+        })}
+      />
       <div className="bg-slate-500/10 border border-slate-500/25 rounded-2xl px-4 py-3 text-[11px] text-fg flex items-start gap-2">
         <Shield className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
         <span>كلمات مرور الموظفين بتتخزن <b>مشفرة</b> ومحدش يقدر يشوفها — ولا حتى انت. لو موظف نسي كلمته، غيّرهاله من «تعديل». وكلمات مرور <b>العملاء</b> بتفضل ظاهرة ليك انت بس زي ما هي، لأن إدارة الفريق مقفولة ببيانات المالك.</span>

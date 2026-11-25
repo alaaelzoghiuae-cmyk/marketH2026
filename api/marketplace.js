@@ -4,12 +4,13 @@
 //
 // Env (Vercel → Settings → Environment Variables):
 //   SUPABASE_URL                 (أو VITE_SUPABASE_URL)
-//   SUPABASE_ANON_KEY            (أو VITE_SUPABASE_ANON_KEY)  — لتحقق تسجيل دخول العميل عبر RPC client_login
+//   SUPABASE_ANON_KEY            (أو VITE_SUPABASE_ANON_KEY)  — لتحقق تسجيل دخول العميل/المدير
 //   SUPABASE_SERVICE_ROLE_KEY    — سرّي، على السيرفر فقط. يُستخدم لرفع الصور وتنفيذ دوال mp_*
 //   MARKETPLACE_TOKEN_SECRET     — (اختياري) سر توقيع جلسة البائع؛ الافتراضي مشتق من service key
 //
-// الأفعال:  auth · submit · mine · update · report (POST)  |  contact (GET)
-// لا يوجد أي رقم ثابت: رابط واتساب يُبنى من رقم الإعلان نفسه بعد التحقق.
+// الأفعال:
+//   Public/Seller: auth · submit · mine · update · report (POST) | contact (GET)
+//   Admin (JWT or verified Owner/RBAC): admin_list · admin_history · admin_review · admin_handle_report (POST)
 // =============================================================================
 import crypto from 'node:crypto';
 import {
@@ -59,10 +60,15 @@ function verifyToken(tok) {
   } catch { return null; }
 }
 
-async function rest(path, { method = 'GET', body, key = SERVICE, headers = {} } = {}) {
+async function rest(path, { method = 'GET', body, key = SERVICE, authToken = null, headers = {} } = {}) {
   const r = await fetch(`${SB_URL}${path}`, {
     method,
-    headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', ...headers },
+    headers: {
+      apikey: key,
+      Authorization: `Bearer ${authToken || key}`,
+      'Content-Type': 'application/json',
+      ...headers
+    },
     body: body === undefined ? undefined : JSON.stringify(body)
   });
   const txt = await r.text();
@@ -70,6 +76,48 @@ async function rest(path, { method = 'GET', body, key = SERVICE, headers = {} } 
   return { ok: r.ok, status: r.status, json, text: txt };
 }
 const rpc = (name, args) => rest(`/rest/v1/rpc/${name}`, { method: 'POST', body: args });
+
+// ---- Server-side Admin Verification (Supabase Auth JWT OR verified Owner/RBAC RPC) ----
+async function verifyAdminRequest(req, body) {
+  const authHeader = String(req.headers.authorization || '');
+  if (authHeader.startsWith('Bearer ')) {
+    const jwt = authHeader.slice(7).trim();
+    if (jwt) {
+      const prof = await rest('/rest/v1/rpc/my_admin_profile', { method: 'POST', key: ANON, authToken: jwt, body: {} });
+      if (prof.ok && prof.json && prof.json.role) {
+        return { ok: true, mode: 'jwt', jwt, actor: prof.json.display_name || prof.json.role, role: prof.json.role };
+      }
+    }
+  }
+  const creds = body && body.adminAuth && typeof body.adminAuth === 'object' ? body.adminAuth : null;
+  const u = String(creds?.username || '').trim().toLowerCase();
+  const p = String(creds?.password || '');
+  if (!u || !p) return { ok: false };
+
+  // 1) Owner login via server-side verify_admin_login RPC
+  const ownerRes = await rest('/rest/v1/rpc/verify_admin_login', {
+    method: 'POST',
+    key: ANON,
+    body: { p_username: u, p_password: p }
+  });
+  if (ownerRes.ok && ownerRes.json === true) {
+    return { ok: true, mode: 'owner', actor: u, role: 'owner' };
+  }
+
+  // 2) Staff RBAC login via server-side admin_user_login RPC (must have marketplace permission)
+  const staffRes = await rest('/rest/v1/rpc/admin_user_login', {
+    method: 'POST',
+    key: ANON,
+    body: { p_username: u, p_password: p }
+  });
+  if (staffRes.ok && staffRes.json && staffRes.json.ok) {
+    const perms = Array.isArray(staffRes.json.permissions) ? staffRes.json.permissions : [];
+    if (perms.includes('*') || perms.includes('marketplace')) {
+      return { ok: true, mode: 'staff', actor: staffRes.json.display_name || staffRes.json.username, role: staffRes.json.role_label || 'staff' };
+    }
+  }
+  return { ok: false };
+}
 
 const ERR_MAP = {
   rate_limited: [429, 'وصلت للحد الأقصى المسموح حاليًا — حاول لاحقًا'],
@@ -139,6 +187,152 @@ export default async function handler(req, res) {
     if (!sameOrigin(req)) return send(403, { ok: false, error: 'Forbidden origin' });
     if (!SERVICE || !SECRET) return send(503, { ok: false, error: 'الخدمة غير مهيأة: ضبط SUPABASE_SERVICE_ROLE_KEY مطلوب على السيرفر' });
     const body = req.body && typeof req.body === 'object' ? req.body : {};
+
+    // =========================================================================
+    // ADMIN ACTIONS (Verified via Supabase Auth JWT OR Owner/RBAC Server RPC)
+    // Solves the blocker where Owner/RBAC login could not moderate ads!
+    // =========================================================================
+    if (action.startsWith('admin_')) {
+      if (!allow('adm:' + ip, 120, 60_000)) return send(429, { ok: false, error: 'طلبات كثيرة — انتظر لحظة' });
+      const admin = await verifyAdminRequest(req, body);
+      if (!admin.ok) return send(401, { ok: false, error: 'غير مصرح — تحقق من تسجيل دخول الإدارة', needAdminAuth: true });
+
+      if (action === 'admin_list') {
+        await rpc('mp_expire_stale', {});
+        const [a, b] = await Promise.all([
+          rest('/rest/v1/marketplace_listings?select=*&deleted_at=is.null&order=created_at.desc&limit=500'),
+          rest('/rest/v1/marketplace_reports?select=*,marketplace_listings(title,public_id,status)&order=created_at.desc&limit=200')
+        ]);
+        if (!a.ok) return send(a.status === 404 ? 404 : 500, { ok: false, error: a.status === 404 ? 'جداول بيع عندنا غير موجودة — شغّل sql/08_marketplace.sql' : 'تعذر جلب الإعلانات' });
+        return send(200, { ok: true, listings: a.json || [], reports: b.ok ? (b.json || []) : [], actor: admin.actor });
+      }
+
+      if (action === 'admin_history') {
+        const lid = String(body.listingId || '').trim();
+        if (!lid) return send(400, { ok: false, error: 'معرّف الإعلان مطلوب' });
+        const h = await rest(`/rest/v1/marketplace_listing_status_history?listing_id=eq.${encodeURIComponent(lid)}&order=created_at.desc&limit=100`);
+        return send(200, { ok: true, history: h.ok ? (h.json || []) : [] });
+      }
+
+      if (action === 'admin_review') {
+        const lid = String(body.listingId || '').trim();
+        const op = String(body.op || '').trim();
+        const reason = body.reason ? String(body.reason).slice(0, 500) : null;
+        const patch = body.patch && typeof body.patch === 'object' ? body.patch : null;
+        if (!lid || !op) return send(400, { ok: false, error: 'بيانات الإجراء ناقصة' });
+
+        // If authenticated with a real Supabase JWT, delegate directly to mp_admin_review RPC
+        if (admin.mode === 'jwt' && admin.jwt) {
+          const r = await rest('/rest/v1/rpc/mp_admin_review', {
+            method: 'POST',
+            key: ANON,
+            authToken: admin.jwt,
+            body: { p_listing_id: lid, p_action: op, p_reason: reason, p_patch: patch }
+          });
+          if (!r.ok) { const [c, m] = mapDbError(r); return send(c, { ok: false, error: m }); }
+          return send(200, { ok: true });
+        }
+
+        // Verified Owner/RBAC server-side audited execution via SERVICE role
+        const nowIso = new Date().toISOString();
+        const expIso = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
+        const updates = { reviewed_at: nowIso, updated_at: nowIso };
+        let histAction = op;
+
+        if (op === 'approve') {
+          updates.status = 'published'; updates.published_at = nowIso; updates.expires_at = expIso; updates.reject_reason = null; updates.hidden_by = null;
+        } else if (op === 'approve_hold') {
+          updates.status = 'approved'; updates.reject_reason = null; histAction = 'approve';
+        } else if (op === 'publish') {
+          updates.status = 'published'; updates.published_at = nowIso; updates.expires_at = expIso; updates.hidden_by = null;
+        } else if (op === 'reject') {
+          if (!reason) return send(400, { ok: false, error: 'سبب الرفض مطلوب' });
+          updates.status = 'rejected'; updates.reject_reason = reason;
+        } else if (op === 'hide') {
+          updates.status = 'hidden'; updates.hidden_by = 'admin'; histAction = 'admin_hide';
+        } else if (op === 'unhide') {
+          updates.status = 'published'; updates.hidden_by = null; histAction = 'admin_unhide';
+        } else if (op === 'feature') {
+          updates.is_featured = true;
+        } else if (op === 'unfeature') {
+          updates.is_featured = false;
+        } else if (op === 'mark_sold') {
+          updates.status = 'sold'; updates.sold_at = nowIso; histAction = 'admin_mark_sold';
+        } else if (op === 'delete') {
+          if (!reason) return send(400, { ok: false, error: 'سبب الحذف مطلوب' });
+          updates.deleted_at = nowIso; updates.status = 'hidden'; updates.reject_reason = reason; histAction = 'admin_delete';
+        } else if (op === 'edit' && patch) {
+          if (patch.title !== undefined) updates.title = String(patch.title).trim().slice(0, 140);
+          if (patch.price !== undefined && Number(patch.price) > 0) updates.price = Number(patch.price);
+          if (patch.city !== undefined) updates.city = String(patch.city).trim().slice(0, 80);
+          if (patch.area !== undefined) updates.area = String(patch.area).trim().slice(0, 120);
+          if (patch.description !== undefined) updates.description = String(patch.description).slice(0, 2000);
+          if (patch.defects !== undefined) updates.defects = String(patch.defects).slice(0, 1000);
+          if (patch.admin_note !== undefined) updates.admin_note = String(patch.admin_note).slice(0, 1000);
+          histAction = 'admin_edit';
+        } else {
+          return send(400, { ok: false, error: 'إجراء غير معروف' });
+        }
+
+        const uRes = await rest(`/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(lid)}`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: updates
+        });
+        if (!uRes.ok) { const [c, m] = mapDbError(uRes); return send(c, { ok: false, error: m }); }
+
+        await rest('/rest/v1/marketplace_listing_status_history', {
+          method: 'POST',
+          body: {
+            listing_id: lid,
+            action: histAction,
+            actor_type: 'admin',
+            reason: reason || `بواسطة ${admin.actor}`
+          }
+        }).catch(() => {});
+
+        return send(200, { ok: true });
+      }
+
+      if (action === 'admin_handle_report') {
+        const rid = String(body.reportId || '').trim();
+        const st = body.status === 'dismissed' ? 'dismissed' : 'resolved';
+        const hideListing = !!body.hideListing;
+        if (!rid) return send(400, { ok: false, error: 'معرّف البلاغ مطلوب' });
+
+        if (admin.mode === 'jwt' && admin.jwt) {
+          const r = await rest('/rest/v1/rpc/mp_admin_handle_report', {
+            method: 'POST',
+            key: ANON,
+            authToken: admin.jwt,
+            body: { p_report_id: rid, p_status: st, p_hide_listing: hideListing }
+          });
+          if (!r.ok) return send(500, { ok: false, error: 'تعذر تحديث البلاغ' });
+          return send(200, { ok: true });
+        }
+
+        const repRes = await rest(`/rest/v1/marketplace_reports?id=eq.${encodeURIComponent(rid)}`, {
+          method: 'PATCH',
+          headers: { Prefer: 'return=representation' },
+          body: { status: st, resolved_at: new Date().toISOString() }
+        });
+        if (!repRes.ok) return send(500, { ok: false, error: 'تعذر تحديث البلاغ' });
+        const repRow = Array.isArray(repRes.json) ? repRes.json[0] : repRes.json;
+        if (hideListing && repRow && repRow.listing_id) {
+          await rest(`/rest/v1/marketplace_listings?id=eq.${encodeURIComponent(repRow.listing_id)}`, {
+            method: 'PATCH',
+            body: { status: 'hidden', hidden_by: 'admin', updated_at: new Date().toISOString() }
+          });
+          await rest('/rest/v1/marketplace_listing_status_history', {
+            method: 'POST',
+            body: { listing_id: repRow.listing_id, action: 'admin_hide', actor_type: 'admin', reason: `إخفاء بسبب بلاغ (${admin.actor})` }
+          }).catch(() => {});
+        }
+        return send(200, { ok: true });
+      }
+
+      return send(400, { ok: false, error: 'إجراء إداري غير معروف' });
+    }
 
     // ---------------- auth: credentials → short-lived token ----------------
     if (action === 'auth') {

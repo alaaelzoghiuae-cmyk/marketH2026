@@ -84,7 +84,18 @@ function AdImage({ ad, className = '', maxH = '' }) {
 /* ------------------------------------------------------------------ */
 /*  Hero campaign                                                      */
 /* ------------------------------------------------------------------ */
-export function AppleHero({ slides, index, setIndex, onOpen, rtl = true, swipeProps, swipeSuppressRef }) {
+const HERO_HEIGHTS = {
+  compact: 'h-[420px] sm:h-[430px] lg:h-[400px]',
+  standard: 'h-[500px] sm:h-[520px] lg:h-[460px]',
+  tall: 'h-[560px] sm:h-[580px] lg:h-[540px]',
+};
+const HERO_IMG_MAXH = {
+  compact: 'max-h-[170px] sm:max-h-[210px] lg:max-h-[300px]',
+  standard: 'max-h-[200px] sm:max-h-[250px] lg:max-h-[380px]',
+  tall: 'max-h-[240px] sm:max-h-[300px] lg:max-h-[440px]',
+};
+
+export function AppleHero({ slides, index, setIndex, onOpen, rtl = true, swipeProps, swipeSuppressRef, heightMode = 'standard', showControls = true }) {
   const n = slides.length;
   const i = ((index % n) + n) % n;
   const ad = slides[i] || slides[0];
@@ -123,7 +134,7 @@ export function AppleHero({ slides, index, setIndex, onOpen, rtl = true, swipePr
         tabIndex={0}
         onClick={open}
         onKeyDown={(e) => { if (e.key === 'Enter') onOpen(ad); if (e.key === 'ArrowRight') setIndex(rtl ? i - 1 : i + 1); if (e.key === 'ArrowLeft') setIndex(rtl ? i + 1 : i - 1); }}
-        className="group relative isolate overflow-hidden rounded-[28px] cursor-pointer select-none h-[500px] sm:h-[520px] lg:h-[460px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071E3]"
+        className={`group relative isolate overflow-hidden rounded-[28px] cursor-pointer select-none ${HERO_HEIGHTS[heightMode] || HERO_HEIGHTS.standard} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0071E3]`}
       >
         <Backdrop th={th} light={light && !fullBleed} />
         {fullBleed ? (
@@ -136,7 +147,7 @@ export function AppleHero({ slides, index, setIndex, onOpen, rtl = true, swipePr
           <div dir="ltr" className={`relative h-full flex flex-col ${center ? 'lg:flex-col' : imgFirst ? 'lg:flex-row' : 'lg:flex-row-reverse'} justify-between`}>
             {text}
             <div className={`relative flex-1 min-h-0 flex items-center justify-center p-4 sm:p-8 ${center ? 'pb-6' : ''} order-last ${center ? '' : imgFirst ? 'lg:order-first' : 'lg:order-last'}`}>
-              <AdImage ad={ad} maxH="max-h-[200px] sm:max-h-[250px] lg:max-h-[380px]" />
+              <AdImage ad={ad} maxH={HERO_IMG_MAXH[heightMode] || HERO_IMG_MAXH.standard} />
             </div>
           </div>
         ) : (
@@ -144,7 +155,7 @@ export function AppleHero({ slides, index, setIndex, onOpen, rtl = true, swipePr
         )}
       </div>
 
-      {n > 1 && (
+      {n > 1 && showControls && (
         <div className="flex items-center justify-center gap-3 mt-4">
           <button type="button" onClick={() => setIndex(i - 1)} aria-label={rtl ? 'السابق' : 'Previous'} className="w-9 h-9 rounded-full bg-surface hover:bg-surface2 text-fg flex items-center justify-center transition active:scale-95">
             <PrevI className="w-4 h-4" />

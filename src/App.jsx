@@ -3,6 +3,7 @@ import { OR_BRAND_IMAGES } from './orCatalogData';
 import { X, Check, Phone } from 'lucide-react';
 import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY_REG_FORM, INITIAL_ACCOUNT_REQUESTS, INITIAL_AUTO_TEMPLATES, INITIAL_BRANDS, INITIAL_CLIENTS, INITIAL_COMPLAINTS, INITIAL_CURRENCIES, INITIAL_GROUPS, INITIAL_MODELS, INITIAL_ORDERS, INITIAL_PARTS, INITIAL_PROMO_CODES, INITIAL_RETURNS, INITIAL_SHOWCASE_BARS, INITIAL_SITE_SETTINGS, INITIAL_STORE_ADS, PART_IMAGES, SHORTCUT_ICON_PRESETS, SRC_DEPOSIT_LABEL } from './data/constants.jsx';
 import { getAdminJwt, adminSignIn, adminSignOut, fetchMyAdminProfile, ensureFreshAdminJwt } from './lib/sbAuth.js';
+import { applyThemeTokensToDocument, DEFAULT_CMS_PAGES } from './lib/adminControlCenter.js';
 import { ensureCacheVersions } from './lib/cacheVersions.js';
 import { MarketplacePage, MarketplaceHost } from './sections/Marketplace.jsx';
 import { B64_UPLOAD_CACHE, applyVisit, b64Key, detectVisitSource, escapeHtml, getPaymentMethods, loadPersisted, localDayKey, normalizeDigits, nowStamp, readFileAsDataUrl } from './lib/utils.jsx';
@@ -361,6 +362,20 @@ const [isInitialCloudBooting, setIsInitialCloudBooting] = useState(() => {
     }
   });
 const [siteSettings, setSiteSettings] = useState(() => loadPersisted('siteSettings', INITIAL_SITE_SETTINGS));
+const [activeCmsPageSlug, setActiveCmsPageSlug] = useState('');
+useEffect(() => {
+    try {
+      if (siteSettings && siteSettings.themeTokens) {
+        applyThemeTokensToDocument(siteSettings.themeTokens, uiTheme);
+      }
+      const seo = siteSettings && siteSettings.discoveredControls && siteSettings.discoveredControls.seo;
+      if (seo && seo.siteTitle) document.title = seo.siteTitle;
+      if (seo && seo.metaDescription) {
+        let md = document.querySelector('meta[name="description"]');
+        if (md) md.setAttribute('content', seo.metaDescription);
+      }
+    } catch (e) {}
+  }, [siteSettings?.themeTokens, siteSettings?.discoveredControls?.seo, uiTheme]);
 const toggleUiTheme = () => {
     const next = uiTheme === 'dark' ? 'light' : 'dark';
     setUiTheme(next);
@@ -636,6 +651,9 @@ useEffect(() => {
         const h = (window.location.hash || '').toLowerCase();
         if (h.includes('alaadb') || h.includes('admin')) {
           setAppPortal('admin');
+        } else if (h.startsWith('#/page/')) {
+          const slug = decodeURIComponent((window.location.hash || '').slice(7).split('?')[0]).trim();
+          if (slug) { setAppPortal('storefront'); setActiveCmsPageSlug(slug); setClientTab('cms_page'); }
         } else if (window.location.hash === '#/' || window.location.hash === '#store') {
           setAppPortal('storefront');
         }
@@ -10643,6 +10661,57 @@ return (
             {clientTab === 'account' && renderClientAccountPortal()}
             {clientTab === 'karambo' && renderKaramboPage()}
             {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return <MarketplacePage sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />; })()}
+            {clientTab === 'cms_page' && (() => {
+              const allPages = Array.isArray(siteSettings?.cmsPages) && siteSettings.cmsPages.length > 0 ? siteSettings.cmsPages : DEFAULT_CMS_PAGES;
+              const pg = allPages.find((p) => p.slug === activeCmsPageSlug && p.status === 'published');
+              if (!pg) return (
+                <div className="max-w-3xl mx-auto px-4 py-16 text-center space-y-3">
+                  <h2 className="text-xl font-black text-fg">الصفحة غير موجودة</h2>
+                  <button type="button" onClick={() => setClientTab('home')} className="px-5 py-2.5 rounded-full bg-[#0071E3] text-white text-xs font-bold">العودة للرئيسية</button>
+                </div>
+              );
+              return (
+                <div className="max-w-[1200px] mx-auto px-4 sm:px-8 py-8 space-y-8">
+                  <div className="flex items-center justify-between gap-2">
+                    <h1 className="text-2xl sm:text-3xl font-black text-fg">{pg.titleAr}</h1>
+                    <button type="button" onClick={() => setClientTab('home')} className="px-4 py-2 rounded-full bg-surface border border-line text-xs font-bold text-fg">← الرئيسية</button>
+                  </div>
+                  {(pg.sections || []).filter((s) => s.visible !== false).map((sec) => (
+                    <section key={sec.id} className="rounded-[24px] p-6 sm:p-8 border border-line bg-surface space-y-3">
+                      {sec.content?.eyebrow && <div className="text-xs font-bold text-[#0071E3]">{sec.content.eyebrow}</div>}
+                      {sec.content?.title && <h2 className="text-xl font-black text-fg">{sec.content.title}</h2>}
+                      {sec.content?.subtitle && <p className="text-sm text-muted leading-relaxed">{sec.content.subtitle}</p>}
+                      {sec.type === 'custom_features' && Array.isArray(sec.content?.items) && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                          {sec.content.items.map((it, idx) => (
+                            <div key={idx} className="p-4 rounded-2xl bg-bg border border-line space-y-1">
+                              <div className="text-xl">{it.icon}</div>
+                              <div className="font-black text-sm text-fg">{it.title}</div>
+                              <div className="text-xs text-muted">{it.desc}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {sec.type === 'custom_faq' && Array.isArray(sec.content?.items) && (
+                        <div className="space-y-2 pt-2">
+                          {sec.content.items.map((it, idx) => (
+                            <details key={idx} className="p-4 rounded-2xl bg-bg border border-line">
+                              <summary className="font-black text-sm text-fg cursor-pointer">{it.q}</summary>
+                              <p className="text-xs text-muted mt-2 leading-relaxed">{it.a}</p>
+                            </details>
+                          ))}
+                        </div>
+                      )}
+                      {sec.content?.ctaText && (
+                        <button type="button" onClick={() => setClientTab(sec.content.ctaAction || 'search')} className="px-5 py-2.5 rounded-full bg-[#0071E3] text-white text-xs font-bold">
+                          {sec.content.ctaText}
+                        </button>
+                      )}
+                    </section>
+                  ))}
+                </div>
+              );
+            })()}
           </main>
           {clientTab === 'checkout' ? renderCheckoutFooter() : renderClientFooter()}
         </div>
