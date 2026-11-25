@@ -170,7 +170,7 @@ export function ImageViewer({ images, index, onClose, onIndexChange }) {
               src={src}
               alt=""
               onClick={() => onIndexChange(i)}
-              className={`w-12 h-12 rounded-lg object-cover cursor-pointer border-2 ${i === idx ? 'border-[#3B82F6]' : 'border-transparent opacity-60'}`}
+              className={`w-12 h-12 rounded-lg object-cover cursor-pointer border-2 ${i === idx ? 'border-[#2F6BB3]' : 'border-transparent opacity-60'}`}
             />
           ))}
         </div>
@@ -264,13 +264,13 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
   const renderAmbientWaves = () => (
     <>
       <svg className="pointer-events-none absolute inset-0 w-full h-full opacity-30" preserveAspectRatio="none" viewBox="0 0 1440 540" fill="none">
-        <path d="M-80 410 C 340 160, 720 500, 1520 110" stroke={th.accentColor || '#60A5FA'} strokeWidth="2" strokeOpacity="0.5" />
-        <path d="M-80 470 C 420 220, 800 540, 1520 190" stroke={th.accentColor || '#3B82F6'} strokeWidth="1.2" strokeOpacity="0.3" />
+        <path d="M-80 410 C 340 160, 720 500, 1520 110" stroke={th.accentColor || '#7FB0E8'} strokeWidth="2" strokeOpacity="0.5" />
+        <path d="M-80 470 C 420 220, 800 540, 1520 190" stroke={th.accentColor || '#2F6BB3'} strokeWidth="1.2" strokeOpacity="0.3" />
       </svg>
       <div
         className="pointer-events-none absolute inset-0"
         style={{
-          background: `radial-gradient(48% 72% at 24% 50%, ${th.accentColor || '#3B82F6'}2e 0%, transparent 72%)`
+          background: 'transparent'
         }}
       />
     </>
@@ -289,7 +289,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
           } ${
             dark
               ? 'bg-white/12 text-blue-200 border border-white/20 backdrop-blur-md'
-              : 'bg-[#2563EB]/12 text-[#1D4ED8] border border-[#2563EB]/25'
+              : 'bg-[#1E4E8C]/12 text-[#163B6B] border border-[#1E4E8C]/25'
           }`}
         >
           <Bidi text={ad.badge} />
@@ -475,7 +475,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
             {renderCopyBlock()}
           </div>
           <div className={`${compact ? 'w-[38%] h-24' : isPromoCard ? 'w-36 h-36 sm:w-44 sm:h-44' : 'w-48 h-48 sm:w-64 sm:h-64 lg:w-[42%] lg:h-[290px]'} ${heroFixed && !compact && !isPromoCard ? 'max-lg:w-full max-lg:flex-1 max-lg:min-h-0 max-lg:h-auto' : ''} relative flex items-center justify-center shrink-0`}>
-            <div className="pointer-events-none absolute w-40 h-40 sm:w-60 sm:h-60 rounded-full blur-3xl opacity-35" style={{ backgroundColor: th.accentColor || '#3B82F6' }} />
+            <div className="pointer-events-none absolute w-40 h-40 sm:w-60 sm:h-60 rounded-full blur-3xl opacity-35" style={{ backgroundColor: th.accentColor || '#2F6BB3' }} />
             <div
               style={imgTransformStyle}
               className={`${
@@ -555,7 +555,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
           >
             <div
               className="pointer-events-none absolute w-36 h-36 sm:w-56 sm:h-56 rounded-full blur-3xl opacity-30"
-              style={{ backgroundColor: th.accentColor || '#3B82F6' }}
+              style={{ backgroundColor: th.accentColor || '#2F6BB3' }}
             />
             <div
               className={`relative flex items-center justify-center overflow-hidden transition-all duration-300 ${stageHeightCls}${heroFixed && !compact && !isPromoCard ? ' max-lg:h-full max-lg:max-h-[190px]' : ''} ${radiusCls} ${frameContainerCls}`}

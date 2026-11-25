@@ -345,7 +345,7 @@ export function buildWhatsAppCompareText(devices, analysis, shareUrl = '') {
 
 export function openPrintableComparisonWindow(devices, analysis) {
   const esc = (s) => String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const headers = devices.map(d => `<th style="padding:10px;border:1px solid #cbd5e1;background:#eff6ff;font-size:13px;">${esc(d.name)}<div style="font-size:11px;color:#2563eb;margin-top:4px;">نقاط التفوق: ${analysis.scores[d.id] || 0}</div></th>`).join('');
+  const headers = devices.map(d => `<th style="padding:10px;border:1px solid #cbd5e1;background:#eff6ff;font-size:13px;">${esc(d.name)}<div style="font-size:11px;color:#1e4e8c;margin-top:4px;">نقاط التفوق: ${analysis.scores[d.id] || 0}</div></th>`).join('');
   const rowsHtml = (analysis.keyRows || []).map((r, i) => `
     <tr style="background:${i % 2 ? '#f8fafc' : '#fff'}">
       <td style="padding:8px 10px;border:1px solid #cbd5e1;font-weight:700;color:#475569;">${esc(r.label)}</td>
@@ -354,9 +354,9 @@ export function openPrintableComparisonWindow(devices, analysis) {
   const html = `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>مقارنة كرومبو — ELZOGHBI MARKET</title>
   <style>body{font-family:Tahoma,Arial,sans-serif;padding:24px;color:#0f172a;} table{width:100%;border-collapse:collapse;margin-top:16px;} @media print{button{display:none!important;}}</style>
   </head><body>
-    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #2563eb;padding-bottom:12px;">
-      <div><h1 style="margin:0;font-size:20px;color:#1d4ed8;">مقارنة كرومبو الشغلانة — ELZOGHBI MARKET</h1><div style="font-size:12px;color:#64748b;margin-top:4px;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</div></div>
-      <button onclick="window.print()" style="padding:8px 16px;background:#2563eb;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer;">طباعة / حفظ PDF</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1e4e8c;padding-bottom:12px;">
+      <div><h1 style="margin:0;font-size:20px;color:#163b6b;">مقارنة كرومبو الشغلانة — ELZOGHBI MARKET</h1><div style="font-size:12px;color:#64748b;margin-top:4px;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</div></div>
+      <button onclick="window.print()" style="padding:8px 16px;background:#1e4e8c;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer;">طباعة / حفظ PDF</button>
     </div>
     ${analysis.verdict ? `<div style="margin-top:14px;padding:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;font-size:13px;font-weight:700;color:#1e40af;">🕵️‍♂️ حكم كرومبو: ${esc(analysis.verdict)}</div>` : ''}
     <table><thead><tr><th style="padding:10px;border:1px solid #cbd5e1;background:#f1f5f9;">وجه المقارنة</th>${headers}</tr></thead><tbody>${rowsHtml}</tbody></table>

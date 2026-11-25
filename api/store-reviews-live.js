@@ -749,5 +749,79 @@ export default async function handler(req, res) {
     return res.status(200).json(payload);
   }
 
+    if (action === 'scam_check') {
+    const q = String(qObj.q || '').trim();
+    if (q.length < 3) return res.status(200).json({ ok: true, riskLevel: 'unknown', signals: [], matches: [], advice: '' });
+
+    const cacheKey = `scam:${q.toLowerCase()}`;
+    const cached = getCache(cacheKey);
+    if (cached) return res.status(200).json({ ...cached, cached: true });
+
+    const isUrl = /facebook\.com|fb\.com|instagram\.com|tiktok\.com|http|www\./i.test(q);
+    const digits = q.replace(/\D+/g, '');
+    const isPhone = digits.length >= 8;
+    const cleanQ = q.replace(/^https?:\/\/(?:www\.|m\.)?/, '').replace(/\/$/, '');
+
+    const [ypHits, tpHits, redditHits, webHits] = await Promise.all([
+      searchYellowPagesEgypt(cleanQ, 'الكل').catch(() => []),
+      searchTrustpilot(cleanQ).catch(() => []),
+      fetchRedditEgyptExperiences(cleanQ).catch(() => []),
+      (async () => {
+        try {
+          const dQ = `"${cleanQ}" نصب OR احتيال OR تحذير OR مضمون OR تجربة مصر`;
+          const r = await httpRequest(`https://html.duckduckgo.com/html/?q=${encodeURIComponent(dQ)}`, { timeout: 6000 });
+          if (r.status !== 200) return [];
+          const out = [];
+          const re = /<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<a[^>]+class="result__snippet"[^>]*>([\s\S]*?)<\/a>/gi;
+          let m;
+          while ((m = re.exec(r.body)) !== null && out.length < 6) {
+            const title = stripHtml(m[2]);
+            const snippet = stripHtml(m[3]);
+            if (!snippet) continue;
+            let href = m[1];
+            const uddg = href.match(/uddg=([^&]+)/);
+            if (uddg) { try { href = decodeURIComponent(uddg[1]); } catch {} }
+            const txt = `${title} ${snippet}`.toLowerCase();
+            const isWarning = /(نصب|نصاب|احتيال|تحذير|بلاش|مضروب|مغشوش|حرامي|scam|fraud|fake)/i.test(txt);
+            out.push({ title, snippet, url: href.startsWith('http') ? href : '', isWarning });
+          }
+          return out;
+        } catch { return []; }
+      })()
+    ]);
+
+    const warningCount = webHits.filter(w => w.isWarning).length + redditHits.filter(r => r.rating <= 2).length;
+    const positiveCount = ypHits.length + tpHits.filter(t => t.googleRating >= 3.8).length + redditHits.filter(r => r.rating >= 4).length;
+
+    let riskLevel = 'unknown';
+    let advice = 'مفيش بلاغات مسجلة بالاسم أو الرقم ده على الويب المفتوح، لكن دايماً استلم وافحص الجهاز بنفسك قبل دفع أي عربون.';
+    if (warningCount >= 1) {
+      riskLevel = 'high';
+      advice = 'تحذير: ظهرت إشارات أو تجارب سلبية/تحذيرات مرتبطة بالبحث ده على الإنترنت — راجع النتائج تحت كويس وماتحولش أي عربون قبل التأكد.';
+    } else if (positiveCount >= 1) {
+      riskLevel = 'low';
+      advice = 'المتجر أو الرقم ظاهر في أدلة رسمية وتجارب إيجابية — برضه اتأكد إنك بتتعامل مع الحساب الرسمي والفاتورة الضريبية.';
+    } else if (isUrl || isPhone) {
+      riskLevel = 'medium';
+      advice = isUrl
+        ? 'الصفحة دي مش مسجلة في الأدلة التجارية الرسمية — افحص تاريخ إنشاء الصفحة وتفاعل التعليقات الحقيقي وماتحولش فودافون كاش أو إنستاباي قبل الاستلام.'
+        : 'الرقم ده مش مسجل كخط ساخن رسمي لمتجر معروف — اطلب عنوان فرع حقيقي أو دفع عند الاستلام مع فتح العلبة.';
+    }
+
+    const payload = {
+      ok: true,
+      query: q,
+      riskLevel,
+      advice,
+      warningCount,
+      positiveCount,
+      storesFound: [...ypHits.slice(0, 4), ...tpHits.slice(0, 3)],
+      communitySignals: redditHits.slice(0, 4),
+      webSignals: webHits.slice(0, 5)
+    };
+    setCache(cacheKey, payload);
+    return res.status(200).json(payload);
+  }
+
   return res.status(400).json({ ok: false, error: 'Invalid action' });
 }

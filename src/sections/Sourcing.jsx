@@ -154,10 +154,10 @@ export function renderSourcingFormModal(ctx) {
             }}
             onPointerCancel={() => { setSrcSheetDragging(false); setSrcSheetDrag(0); }}
           >
-          <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-violet-950"><span className="w-12 h-1.5 rounded-full bg-surface" /></div>
-          <div className="flex items-center justify-between px-4 py-2.5 sm:py-3 border-b border-line bg-gradient-to-l from-violet-950 to-indigo-900 text-white">
+          <div className="sm:hidden pt-2.5 pb-1 flex justify-center bg-slate-950"><span className="w-12 h-1.5 rounded-full bg-surface" /></div>
+          <div className="flex items-center justify-between px-4 py-2.5 sm:py-3 border-b border-line bg-gradient-to-l from-slate-950 to-slate-900 text-white">
             <div>
-              <div className="text-[11px] text-violet-200 font-bold">🌍 اطلب منتجك من أي مكان</div>
+              <div className="text-[11px] text-slate-200 font-bold">🌍 اطلب منتجك من أي مكان</div>
               <div className="font-extrabold">ابعت طلبك</div>
             </div>
             <button type="button" onClick={() => setSourcingFormOpen(false)} className="hidden sm:flex w-10 h-10 rounded-xl bg-surface items-center justify-center">
@@ -192,7 +192,7 @@ export function renderSourcingFormModal(ctx) {
                     </button>
                   </div>
                 ) : (
-                  <label className="w-20 h-20 rounded-xl border-2 border-dashed border-line hover:border-violet-500 flex items-center justify-center text-3xl text-muted cursor-pointer">
+                  <label className="w-20 h-20 rounded-xl border-2 border-dashed border-line hover:border-slate-500 flex items-center justify-center text-3xl text-muted cursor-pointer">
                     +
                     <input type="file" accept="image/*" className="hidden" onChange={handleSrcFormImage} />
                   </label>
@@ -206,7 +206,7 @@ export function renderSourcingFormModal(ctx) {
               <div className="font-extrabold text-fg">شروط الخدمة</div>
               <div className="max-h-40 overflow-y-auto p-2.5 rounded-lg bg-surface border border-line text-[11px] leading-relaxed text-muted whitespace-pre-line">{termsText}</div>
               <label className="flex items-start gap-2 cursor-pointer font-bold text-fg">
-                <input type="checkbox" checked={srcForm.accept} onChange={e => setSrcForm(p => ({ ...p, accept: e.target.checked }))} className="w-4 h-4 mt-0.5 accent-violet-600" />
+                <input type="checkbox" checked={srcForm.accept} onChange={e => setSrcForm(p => ({ ...p, accept: e.target.checked }))} className="w-4 h-4 mt-0.5 accent-slate-600" />
                 <span>قرأت شروط الخدمة وموافق عليها *</span>
               </label>
             </div>
@@ -216,7 +216,7 @@ export function renderSourcingFormModal(ctx) {
               <button type="button" onClick={() => setSourcingFormOpen(false)} className="py-3.5 rounded-xl bg-surface2 text-fg font-extrabold text-sm">
                 إغلاق
               </button>
-              <button type="submit" className="col-span-2 py-3.5 rounded-xl bg-gradient-to-l from-violet-600 to-indigo-600 text-white font-extrabold text-sm">
+              <button type="submit" className="col-span-2 py-3.5 rounded-xl bg-gradient-to-l from-slate-600 to-slate-600 text-white font-extrabold text-sm">
                 ابعت الطلب
               </button>
             </div>
@@ -234,7 +234,7 @@ export function renderClientSourcingSection(ctx) {
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <h3 className="text-sm font-extrabold text-fg flex items-center gap-2">🌍 طلباتي من برّه ({mine.length})</h3>
-          <button type="button" onClick={openSourcing} className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-extrabold">
+          <button type="button" onClick={openSourcing} className="px-3.5 py-2 rounded-xl bg-slate-600 hover:bg-slate-700 text-white text-xs font-extrabold">
             + اطلب منتج جديد
           </button>
         </div>
@@ -249,7 +249,7 @@ export function renderClientSourcingSection(ctx) {
           const stepIdx = SRC_STEPS.indexOf(req.status);
           const cancellable = !req.closed && ['جديد', 'قيد المراجعة', 'تم تحديد السعر', 'تم استلام العربون', 'جاري التجهيز'].includes(req.status);
           return (
-            <div key={req.id} className="bg-surface rounded-2xl border border-violet-200 shadow-xs overflow-hidden">
+            <div key={req.id} className="bg-surface rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
               <button
                 type="button"
                 onClick={() => {
@@ -274,7 +274,7 @@ export function renderClientSourcingSection(ctx) {
                     <div className="flex flex-wrap items-center gap-1.5 pb-1">
                       {SRC_STEPS.map((st, i) => (
                         <div key={st} className="flex items-center gap-1 shrink-0">
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-extrabold ${i <= stepIdx ? 'bg-violet-600 text-white' : 'bg-surface2 text-muted'}`}>{st}</span>
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-extrabold ${i <= stepIdx ? 'bg-slate-600 text-white' : 'bg-surface2 text-muted'}`}>{st}</span>
                           {i < SRC_STEPS.length - 1 && <span className="text-muted">›</span>}
                         </div>
                       ))}
@@ -419,7 +419,7 @@ export function renderAdminSourcing(ctx) {
                 <div className="font-bold text-muted">لون الخلفية</div>
                 <div className="flex flex-wrap gap-2">
                   {Object.keys(AD_THEMES).map(k => (
-                    <button key={k} type="button" onClick={() => setBanner({ theme: k })} title={AD_THEMES[k].label} style={{ background: AD_THEMES[k].cssGrad }} className={`px-3 py-2 rounded-xl border-2 flex items-center gap-2 text-xs font-extrabold transition ${banner.theme === k ? 'border-[#3B82F6] ring-2 ring-[#3B82F6]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'} ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}><span className="w-3.5 h-3.5 rounded-full border border-white/40" style={{ background: AD_THEMES[k].accentColor }} /><span>{AD_THEMES[k].label}</span></button>
+                    <button key={k} type="button" onClick={() => setBanner({ theme: k })} title={AD_THEMES[k].label} style={{ background: AD_THEMES[k].cssGrad }} className={`px-3 py-2 rounded-xl border-2 flex items-center gap-2 text-xs font-extrabold transition ${banner.theme === k ? 'border-[#2F6BB3] ring-2 ring-[#2F6BB3]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'} ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}><span className="w-3.5 h-3.5 rounded-full border border-white/40" style={{ background: AD_THEMES[k].accentColor }} /><span>{AD_THEMES[k].label}</span></button>
                   ))}
                 </div>
               </div>
@@ -506,7 +506,7 @@ export function renderAdminSourcing(ctx) {
                       العربون (ج.م)
                       <input type="number" min="0" value={draft.deposit} onChange={e => setSrcPriceDraft(prev => ({ ...prev, [req.id]: { ...draft, deposit: e.target.value } }))} className="w-full p-2 rounded-lg border border-line bg-bg text-fg" />
                     </label>
-                    <button type="button" onClick={() => adminSaveSrcPrice(req)} className="sm:col-span-2 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white font-extrabold">
+                    <button type="button" onClick={() => adminSaveSrcPrice(req)} className="sm:col-span-2 py-2.5 rounded-lg bg-slate-600 hover:bg-slate-700 text-white font-extrabold">
                       احفظ السعر وبلّغ العميل
                     </button>
                   </div>

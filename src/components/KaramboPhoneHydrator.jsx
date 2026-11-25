@@ -51,7 +51,7 @@ export default function KaramboPhoneHydrator({ phone, onHydrated, genEditorial }
 
   if (!phone || (!phone.loadingSpecs && !phone.loadingPrice)) return null;
   return (
-    <div className="rounded-2xl bg-[#2563EB]/10 border border-[#2563EB]/30 px-4 py-2.5 flex items-center gap-2 text-xs font-black text-[#2563EB] dark:text-[#60A5FA]">
+    <div className="rounded-2xl bg-[#1E4E8C]/10 border border-[#1E4E8C]/30 px-4 py-2.5 flex items-center gap-2 text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8]">
       <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
       <span>جاري تحميل المواصفات الكاملة وفحص السعر الحالي في مصر...</span>
     </div>

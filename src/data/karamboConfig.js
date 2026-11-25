@@ -1,31 +1,32 @@
 // ===================== Korombo Shared Config & Defaults (11 Services — 100% White-Labeled) =====================
 
 export const KARAMBO_SERVICES = [
-  { id: 'guide', title: 'دليل الموبايلات', desc: 'كل موديلات العالم بمواصفاتها وأسعارها في مصر', icon: 'Smartphone', color: 'bg-sky-500', badge: 'شامل' },
-  { id: 'compare', title: 'قارن بنفسك', desc: 'قارن أي موبايل في العالم بالتفصيل', icon: 'Scale', color: 'bg-violet-500', badge: 'مباشر' },
-  { id: 'reviews', title: 'تحريات كرومبو: تقييم المحلات', desc: 'اعرف تجارب الناس مع المحلات والمنصات قبل ما تشتري', icon: 'Shield', color: 'bg-emerald-600', badge: 'جديد' },
-  { id: 'news', title: 'آخر الأخبار', desc: 'أحدث أخبار ومراجعات وإطلاقات الموبايلات', icon: 'Megaphone', color: 'bg-blue-600', badge: '' },
-  { id: 'choose', title: 'ساعدني أختار', desc: 'ترشيحات حية من السوق المصري على قد ميزانيتك', icon: 'Sparkles', color: 'bg-amber-500', badge: '' },
-  { id: 'radar', title: 'رادار الأسعار', desc: 'مؤشر البورصة الحية: إيه نزل وإيه طلع النهاردة', icon: 'TrendingDown', color: 'bg-rose-500', badge: 'حي' },
-  { id: 'gulf', title: 'من الخليج ولا مصر؟', desc: 'أسعار الخليج ومصر التلقائية مع حاسبة الجمارك والصرف', icon: 'Globe', color: 'bg-indigo-500', badge: '' },
-  { id: 'tradein', title: 'قيّم موبايلك القديم', desc: 'سعر بيع موبايلك العادل وفرق الاستبدال تلقائياً', icon: 'RotateCcw', color: 'bg-orange-500', badge: '' },
-  { id: 'compatibility', title: 'فاحص التوافق', desc: 'إكسسوارات وشواحن متجرنا المتوافقة مع جهازك', icon: 'Cpu', color: 'bg-teal-500', badge: '' },
-  { id: 'budget', title: 'على قد ميزانيتك', desc: 'منتجات وباكدجات المتجر جوه حدود سعرك', icon: 'Wallet', color: 'bg-emerald-500', badge: '' },
-  { id: 'installment', title: 'حاسبة التقسيط', desc: 'مقدم وخطط تقسيط وجدول شهور فوري', icon: 'Calculator', color: 'bg-cyan-600', badge: '' }
+  { id: 'guide', title: 'دليل الموبايلات', desc: 'كل موديلات العالم بمواصفاتها وأسعارها في مصر', icon: 'Smartphone', color: 'bg-slate-700', badge: 'شامل' },
+  { id: 'compare', title: 'قارن بنفسك', desc: 'قارن أي موبايل في العالم بالتفصيل', icon: 'Scale', color: 'bg-slate-700', badge: 'مباشر' },
+  { id: 'reviews', title: 'تحريات كرومبو: تقييم المحلات', desc: 'اعرف تجارب الناس مع المحلات والمنصات قبل ما تشتري', icon: 'Shield', color: 'bg-slate-700', badge: 'جديد' },
+  { id: 'news', title: 'آخر الأخبار', desc: 'أحدث أخبار ومراجعات وإطلاقات الموبايلات', icon: 'Megaphone', color: 'bg-slate-700', badge: '' },
+  { id: 'wearables', title: 'ساعات وسماعات ذكية', desc: 'ساعات وسماعات أصلية من أشهر الماركات العالمية بالسعر وتقييم العملاء', icon: 'Watch', color: 'bg-slate-700', badge: 'جديد' },
+  { id: 'choose', title: 'ساعدني أختار', desc: 'ترشيحات حية من السوق المصري على قد ميزانيتك', icon: 'Sparkles', color: 'bg-slate-700', badge: '' },
+  { id: 'radar', title: 'رادار الأسعار', desc: 'مؤشر البورصة الحية: إيه نزل وإيه طلع النهاردة', icon: 'TrendingDown', color: 'bg-slate-700', badge: 'حي' },
+  { id: 'gulf', title: 'من الخليج ولا مصر؟', desc: 'أسعار الخليج ومصر التلقائية مع حاسبة الجمارك والصرف', icon: 'Globe', color: 'bg-slate-700', badge: '' },
+  { id: 'tradein', title: 'قيّم موبايلك القديم', desc: 'سعر بيع موبايلك العادل وفرق الاستبدال تلقائياً', icon: 'RotateCcw', color: 'bg-slate-700', badge: '' },
+  { id: 'compatibility', title: 'فاحص التوافق', desc: 'إكسسوارات وشواحن متجرنا المتوافقة مع جهازك', icon: 'Cpu', color: 'bg-slate-700', badge: '' },
+  { id: 'budget', title: 'على قد ميزانيتك', desc: 'منتجات وباكدجات المتجر جوه حدود سعرك', icon: 'Wallet', color: 'bg-slate-700', badge: '' },
+  { id: 'installment', title: 'حاسبة التقسيط', desc: 'مقدم وخطط تقسيط وجدول شهور فوري', icon: 'Calculator', color: 'bg-slate-700', badge: '' }
 ];
 
 export const KARAMBO_THEMES = {
-  blue: { label: 'أزرق كرومبو الكلاسيكي', from: '#1D4ED8', via: '#2563EB', to: '#0EA5E9', border: 'rgba(29,78,216,0.45)', text: '#FFFFFF' },
-  dark: { label: 'داكن فخم (VIP)', from: '#0F172A', via: '#1E293B', to: '#334155', border: 'rgba(148,163,184,0.35)', text: '#FFFFFF' },
-  emerald: { label: 'زمردي حيوي', from: '#047857', via: '#059669', to: '#14B8A6', border: 'rgba(16,185,129,0.45)', text: '#FFFFFF' },
-  violet: { label: 'بنفسجي ملكي', from: '#5B21B6', via: '#7C3AED', to: '#EC4899', border: 'rgba(139,92,246,0.45)', text: '#FFFFFF' },
-  sunset: { label: 'برتقالي ناري', from: '#C2410C', via: '#EA580C', to: '#F59E0B', border: 'rgba(249,115,22,0.45)', text: '#FFFFFF' },
-  custom: { label: 'ألوان مخصصة', from: '#1D4ED8', via: '#2563EB', to: '#0EA5E9', border: 'rgba(37,99,235,0.45)', text: '#FFFFFF' }
+  blue: { label: 'أزرق مؤسسي', from: '#1E4E8C', via: '#1E4E8C', to: '#1E4E8C', border: 'rgba(30,78,140,0.45)', text: '#FFFFFF' },
+  dark: { label: 'فحمي داكن', from: '#1B1F24', via: '#1B1F24', to: '#1B1F24', border: 'rgba(148,163,184,0.30)', text: '#FFFFFF' },
+  emerald: { label: 'أخضر ثقة', from: '#0F6B4F', via: '#0F6B4F', to: '#0F6B4F', border: 'rgba(16,185,129,0.40)', text: '#FFFFFF' },
+  violet: { label: 'بنفسجي هادئ', from: '#44407A', via: '#44407A', to: '#44407A', border: 'rgba(100,96,170,0.40)', text: '#FFFFFF' },
+  sunset: { label: 'برتقالي ترابي', from: '#A8480F', via: '#A8480F', to: '#A8480F', border: 'rgba(200,100,30,0.40)', text: '#FFFFFF' },
+  custom: { label: 'ألوان مخصصة', from: '#1E4E8C', via: '#1E4E8C', to: '#1E4E8C', border: 'rgba(30,78,140,0.45)', text: '#FFFFFF' }
 };
 
 export const KARAMBO_ICON_OPTIONS = [
   'Smartphone', 'Scale', 'Shield', 'Megaphone', 'Sparkles', 'Cpu', 'Wallet', 'TrendingDown',
-  'Calculator', 'Globe', 'RotateCcw', 'Zap', 'Award', 'Package', 'Tag', 'Layers', 'Gauge'
+  'Calculator', 'Globe', 'RotateCcw', 'Watch', 'Headphones', 'Zap', 'Award', 'Package', 'Tag', 'Layers', 'Gauge'
 ];
 
 export const KARAMBO_COLOR_OPTIONS = [
@@ -68,8 +69,8 @@ export const DEFAULT_KARAMBO_CFG = {
   showMascot: true,
   mascotUrl: '/karambo.png',
   theme: 'blue',
-  customFrom: '#1D4ED8',
-  customTo: '#0EA5E9',
+  customFrom: '#1E4E8C',
+  customTo: '#1E4E8C',
   services: {},
   serviceOrder: KARAMBO_SERVICES.map(s => s.id),
   serviceOverrides: {},

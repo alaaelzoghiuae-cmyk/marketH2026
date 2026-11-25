@@ -70,7 +70,7 @@ export function renderCheckoutView(ctx) {
                   onClick={() => setCheckoutAddressChoice('secondary')}
                   className={`p-3.5 rounded-xl border cursor-pointer transition ${
                     checkoutAddressChoice === 'secondary'
-                      ? 'border-violet-500 bg-violet-500/10 ring-2 ring-violet-500/20'
+                      ? 'border-slate-500 bg-slate-500/10 ring-2 ring-slate-500/20'
                       : 'border-line hover:bg-surface2'
                   }`}
                 >
@@ -153,7 +153,7 @@ export function renderCheckoutView(ctx) {
             {/* 3. Payment Methods */}
             <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
               <h3 className="text-sm font-extrabold text-fg flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-indigo-600" />
+                <CreditCard className="w-4 h-4 text-slate-600" />
                 3. طريقة الدفع
               </h3>
 
@@ -180,13 +180,13 @@ export function renderCheckoutView(ctx) {
                     pmId.includes('cod') || pmId.includes('cash') || pmId.includes('عند الاستلام')
                       ? { sel: 'border-emerald-500 bg-emerald-500/10 ring-2 ring-emerald-500/25', dot: 'bg-emerald-500', check: 'text-emerald-500' }
                       : pmId.includes('wallet') || pmId.includes('محفظة')
-                      ? { sel: 'border-violet-500 bg-violet-500/10 ring-2 ring-violet-500/25', dot: 'bg-violet-500', check: 'text-violet-500' }
+                      ? { sel: 'border-slate-500 bg-slate-500/10 ring-2 ring-slate-500/25', dot: 'bg-slate-500', check: 'text-slate-500' }
                       : pmId.includes('credit') || pmId.includes('آجل') || pmId.includes('اجل')
                       ? { sel: 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/25', dot: 'bg-amber-500', check: 'text-amber-500' }
                       : pmId.includes('bank') || pmId.includes('transfer') || pmId.includes('insta') || pmId.includes('تحويل')
-                      ? { sel: 'border-sky-500 bg-sky-500/10 ring-2 ring-sky-500/25', dot: 'bg-sky-500', check: 'text-sky-500' }
+                      ? { sel: 'border-slate-500 bg-slate-500/10 ring-2 ring-slate-500/25', dot: 'bg-slate-500', check: 'text-slate-500' }
                       : pmId.includes('card') || pmId.includes('visa') || pmId.includes('كارت')
-                      ? { sel: 'border-indigo-500 bg-indigo-500/10 ring-2 ring-indigo-500/25', dot: 'bg-indigo-500', check: 'text-indigo-500' }
+                      ? { sel: 'border-slate-500 bg-slate-500/10 ring-2 ring-slate-500/25', dot: 'bg-slate-500', check: 'text-slate-500' }
                       : { sel: 'border-blue-500 bg-blue-500/10 ring-2 ring-blue-500/25', dot: 'bg-blue-500', check: 'text-blue-500' };
                   return (
                   <button
@@ -440,7 +440,7 @@ export function renderCheckoutView(ctx) {
                   </div>
                 )}
                 {cartSummary.qtyDiscountTotalBase > 0 && (
-                  <div className="flex justify-between text-[#1D4ED8] dark:text-[#3B82F6] font-extrabold">
+                  <div className="flex justify-between text-[#163B6B] dark:text-[#2F6BB3] font-extrabold">
                     <span>🏷️ خصم الكميات (اشتري أكتر ووفّر):</span>
                     <span>-{formatMoney(cartSummary.qtyDiscountTotalBase)}</span>
                   </div>
@@ -493,7 +493,7 @@ export function renderCheckoutView(ctx) {
               <button
                 onClick={handlePlaceOrder}
                 disabled={placingOrder}
-                className="w-full py-3.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 أكّد وابعت الطلب

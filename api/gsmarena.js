@@ -628,6 +628,40 @@ async function fetchDeviceDetail(slugOrId) {
   return parsed;
 }
 
+// ---------- Featured ordering for the guide's first page ----------
+const NON_PHONE_RE = /\b(watch|band|pad|tab|tablet|buds|airpods|fit|ring|glasses|earbuds|ipad|pencil|vision|speaker|tv|laptop)\b/i;
+const MIDRANGE_RULES = [
+  { brand: 'samsung', re: /galaxy\s+(a\d{2}|m\d{2}|f\d{2}|s\d{2}\s+fe)\b/i },
+  { brand: 'xiaomi', re: /(redmi\s+(note\s+)?\d+|poco\s+[xmf]\d+|xiaomi\s+\d+[a-z]?\s*(lite)?)/i },
+  { brand: 'oppo', re: /oppo\s+(reno\s*\d+|a\d+)/i },
+  { brand: 'realme', re: /realme\s+(\d+|note|c\d+|gt)/i },
+  { brand: 'honor', re: /honor\s+(x\d+|\d{2,3}\b|play|90|200|400)/i },
+  { brand: 'infinix', re: /infinix\s+(note|hot|zero|smart|gt)/i },
+  { brand: 'tecno', re: /tecno\s+(spark|camon|pova|phantom)/i },
+  { brand: 'vivo', re: /vivo\s+(y\d+|v\d+|t\d+)/i }
+];
+
+function featuredOrder(list) {
+  const phones = list.filter(it => !NON_PHONE_RE.test(it.name || '') && !/\((china|india|japan|korea|vietnam|taiwan|russia|indonesia|brazil)/i.test(it.name || '') && !/\b(refresh|hd)\b/i.test(it.name || '') && !/\b(pro\s*max\s*mini)\b/i.test(it.name || ''));
+  const maxId = Math.max(...phones.map(p => parseInt(p.gsmId, 10) || 0), 0);
+  const recent = phones.filter(p => (parseInt(p.gsmId, 10) || 0) >= maxId - 2600);
+  const iphones = phones.filter(p => /^apple iphone/i.test(p.name || '') && !/\bse\b|\bmini\b/i.test(p.name || ''));
+  const topIphones = iphones.slice(0, 8);
+  const topSet = new Set(topIphones.map(p => p.id));
+
+  // Mid-range Android, interleaved by brand so the page is varied (newest first inside each brand)
+  const buckets = MIDRANGE_RULES.map(rule => recent.filter(p => (p.brand || '').toLowerCase() === rule.brand && rule.re.test(p.name || '') && !/\b(ultra|fold|flip|pro\+|magic)\b/i.test(p.name || '')));
+  const mid = [];
+  for (let i = 0; i < 6; i++) buckets.forEach(b => { if (b[i]) mid.push(b[i]); });
+  const midSet = new Set(mid.map(p => p.id));
+
+  const rest = phones.filter(p => !topSet.has(p.id) && !midSet.has(p.id));
+  // remaining Apple + flagship first, then everything else by recency
+  const restApple = rest.filter(p => /^apple iphone/i.test(p.name || ''));
+  const restOther = rest.filter(p => !/^apple iphone/i.test(p.name || ''));
+  return [...topIphones, ...mid, ...restApple.slice(0, 12), ...restOther, ...restApple.slice(12)];
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -761,7 +795,10 @@ export default async function handler(req, res) {
         list = list.filter(it => words.every(w => it.searchKey.includes(w)));
       }
       // Sort newest first (highest numeric ID)
-      const sorted = [...list].sort((a, b) => (parseInt(b.gsmId, 10) || 0) - (parseInt(a.gsmId, 10) || 0));
+      let sorted = [...list].sort((a, b) => (parseInt(b.gsmId, 10) || 0) - (parseInt(a.gsmId, 10) || 0));
+      // Default storefront view: iPhones first, then the mid-range Android phones people actually buy in Egypt.
+      // (Newest-ID order surfaced obscure rugged phones / watches that have no Egyptian price at all.)
+      if ((!brand || brand === 'all') && !enQ) sorted = featuredOrder(sorted);
       const total = sorted.length;
       const start = (page - 1) * limit;
       const slice = sorted.slice(start, start + limit).map(({ searchKey, ...clean }) => clean);

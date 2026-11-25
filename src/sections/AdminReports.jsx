@@ -8,9 +8,9 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
     return (
       <div className={`space-y-6 text-xs ${forPrintModal ? 'text-slate-900 bg-white p-6' : ''}`}>
         {/* Formal Report Header */}
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-nav via-nav2 to-nav text-white border-2 border-[#3B82F6]/40 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-nav via-nav2 to-nav text-white border-2 border-[#2F6BB3]/40 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <img src={ELZOGHBI_LOGO} alt="Logo" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#3B82F6] shadow-md" />
+            <img src={ELZOGHBI_LOGO} alt="Logo" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#2F6BB3] shadow-md" />
             <div>
               <div className="text-[11px] font-black text-amber-300 tracking-wide">
                 EXECUTIVE GENERAL MANAGER REPORT • تقرير الإدارة العامة التنفيذي
@@ -18,13 +18,13 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
               <h2 className="text-lg sm:text-xl font-black text-white mt-0.5">
                 {siteSettings.storeName || 'ELZOGHBI'} — التقرير الشامل للمبيعات والأرباح والمخازن
               </h2>
-              <div className="text-[11px] text-cyan-200 font-bold mt-1">
+              <div className="text-[11px] text-slate-200 font-bold mt-1">
                 الفترة من: <span className="font-mono text-white">{rep.fromStr}</span> إلى: <span className="font-mono text-white">{rep.toStr}</span> • تاريخ الإصدار: <span className="font-mono text-white">{new Date().toISOString().slice(0, 16).replace('T', ' ')}</span>
               </div>
             </div>
           </div>
           <div className="text-left space-y-1">
-            <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 font-black text-[#60A5FA] text-xs">
+            <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 font-black text-[#7FB0E8] text-xs">
               الأقسام المضمنة: {selectedCount} / 12 قسم
             </div>
             <div className="text-[11px] text-muted font-bold">
@@ -253,7 +253,7 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
         {gmReportSections.croAndMarketing && (
           <div className="bg-surface rounded-2xl p-5 border border-line space-y-3">
             <h3 className="text-sm sm:text-base font-black text-fg border-b border-line pb-2.5">
-              🚀 سابعاً: أداء الميزات التسويقية والكوبونات والكاش باك وسقف المبيعات
+              سابعاً: أداء الميزات التسويقية والكوبونات والكاش باك وسقف المبيعات
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="p-3 rounded-xl bg-surface2 border border-line">
@@ -377,7 +377,7 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
                 )}
               </div>
               <div className="p-3 rounded-xl bg-surface2 border border-line space-y-1.5">
-                <div className="font-black text-[#2563EB]">طلبات التوفير الخاصة من الخارج (Sourcing):</div>
+                <div className="font-black text-[#1E4E8C]">طلبات التوفير الخاصة من الخارج (Sourcing):</div>
                 {rep.activeSourcingList.length === 0 ? (
                   <div className="text-muted">لا توجد طلبات توفير مفتوحة.</div>
                 ) : (
@@ -486,7 +486,7 @@ export function renderAdminExecutiveReportsView(ctx) {
       { key: 'topProducts', icon: '🏆', label: '4. الأصناف الأكثر مبيعاً والأعلى ربحية' },
       { key: 'categoriesAndBrands', icon: '📊', label: '5. أداء المبيعات والأرباح حسب الأقسام والماركات' },
       { key: 'clientsAndDebts', icon: '👥', label: '6. كبار العملاء + مديونيات الآجل وأرصدة المحافظ' },
-      { key: 'croAndMarketing', icon: '🚀', label: '7. أداء العروض والكوبونات والكاش باك وسقف المبيعات' },
+      { key: 'croAndMarketing', icon: '', label: '7. أداء العروض والكوبونات والكاش باك وسقف المبيعات' },
       { key: 'returnsAndWarranty', icon: '🔄', label: '8. تقرير المرتجعات وطلبات الضمان والتعويضات' },
       { key: 'inventoryValuation', icon: '🏭', label: '9. تقييم أصول المخزن الحالي والنواقص الحرجة' },
       { key: 'restockAndSourcing', icon: '🔔', label: '10. طلبات "نبّهني عند التوفر" وطلبات التوفير الخارجي' },
@@ -497,7 +497,7 @@ export function renderAdminExecutiveReportsView(ctx) {
     return (
       <div className="space-y-5 text-xs">
         {/* Builder Controls Card */}
-        <div className="bg-surface rounded-3xl p-6 border-2 border-[#3B82F6]/45 shadow-lg space-y-5">
+        <div className="bg-surface rounded-3xl p-6 border-2 border-[#2F6BB3]/45 shadow-lg space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
             <div>
               <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
@@ -514,7 +514,7 @@ export function renderAdminExecutiveReportsView(ctx) {
               <button
                 type="button"
                 onClick={() => setGmReportPrintPreviewOpen(true)}
-                className="px-5 py-3 rounded-xl bg-gradient-to-l from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs flex items-center gap-2 shadow-lg"
+                className="px-5 py-3 rounded-xl bg-gradient-to-l from-slate-500 to-blue-600 hover:from-slate-400 hover:to-blue-500 text-white font-black text-xs flex items-center gap-2 shadow-lg"
               >
                 <Printer className="w-4 h-4" />
                 <span>🖨️ معاينة وطباعة التقرير الرسمي (A4 / PDF)</span>
@@ -522,7 +522,7 @@ export function renderAdminExecutiveReportsView(ctx) {
               <button
                 type="button"
                 onClick={handleExportGmReportCsv}
-                className="px-4 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+                className="px-4 py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
               >
                 <span>📥 تصدير التقرير لـ Excel (CSV)</span>
               </button>
@@ -540,7 +540,7 @@ export function renderAdminExecutiveReportsView(ctx) {
                   { id: 'last7', label: '📆 آخر 7 أيام' },
                   { id: 'month', label: '🗓️ هذا الشهر' },
                   { id: 'all', label: '♾️ كل الفترات (شامل)' },
-                  { id: 'custom', label: '🎯 تحديد تواريخ يدوياً' }
+                  { id: 'custom', label: 'تحديد تواريخ يدوياً' }
                 ].map(p => (
                   <button
                     key={p.id}
@@ -580,7 +580,7 @@ export function renderAdminExecutiveReportsView(ctx) {
 
             <div className="space-y-3">
               <div>
-                <label className="font-black text-fg block mb-1">🎯 نطاق الفواتير المحسوبة في الأرباح:</label>
+                <label className="font-black text-fg block mb-1">نطاق الفواتير المحسوبة في الأرباح:</label>
                 <select
                   value={gmReportOrderFilter}
                   onChange={e => setGmReportOrderFilter(e.target.value)}
@@ -663,7 +663,7 @@ export function renderAdminExecutiveReportsView(ctx) {
                       type="checkbox"
                       checked={checked}
                       onChange={e => setGmReportSections(prev => ({ ...prev, [sec.key]: e.target.checked }))}
-                      className="w-4 h-4 accent-cyan-500 shrink-0"
+                      className="w-4 h-4 accent-slate-500 shrink-0"
                     />
                     <span>{sec.icon}</span>
                     <span className="leading-snug">{sec.label}</span>
@@ -687,7 +687,7 @@ export function renderGmReportPrintModal(ctx) {
     const rep = computeGmReportData();
     return (
       <div className="fixed inset-0 bg-nav/90 backdrop-blur-xs z-[230] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-        <div className="bg-surface rounded-3xl max-w-5xl w-full p-4 sm:p-6 border-2 border-[#3B82F6] shadow-2xl space-y-4 my-auto max-h-[94vh] flex flex-col">
+        <div className="bg-surface rounded-3xl max-w-5xl w-full p-4 sm:p-6 border-2 border-[#2F6BB3] shadow-2xl space-y-4 my-auto max-h-[94vh] flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 print:hidden">
             <div className="flex items-center gap-2">
               <Printer className="w-5 h-5 text-accent-text" />
@@ -770,7 +770,7 @@ export function renderGmReportPrintModal(ctx) {
                     </div>`;
                   openCleanA4PrintWindow(`تقرير_ELZOGHBI_${rep.fromStr}_${rep.toStr}`, htmlBody);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+                className="px-5 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
               >
                 <Printer className="w-4 h-4" />
                 <span>🖨️ طباعة تقرير A4 احترافي / تصدير PDF</span>
@@ -778,7 +778,7 @@ export function renderGmReportPrintModal(ctx) {
               <button
                 type="button"
                 onClick={handleExportGmReportCsv}
-                className="px-4 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs"
+                className="px-4 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs"
               >
                 📥 تحميل Excel
               </button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Megaphone, Search, X, RefreshCw, Clock, Share2, ChevronLeft, Sparkles, CheckCircle2, Award, Zap
 } from 'lucide-react';
-import { fetchLiveNews } from '../services/karamboLiveClient.js';
+import { fetchLiveNewsResilient } from '../services/karamboLiveClient.js';
 
 /**
  * Editorial Magazine-Style "آخر الأخبار" Service (v22 — 100% White-Labeled)
@@ -23,15 +23,25 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
   const [cat, setCat] = useState('ALL');
   const [activeArticle, setActiveArticle] = useState(initialArticle);
 
-  const loadNews = async () => {
+  const [newsMeta, setNewsMeta] = useState({ at: 0, stale: false, sources: [] });
+
+  const loadNews = async (force = true) => {
     if (nCfg.enabledLive === false) { setLoading(false); return; }
     setLoading(true);
-    const r = await fetchLiveNews(maxArticles);
+    const r = await fetchLiveNewsResilient(Math.max(maxArticles, 18), force);
     setLoading(false);
-    if (r.ok && Array.isArray(r.articles)) setLiveArticles(r.articles);
+    if (r.ok && Array.isArray(r.articles)) {
+      setLiveArticles(r.articles);
+      setNewsMeta({ at: r.updatedAt || Date.now(), stale: !!r.stale, sources: [...new Set(r.articles.map(a => a.source).filter(Boolean))] });
+    }
   };
 
-  useEffect(() => { loadNews(); }, [nCfg.enabledLive, maxArticles]);
+  // Loads on open, then refreshes by itself every 10 minutes while the page stays open
+  useEffect(() => {
+    loadNews(false);
+    const t = setInterval(() => loadNews(true), 10 * 60 * 1000);
+    return () => clearInterval(t);
+  }, [nCfg.enabledLive, maxArticles]);
 
   const allArticles = [...customArticles, ...liveArticles];
   const categories = ['ALL', ...new Set(allArticles.map(a => a.category).filter(Boolean))];
@@ -60,7 +70,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
 
     return (
       <div className="max-w-[860px] mx-auto space-y-4">
-        <button type="button" onClick={() => setActiveArticle(null)} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#3B82F6]">
+        <button type="button" onClick={() => setActiveArticle(null)} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#2F6BB3]">
           <ChevronLeft className="w-4 h-4 rotate-180" /> رجوع لكل الأخبار
         </button>
 
@@ -75,13 +85,16 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
           <div className="p-5 sm:p-8 space-y-6">
             {/* Meta row */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-[#2563EB] text-white text-[11px] font-black">{activeArticle.category || 'أخبار الموبايلات'}</span>
+              <span className="px-3 py-1 rounded-full bg-[#1E4E8C] text-white text-[11px] font-black">{activeArticle.category || 'أخبار الموبايلات'}</span>
               {activeArticle.date && <span className="inline-flex items-center gap-1 text-xs font-bold text-muted"><Clock className="w-3.5 h-3.5" /> {activeArticle.date}</span>}
               {activeArticle.readTimeMin && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface2 border border-line text-[11px] font-black text-muted">
                   وقت القراءة: {activeArticle.readTimeMin} دقيقة
                 </span>
               )}
+              {activeArticle.source && (activeArticle.sourceUrl
+                ? <a href={activeArticle.sourceUrl} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface2 border border-line text-[11px] font-black text-fg hover:underline">المصدر: {activeArticle.source}</a>
+                : <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface2 border border-line text-[11px] font-black text-muted">المصدر: {activeArticle.source}</span>)}
               <button type="button" onClick={() => shareArticleWA(activeArticle)} className="ms-auto inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition">
                 <Share2 className="w-3.5 h-3.5" /> مشاركة واتساب
               </button>
@@ -94,10 +107,10 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
             {highlights.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {highlights.map((h, i) => (
-                  <div key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-[#2563EB]/10 border border-[#2563EB]/25 text-xs font-black">
-                    <Zap className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <div key={i} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-[#1E4E8C]/10 border border-[#1E4E8C]/25 text-xs font-black">
+                    <Zap className="w-3.5 h-3.5 text-[#1E4E8C]" />
                     <span className="text-muted">{h.label}:</span>
-                    <span className="text-[#2563EB] dark:text-[#60A5FA]">{h.val}</span>
+                    <span className="text-[#1E4E8C] dark:text-[#7FB0E8]">{h.val}</span>
                   </div>
                 ))}
               </div>
@@ -126,7 +139,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
               {sections.map((sec, idx) => {
                 if (sec.type === 'heading') {
                   return (
-                    <h3 key={idx} className="text-base sm:text-lg font-black text-[#2563EB] dark:text-[#60A5FA] pt-2">
+                    <h3 key={idx} className="text-base sm:text-lg font-black text-[#1E4E8C] dark:text-[#7FB0E8] pt-2">
                       {sec.text}
                     </h3>
                   );
@@ -134,7 +147,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
                 if (sec.type === 'bullet') {
                   return (
                     <div key={idx} className="flex items-start gap-2.5 ps-2 text-sm font-bold text-fg/90 leading-relaxed">
-                      <span className="w-2 h-2 rounded-full bg-[#2563EB] shrink-0 mt-2" />
+                      <span className="w-2 h-2 rounded-full bg-[#1E4E8C] shrink-0 mt-2" />
                       <span>{sec.text}</span>
                     </div>
                   );
@@ -149,10 +162,10 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
 
             {/* Karambo Buyer Analysis Verdict Card */}
             {activeArticle.karamboAnalysis && (
-              <div className="rounded-3xl bg-gradient-to-l from-[#1D4ED8]/15 via-[#2563EB]/10 to-emerald-500/10 border border-[#2563EB]/30 p-4 sm:p-5 flex items-start gap-3">
-                <Award className="w-6 h-6 text-[#2563EB] shrink-0 mt-0.5" />
+              <div className="rounded-3xl bg-gradient-to-l from-[#163B6B]/15 via-[#1E4E8C]/10 to-emerald-500/10 border border-[#1E4E8C]/30 p-4 sm:p-5 flex items-start gap-3">
+                <Award className="w-6 h-6 text-[#1E4E8C] shrink-0 mt-0.5" />
                 <div className="space-y-1">
-                  <div className="text-xs font-black text-[#2563EB] dark:text-[#60A5FA]">رأي وتحليل كرومبو للمشتري</div>
+                  <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8]">رأي وتحليل كرومبو للمشتري</div>
                   <p className="text-xs sm:text-sm font-black text-fg leading-relaxed">{activeArticle.karamboAnalysis}</p>
                 </div>
               </div>
@@ -167,20 +180,26 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-2.5">
-        <div className="flex items-center gap-2 flex-1 rounded-2xl px-3.5 py-2 bg-surface border border-line focus-within:border-[#3B82F6]">
-          <Search className="w-4 h-4 text-[#3B82F6] shrink-0" />
+        <div className="flex items-center gap-2 flex-1 rounded-2xl px-3.5 py-2 bg-surface border border-line focus-within:border-[#2F6BB3]">
+          <Search className="w-4 h-4 text-[#2F6BB3] shrink-0" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="ابحث في أخبار ومراجعات الموبايلات..." className="flex-1 bg-transparent border-0 text-sm font-bold focus:outline-none py-1" />
           {search && <button type="button" onClick={() => setSearch('')}><X className="w-4 h-4 text-muted" /></button>}
         </div>
-        <button type="button" onClick={loadNews} disabled={loading} className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#3B82F6] shrink-0">
+        <button type="button" onClick={loadNews} disabled={loading} className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#2F6BB3] shrink-0">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> تحديث الأخبار
         </button>
       </div>
+      {newsMeta.at > 0 && (
+        <div className="text-[11px] font-bold text-muted flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>آخر تحديث: {new Date(newsMeta.at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}{newsMeta.stale ? ' (نسخة محفوظة — المصادر غير متاحة الآن)' : ' · بيتحدث تلقائياً كل 10 دقائق'}</span>
+          {newsMeta.sources.length > 0 && <span>المصادر: {newsMeta.sources.join(' • ')}</span>}
+        </div>
+      )}
 
       {categories.length > 1 && (
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
           {categories.map(c => (
-            <button key={c} type="button" onClick={() => setCat(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 border transition ${cat === c ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface border-line text-fg'}`}>
+            <button key={c} type="button" onClick={() => setCat(c)} className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 border transition ${cat === c ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface border-line text-fg'}`}>
               {c === 'ALL' ? `الكل (${allArticles.length})` : c}
             </button>
           ))}
@@ -189,7 +208,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
 
       {loading && allArticles.length === 0 ? (
         <div className="bg-surface border border-line rounded-3xl p-12 text-center space-y-2">
-          <RefreshCw className="w-8 h-8 text-[#2563EB] animate-spin mx-auto" />
+          <RefreshCw className="w-8 h-8 text-[#1E4E8C] animate-spin mx-auto" />
           <div className="text-sm font-black text-fg">جاري جلب وتنسيق أحدث أخبار الموبايلات...</div>
         </div>
       ) : filtered.length === 0 ? (
@@ -200,17 +219,17 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(art => (
-            <article key={art.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#3B82F6] transition group">
+            <article key={art.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#2F6BB3] transition group">
               <button type="button" onClick={() => setActiveArticle(art)} className="relative aspect-[16/10] bg-surface2 overflow-hidden flex items-center justify-center">
                 {art.image
                   ? <img src={art.image} alt={art.title} loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                   : <Megaphone className="w-12 h-12 text-muted" />}
-                <span className="absolute top-2.5 start-2.5 px-2.5 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black shadow">{art.category || 'أخبار'}</span>
+                <span className="absolute top-2.5 start-2.5 px-2.5 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[10px] font-black shadow">{art.category || 'أخبار'}</span>
                 {art.readTimeMin && <span className="absolute bottom-2 end-2 px-2 py-0.5 rounded-full bg-black/65 text-white text-[9px] font-black">{art.readTimeMin} د قراءة</span>}
               </button>
               <div className="p-4 flex flex-col gap-2.5 flex-1">
-                {art.date && <div className="text-[10px] font-bold text-muted flex items-center gap-1"><Clock className="w-3 h-3" /> {art.date}</div>}
-                <button type="button" onClick={() => setActiveArticle(art)} className="text-start font-black text-sm text-fg leading-snug hover:text-[#2563EB] line-clamp-2">{art.title}</button>
+                {(art.date || art.source) && <div className="text-[10px] font-bold text-muted flex items-center gap-2 flex-wrap">{art.date && <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> {art.date}</span>}{art.source && <span className="px-1.5 py-0.5 rounded bg-surface2 border border-line">{art.source}</span>}</div>}
+                <button type="button" onClick={() => setActiveArticle(art)} className="text-start font-black text-sm text-fg leading-snug hover:text-[#1E4E8C] line-clamp-2">{art.title}</button>
                 <p className="text-xs font-bold text-muted line-clamp-2 leading-relaxed">{art.excerpt}</p>
                 {Array.isArray(art.highlights) && art.highlights.length > 0 && (
                   <div className="flex flex-wrap gap-1">
@@ -220,7 +239,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
                   </div>
                 )}
                 <div className="mt-auto pt-2 flex items-center gap-2">
-                  <button type="button" onClick={() => setActiveArticle(art)} className="flex-1 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black transition">اقرأ الملخص والتحليل</button>
+                  <button type="button" onClick={() => setActiveArticle(art)} className="flex-1 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-black transition">اقرأ الملخص والتحليل</button>
                   <button type="button" onClick={() => shareArticleWA(art)} className="p-2 rounded-xl bg-surface2 border border-line hover:border-emerald-500 text-fg transition" title="مشاركة"><Share2 className="w-4 h-4" /></button>
                 </div>
               </div>

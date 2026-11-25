@@ -10,11 +10,13 @@ import {
   REVIEW_ENTITY_TYPES,
   REVIEW_QUICK_TAGS,
   REVIEW_BRAND_TIERS,
+  STORE_REVIEW_ENTITIES_SEED,
   containsProfanity
 } from '../data/storeReviewsSeed.js';
 import {
   searchLiveExternalStores,
-  fetchLiveStoreDetails
+  fetchLiveStoreDetails,
+  runLiveScamCheck
 } from '../services/storeReviewsLiveClient.js';
 
 /**
@@ -144,7 +146,10 @@ export default function KaramboStoreReviewsView({
   const clientDisplayName = currentClient ? (currentClient.name || currentClient.owner || 'عميل مسجل') : '';
   const clientPhone = currentClient ? String(currentClient.phone || '') : '';
 
-  const approvedEntities = useMemo(() => (entities || []).filter(e => e && e.approved !== false), [entities]);
+  const approvedEntities = useMemo(() => {
+    const base = (Array.isArray(entities) && entities.length > 0) ? entities : STORE_REVIEW_ENTITIES_SEED;
+    return base.filter(e => e && e.approved !== false);
+  }, [entities]);
 
   const metricsMap = useMemo(() => {
     const m = {};
@@ -175,8 +180,20 @@ export default function KaramboStoreReviewsView({
   const [cmpA, setCmpA] = useState('');
   const [cmpB, setCmpB] = useState('');
 
-  // Phone / Social Page Scam Checker (#17)
+  // Phone / Social Page Scam Checker (#17) + Live Web/Directory Verification
   const [checkerQuery, setCheckerQuery] = useState('');
+  const [scamLoading, setScamLoading] = useState(false);
+  const [scamResult, setScamResult] = useState(null);
+
+  const handleRunScamCheck = async (e) => {
+    e && e.preventDefault();
+    const q = checkerQuery.trim();
+    if (q.length < 3) return;
+    setScamLoading(true);
+    const res = await runLiveScamCheck(q);
+    setScamLoading(false);
+    setScamResult(res && res.ok ? res : null);
+  };
 
   // Add Store Modal (#6)
   const [addStoreOpen, setAddStoreOpen] = useState(false);
@@ -856,7 +873,7 @@ export default function KaramboStoreReviewsView({
                   onClick={() => { setVotedIds(p => ({ ...p, [r.id]: true })); onVoteHelpful && onVoteHelpful(r.id); }}
                   className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-black border transition ${votedIds[r.id] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-surface2 border-line text-fg hover:border-[#3B82F6]'}`}
                 >
-                  👍 التقييم ده فادني ({r.helpfulCount || 0})
+                  التقييم ده فادني ({r.helpfulCount || 0})
                 </button>
               </div>
             </div>
@@ -929,10 +946,10 @@ export default function KaramboStoreReviewsView({
       <div className="flex flex-wrap items-center gap-2">
         {[
           ['directory', `دليل المحلات (${approvedEntities.length}+ حي)`],
-          ['honor', '🏆 لوحة الشرف'],
-          ['warning', '⚠️ قائمة التحذير'],
-          ['compare', '⚖️ مقارنة محلّين'],
-          ['checker', '🔍 فاحص رقم/صفحة قبل العربون']
+          ['honor', 'لوحة الشرف'],
+          ['warning', 'قائمة التحذير'],
+          ['compare', 'مقارنة محلّين'],
+          ['checker', 'فاحص الأرقام والصفحات']
         ].map(([k, l]) => (
           <button key={k} type="button" onClick={() => setTab(k)} className={`px-3.5 py-2 rounded-2xl text-xs font-black border transition ${tab === k ? 'bg-[#2563EB] text-white border-[#2563EB] shadow' : 'bg-surface border-line text-fg hover:border-[#3B82F6]'}`}>{l}</button>
         ))}
@@ -1051,7 +1068,7 @@ export default function KaramboStoreReviewsView({
               <div className="text-sm font-black text-fg">المحل ده مش متسجل في الدليل المحلي لسه</div>
               <p className="text-xs font-bold text-muted">اضغط على «بحث حي في مصر» عشان نجيبهولك مباشرة من الخرائط والإنترنت بتقييماته الحقيقية!</p>
               <button type="button" onClick={() => runLiveDiscovery()} className="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-black shadow">
-                🔍 ابحث عن «{search}» حياً على الخرائط
+                ابحث عن «{search}» حياً على الخرائط
               </button>
             </div>
           )}
@@ -1061,7 +1078,7 @@ export default function KaramboStoreReviewsView({
       {/* TAB: HONOR ROLL */}
       {tab === 'honor' && (
         <div className="space-y-3">
-          <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-3.5 text-xs font-black text-emerald-800 dark:text-emerald-300">🏆 لوحة شرف كرومبو — أعلى المحلات والمنصات ثقة في مصر بناءً على تقييمات العملاء</div>
+          <div className="rounded-2xl bg-emerald-500/10 border border-emerald-500/30 p-3.5 text-xs font-black text-emerald-800 dark:text-emerald-300">لوحة شرف كرومبو — أعلى المحلات والمنصات ثقة في مصر بناءً على تقييمات العملاء</div>
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3.5">{honorList.map(renderStoreCard)}</div>
         </div>
       )}
@@ -1069,27 +1086,28 @@ export default function KaramboStoreReviewsView({
       {/* TAB: WARNING LIST */}
       {tab === 'warning' && (
         <div className="space-y-3">
-          <div className="rounded-2xl bg-rose-500/10 border border-rose-500/30 p-3.5 text-xs font-black text-rose-800 dark:text-rose-300">⚠️ قائمة التحذير — المحلات والمنصات التي تحتاج مراجعة ملاحظات وشكاوى العملاء قبل الشراء</div>
+          <div className="rounded-2xl bg-rose-500/10 border border-rose-500/30 p-3.5 text-xs font-black text-rose-800 dark:text-rose-300">قائمة التحذير — المحلات والمنصات التي تحتاج مراجعة ملاحظات وشكاوى العملاء قبل الشراء</div>
           <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3.5">{warningList.map(renderStoreCard)}</div>
         </div>
       )}
 
       {/* TAB: COMPARE TWO STORES */}
       {tab === 'compare' && (() => {
-        const eA = approvedEntities.find(e => e.id === cmpA);
-        const eB = approvedEntities.find(e => e.id === cmpB);
-        const mA = eA ? metricsMap[eA.id] : null;
-        const mB = eB ? metricsMap[eB.id] : null;
+        const allComparable = [...approvedEntities, ...liveStores];
+        const eA = allComparable.find(e => e.id === cmpA);
+        const eB = allComparable.find(e => e.id === cmpB);
+        const mA = eA ? (metricsMap[eA.id] || computeEntityTrustMetrics(eA, entries)) : null;
+        const mB = eB ? (metricsMap[eB.id] || computeEntityTrustMetrics(eB, entries)) : null;
         return (
           <div className="bg-surface border border-line rounded-3xl p-5 space-y-4">
             <div className="grid sm:grid-cols-2 gap-3">
               <select value={cmpA} onChange={e => setCmpA(e.target.value)} className="rounded-2xl px-3 py-2.5 bg-surface2 border border-line text-xs font-black text-fg">
                 <option value="">— اختار المحل / المنصة الأولى —</option>
-                {approvedEntities.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                {allComparable.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
               <select value={cmpB} onChange={e => setCmpB(e.target.value)} className="rounded-2xl px-3 py-2.5 bg-surface2 border border-line text-xs font-black text-fg">
                 <option value="">— اختار المحل / المنصة الثانية —</option>
-                {approvedEntities.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
+                {allComparable.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
               </select>
             </div>
             {eA && eB && mA && mB ? (
@@ -1129,24 +1147,87 @@ export default function KaramboStoreReviewsView({
 
       {/* TAB: PHONE / SOCIAL PAGE SCAM CHECKER */}
       {tab === 'checker' && (
-        <div className="bg-surface border border-line rounded-3xl p-5 space-y-4">
+        <div className="bg-surface border border-line rounded-2xl p-5 space-y-4">
           <div className="space-y-1">
             <h3 className="font-black text-fg flex items-center gap-2"><Shield className="w-5 h-5 text-amber-500" /> فاحص الأرقام وصفحات السوشيال قبل تحويل أي عربون</h3>
-            <p className="text-xs font-bold text-muted">قبل ما تحوّل فودافون كاش أو إنستاباي، اكتب رقم الموبايل أو اسم/رابط الصفحة عشان تتأكد لو عليها بلاغات أو تجارب سلبية</p>
+            <p className="text-xs font-bold text-muted">اكتب رقم الموبايل أو رابط صفحة فيسبوك/إنستجرام أو اسم المحل واضغط «افحص الآن» للبحث الفوري في قاعدة كرومبو والإنترنت ومجتمعات مصر.</p>
           </div>
-          <div className="flex items-center gap-2 rounded-2xl px-3.5 py-2.5 bg-surface2 border border-line focus-within:border-amber-500">
-            <Phone className="w-4 h-4 text-amber-500 shrink-0" />
-            <input value={checkerQuery} onChange={e => setCheckerQuery(e.target.value)} placeholder="اكتب رقم التليفون أو رابط/اسم الصفحة..." className="flex-1 bg-transparent border-0 text-sm font-bold focus:outline-none" />
-          </div>
-          {checkerQuery.trim().length >= 3 && (
-            checkerMatches.length === 0 ? (
-              <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-4 text-xs font-bold text-amber-800 dark:text-amber-200 space-y-1">
-                <div className="font-black">لم يتم العثور على سجل لهذا الرقم أو الصفحة في قاعدة تحريات كرومبو حتى الآن</div>
-                <div>نصيحة كرومبو: لا تحوّل أي عربون لصفحة غير معروفة بدون استلام فعلي أو فاتورة موثقة — ولو عندك تجربة معاهم تقدر تضيفهم من زر «أضف محل / منصة» لتحذير أو إفادة غيرك.</div>
-              </div>
-            ) : (
+          <form onSubmit={handleRunScamCheck} className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 flex items-center gap-2 rounded-xl px-3.5 py-2.5 bg-surface2 border border-line focus-within:border-amber-500">
+              <Phone className="w-4 h-4 text-amber-500 shrink-0" />
+              <input value={checkerQuery} onChange={e => setCheckerQuery(e.target.value)} placeholder="مثال: 16942 أو رابط الصفحة أو اسم المتجر..." className="flex-1 bg-transparent border-0 text-sm font-bold focus:outline-none" />
+              {checkerQuery && <button type="button" onClick={() => { setCheckerQuery(''); setScamResult(null); }}><X className="w-4 h-4 text-muted" /></button>}
+            </div>
+            <button type="submit" disabled={scamLoading || checkerQuery.trim().length < 3} className="px-5 py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] disabled:opacity-50 text-white text-xs font-black inline-flex items-center justify-center gap-1.5 shrink-0">
+              {scamLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+              <span>{scamLoading ? 'جاري الفحص الحي...' : 'افحص الآن'}</span>
+            </button>
+          </form>
+
+          {/* Local Directory Matches */}
+          {checkerMatches.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-xs font-black text-emerald-700 dark:text-emerald-300">مطابقات في دليل كرومبو ({checkerMatches.length}):</div>
               <div className="grid sm:grid-cols-2 gap-3">{checkerMatches.map(renderStoreCard)}</div>
-            )
+            </div>
+          )}
+
+          {/* Live Web & Community Scam Check Result */}
+          {scamResult && (
+            <div className="space-y-3">
+              <div className={`rounded-2xl border p-4 space-y-1.5 ${
+                scamResult.riskLevel === 'high' ? 'bg-rose-500/10 border-rose-500/40 text-rose-800 dark:text-rose-200'
+                : scamResult.riskLevel === 'low' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-800 dark:text-emerald-200'
+                : 'bg-amber-500/10 border-amber-500/40 text-amber-800 dark:text-amber-200'
+              }`}>
+                <div className="text-sm font-black flex items-center gap-2">
+                  {scamResult.riskLevel === 'high' ? <AlertTriangle className="w-4 h-4" /> : scamResult.riskLevel === 'low' ? <CheckCircle2 className="w-4 h-4" /> : <Shield className="w-4 h-4" />}
+                  <span>
+                    {scamResult.riskLevel === 'high' ? 'تحذير مرتفع — ظهرت إشارات سلبية أو تحذيرات'
+                      : scamResult.riskLevel === 'low' ? 'سجل إيجابي مبدئياً في الأدلة والتجارب'
+                      : 'غير موثّق في الأدلة الرسمية — تعامل بحذر'}
+                  </span>
+                </div>
+                <p className="text-xs font-bold leading-relaxed">{scamResult.advice}</p>
+              </div>
+
+              {Array.isArray(scamResult.storesFound) && scamResult.storesFound.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-black text-fg">سجلات مطابقة في الأدلة الحية:</div>
+                  <div className="grid sm:grid-cols-2 gap-3">{scamResult.storesFound.map(renderStoreCard)}</div>
+                </div>
+              )}
+
+              {Array.isArray(scamResult.communitySignals) && scamResult.communitySignals.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-black text-fg">تجارب ومنشورات حقيقية من مجتمعات مصر:</div>
+                  <div className="grid sm:grid-cols-2 gap-2.5">
+                    {scamResult.communitySignals.map(c => (
+                      <div key={c.id} className="rounded-xl bg-surface2 border border-line p-3 space-y-1">
+                        <div className="text-xs font-black text-fg line-clamp-1">{c.title}</div>
+                        <p className="text-[11px] font-bold text-muted line-clamp-3">{c.text}</p>
+                        {c.sourceUrl && <a href={c.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#2563EB] hover:underline">اقرأ المنشور الأصلي ↗</a>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {Array.isArray(scamResult.webSignals) && scamResult.webSignals.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-xs font-black text-fg">نتائج الفحص على الإنترنت:</div>
+                  <div className="space-y-2">
+                    {scamResult.webSignals.map((w, i) => (
+                      <div key={i} className={`rounded-xl border p-3 text-xs space-y-1 ${w.isWarning ? 'bg-rose-500/5 border-rose-500/30' : 'bg-surface2/60 border-line'}`}>
+                        <div className="font-black text-fg">{w.title}</div>
+                        <div className="text-[11px] font-bold text-muted">{w.snippet}</div>
+                        {w.url && <a href={w.url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#2563EB] hover:underline">فتح المصدر ↗</a>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

@@ -55,3 +55,19 @@ export async function fetchLiveStoreDetails({ placeId = '', domain = '', name = 
     return { ok: false, externalReviews: [] };
   }
 }
+
+export async function runLiveScamCheck(q) {
+  const clean = String(q || '').trim();
+  if (clean.length < 3) return { ok: false, riskLevel: 'unknown' };
+  const key = `scam:${clean.toLowerCase()}`;
+  if (SESSION_CACHE.has(key)) return SESSION_CACHE.get(key);
+  try {
+    const res = await fetch(`/api/store-reviews-live?action=scam_check&q=${encodeURIComponent(clean)}`);
+    if (!res.ok) return { ok: false, riskLevel: 'unknown' };
+    const data = await res.json();
+    if (data && data.ok) SESSION_CACHE.set(key, data);
+    return data;
+  } catch {
+    return { ok: false, riskLevel: 'unknown' };
+  }
+}

@@ -14,6 +14,7 @@ import http from 'node:http';
 import https from 'node:https';
 import zlib from 'node:zlib';
 import { translateArabicPhoneQuery } from './gsmarena.js';
+import { liveStoreOffers, httpGet } from './_lib/shops.js';
 
 const ALLOWED_HOSTS = new Set([
   // Egypt stores
@@ -201,6 +202,7 @@ export function pickBestPhonePriceHit(hits, query, minPhonePrice = 2200) {
     const price = Number(h.sale_price || h.price || 0);
     if (!rawTitle || !isFinite(price) || price < minPhonePrice) continue;
     if (ACCESSORY_RE.test(rawTitle)) continue;
+    if (/\b(used|renewed|refurbished|pre-owned|open box)\b|مستعمل|مجدد/i.test(rawTitle)) continue;
 
     const normTitle = `${rawTitle} ${translateArabicPhoneQuery(rawTitle)}`.toLowerCase();
     const qNums = coreTokens.filter(t => /^\d+$/.test(t));
@@ -554,6 +556,57 @@ async function fetchSmartRegionPrice(rawQuery, region = 'eg') {
   return result;
 }
 
+// ---------- Multi-store price lookup: Egyptian catalogs + Amazon + Noon (Egypt / UAE / KSA) ----------
+const REGION_META = {
+  eg: { currency: 'EGP', minPrice: 2200, maxPrice: 300000, label: 'مصر' },
+  ae: { currency: 'AED', minPrice: 200, maxPrice: 20000, label: 'الإمارات' },
+  sa: { currency: 'SAR', minPrice: 200, maxPrice: 20000, label: 'السعودية' }
+};
+
+async function fetchPriceMulti(rawQuery, region = 'eg') {
+  const meta = REGION_META[region] || REGION_META.eg;
+  const cleanQ = buildCleanPhoneQuery(rawQuery);
+  if (!cleanQ || cleanQ.length < 2) return { found: false, price: 0, currency: meta.currency, region: meta.label, offers: [] };
+  const ck = `pm_v1:${region}:${cleanQ.toLowerCase()}`;
+  const cached = cacheGet(ck);
+  if (cached) return { ...cached, cached: true };
+
+  const [base, live] = await Promise.all([
+    fetchSmartRegionPrice(rawQuery, region),
+    liveStoreOffers(region, cleanQ, { minPrice: meta.minPrice, maxPrice: meta.maxPrice }).catch(() => [])
+  ]);
+
+  const offers = (live || []).map(o => ({ store: o.storeLabel, price: o.price, currency: o.currency, url: o.url, rating: o.rating || 0, reviews: o.reviews || 0, title: o.name, image: o.image }));
+  let price = 0;
+  let matchedTitle = '';
+  let source = '';
+  if (base && base.found) {
+    price = base.price; matchedTitle = base.matchedTitle || ''; source = 'local-stores';
+  }
+  if (offers.length) {
+    const cheapest = offers[0];
+    if (!price) { price = cheapest.price; matchedTitle = cheapest.title; source = cheapest.store; }
+  }
+  const image = (offers.find(o => o.image) || {}).image || '';
+  const result = price > 0
+    ? { found: true, price, currency: meta.currency, region: meta.label, matchedTitle: scrubExternalBrands(matchedTitle), offers, image, source }
+    : { found: false, price: 0, currency: meta.currency, region: meta.label, offers: [] };
+  cacheSet(ck, result, price > 0 ? CACHE_TTL_PRICE : 8 * 60 * 1000);
+  return result;
+}
+
+async function mapLimit(list, limit, fn) {
+  const out = new Array(list.length);
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(limit, list.length) }, async () => {
+    while (i < list.length) {
+      const idx = i++;
+      try { out[idx] = await fn(list[idx], idx); } catch { out[idx] = null; }
+    }
+  }));
+  return out;
+}
+
 // ---------- Editorial News Rewriter & Analyzer ----------
 export function rewriteAndAnalyzeArticle({ id, rawTitle, rawExcerpt, rawHtml, image, category, date }) {
   const title = scrubExternalBrands(stripHtml(rawTitle));
@@ -652,19 +705,126 @@ export function parseWpPostsToNews(posts) {
   }).filter(Boolean);
 }
 
-async function fetchLiveNews(limit = 16) {
-  const ck = `news_v25:${limit}`;
-  const cached = cacheGet(ck);
-  if (cached) return { ok: true, articles: cached, cached: true };
+// ---------- Multi-source Arabic mobile news (auto refreshed, cached, de-duplicated) ----------
+const NEWS_RSS_SOURCES = [
+  { id: 'arabhardware', name: 'عرب هاردوير', url: 'https://arabhardware.net/feed', filter: true },
+  { id: 'tech-wd', name: 'تك دبليو دي', url: 'https://www.tech-wd.com/wd/feed/', filter: true },
+  { id: 'aitnews', name: 'عالم التقنية', url: 'https://aitnews.com/feed/', filter: true },
+  { id: 'youm7', name: 'اليوم السابع - تكنولوجيا', url: 'https://www.youm7.com/rss/SectionRss?SectionID=332', filter: true },
+  { id: 'gsmarena', name: 'GSMArena', url: 'https://www.gsmarena.com/rss-news-reviews.php3', filter: false, lang: 'en', max: 4 }
+];
+const NEWS_MOBILE_RE = /موبايل|هاتف|هواتف|جوال|آيفون|ايفون|iphone|سامسونج|samsung|galaxy|جالاكسي|شاومي|xiaomi|redmi|poco|ريدمي|ريلمي|realme|أوبو|اوبو|oppo|فيفو|vivo|هونر|honor|هواوي|huawei|انفينكس|infinix|تكنو|tecno|ون بلس|oneplus|بيكسل|pixel|موتورولا|motorola|nothing|اندرويد|أندرويد|android|ios|سماعة|سماعات|ايربودز|airpods|buds|ساعة ذكية|ساعات ذكية|smartwatch|apple watch|هونر|معالج|سناب دراجون|snapdragon|ديمنسيتي|dimensity|شحن|بطارية/i;
 
-  let articles = [];
+function rssTag(block, tag) {
+  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i'));
+  if (!m) return '';
+  let v = m[1].replace(/^<!\[CDATA\[/, '').replace(/\]\]>$/, '').trim();
+  if (/&lt;\w+/.test(v) && !/<\w+/.test(v)) v = v.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  return v;
+}
+
+export function parseRssToNews(xml, src) {
+  const items = String(xml || '').split(/<item[\s>]/i).slice(1);
+  const out = [];
+  for (const raw of items.slice(0, 25)) {
+    const title = rssTag(raw, 'title');
+    const link = rssTag(raw, 'link') || (raw.match(/<link>([^<]+)</) || [])[1] || '';
+    const html = rssTag(raw, 'content:encoded') || rssTag(raw, 'description');
+    const pub = rssTag(raw, 'pubDate');
+    const cat = stripHtml(rssTag(raw, 'category')) || 'أخبار الموبايلات';
+    const img =
+      (raw.match(/<enclosure[^>]+url=["']([^"']+\.(?:jpe?g|png|webp)[^"']*)["']/i) || [])[1] ||
+      (raw.match(/<media:content[^>]+url=["']([^"']+)["']/i) || [])[1] ||
+      (html.match(/<img[^>]+src=["']([^"']+)["']/i) || [])[1] || '';
+    const text = `${title} ${stripHtml(html)}`;
+    if (src.filter && !NEWS_MOBILE_RE.test(text)) continue;
+    const d = pub ? new Date(pub) : null;
+    const art = rewriteAndAnalyzeArticle({
+      id: `news_${src.id}_${Buffer.from(link || title).toString('base64').replace(/[^a-z0-9]/gi, '').slice(-14)}`,
+      rawTitle: title,
+      rawExcerpt: html,
+      rawHtml: html,
+      image: img,
+      category: src.lang === 'en' ? 'أخبار عالمية' : cat,
+      date: d && !isNaN(d) ? d.toISOString() : ''
+    });
+    if (!art) continue;
+    art.source = src.name;
+    art.sourceUrl = link;
+    art.lang = src.lang || 'ar';
+    art.ts = d && !isNaN(d) ? d.getTime() : 0;
+    out.push(art);
+  }
+  return out;
+}
+
+async function fetchRssSource(src) {
   try {
-    const r = await safeRequest(`https://mobizil.com/wp-json/wp/v2/posts?_embed&per_page=${Math.min(20, limit)}`, {}, 5000);
-    if (r.status === 200 && r.body.trim().startsWith('[')) articles = parseWpPostsToNews(JSON.parse(r.body));
-  } catch {}
+    const r = await httpGet(src.url, { timeout: 6000, headers: { Accept: 'application/rss+xml, application/xml, text/xml, */*', 'Accept-Language': 'ar,en;q=0.8' } });
+    if (r.status !== 200 || !/<item[\s>]/i.test(r.body)) return [];
+    const arts = parseRssToNews(r.body, src);
+    return src.max ? arts.slice(0, src.max) : arts;
+  } catch { return []; }
+}
 
-  if (articles.length > 0) cacheSet(ck, articles, CACHE_TTL_NEWS);
-  return { ok: articles.length > 0, articles };
+function titleKey(t) {
+  return String(t || '').toLowerCase().replace(/[^\u0600-\u06FFa-z0-9 ]/g, '').split(/\s+/).filter(w => w.length > 2).slice(0, 7).join(' ');
+}
+
+let lastGoodNews = [];
+async function fetchLiveNews(limit = 16) {
+  const ck = `news_v26:${limit}`;
+  const cached = cacheGet(ck);
+  if (cached) return { ok: true, articles: cached, cached: true, updatedAt: cached._t };
+
+  const [wp, ...rss] = await Promise.all([
+    (async () => {
+      try {
+        const r = await safeRequest(`https://mobizil.com/wp-json/wp/v2/posts?_embed&per_page=${Math.min(20, limit)}`, {}, 6000);
+        if (r.status === 200 && r.body.trim().startsWith('[')) {
+          return parseWpPostsToNews(JSON.parse(r.body)).map(a => {
+            const raw = a.date ? new Date(a.date).getTime() : 0;
+            return { ...a, source: 'موبيزل', sourceUrl: '', lang: 'ar', ts: raw };
+          });
+        }
+      } catch {}
+      return [];
+    })(),
+    ...NEWS_RSS_SOURCES.map(fetchRssSource)
+  ]);
+
+  const all = [...wp, ...rss.flat()];
+  const seen = new Set();
+  const uniq = [];
+  for (const a of all) {
+    const k = titleKey(a.title);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    uniq.push(a);
+  }
+  // newest first, Arabic sources first on ties, but keep every source represented
+  const rank = (a) => (a.ts || 0) - (a.lang === 'en' ? 18 * 3600 * 1000 : 0);
+  uniq.sort((a, b) => rank(b) - rank(a));
+  // Guarantee every source (mobizil included) is represented, then fill by recency
+  const articles = [];
+  const taken = new Set();
+  const perSource = {};
+  for (const a of uniq) {
+    perSource[a.source] = (perSource[a.source] || 0) + 1;
+    if (perSource[a.source] <= 3 && articles.length < limit) { articles.push(a); taken.add(a.id); }
+  }
+  for (const a of uniq) {
+    if (articles.length >= limit) break;
+    if (!taken.has(a.id)) { articles.push(a); taken.add(a.id); }
+  }
+  articles.sort((a, b) => rank(b) - rank(a));
+
+  if (articles.length > 0) {
+    lastGoodNews = articles;
+    cacheSet(ck, articles, CACHE_TTL_NEWS);
+  }
+  const final = articles.length ? articles : lastGoodNews.slice(0, limit);
+  return { ok: final.length > 0, articles: final, updatedAt: Date.now(), sources: [...new Set(final.map(a => a.source))] };
 }
 
 export function parseKanbkamHtml(html, minPrice = 2200) {
@@ -721,25 +881,40 @@ export default async function handler(req, res) {
   try {
     if (action === 'egypt-price') {
       const q = String(req.query?.q || req.body?.q || '').trim();
-      const data = await fetchSmartRegionPrice(q, 'eg');
+      const data = await fetchPriceMulti(q, 'eg');
       return res.status(200).json({ ok: true, ...data });
     }
 
     if (action === 'gulf-prices') {
       const q = String(req.query?.q || req.body?.q || '').trim();
-      const [egypt, uae] = await Promise.all([
-        fetchSmartRegionPrice(q, 'eg'),
-        fetchSmartRegionPrice(q, 'ae')
+      const [egypt, uae, ksa] = await Promise.all([
+        fetchPriceMulti(q, 'eg'),
+        fetchPriceMulti(q, 'ae'),
+        fetchPriceMulti(q, 'sa')
       ]);
-      let gulf = uae;
-      if (!uae.found) {
-        gulf = await fetchSmartRegionPrice(q, 'sa');
-      }
+      const gulf = uae.found ? uae : ksa;
       return res.status(200).json({
         ok: true,
-        gulf: gulf.found ? gulf : { found: false, price: 0, currency: 'AED', region: '' },
-        egypt: egypt.found ? egypt : { found: false, price: 0, currency: 'EGP', region: 'مصر' }
+        gulf: gulf.found ? gulf : { found: false, price: 0, currency: 'AED', region: '', offers: [] },
+        egypt: egypt.found ? egypt : { found: false, price: 0, currency: 'EGP', region: 'مصر', offers: [] },
+        uae: uae.found ? uae : null,
+        ksa: ksa.found ? ksa : null
       });
+    }
+
+    // Batch Egypt prices for a grid of phones (one request, limited concurrency, shared cache)
+    if (action === 'prices-batch') {
+      const names = String(req.query?.names || req.body?.names || '').split('|').map(x => x.trim()).filter(Boolean).slice(0, 30);
+      const region = ['eg', 'ae', 'sa'].includes(String(req.query?.region)) ? String(req.query.region) : 'eg';
+      const results = await mapLimit(names, 4, (n) => fetchPriceMulti(n, region));
+      const prices = {};
+      names.forEach((n, i) => {
+        const r = results[i];
+        prices[n] = r && r.found
+          ? { found: true, price: r.price, currency: r.currency, offers: (r.offers || []).slice(0, 3), source: r.source || '' }
+          : { found: false, price: 0 };
+      });
+      return res.status(200).json({ ok: true, region, prices });
     }
 
     if (action === 'news') {

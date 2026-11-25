@@ -56,7 +56,7 @@ const DUP_BADGE_CLASS = {
   EXACT_DUPLICATE: 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/30',
   POSSIBLE_DUPLICATE: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
   EXISTING_NEEDS_UPDATE: 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30',
-  VARIANT_OF_EXISTING: 'bg-violet-500/15 text-violet-700 dark:text-violet-300 border-violet-500/30',
+  VARIANT_OF_EXISTING: 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30',
   INSUFFICIENT_DATA: 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30'
 };
 
@@ -731,7 +731,7 @@ export default function AiProductSourcingAgent({
         });
       }
 
-      pushLog(`✨ تم إثراء وتجهيز ${staged.length} منتج للمراجعة (تكرارات مكتشفة: ${dupCount}).`);
+      pushLog(`تم إثراء وتجهيز ${staged.length} منتج للمراجعة (تكرارات مكتشفة: ${dupCount}).`);
 
       setStagedItems(staged);
       setResultsMode(activeWorkflow.mode);
@@ -1102,7 +1102,7 @@ export default function AiProductSourcingAgent({
       <div className="rounded-2xl border border-line bg-surface p-4 sm:p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center shrink-0 shadow-sm">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-600 to-slate-700 text-white flex items-center justify-center shrink-0 shadow-sm">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -1291,7 +1291,7 @@ export default function AiProductSourcingAgent({
               { label: 'تم اكتشافها', val: execState.discovered, cls: 'text-fg' },
               { label: 'طابقت الفلاتر', val: execState.filteredPassed, cls: 'text-blue-600' },
               { label: 'تم استبعادها', val: execState.excluded, cls: 'text-amber-600' },
-              { label: 'تكرارات مرصودة', val: execState.duplicates, cls: 'text-violet-600' },
+              { label: 'تكرارات مرصودة', val: execState.duplicates, cls: 'text-slate-600' },
               { label: 'تم إثراؤها وتجهيزها', val: execState.prepared, cls: 'text-emerald-600' },
               { label: 'أخطاء / قيود', val: execState.errors.length, cls: execState.errors.length ? 'text-rose-600' : 'text-muted' }
             ].map((stat, i) => (
@@ -1403,7 +1403,7 @@ export default function AiProductSourcingAgent({
                 <button
                   type="button"
                   onClick={() => handleAnalyzeInstruction()}
-                  className="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black flex items-center gap-1.5 transition"
+                  className="px-3.5 py-2 rounded-xl bg-slate-600 hover:bg-slate-700 text-white text-xs font-black flex items-center gap-1.5 transition"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   تحليل الأمر وتحديث خطة العمل
@@ -2234,7 +2234,7 @@ export default function AiProductSourcingAgent({
                     <div className="p-1.5 rounded-lg bg-surface2 border border-line"><b>{importProgress.total}</b><div className="text-muted">إجمالي</div></div>
                     <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300"><b>{importProgress.imported}</b><div>تم استيرادها</div></div>
                     <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300"><b>{importProgress.skipped}</b><div>تم تخطيها</div></div>
-                    <div className="p-1.5 rounded-lg bg-violet-500/10 border border-violet-500/30 text-violet-700 dark:text-violet-300"><b>{importProgress.duplicates}</b><div>مكررة</div></div>
+                    <div className="p-1.5 rounded-lg bg-slate-500/10 border border-slate-500/30 text-slate-700 dark:text-slate-300"><b>{importProgress.duplicates}</b><div>مكررة</div></div>
                     <div className="p-1.5 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300"><b>{importProgress.failed}</b><div>فشلت</div></div>
                     <div className="p-1.5 rounded-lg bg-surface2 border border-line"><b>{importProgress.remaining}</b><div className="text-muted">متبقي</div></div>
                   </div>

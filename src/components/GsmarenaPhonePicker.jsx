@@ -176,19 +176,19 @@ export default function GsmarenaPhonePicker({
       {label && <label className="text-xs font-black text-muted block">{label}</label>}
 
       {fetchingSpec ? (
-        <div className="flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 bg-surface2 border border-violet-400 text-xs font-black text-violet-600 dark:text-violet-300">
+        <div className="flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 bg-surface2 border border-slate-400 text-xs font-black text-slate-600 dark:text-slate-300">
           <RefreshCw className="w-4 h-4 animate-spin" />
           <span>جاري جلب المواصفات الكاملة للجهاز...</span>
         </div>
       ) : value ? (
-        <div className={`flex items-center gap-2.5 rounded-2xl border border-[#2563EB]/40 bg-surface2/80 ${compact ? 'p-2' : 'p-2.5'}`}>
+        <div className={`flex items-center gap-2.5 rounded-2xl border border-[#1E4E8C]/40 bg-surface2/80 ${compact ? 'p-2' : 'p-2.5'}`}>
           <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0D1528] border border-line flex items-center justify-center overflow-hidden shrink-0">
             {selectedImg ? <img src={selectedImg} alt={value.name} referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-5 h-5 text-muted" />}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-xs font-black text-fg truncate">{value.name}</span>
-              <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black text-white ${value.source === 'gsmarena' ? 'bg-violet-600' : 'bg-sky-600'}`}>
+              <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-black text-white ${value.source === 'gsmarena' ? 'bg-slate-600' : 'bg-slate-600'}`}>
                 {value.source === 'gsmarena' ? 'كتالوج عالمي' : 'دليلنا'}
               </span>
             </div>
@@ -203,8 +203,8 @@ export default function GsmarenaPhonePicker({
           )}
         </div>
       ) : (
-        <div className="flex items-center gap-2 rounded-2xl px-3 py-2 bg-surface2 border border-line focus-within:border-violet-500 transition">
-          <Globe className="w-4 h-4 text-violet-500 shrink-0" />
+        <div className="flex items-center gap-2 rounded-2xl px-3 py-2 bg-surface2 border border-line focus-within:border-slate-500 transition">
+          <Globe className="w-4 h-4 text-slate-500 shrink-0" />
           <input
             value={query}
             onFocus={() => { setOpen(true); if (query.trim().length < 2) ensurePopular(); }}
@@ -213,7 +213,7 @@ export default function GsmarenaPhonePicker({
             className="flex-1 bg-transparent border-0 text-xs sm:text-sm font-bold text-fg focus:outline-none min-w-0 py-0.5"
           />
           {loading ? (
-            <RefreshCw className="w-4 h-4 text-violet-500 animate-spin shrink-0" />
+            <RefreshCw className="w-4 h-4 text-slate-500 animate-spin shrink-0" />
           ) : query ? (
             <button type="button" onClick={() => { setQuery(''); setResults([]); }} className="text-muted hover:text-fg"><X className="w-4 h-4" /></button>
           ) : (
@@ -233,7 +233,7 @@ export default function GsmarenaPhonePicker({
                   key={k}
                   type="button"
                   onClick={() => setSourceFilter(k)}
-                  className={`px-2 py-0.5 rounded-lg text-[10px] font-black transition ${sourceFilter === k ? 'bg-violet-600 text-white' : 'bg-surface text-muted hover:text-fg'}`}
+                  className={`px-2 py-0.5 rounded-lg text-[10px] font-black transition ${sourceFilter === k ? 'bg-slate-600 text-white' : 'bg-surface text-muted hover:text-fg'}`}
                 >
                   {lbl}
                 </button>
@@ -255,7 +255,7 @@ export default function GsmarenaPhonePicker({
           <div className="max-h-72 overflow-y-auto p-1.5 space-y-1">
             {loading ? (
               <div className="p-5 text-center text-xs font-bold text-muted flex items-center justify-center gap-2">
-                <RefreshCw className="w-4 h-4 animate-spin text-violet-500" /> جاري البحث في قاعدة البيانات العالمية...
+                <RefreshCw className="w-4 h-4 animate-spin text-slate-500" /> جاري البحث في قاعدة البيانات العالمية...
               </div>
             ) : visibleList.length === 0 ? (
               <div className="p-5 text-center text-xs font-bold text-muted">
@@ -279,7 +279,7 @@ export default function GsmarenaPhonePicker({
                   <div className="flex-1 min-w-0">
                     <div className="text-xs font-black text-fg truncate">{item.name}</div>
                     <div className="text-[10px] font-bold text-muted flex items-center gap-1.5">
-                      <span className={item.source === 'gsmarena' ? 'text-violet-600 dark:text-violet-400 font-black' : 'text-sky-600 dark:text-sky-400'}>
+                      <span className={item.source === 'gsmarena' ? 'text-slate-600 dark:text-slate-400 font-black' : 'text-slate-600 dark:text-slate-400'}>
                         {item.source === 'gsmarena' ? 'قاعدة البيانات العالمية' : 'دليل السوق المصري'}
                       </span>
                       {item.price ? <span>· {formatMoney(item.price)}</span> : null}

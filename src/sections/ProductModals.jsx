@@ -35,7 +35,7 @@ export function renderPrintModal(ctx) {
                     onClick={() => setPrintModalOrder({ order, mode: 'picking', isClientView: false })}
                     className={`px-3.5 py-2 rounded-xl text-xs font-extrabold transition ${
                       effectiveMode === 'picking'
-                        ? 'bg-indigo-600 text-white shadow-xs'
+                        ? 'bg-slate-600 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-700'
                     }`}
                   >
@@ -374,7 +374,7 @@ export function renderProductOrAdDetailModal(ctx) {
                         <div
                           key={i}
                           onClick={e => { e.stopPropagation(); setDetailImageIdx(i); }}
-                          className={`w-2 h-2 rounded-full cursor-pointer transition ${i === safeIdx ? 'bg-cyan-400 w-4' : 'bg-surface/50'}`}
+                          className={`w-2 h-2 rounded-full cursor-pointer transition ${i === safeIdx ? 'bg-slate-400 w-4' : 'bg-surface/50'}`}
                         />
                       ))}
                     </div>
@@ -383,7 +383,7 @@ export function renderProductOrAdDetailModal(ctx) {
                 <div className="absolute top-3 right-3 flex flex-wrap gap-1.5">
                   {priceInfo.hasDiscount && (
                     <span className="px-3 py-1 rounded-xl bg-rose-600 text-white text-xs font-black shadow">
-                      🔥 خصم {priceInfo.discountPercent}%
+                      خصم {priceInfo.discountPercent}%
                     </span>
                   )}
                   <span className="px-3 py-1 rounded-xl bg-nav/90 text-white text-xs font-extrabold">
@@ -439,7 +439,7 @@ export function renderProductOrAdDetailModal(ctx) {
                     <span className="text-muted font-bold">سعر الوحدة:</span>
                     {priceInfo.hasDiscount && (
                       <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black">
-                        🔥 خصم {priceInfo.discountPercent}% (وفّر {(priceInfo.displayOldPrice - priceInfo.displayPrice).toLocaleString()} {priceInfo.currencySymbol})
+                        خصم {priceInfo.discountPercent}% (وفّر {(priceInfo.displayOldPrice - priceInfo.displayPrice).toLocaleString()} {priceInfo.currencySymbol})
                       </span>
                     )}
                   </div>
@@ -1036,7 +1036,7 @@ export function renderTemplateManagerModal(ctx) {
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
               <h3 className="text-base font-extrabold text-fg flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-600" />
+                <Layers className="w-5 h-5 text-slate-600" />
                 إدارة وتخصيص التمبلت التلقائي لقطع الغيار (Auto-Template Builder)
               </h3>
               <p className="text-xs text-muted">
@@ -1101,7 +1101,7 @@ export function renderTemplateManagerModal(ctx) {
               </div>
               <button
                 type="submit"
-                className="p-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold"
+                className="p-2 rounded-lg bg-slate-600 hover:bg-slate-700 text-white font-extrabold"
               >
                 + إضافة للتمبلت
               </button>
@@ -1164,7 +1164,7 @@ export function renderTemplateManagerModal(ctx) {
                             prev.map(t => (t.id === tpl.id ? { ...t, enabled: checked } : t))
                           );
                         }}
-                        className="w-4 h-4 accent-indigo-600 cursor-pointer"
+                        className="w-4 h-4 accent-slate-600 cursor-pointer"
                       />
                     </td>
                     <td className="p-2.5">
@@ -1331,7 +1331,7 @@ export function renderBrandImageModal(ctx) {
         <form onSubmit={handleSaveBrandImage} className="bg-surface rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl text-xs">
           <div className="flex items-center justify-between border-b border-line pb-3">
             <h3 className="text-sm font-extrabold text-fg">
-              صورة البراند: <span className="text-indigo-600">{brandName}</span> (صورة واحدة للبراند)
+              صورة البراند: <span className="text-slate-600">{brandName}</span> (صورة واحدة للبراند)
             </h3>
             <button type="button" onClick={() => setEditingBrandImageFor(null)} className="p-1 text-muted hover:text-muted">
               <X className="w-5 h-5" />
@@ -1377,7 +1377,7 @@ export function renderBrandImageModal(ctx) {
           </div>
 
           <div className="flex gap-2">
-            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold">
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold">
               حفظ صورة البراند ✓
             </button>
             {imageUrl && (
@@ -1571,7 +1571,7 @@ export function renderAddPartToModelModal(ctx) {
         >
           <div className="flex items-center justify-between border-b border-line pb-3">
             <h3 className="text-base font-extrabold text-fg">
-              إضافة منتج جديد داخل: <span className="text-indigo-600">{addingPartToModel.model.name}</span>
+              إضافة منتج جديد داخل: <span className="text-slate-600">{addingPartToModel.model.name}</span>
             </h3>
             <button type="button" onClick={() => setAddingPartToModel(null)} className="p-1.5 rounded-lg bg-surface2 hover:bg-rose-500/15 text-muted hover:text-rose-600">
               <X className="w-5 h-5" />
@@ -1690,12 +1690,12 @@ export function renderAddPartToModelModal(ctx) {
                       compatibleText: ai.compatibleText || prev.compatibleText,
                       description: ai.description
                     }));
-                    showToast('✨ تم توليد الوصف وتعبئة المواصفات والضمان بالذكاء الاصطناعي ✓', 'success');
+                    showToast('تم توليد الوصف وتعبئة المواصفات والضمان بالذكاء الاصطناعي ✓', 'success');
                   }}
-                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2563EB] to-indigo-600 hover:from-[#3B82F6] hover:to-indigo-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-slate-600 hover:from-[#2F6BB3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>✨ توليد الوصف وتعبئة الخانات بالذكاء الاصطناعي (AI)</span>
+                  <span>توليد الوصف وتعبئة الخانات بالذكاء الاصطناعي (AI)</span>
                 </button>
               </div>
               <input
@@ -1776,7 +1776,7 @@ export function renderAddPartToModelModal(ctx) {
 
             <div>
               <label className="font-bold text-rose-500 dark:text-rose-400 block mb-1">
-                🔥 السعر قبل الخصم (اختياري — للخصم المشطوب):
+                السعر قبل الخصم (اختياري — للخصم المشطوب):
               </label>
               <input
                 type="number"
@@ -1855,7 +1855,7 @@ export function renderAddPartToModelModal(ctx) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold"
+            className="w-full py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold"
           >
             حفظ وإدراج المنتج الآن ✓
           </button>
@@ -2135,12 +2135,12 @@ export function renderEditPartModal(ctx) {
                       compatibleText: prev.compatibleText || ai.compatibleText,
                       description: ai.description
                     }));
-                    showToast('✨ تم توليد وصف جديد وتعبئة الخانات الفاضية فقط — بيانات المنتج الحالية لم تتغير.', 'success');
+                    showToast('تم توليد وصف جديد وتعبئة الخانات الفاضية فقط — بيانات المنتج الحالية لم تتغير.', 'success');
                   }}
-                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#2563EB] to-indigo-600 hover:from-[#3B82F6] hover:to-indigo-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-slate-600 hover:from-[#2F6BB3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>✨ توليد الوصف والمواصفات بالذكاء الاصطناعي (AI)</span>
+                  <span>توليد الوصف والمواصفات بالذكاء الاصطناعي (AI)</span>
                 </button>
               </div>
               <input
@@ -2196,7 +2196,7 @@ export function renderEditPartModal(ctx) {
 
             <div>
               <label className="font-bold text-rose-500 dark:text-rose-400 block mb-1">
-                🔥 السعر قبل الخصم (اختياري — للخصم المشطوب):
+                السعر قبل الخصم (اختياري — للخصم المشطوب):
               </label>
               <input
                 type="number"
@@ -2274,7 +2274,7 @@ export function renderEditPartModal(ctx) {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-line">
                 <div>
-                  <label className="text-[10px] font-bold text-muted block mb-1">✨ سعر الأصلي 100% (ج.م):</label>
+                  <label className="text-[10px] font-bold text-muted block mb-1">سعر الأصلي 100% (ج.م):</label>
                   <input
                     type="number"
                     value={editingPartObj.basePrice ?? 0}
@@ -2377,7 +2377,7 @@ export function renderEditPartModal(ctx) {
             </div>
           </div>
 
-          <button type="submit" className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold">
+          <button type="submit" className="w-full py-3 rounded-xl bg-slate-600 hover:bg-slate-700 text-white font-extrabold">
             حفظ التعديلات وروابط الصور ✓
           </button>
         </form>

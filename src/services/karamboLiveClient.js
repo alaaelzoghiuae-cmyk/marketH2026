@@ -122,3 +122,65 @@ export async function fetchLiveRadar() {
   }
   return { ok: false, items: [] };
 }
+
+// ---------- v27 additions: batch prices, wearables, trust checker, resilient news ----------
+
+/** One request for a whole grid of phones (server shares cache + limits concurrency). */
+export async function fetchPricesBatch(names, region = 'eg') {
+  const list = [...new Set((names || []).map(n => String(n || '').trim()).filter(Boolean))].slice(0, 30);
+  if (!list.length) return {};
+  const out = {};
+  const missing = [];
+  for (const n of list) {
+    const c = getCache(`pb:${region}:${n.toLowerCase()}`);
+    if (c) out[n] = c; else missing.push(n);
+  }
+  if (!missing.length) return out;
+  const data = await fetchJsonSafe(`/api/karambo-live?action=prices-batch&region=${region}&names=${encodeURIComponent(missing.join('|'))}`);
+  if (data && data.ok && data.prices) {
+    for (const n of missing) {
+      const v = data.prices[n];
+      if (v) { out[n] = v; setCache(`pb:${region}:${n.toLowerCase()}`, v, v.found ? 45 * 60 * 1000 : 10 * 60 * 1000); }
+    }
+  }
+  return out;
+}
+
+export async function fetchWearablesList() {
+  const c = getCache('wear:list');
+  if (c) return c;
+  const data = await fetchJsonSafe('/api/wearables?action=list');
+  if (data && data.ok && Array.isArray(data.items)) { setCache('wear:list', data, 60 * 60 * 1000); return data; }
+  return { ok: false, items: [] };
+}
+
+export async function fetchWearableLive(id) {
+  const c = getCache(`wear:${id}`);
+  if (c) return c;
+  const data = await fetchJsonSafe(`/api/wearables?action=live&id=${encodeURIComponent(id)}`);
+  if (data && data.ok) { setCache(`wear:${id}`, data, 3 * 60 * 60 * 1000); return data; }
+  return { ok: false };
+}
+
+export async function checkTrust(q) {
+  const query = String(q || '').trim();
+  if (query.length < 3) return { ok: false, error: 'اكتب رقم أو رابط أو اسم الصفحة' };
+  const data = await fetchJsonSafe(`/api/trust-check?q=${encodeURIComponent(query)}`);
+  return data || { ok: false, error: 'تعذّر الاتصال بخدمة الفحص الآن — جرّب تاني' };
+}
+
+/** Last good news list survives server hiccups (stored on the device). */
+const NEWS_LS = 'elz_news_last_good_v2';
+export function readLastGoodNews() {
+  try { const o = JSON.parse(window.localStorage.getItem(NEWS_LS) || 'null'); return o && Array.isArray(o.articles) ? o : null; } catch { return null; }
+}
+export async function fetchLiveNewsResilient(limit = 18, force = false) {
+  if (force) { try { window.sessionStorage.removeItem(PREFIX + `news:${limit}`); mem.delete(`news:${limit}`); } catch {} }
+  const r = await fetchLiveNews(limit);
+  if (r.ok && r.articles.length) {
+    try { window.localStorage.setItem(NEWS_LS, JSON.stringify({ articles: r.articles.slice(0, 30), at: Date.now() })); } catch {}
+    return { ...r, stale: false };
+  }
+  const last = readLastGoodNews();
+  return last ? { ok: true, articles: last.articles, stale: true, updatedAt: last.at } : { ok: false, articles: [] };
+}

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Search, Smartphone, Scale, X, RefreshCw, Megaphone, ChevronLeft, Globe, Sparkles, DollarSign
-} from 'lucide-react';
-import { fetchGlobalCatalog, fetchLiveEgyptPrice, fetchLiveNews } from '../services/karamboLiveClient.js';
+  Search, Smartphone, Scale, X, RefreshCw, Megaphone, ChevronLeft, Globe, Sparkles, DollarSign, ShoppingCart } from 'lucide-react';
+import { fetchGlobalCatalog, fetchLiveEgyptPrice, fetchLiveNews, fetchPricesBatch } from '../services/karamboLiveClient.js';
 import { matchesPhoneSearch } from '../services/gsmarenaClient.js';
 
 /**
@@ -20,6 +19,7 @@ export default function KaramboLiveGuideView({
   onOpenPhone,
   onOpenNews,
   onOpenComparePage,
+  onRequestImport,
   renderLocalPhoneCard
 }) {
   const gCfg = (cfg && cfg.guideCfg) || {};
@@ -71,6 +71,30 @@ export default function KaramboLiveGuideView({
     return () => { alive = false; clearTimeout(t); };
   }, [mode, brand, query, page]);
 
+  // Auto-check Egypt prices for the visible grid (batched, never floods the browser)
+  const checkedRef = React.useRef(new Set());
+  useEffect(() => {
+    if (mode !== 'global' || gCfg.autoFetchEgyptPrice === false) return;
+    const todo = items.filter(it => !checkedRef.current.has(it.id) && !(localPhones.find(lp => lp.slug === it.slug && lp.price > 0)));
+    if (!todo.length) return;
+    let alive = true;
+    todo.forEach(it => checkedRef.current.add(it.id));
+    setEgyptPrices(p => { const n = { ...p }; todo.forEach(it => { if (!n[it.id]) n[it.id] = { loading: true }; }); return n; });
+    (async () => {
+      for (let i = 0; i < todo.length; i += 6) {
+        const chunk = todo.slice(i, i + 6);
+        const res = await fetchPricesBatch(chunk.map(c => c.name));
+        if (!alive) return;
+        setEgyptPrices(p => {
+          const n = { ...p };
+          chunk.forEach(c => { const r = res[c.name]; n[c.id] = r && r.found ? { loading: false, found: true, price: r.price, offers: r.offers || [], source: r.source } : { loading: false, found: false, price: 0 }; });
+          return n;
+        });
+      }
+    })();
+    return () => { alive = false; };
+  }, [items, mode]);
+
   const checkCardPrice = async (it, e) => {
     e && e.stopPropagation();
     setEgyptPrices(p => ({ ...p, [it.id]: { loading: true } }));
@@ -113,13 +137,13 @@ export default function KaramboLiveGuideView({
     <div className="space-y-4">
       {/* Editorial News Banner inside Guide */}
       {gCfg.showNewsBannerInGuide !== false && newsList.length > 0 && (
-        <div className="rounded-3xl bg-gradient-to-l from-[#1D4ED8]/15 via-[#2563EB]/10 to-[#0EA5E9]/15 border border-[#2563EB]/30 p-3.5 space-y-2.5">
+        <div className="rounded-3xl bg-gradient-to-l from-[#163B6B]/15 via-[#1E4E8C]/10 to-[#2F6BB3]/15 border border-[#1E4E8C]/30 p-3.5 space-y-2.5">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="w-7 h-7 rounded-xl bg-[#2563EB] text-white flex items-center justify-center shrink-0"><Megaphone className="w-4 h-4" /></span>
+              <span className="w-7 h-7 rounded-xl bg-[#1E4E8C] text-white flex items-center justify-center shrink-0"><Megaphone className="w-4 h-4" /></span>
               <span className="text-xs sm:text-sm font-black text-fg">{nCfg.bannerTitle || 'آخر أخبار الموبايلات'}</span>
             </div>
-            <button type="button" onClick={() => onOpenNews && onOpenNews()} className="inline-flex items-center gap-1 text-xs font-black text-[#2563EB] dark:text-[#60A5FA] hover:underline">
+            <button type="button" onClick={() => onOpenNews && onOpenNews()} className="inline-flex items-center gap-1 text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8] hover:underline">
               عرض كل الأخبار <ChevronLeft className="w-4 h-4" />
             </button>
           </div>
@@ -129,12 +153,12 @@ export default function KaramboLiveGuideView({
                 key={art.id}
                 type="button"
                 onClick={() => onOpenNews && onOpenNews(art)}
-                className="w-64 shrink-0 flex items-center gap-2.5 p-2 rounded-2xl bg-surface border border-line hover:border-[#3B82F6] text-start transition"
+                className="w-64 shrink-0 flex items-center gap-2.5 p-2 rounded-2xl bg-surface border border-line hover:border-[#2F6BB3] text-start transition"
               >
                 {art.image ? (
                   <img src={art.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-14 h-14 rounded-xl object-cover shrink-0 bg-surface2" />
                 ) : (
-                  <span className="w-14 h-14 rounded-xl bg-[#2563EB]/10 flex items-center justify-center shrink-0"><Megaphone className="w-5 h-5 text-[#2563EB]" /></span>
+                  <span className="w-14 h-14 rounded-xl bg-[#1E4E8C]/10 flex items-center justify-center shrink-0"><Megaphone className="w-5 h-5 text-[#1E4E8C]" /></span>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="text-[11px] font-black text-fg line-clamp-2 leading-snug">{art.title}</div>
@@ -148,8 +172,8 @@ export default function KaramboLiveGuideView({
 
       {/* Search + Mode Switcher */}
       <div className="flex flex-col md:flex-row gap-2.5">
-        <div className="flex items-center gap-2 flex-1 rounded-2xl px-3.5 py-2 bg-surface border border-line focus-within:border-[#3B82F6]">
-          <Search className="w-4 h-4 text-[#3B82F6] shrink-0" />
+        <div className="flex items-center gap-2 flex-1 rounded-2xl px-3.5 py-2 bg-surface border border-line focus-within:border-[#2F6BB3]">
+          <Search className="w-4 h-4 text-[#2F6BB3] shrink-0" />
           <input
             value={query}
             onChange={e => { setQuery(e.target.value); setPage(1); }}
@@ -162,7 +186,7 @@ export default function KaramboLiveGuideView({
           <button
             type="button"
             onClick={() => { setMode('global'); setPage(1); }}
-            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black border transition ${mode === 'global' ? 'bg-[#2563EB] text-white border-[#2563EB] shadow' : 'bg-surface border-line text-fg'}`}
+            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-2xl text-xs font-black border transition ${mode === 'global' ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow' : 'bg-surface border-line text-fg'}`}
           >
             <Globe className="w-4 h-4" /> كل موديلات العالم {total > 0 ? `(${total.toLocaleString('en-US')})` : ''}
           </button>
@@ -181,7 +205,7 @@ export default function KaramboLiveGuideView({
         <button
           type="button"
           onClick={() => { setBrand('all'); setPage(1); }}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 transition ${brand === 'all' ? 'bg-[#2563EB] text-white' : 'bg-surface2 text-fg border border-line'}`}
+          className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 transition ${brand === 'all' ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}
         >
           كل الماركات
         </button>
@@ -190,7 +214,7 @@ export default function KaramboLiveGuideView({
             key={b}
             type="button"
             onClick={() => { setBrand(b); setPage(1); }}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 transition ${brand.toLowerCase() === b.toLowerCase() ? 'bg-[#2563EB] text-white' : 'bg-surface2 text-fg border border-line'}`}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-black shrink-0 transition ${brand.toLowerCase() === b.toLowerCase() ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}
           >
             {b}
           </button>
@@ -201,7 +225,7 @@ export default function KaramboLiveGuideView({
       {mode === 'global' ? (
         loading && items.length === 0 ? (
           <div className="bg-surface border border-line rounded-3xl p-12 text-center space-y-2">
-            <RefreshCw className="w-8 h-8 text-[#2563EB] animate-spin mx-auto" />
+            <RefreshCw className="w-8 h-8 text-[#1E4E8C] animate-spin mx-auto" />
             <div className="text-sm font-black text-fg">جاري تحميل موديلات الموبايلات...</div>
           </div>
         ) : items.length === 0 ? (
@@ -216,7 +240,7 @@ export default function KaramboLiveGuideView({
                 const localMatch = localPhones.find(lp => lp.slug === it.slug);
                 const pr = egyptPrices[it.id] || (localMatch && localMatch.price > 0 ? { loading: false, found: true, price: localMatch.price } : null);
                 return (
-                  <div key={it.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#3B82F6] transition group">
+                  <div key={it.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#2F6BB3] transition group">
                     <button
                       type="button"
                       onClick={() => handleOpenGlobalDevice(it)}
@@ -225,10 +249,10 @@ export default function KaramboLiveGuideView({
                       {it.img
                         ? <img src={it.img} alt={it.name} loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" />
                         : <Smartphone className="w-12 h-12 text-muted" />}
-                      <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black">{it.brand}</span>
+                      <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[10px] font-black">{it.brand}</span>
                     </button>
                     <div className="p-3.5 flex flex-col gap-2 flex-1">
-                      <button type="button" onClick={() => handleOpenGlobalDevice(it)} className="text-start font-black text-sm text-fg leading-snug hover:text-[#2563EB] line-clamp-2">
+                      <button type="button" onClick={() => handleOpenGlobalDevice(it)} className="text-start font-black text-sm text-fg leading-snug hover:text-[#1E4E8C] line-clamp-2">
                         {it.name}
                       </button>
 
@@ -244,12 +268,13 @@ export default function KaramboLiveGuideView({
                           </button>
                         ) : pr.loading ? (
                           <div className="text-[11px] font-bold text-muted flex items-center gap-1.5">
-                            <RefreshCw className="w-3 h-3 animate-spin text-[#2563EB]" /> جاري فحص السعر...
+                            <RefreshCw className="w-3 h-3 animate-spin text-[#1E4E8C]" /> جاري فحص السعر...
                           </div>
                         ) : pr.found && pr.price > 0 ? (
                           <div>
                             <div className="text-[10px] font-bold text-muted">السعر في مصر</div>
                             <div className="text-base font-black text-emerald-600 dark:text-emerald-400">{formatMoney(pr.price)}</div>
+                            {pr.offers && pr.offers[0] && <div className="text-[9px] font-bold text-muted">متاح أيضاً على {pr.offers[0].store}</div>}
                           </div>
                         ) : (
                           <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-rose-500/10 border border-rose-500/20 text-[10px] font-black text-rose-600 dark:text-rose-400">
@@ -262,14 +287,24 @@ export default function KaramboLiveGuideView({
                         <button
                           type="button"
                           onClick={() => handleOpenGlobalDevice(it)}
-                          className="flex-1 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black transition"
+                          className="flex-1 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-black transition"
                         >
                           المواصفات والسعر
                         </button>
+                        {onRequestImport && gCfg.allowImportCta !== false && (
+                          <button
+                            type="button"
+                            onClick={() => onRequestImport(it.name, pr && pr.found ? pr.price : 0)}
+                            className="px-2.5 py-2 rounded-xl bg-surface2 border border-line hover:border-emerald-500 text-fg text-xs font-black transition inline-flex items-center gap-1"
+                            title="اطلب الجهاز ده — هنأكد التوفر والسعر"
+                          >
+                            <ShoppingCart className="w-4 h-4" /><span className="hidden sm:inline">اطلبه</span>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => onOpenComparePage && onOpenComparePage([it.slug])}
-                          className="px-2.5 py-2 rounded-xl bg-surface2 border border-line hover:border-violet-500 text-fg text-xs font-black transition"
+                          className="px-2.5 py-2 rounded-xl bg-surface2 border border-line hover:border-slate-500 text-fg text-xs font-black transition"
                           title="قارن هذا الجهاز"
                         >
                           <Scale className="w-4 h-4" />
@@ -287,7 +322,7 @@ export default function KaramboLiveGuideView({
                   type="button"
                   disabled={loading}
                   onClick={() => setPage(p => p + 1)}
-                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-surface2 hover:bg-[#2563EB] hover:text-white border border-line text-xs font-black text-fg transition"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-surface2 hover:bg-[#1E4E8C] hover:text-white border border-line text-xs font-black text-fg transition"
                 >
                   {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
                   {loading ? 'جاري تحميل المزيد...' : `عرض المزيد من الموديلات (${items.length} من ${total.toLocaleString('en-US')})`}

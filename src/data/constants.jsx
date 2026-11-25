@@ -535,7 +535,7 @@ export const AD_THEMES = {
   indigo: {
     label: 'أزرق ملكي (VVIP)',
     grad: 'from-[#060D24] via-[#0F2557] to-[#1D4ED8]',
-    cssGrad: 'linear-gradient(135deg, #060D24 0%, #0F2557 52%, #1D4ED8 100%)',
+    cssGrad: '#0F2557',
     endColor: '#0F2557',
     accentColor: '#3B82F6',
     light: false
@@ -543,7 +543,7 @@ export const AD_THEMES = {
   violet: {
     label: 'بنفسجي ملكي',
     grad: 'from-[#14052B] via-[#3B0F70] to-[#6D28D9]',
-    cssGrad: 'linear-gradient(135deg, #14052B 0%, #3B0F70 52%, #6D28D9 100%)',
+    cssGrad: '#3B0F70',
     endColor: '#3B0F70',
     accentColor: '#A855F7',
     light: false
@@ -551,7 +551,7 @@ export const AD_THEMES = {
   emerald: {
     label: 'أخضر زمردي',
     grad: 'from-[#022C22] via-[#065F46] to-[#059669]',
-    cssGrad: 'linear-gradient(135deg, #022C22 0%, #065F46 52%, #059669 100%)',
+    cssGrad: '#065F46',
     endColor: '#065F46',
     accentColor: '#10B981',
     light: false
@@ -559,7 +559,7 @@ export const AD_THEMES = {
   rose: {
     label: 'أحمر ياقوتي',
     grad: 'from-[#2A0410] via-[#881337] to-[#E11D48]',
-    cssGrad: 'linear-gradient(135deg, #2A0410 0%, #881337 52%, #E11D48 100%)',
+    cssGrad: '#881337',
     endColor: '#881337',
     accentColor: '#F43F5E',
     light: false
@@ -567,7 +567,7 @@ export const AD_THEMES = {
   cyan: {
     label: 'سماوي محيطي',
     grad: 'from-[#041E2B] via-[#155E75] to-[#0891B2]',
-    cssGrad: 'linear-gradient(135deg, #041E2B 0%, #155E75 52%, #0891B2 100%)',
+    cssGrad: '#155E75',
     endColor: '#155E75',
     accentColor: '#06B6D4',
     light: false
@@ -575,7 +575,7 @@ export const AD_THEMES = {
   amber: {
     label: 'كهرماني برونزي',
     grad: 'from-[#271202] via-[#78350F] to-[#D97706]',
-    cssGrad: 'linear-gradient(135deg, #271202 0%, #78350F 52%, #D97706 100%)',
+    cssGrad: '#78350F',
     endColor: '#78350F',
     accentColor: '#F59E0B',
     light: false
@@ -583,7 +583,7 @@ export const AD_THEMES = {
   slate: {
     label: 'كربوني فخم',
     grad: 'from-[#050811] via-[#1E293B] to-[#334155]',
-    cssGrad: 'linear-gradient(135deg, #050811 0%, #1E293B 52%, #334155 100%)',
+    cssGrad: '#1E293B',
     endColor: '#1E293B',
     accentColor: '#64748B',
     light: false
@@ -591,7 +591,7 @@ export const AD_THEMES = {
   gold: {
     label: 'ذهبي مضيء',
     grad: 'from-amber-300 via-amber-200 to-yellow-100',
-    cssGrad: 'linear-gradient(135deg, #FDE047 0%, #FBBF24 55%, #F59E0B 100%)',
+    cssGrad: '#FBBF24',
     endColor: '#FBBF24',
     accentColor: '#B45309',
     light: true
@@ -599,7 +599,7 @@ export const AD_THEMES = {
   light: {
     label: 'أبيض ثلجي فاتح',
     grad: 'from-white via-blue-50 to-slate-100',
-    cssGrad: 'linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 55%, #DBEAFE 100%)',
+    cssGrad: '#EFF6FF',
     endColor: '#EFF6FF',
     accentColor: '#2563EB',
     light: true

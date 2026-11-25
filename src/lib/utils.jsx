@@ -127,7 +127,7 @@ export const generateAiProductDetails = (rawName, modelName = '', brandName = ''
     qualityGrade = 'أصلي معتمد';
     warrantyText = 'ضمان تجربة 14 يوم وضمان 3 شهور ضد عيوب الصناعة';
     colorsText = 'أسود';
-    description = `✨ ${cleanTitle} — إضاءة LED احترافية عالية السطوع مع تحكم دقيق في درجات حرارة اللون (دافئ / محايد / أبيض ناصع) لتصوير الفيديو، الريلز، البث المباشر، ومكالمات العمل بجودة استوديو فائقة. تصميم عملي متين مع ثبات ممتاز وتشغيل مستقر لفترات طويلة.`;
+    description = `${cleanTitle} — إضاءة LED احترافية عالية السطوع مع تحكم دقيق في درجات حرارة اللون (دافئ / محايد / أبيض ناصع) لتصوير الفيديو، الريلز، البث المباشر، ومكالمات العمل بجودة استوديو فائقة. تصميم عملي متين مع ثبات ممتاز وتشغيل مستقر لفترات طويلة.`;
   } else if (/iphone|ايفون|آيفون|used|كسر زيرو|gb|تيرا/i.test(low)) {
     category = existingCategory || 'أجهزة كسر زيرو وموبايلات';
     qualityGrade = 'أصلي أبل 100%';
@@ -202,9 +202,9 @@ export const openCleanA4PrintWindow = (docTitle, bodyHtml) => {
       print-color-adjust: exact !important;
     }
     .report-wrap { max-width: 900px; margin: 0 auto; }
-    .hdr { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1d4ed8; padding-bottom: 14px; margin-bottom: 18px; }
+    .hdr { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #163b6b; padding-bottom: 14px; margin-bottom: 18px; }
     .brand { display: flex; align-items: center; gap: 12px; }
-    .brand-badge { width: 46px; height: 46px; border-radius: 12px; background: #1d4ed8; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; }
+    .brand-badge { width: 46px; height: 46px; border-radius: 12px; background: #163b6b; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; }
     .hdr h1 { margin: 0; font-size: 20px; font-weight: 900; color: #0f172a; }
     .hdr p { margin: 2px 0 0; font-size: 11px; color: #475569; font-weight: 700; }
     .meta { text-align: left; font-size: 11px; color: #334155; }
@@ -213,7 +213,7 @@ export const openCleanA4PrintWindow = (docTitle, bodyHtml) => {
     .kpi-label { font-size: 10px; color: #475569; font-weight: 700; }
     .kpi-val { font-size: 17px; font-weight: 900; color: #0f172a; margin-top: 2px; }
     .sec { margin-bottom: 18px; page-break-inside: avoid; }
-    .sec-title { font-size: 13px; font-weight: 900; color: #1e3a8a; background: #eff6ff; border-right: 4px solid #2563eb; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
+    .sec-title { font-size: 13px; font-weight: 900; color: #1e3a8a; background: #eff6ff; border-right: 4px solid #1e4e8c; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; }
     table { width: 100%; border-collapse: collapse; font-size: 11px; }
     th { background: #0f172a; color: #ffffff; text-align: right; padding: 7px 9px; font-weight: 800; border: 1px solid #1e293b; }
     td { padding: 6px 9px; border: 1px solid #cbd5e1; color: #0f172a; }

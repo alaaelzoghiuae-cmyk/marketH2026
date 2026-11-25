@@ -75,13 +75,13 @@ export function KaramboLiveAdvisorView({
             <div className="text-xs font-black text-muted">ميزانيتك لحد كام في السوق المصري؟</div>
             <div className="flex items-center gap-2">
               <input type="number" min="3000" max="200000" step="1000" value={budget} onChange={e => setBudget(Math.max(2000, Number(e.target.value) || 0))} className="w-28 px-2.5 py-1 rounded-xl border border-line bg-surface2 text-xs font-black text-fg" />
-              <span className="text-xs font-black text-[#2563EB]">{formatMoney(budget)}</span>
+              <span className="text-xs font-black text-[#1E4E8C]">{formatMoney(budget)}</span>
             </div>
           </div>
-          <input type="range" min="4000" max="150000" step="1000" value={Math.min(150000, budget)} onChange={e => setBudget(Number(e.target.value))} className="w-full accent-[#2563EB]" />
+          <input type="range" min="4000" max="150000" step="1000" value={Math.min(150000, budget)} onChange={e => setBudget(Number(e.target.value))} className="w-full accent-[#1E4E8C]" />
           <div className="flex flex-wrap gap-1.5">
             {budgets.map(b => (
-              <button key={b} type="button" onClick={() => setBudget(b)} className={`px-3 py-1 rounded-full text-[11px] font-black transition ${budget === b ? 'bg-[#2563EB] text-white' : 'bg-surface2 text-fg border border-line'}`}>
+              <button key={b} type="button" onClick={() => setBudget(b)} className={`px-3 py-1 rounded-full text-[11px] font-black transition ${budget === b ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}>
                 {formatMoney(b)}
               </button>
             ))}
@@ -90,7 +90,7 @@ export function KaramboLiveAdvisorView({
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="flex items-center gap-2 rounded-2xl px-3 py-2 bg-surface2 border border-line">
-            <Search className="w-4 h-4 text-[#3B82F6] shrink-0" />
+            <Search className="w-4 h-4 text-[#2F6BB3] shrink-0" />
             <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="فلترة بكلمة محددة (مثال: 5G أو 256GB أو Pro)..." className="flex-1 bg-transparent border-0 text-xs font-bold focus:outline-none" />
             {searchQ && <button type="button" onClick={() => setSearchQ('')}><X className="w-3.5 h-3.5 text-muted" /></button>}
           </div>
@@ -103,7 +103,7 @@ export function KaramboLiveAdvisorView({
 
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
           {brands.map(b => (
-            <button key={b} type="button" onClick={() => setBrand(b)} className={`px-3 py-1 rounded-full text-xs font-black shrink-0 border transition ${brand === b ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 text-fg border-line'}`}>
+            <button key={b} type="button" onClick={() => setBrand(b)} className={`px-3 py-1 rounded-full text-xs font-black shrink-0 border transition ${brand === b ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'}`}>
               {b === 'ALL' ? 'كل الماركات' : b}
             </button>
           ))}
@@ -140,7 +140,7 @@ export function KaramboLiveAdvisorView({
                 <div className="text-xs font-black text-fg line-clamp-2 leading-snug">{it.name}</div>
                 <div className="mt-auto space-y-1.5 pt-1 border-t border-line/60">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-base font-black text-[#2563EB] dark:text-[#60A5FA]">{formatMoney(it.price)}</span>
+                    <span className="text-base font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{formatMoney(it.price)}</span>
                     {it.trend === 'down' && <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black"><TrendingDown className="w-3 h-3" /> نزل {it.pct ? `${it.pct}%` : ''}</span>}
                     {it.trend === 'up' && <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[9px] font-black"><TrendingUp className="w-3 h-3" /> طلع {it.pct ? `${it.pct}%` : ''}</span>}
                   </div>
@@ -157,7 +157,7 @@ export function KaramboLiveAdvisorView({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h3 className="font-black text-fg">أفضل ترشيحات دليل كرومبو المفصّل تحت {formatMoney(budget)}</h3>
             {localInBudget.length >= 2 && onCompareIds && (
-              <button type="button" onClick={() => onCompareIds(localInBudget.slice(0, 3).map(p => p.id))} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-violet-600 text-white text-xs font-black">
+              <button type="button" onClick={() => onCompareIds(localInBudget.slice(0, 3).map(p => p.id))} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-600 text-white text-xs font-black">
                 <Scale className="w-3.5 h-3.5" /> قارن أفضل 3 ترشيحات
               </button>
             )}
@@ -238,7 +238,7 @@ export function KaramboLiveRadarView({
         </div>
         <div className="bg-surface border border-line rounded-2xl p-3 text-center">
           <div className="text-[11px] font-bold text-muted">تخفيضات المتجر</div>
-          <div className="text-xl font-black text-[#2563EB]">{storeDeals.length}</div>
+          <div className="text-xl font-black text-[#1E4E8C]">{storeDeals.length}</div>
         </div>
       </div>
 
@@ -263,45 +263,29 @@ export function KaramboLiveRadarView({
           ) : visible.length === 0 ? (
             <div className="bg-surface border border-line rounded-3xl p-6 text-center text-muted text-sm font-bold">لا توجد حركات أسعار في هذا التصنيف حالياً</div>
           ) : (
-            <div className="space-y-2">
-              {visible.slice(0, 80).map(item => {
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-2.5">
+              {visible.slice(0, 96).map(item => {
                 const isDown = item.trend === 'down';
                 const isUp = item.trend === 'up';
                 return (
                   <div
                     key={item.id}
                     onClick={() => item.localPhoneId && onOpenPhone && onOpenPhone(item.localPhoneId)}
-                    className={`flex items-center gap-3 bg-surface border border-line rounded-2xl p-3 transition ${item.localPhoneId ? 'cursor-pointer hover:border-[#3B82F6]' : ''}`}
+                    className={`relative aspect-square bg-surface border border-line rounded-xl p-2.5 flex flex-col transition ${item.localPhoneId ? 'cursor-pointer hover:border-slate-400' : ''}`}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-[#0D1528] border border-line flex items-center justify-center overflow-hidden shrink-0">
-                      {item.image ? <img src={item.image} alt="" loading="lazy" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-6 h-6 text-muted" />}
+                    <span className={`absolute top-2 end-2 z-10 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-black ${isDown ? 'bg-emerald-600 text-white' : isUp ? 'bg-rose-600 text-white' : 'bg-surface2 text-muted border border-line'}`}>
+                      {isDown ? <TrendingDown className="w-3 h-3" /> : isUp ? <TrendingUp className="w-3 h-3" /> : null}
+                      {isDown ? `-${item.pct > 0 ? item.pct + '%' : (item.diff ? formatMoney(Math.abs(item.diff)) : '')}` : isUp ? `+${item.pct > 0 ? item.pct + '%' : (item.diff ? formatMoney(Math.abs(item.diff)) : '')}` : 'مستقر'}
+                    </span>
+                    <div className="flex-1 min-h-0 rounded-lg bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden">
+                      {item.image ? <img src={item.image} alt="" loading="lazy" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} className="max-h-full max-w-full object-contain p-1" /> : <Smartphone className="w-8 h-8 text-muted" />}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs sm:text-sm font-black text-fg truncate">{item.name}</div>
-                      <div className="text-[10px] font-bold text-muted flex items-center gap-2">
-                        {item.oldPrice && item.oldPrice !== item.price ? <span className="line-through">{formatMoney(item.oldPrice)}</span> : <span>سعر السوق المرصود</span>}
+                    <div className="pt-1.5 space-y-0.5">
+                      <div className="text-[11px] font-black text-fg leading-tight line-clamp-2 min-h-[1.75rem]">{item.name}</div>
+                      <div className="flex items-baseline justify-between gap-1">
+                        <span className="text-sm font-black text-fg">{formatMoney(item.price)}</span>
+                        {item.oldPrice && item.oldPrice !== item.price && <span className="text-[10px] font-bold text-muted line-through">{formatMoney(item.oldPrice)}</span>}
                       </div>
-                    </div>
-                    {/* Stock-style Arrow Badge */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      {isDown ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-600 text-white text-[11px] font-black shadow-sm">
-                          <TrendingDown className="w-4 h-4" />
-                          <span>نزل {item.pct > 0 ? `${item.pct}%` : (item.diff ? formatMoney(Math.abs(item.diff)) : '')}</span>
-                        </span>
-                      ) : isUp ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-600 text-white text-[11px] font-black shadow-sm">
-                          <TrendingUp className="w-4 h-4" />
-                          <span>طلع {item.pct > 0 ? `${item.pct}%` : (item.diff ? formatMoney(Math.abs(item.diff)) : '')}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-surface2 border border-line text-muted text-[11px] font-black">
-                          • مستقر
-                        </span>
-                      )}
-                      <span className="text-sm sm:text-base font-black text-[#2563EB] dark:text-[#60A5FA] min-w-[80px] text-end">
-                        {formatMoney(item.price)}
-                      </span>
                     </div>
                   </div>
                 );
@@ -455,7 +439,7 @@ export function KaramboGulfView({
         />
 
         {fetchingPrices && (
-          <div className="flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400">
+          <div className="flex items-center gap-2 text-xs font-black text-slate-600 dark:text-slate-400">
             <RefreshCw className="w-4 h-4 animate-spin" /> جاري البحث التلقائي عن أسعار الخليج ومصر...
           </div>
         )}
@@ -469,14 +453,14 @@ export function KaramboGulfView({
                 {Object.keys(FX_MAP).map(c => <option key={c} value={c}>{CUR_LABELS[c] || c}</option>)}
               </select>
             </div>
-            {gulfRegionNote && <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mt-1">{gulfRegionNote}</div>}
+            {gulfRegionNote && <div className="text-[10px] font-bold text-slate-600 dark:text-slate-400 mt-1">{gulfRegionNote}</div>}
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-black text-muted">سعر الصرف بالجنيه ({cur} → ج.م)</label>
               {gCfg.enableLiveFx !== false && (
-                <button type="button" disabled={fetchingFx} onClick={fetchLiveFx} className="inline-flex items-center gap-1 text-[10px] font-black text-indigo-600 dark:text-indigo-400 hover:underline">
+                <button type="button" disabled={fetchingFx} onClick={fetchLiveFx} className="inline-flex items-center gap-1 text-[10px] font-black text-slate-600 dark:text-slate-400 hover:underline">
                   <RefreshCw className={`w-3 h-3 ${fetchingFx ? 'animate-spin' : ''}`} /> تحديث الصرف الحي
                 </button>
               )}
@@ -516,15 +500,15 @@ export function KaramboGulfView({
                 {egNum > 0 && <div className={`text-[11px] font-black ${diffExempt > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{diffExempt > 0 ? `أوفر بـ ${formatMoney(Math.round(diffExempt))}` : `أغلى بـ ${formatMoney(Math.round(-diffExempt))}`}</div>}
               </div>
 
-              <div className="rounded-2xl bg-indigo-500/10 border border-indigo-500/30 p-3.5 text-center space-y-1">
-                <div className="text-[11px] font-black text-indigo-700 dark:text-indigo-300">2. بالضريبة الجمركية ({taxNum}%)</div>
+              <div className="rounded-2xl bg-slate-500/10 border border-slate-500/30 p-3.5 text-center space-y-1">
+                <div className="text-[11px] font-black text-slate-700 dark:text-slate-300">2. بالضريبة الجمركية ({taxNum}%)</div>
                 <div className="text-xl font-black text-fg">{formatMoney(Math.round(taxedTotal))}</div>
                 <div className="text-[10px] font-bold text-muted">الضريبة وحدها: {formatMoney(Math.round(taxEgp))}</div>
                 {egNum > 0 && <div className={`text-[11px] font-black ${diffTaxed > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{diffTaxed > 0 ? `أوفر بـ ${formatMoney(Math.round(diffTaxed))}` : `أغلى بـ ${formatMoney(Math.round(-diffTaxed))}`}</div>}
               </div>
 
-              <div className="rounded-2xl bg-sky-500/10 border border-sky-500/30 p-3.5 text-center space-y-1">
-                <div className="text-[11px] font-black text-sky-700 dark:text-sky-300">3. الشراء من مصر (بضمان)</div>
+              <div className="rounded-2xl bg-slate-500/10 border border-slate-500/30 p-3.5 text-center space-y-1">
+                <div className="text-[11px] font-black text-slate-700 dark:text-slate-300">3. الشراء من مصر (بضمان)</div>
                 <div className="text-xl font-black text-fg">{egNum > 0 ? formatMoney(Math.round(egNum)) : '—'}</div>
                 <div className="text-[10px] font-bold text-muted">بفاتورة وضمان محلي معتمد</div>
               </div>
@@ -532,7 +516,7 @@ export function KaramboGulfView({
 
             {egNum > 0 && (
               <div className="rounded-2xl bg-surface2 border border-line p-3.5 text-center space-y-2">
-                <div className={`text-sm font-black ${diffTaxed > 2000 ? 'text-emerald-600' : 'text-[#2563EB]'}`}>
+                <div className={`text-sm font-black ${diffTaxed > 2000 ? 'text-emerald-600' : 'text-[#1E4E8C]'}`}>
                   {diffTaxed > 2000
                     ? `حتى بعد الضريبة الجمركية، الخليج أوفر بـ ${formatMoney(Math.round(diffTaxed))} — بس خد بالك من الضمان المحلي.`
                     : diffTaxed < 0
@@ -540,7 +524,7 @@ export function KaramboGulfView({
                       : 'الفرق بسيط جداً — الشراء من مصر بضمان وفاتورة أريح وأضمن.'}
                 </div>
                 {onOpenSourcing && (
-                  <button type="button" onClick={() => onOpenSourcing(selectedPhone ? selectedPhone.name : 'طلب استيراد موبايل', `سعر الخليج: ${gpNum} ${cur} — التكلفة بالضريبة: ${formatMoney(Math.round(taxedTotal))}`)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black transition">
+                  <button type="button" onClick={() => onOpenSourcing(selectedPhone ? selectedPhone.name : 'طلب استيراد موبايل', `سعر الخليج: ${gpNum} ${cur} — التكلفة بالضريبة: ${formatMoney(Math.round(taxedTotal))}`)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-600 hover:bg-slate-500 text-white text-xs font-black transition">
                     <PhoneCall className="w-4 h-4" /> عايز تستورده؟ اطلب تسعير استيراد من ELZOGHBI
                   </button>
                 )}
@@ -710,7 +694,7 @@ export function KaramboTradeInView({
             {upgradeDiff !== null && targetPhone && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-line text-xs font-black text-fg">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>للترقية إلى {targetPhone.name} هتزود تقريباً: <strong className="text-[#2563EB]">{formatMoney(upgradeDiff)}</strong></span>
+                <span>للترقية إلى {targetPhone.name} هتزود تقريباً: <strong className="text-[#1E4E8C]">{formatMoney(upgradeDiff)}</strong></span>
               </div>
             )}
             <div className="pt-1">

@@ -32,7 +32,7 @@ export function renderAdminSiteSettings(ctx) {
           <button
             type="button"
             onClick={() => pushToSupabaseCloud(null, true)}
-            className="px-4 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+            className="px-4 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
           >
             <Save className="w-4 h-4" />
             <span>حفظ وتأكيد الإعدادات في السيرفر ✓</span>
@@ -48,7 +48,7 @@ export function renderAdminSiteSettings(ctx) {
             className="w-full flex items-center justify-between gap-2 font-extrabold text-fg"
           >
             <span className="flex items-center gap-2">
-              <Megaphone className="w-4 h-4 text-indigo-600" />
+              <Megaphone className="w-4 h-4 text-slate-600" />
               الإعلانات النصية (شريط متحرك + بنر ثابت)
               {(siteSettings.tickerEnabled || siteSettings.bannerEnabled) && (
                 <span className="text-[11px] font-bold text-accent-text">(شغّالة)</span>
@@ -113,7 +113,7 @@ export function renderAdminSiteSettings(ctx) {
                       value={
                         (siteSettings.tickerColor && siteSettings.tickerColor.startsWith('#'))
                           ? siteSettings.tickerColor
-                          : ({ blue: '#2563eb', green: '#16a34a', amber: '#d97706', red: '#be123c', dark: '#111827', purple: '#7c3aed', teal: '#0d9488' }[siteSettings.tickerColor] || '#2563eb')
+                          : ({ blue: '#1e4e8c', green: '#16a34a', amber: '#d97706', red: '#be123c', dark: '#111827', purple: '#7c3aed', teal: '#0d9488' }[siteSettings.tickerColor] || '#1e4e8c')
                       }
                       onChange={e => saveSiteSettingsImmediate(prev => ({ ...prev, tickerColor: e.target.value, tickerBgColor: e.target.value }))}
                       className="w-10 h-9 p-0.5 rounded-lg border border-line cursor-pointer bg-surface shrink-0"
@@ -164,7 +164,7 @@ export function renderAdminSiteSettings(ctx) {
             className="w-full flex items-center justify-between gap-2 font-extrabold text-fg"
           >
             <span className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-indigo-600" />
+              <Eye className="w-4 h-4 text-slate-600" />
               الأقسام اللي بتظهر في صفحة العميل
             </span>
             <span className="w-7 h-7 rounded-lg bg-nav2 text-white flex items-center justify-center">
@@ -206,7 +206,7 @@ export function renderAdminSiteSettings(ctx) {
             className="w-full flex items-center justify-between gap-2 font-extrabold text-fg"
           >
             <span className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-indigo-600" />
+              <CreditCard className="w-4 h-4 text-slate-600" />
               طرق الدفع اللي بتظهر للعميل
               <span className="text-[11px] font-bold text-accent-text">
                 ({getPaymentMethods(siteSettings).filter(m => m.enabled).length} شغّالة)
@@ -233,7 +233,7 @@ export function renderAdminSiteSettings(ctx) {
                   }
                 ])
               }
-              className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold"
+              className="px-3 py-1.5 rounded-xl bg-slate-600 hover:bg-slate-700 text-white font-extrabold"
             >
               + ضيف طريقة دفع
             </button>
@@ -323,7 +323,7 @@ export function renderAdminSiteSettings(ctx) {
             className="w-full flex items-center justify-between gap-2 font-extrabold text-fg"
           >
             <span className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-indigo-600" />
+              <FileText className="w-4 h-4 text-slate-600" />
               الشروط والأحكام اللي العميل لازم يوافق عليها وقت التسجيل
             </span>
             <span className="w-7 h-7 rounded-lg bg-nav2 text-white flex items-center justify-center">
@@ -425,14 +425,14 @@ export function renderAdminSiteSettings(ctx) {
           </div>
 
           <div>
-            <label className="font-bold text-pink-700 block mb-1">رابط حساب إنستجرام (Instagram URL):</label>
+            <label className="font-bold text-slate-700 block mb-1">رابط حساب إنستجرام (Instagram URL):</label>
             <input
               type="text"
               dir="ltr"
               value={siteSettings.instagramUrl}
               onChange={e => setSiteSettings(prev => ({ ...prev, instagramUrl: e.target.value }))}
               placeholder="https://instagram.com/..."
-              className="w-full p-2.5 rounded-xl border border-pink-300 bg-pink-50/30 font-mono"
+              className="w-full p-2.5 rounded-xl border border-slate-300 bg-slate-50/30 font-mono"
             />
           </div>
         </div>
@@ -537,7 +537,7 @@ export function renderAdminSiteSettings(ctx) {
           <div className="p-4 rounded-2xl bg-surface2 border border-line flex flex-wrap items-center justify-between gap-3 mt-3">
             <div className="space-y-1 max-w-xl">
               <div className="font-extrabold text-fg text-xs flex items-center gap-1.5">
-                <Database className="w-4 h-4 text-indigo-600" />
+                <Database className="w-4 h-4 text-slate-600" />
                 <span>أداة تنظيف وتصغير حجم الصف ونقل الصور القديمة إلى Supabase Storage</span>
               </div>
               <p className="text-[11px] text-fg leading-relaxed">
@@ -548,7 +548,7 @@ export function renderAdminSiteSettings(ctx) {
               type="button"
               disabled={migratingImages}
               onClick={handleMigrateAllBase64ImagesToStorage}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition shrink-0"
+              className="px-4 py-2.5 rounded-xl bg-slate-600 hover:bg-slate-700 disabled:opacity-50 text-white font-extrabold text-xs shadow-sm flex items-center gap-1.5 transition shrink-0"
             >
               <Upload className="w-4 h-4" />
               <span>{migratingImages ? migrationProgress || 'جاري نقل الصور...' : 'نقل صور Base64 فقط'}</span>
@@ -556,11 +556,11 @@ export function renderAdminSiteSettings(ctx) {
           </div>
 
           {/* Comprehensive Anti-Egress Dashboard & Whole-Site WebP Image Optimizer */}
-          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#2563EB]/10 via-surface2 to-emerald-500/10 border-2 border-[#2563EB]/35 space-y-4 mt-4">
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#1E4E8C]/10 via-surface2 to-emerald-500/10 border-2 border-[#1E4E8C]/35 space-y-4 mt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1 max-w-2xl">
                 <div className="font-black text-fg text-sm flex items-center gap-2">
-                  <span>🚀 درع خفض استهلاك باقة Supabase Egress (+92% توفير فعلي) + ضغط كل صور الموقع لـ WebP</span>
+                  <span>درع خفض استهلاك باقة Supabase Egress (+92% توفير فعلي) + ضغط كل صور الموقع لـ WebP</span>
                 </div>
                 <p className="text-[11px] text-muted leading-relaxed">
                   تم تفعيل الكاش الذكي المشترك بين التبويبات (`35 دقيقة`)، وإيقاف سحب جدول العملاء المتكرر، وتحويل زر الحفظ ليرفع التعديلات الجديدة فقط، وضبط كاش الصور لمدة سنة كاملة (`max-age=31536000, immutable`). اضغط الزر بالأسفل لفحص وضغط جميع صور الإعلانات والمنتجات الحالية (بما فيها ملفات `.jpg` و`.png` الكبيرة في Storage) إلى صيغة `WebP` فائقة الخفة!
@@ -570,7 +570,7 @@ export function renderAdminSiteSettings(ctx) {
                 <button
                   type="button"
                   onClick={runSiteImagesAudit}
-                  className="px-3.5 py-2.5 rounded-xl bg-surface hover:border-[#2563EB] border border-line text-fg font-extrabold text-xs transition"
+                  className="px-3.5 py-2.5 rounded-xl bg-surface hover:border-[#1E4E8C] border border-line text-fg font-extrabold text-xs transition"
                 >
                   🔍 فحص حالة صور الموقع
                 </button>
@@ -601,7 +601,7 @@ export function renderAdminSiteSettings(ctx) {
                   <div className="text-[11px] font-bold text-muted">صور Base64 خام داخل الجداول</div>
                 </div>
                 <div className="p-3 rounded-xl bg-surface border border-line text-center">
-                  <div className="text-lg font-black text-[#2563EB]">{siteImageAuditStats.externalCdnCount}</div>
+                  <div className="text-lg font-black text-[#1E4E8C]">{siteImageAuditStats.externalCdnCount}</div>
                   <div className="text-[11px] font-bold text-muted">روابط خارجية (صفر Egress)</div>
                 </div>
               </div>
@@ -632,7 +632,7 @@ export function renderAdminSiteSettings(ctx) {
           const ntfyWebUrl = `https://ntfy.sh/${encodeURIComponent(pCfg.ntfyTopic)}`;
           return (
             <div className="pt-2 space-y-5 text-xs">
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-surface2 to-[#2563EB]/10 border-2 border-emerald-500/35 space-y-3">
+              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-surface2 to-[#1E4E8C]/10 border-2 border-emerald-500/35 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black">يعمل مجاناً 100% حتى والموقع والمتصفح مغلقان تماماً!</span>
@@ -647,7 +647,7 @@ export function renderAdminSiteSettings(ctx) {
                       const ok = await sendMobileOrderPushAlert({
                         eventType: 'order',
                         title: '🔔 تجربة ناجحة! إشعارات متجر الزغبي تعمل الآن',
-                        body: 'مبروك! سيصلك نفس هذا التنبيه الفوري على موبايلك مع كل أوردر جديد حتى والموقع مغلق تماماً 🚀'
+                        body: 'مبروك! سيصلك نفس هذا التنبيه الفوري على موبايلك مع كل أوردر جديد حتى والموقع مغلق تماماً '
                       });
                       if (ok) showToast('✅ تم إرسال الإشعار التجريبي لموبايلك الآن! تفقد تطبيق ntfy أو تليجرام.', 'success');
                       else showToast('يرجى تفعيل قناة ntfy أو كتابة بيانات بوت تليجرام أولاً.', 'warning');
@@ -677,7 +677,7 @@ export function renderAdminSiteSettings(ctx) {
                   </div>
 
                   <ol className="list-decimal list-inside space-y-1.5 text-[11px] text-fg/90 font-bold bg-surface p-3 rounded-xl border border-line">
-                    <li>حمّل تطبيق <b>ntfy</b> المجاني على موبايلك (<a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer" className="text-[#2563EB] underline">أندرويد Google Play</a> أو <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener noreferrer" className="text-[#2563EB] underline">آيفون App Store</a>).</li>
+                    <li>حمّل تطبيق <b>ntfy</b> المجاني على موبايلك (<a href="https://play.google.com/store/apps/details?id=io.heckel.ntfy" target="_blank" rel="noopener noreferrer" className="text-[#1E4E8C] underline">أندرويد Google Play</a> أو <a href="https://apps.apple.com/app/ntfy/id1625396347" target="_blank" rel="noopener noreferrer" className="text-[#1E4E8C] underline">آيفون App Store</a>).</li>
                     <li>افتح التطبيق واضغط <b>(+)</b> واكتب كود قناتك السري الموجود بالأسفل تماماً.</li>
                     <li>اضغط زر <b>«إرسال إشعار تجريبي»</b> بالأعلى لتسمع رنّة الإشعار على موبايلك فوراً!</li>
                   </ol>
@@ -699,7 +699,7 @@ export function renderAdminSiteSettings(ctx) {
                           navigator.clipboard?.writeText(pCfg.ntfyTopic);
                           showToast('تم نسخ كود القناة السري! الصقه داخل تطبيق ntfy في موبايلك.', 'success');
                         }}
-                        className="px-3.5 py-2.5 rounded-xl bg-[#2563EB] text-white font-extrabold text-xs shrink-0"
+                        className="px-3.5 py-2.5 rounded-xl bg-[#1E4E8C] text-white font-extrabold text-xs shrink-0"
                       >
                         نسخ الكود
                       </button>
@@ -716,7 +716,7 @@ export function renderAdminSiteSettings(ctx) {
                       </button>
                     </div>
                     <div className="pt-1">
-                      <a href={ntfyWebUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-extrabold text-[#2563EB] hover:underline">
+                      <a href={ntfyWebUrl} target="_blank" rel="noopener noreferrer" className="text-[11px] font-extrabold text-[#1E4E8C] hover:underline">
                         🔗 أو افتح صفحة القناة مباشرة في المتصفح ({ntfyWebUrl})
                       </a>
                     </div>
@@ -731,7 +731,7 @@ export function renderAdminSiteSettings(ctx) {
                       type="button"
                       onClick={() => updatePushCfg({ telegramEnabled: !pCfg.telegramEnabled })}
                       className={`px-3 py-1 rounded-lg font-extrabold text-[11px] border ${
-                        pCfg.telegramEnabled ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-muted border-line'
+                        pCfg.telegramEnabled ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-muted border-line'
                       }`}
                     >
                       {pCfg.telegramEnabled ? 'مفعّل ✓' : 'غير مفعّل'}
@@ -782,7 +782,7 @@ export function renderAdminSiteSettings(ctx) {
                       type="checkbox"
                       checked={Boolean(pCfg[ek])}
                       onChange={e => updatePushCfg({ [ek]: e.target.checked })}
-                      className="w-4 h-4 accent-[#2563EB]"
+                      className="w-4 h-4 accent-[#1E4E8C]"
                     />
                     <span>{elbl}</span>
                   </label>
@@ -808,7 +808,7 @@ export function renderCmsAccordionHeader(ctx, secKey, icon, title, subtitle, bad
             <span className="text-base">{icon}</span>
             <h3 className="text-sm sm:text-base font-black text-fg">{title}</h3>
             {badgeTxt && (
-              <span className="px-2.5 py-0.5 rounded-full bg-[#2563EB]/15 text-[#2563EB] dark:text-[#60A5FA] font-black text-[11px]">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] font-black text-[11px]">
                 {badgeTxt}
               </span>
             )}
@@ -820,8 +820,8 @@ export function renderCmsAccordionHeader(ctx, secKey, icon, title, subtitle, bad
           onClick={e => { e.stopPropagation(); toggleCmsSection(secKey); }}
           className={`w-9 h-9 rounded-xl font-mono font-black text-base flex items-center justify-center border transition shrink-0 ${
             isOpen
-              ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-xs'
-              : 'bg-surface2 text-fg border-line hover:border-[#3B82F6]'
+              ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-xs'
+              : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
           }`}
           title={isOpen ? 'طي القسم (−)' : 'فتح القسم (+)'}
         >
@@ -846,8 +846,8 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
         onClick={onClick}
         className={`px-2.5 py-1.5 rounded-lg border text-[11px] font-extrabold transition ${
           active
-            ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-2xs'
-            : 'bg-bg text-fg border-line hover:border-[#3B82F6]'
+            ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-2xs'
+            : 'bg-bg text-fg border-line hover:border-[#2F6BB3]'
         } ${extraCls}`}
       >
         {label}
@@ -874,7 +874,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="px-3 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-[11px] cursor-pointer transition inline-flex items-center gap-1.5 shrink-0">
+              <label className="px-3 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-[11px] cursor-pointer transition inline-flex items-center gap-1.5 shrink-0">
                 <Upload className="w-3.5 h-3.5" />
                 <span>رفع صورة (تُضغط WebP)</span>
                 <input type="file" accept="image/*" onChange={onUploadFile} className="hidden" />
@@ -898,7 +898,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
               {miniPill(
                 curLayout === 'editorial_split' && targetObj.imageFrameStyle === 'white_cutout',
                 () => patchObj({ layout: 'editorial_split', imageFrameStyle: 'white_cutout', blendWhiteBg: true, imageFit: 'contain', imageScale: 104, imageOffsetX: 0, imageOffsetY: 0 }),
-                '✨ عزل خلفية بيضاء'
+                'عزل خلفية بيضاء'
               )}
               {miniPill(
                 curLayout === 'editorial_split' && (targetObj.imageFrameStyle || 'white_pedestal') === 'white_pedestal' && !targetObj.blendWhiteBg,
@@ -923,7 +923,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
               {miniPill(
                 curLayout === 'icon_3d_studio',
                 () => patchObj({ layout: 'icon_3d_studio', mediaMode: 'icon_only' }),
-                '💎 أيقونة 3D جاهزة'
+                'أيقونة 3D جاهزة'
               )}
             </div>
           </div>
@@ -976,11 +976,11 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
           {/* DECK 3: Live Sliders Side-by-Side (Scale + X + Y + Reset) */}
           <div className="p-3 rounded-2xl bg-surface border border-line space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-black text-fg text-xs">🎯 3. تحريك وتكبير الصورة بالمللي</span>
+              <span className="font-black text-fg text-xs">3. تحريك وتكبير الصورة بالمللي</span>
               <button
                 type="button"
                 onClick={() => patchObj({ imageScale: 100, imageOffsetX: 0, imageOffsetY: 0, imageFocal: 'center', imageWidthPct: 44, imagePos: 'left' })}
-                className="px-2.5 py-0.5 rounded-lg bg-surface2 hover:bg-[#2563EB] text-fg hover:text-white border border-line text-[10px] font-extrabold transition"
+                className="px-2.5 py-0.5 rounded-lg bg-surface2 hover:bg-[#1E4E8C] text-fg hover:text-white border border-line text-[10px] font-extrabold transition"
               >
                 ↺ تصفير 100%
               </button>
@@ -990,7 +990,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
               <div>
                 <div className="flex justify-between text-[10px] font-extrabold mb-0.5">
                   <span className="text-muted">الحجم (Zoom):</span>
-                  <span className="font-mono text-[#2563EB] dark:text-[#60A5FA]">{curScale}%</span>
+                  <span className="font-mono text-[#1E4E8C] dark:text-[#7FB0E8]">{curScale}%</span>
                 </div>
                 <input type="range" min="65" max="150" value={curScale} onChange={e => patchObj({ imageScale: Number(e.target.value) })} className="w-full hm-range" />
               </div>
@@ -999,14 +999,14 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
                 <div>
                   <div className="flex justify-between text-[10px] font-extrabold mb-0.5">
                     <span className="text-muted">يمين / يسار (X):</span>
-                    <span className="font-mono text-[#2563EB] dark:text-[#60A5FA]" dir="ltr">{curOffX}px</span>
+                    <span className="font-mono text-[#1E4E8C] dark:text-[#7FB0E8]" dir="ltr">{curOffX}px</span>
                   </div>
                   <input type="range" min="-55" max="55" value={curOffX} onChange={e => patchObj({ imageOffsetX: Number(e.target.value) })} className="w-full hm-range" />
                 </div>
                 <div>
                   <div className="flex justify-between text-[10px] font-extrabold mb-0.5">
                     <span className="text-muted">أعلى / أسفل (Y):</span>
-                    <span className="font-mono text-[#2563EB] dark:text-[#60A5FA]" dir="ltr">{curOffY}px</span>
+                    <span className="font-mono text-[#1E4E8C] dark:text-[#7FB0E8]" dir="ltr">{curOffY}px</span>
                   </div>
                   <input type="range" min="-55" max="55" value={curOffY} onChange={e => patchObj({ imageOffsetY: Number(e.target.value) })} className="w-full hm-range" />
                 </div>
@@ -1025,7 +1025,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
                 <div>
                   <div className="flex justify-between text-[10px] font-extrabold mb-0.5">
                     <span className="text-muted">تعتيم خلف النص:</span>
-                    <span className="font-mono text-[#2563EB]">{targetObj.overlay ?? 52}%</span>
+                    <span className="font-mono text-[#1E4E8C]">{targetObj.overlay ?? 52}%</span>
                   </div>
                   <input type="range" min="15" max="88" value={targetObj.overlay ?? 52} onChange={e => patchObj({ overlay: Number(e.target.value) })} className="w-full hm-range" />
                 </div>
@@ -1038,8 +1038,8 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
         {(curLayout === 'icon_3d_studio' || targetObj.mediaMode === 'image_and_icon') && (
           <div className="p-3 rounded-2xl bg-surface border border-line space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-extrabold text-fg text-xs">💎 اختر الأيقونة ثلاثية الأبعاد (41 شكل جاهز):</span>
-              <span className="text-[11px] font-bold text-[#2563EB] dark:text-[#60A5FA]">
+              <span className="font-extrabold text-fg text-xs">اختر الأيقونة ثلاثية الأبعاد (41 شكل جاهز):</span>
+              <span className="text-[11px] font-bold text-[#1E4E8C] dark:text-[#7FB0E8]">
                 {(SHORTCUT_ICON_PRESETS[targetObj.iconPreset || 'flagship_iphones'] || SHORTCUT_ICON_PRESETS.flagship_iphones).label}
               </span>
             </div>
@@ -1052,7 +1052,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
                     type="button"
                     onClick={() => patchObj({ iconPreset: k })}
                     className={`p-1.5 rounded-xl border flex flex-col items-center justify-center gap-0.5 text-center transition ${
-                      selected ? 'bg-[#2563EB]/20 border-[#2563EB]' : 'bg-surface hover:bg-surface2 border-line'
+                      selected ? 'bg-[#1E4E8C]/20 border-[#1E4E8C]' : 'bg-surface hover:bg-surface2 border-line'
                     }`}
                   >
                     <div className="w-7 h-7 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6">
@@ -1089,7 +1089,7 @@ export function renderAdminStorefrontCms(ctx) {
             { id: 'header_studio', icon: '🎛️', label: 'التحكم الكامل في الهيدر والشعار' },
             { id: 'footer_studio', icon: '🦶', label: 'التحكم الكامل في الفوتر (أسفل الموقع)' },
             { id: 'home_layout', icon: '🏠', label: 'أقسام الرئيسية والـ 8 اختصارات' },
-            { id: 'bars_cats', icon: '✨', label: 'بارات العرض والتصنيفات', badge: showcaseBars.length },
+            { id: 'bars_cats', icon: '', label: 'بارات العرض والتصنيفات', badge: showcaseBars.length },
             { id: 'sourcing_banner', icon: '🌍', label: 'بانر الاستيراد من الخارج' },
             { id: 'newsletter', icon: '📧', label: 'النشرة البريدية والحملات' }
           ],
@@ -1118,7 +1118,7 @@ export function renderAdminStorefrontCms(ctx) {
                   <a
                     href="/elzoghbi-logo-full.webp"
                     download="ELZOGHBI_Brand_Logo.webp"
-                    className="px-3.5 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm transition"
+                    className="px-3.5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-xs flex items-center gap-1.5 shadow-sm transition"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>تحميل نسخة اللوجو الجديد</span>
@@ -1141,7 +1141,7 @@ export function renderAdminStorefrontCms(ctx) {
               </div>
 
               {/* Live Header Preview */}
-              <div className="rounded-2xl border-2 border-[#2563EB]/35 overflow-hidden shadow-md">
+              <div className="rounded-2xl border-2 border-[#1E4E8C]/35 overflow-hidden shadow-md">
                 <div className="px-3 py-1.5 bg-surface2 text-[10px] font-extrabold text-muted border-b border-line">👁️ معاينة حية لهيدر العميل الآن:</div>
                 <div className="pointer-events-none">{renderClientHeader()}</div>
               </div>
@@ -1149,10 +1149,10 @@ export function renderAdminStorefrontCms(ctx) {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Col 1: Brand Logo & Title */}
                 <div className="p-4 rounded-2xl bg-surface2/50 border border-line space-y-3">
-                  <div className="font-black text-fg text-xs">✨ 1. الشعار (Logo) واسم الهيدر</div>
+                  <div className="font-black text-fg text-xs">1. الشعار (Logo) واسم الهيدر</div>
                   <div className="grid grid-cols-2 gap-1.5">
                     {[
-                      ['geometric_svg', '💎 شعار Z الهندسي (SVG)'],
+                      ['geometric_svg', 'شعار Z الهندسي (SVG)'],
                       ['emblem_webp', '🖼️ أيقونة الشعار (WebP)'],
                       ['custom_image', '📤 رفع شعار مخصص'],
                       ['text_only', '🔤 نص العلامة فقط']
@@ -1162,7 +1162,7 @@ export function renderAdminStorefrontCms(ctx) {
                         type="button"
                         onClick={() => updateHdr({ logoMode: mk })}
                         className={`p-2 rounded-xl border text-[11px] font-extrabold text-right transition ${
-                          hCfg.logoMode === mk ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'
+                          hCfg.logoMode === mk ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'
                         }`}
                       >
                         {mlbl}
@@ -1180,7 +1180,7 @@ export function renderAdminStorefrontCms(ctx) {
                         placeholder="https://... رابط صورة اللوجو"
                         className="w-full px-3 py-2 rounded-xl border border-line text-xs font-mono bg-surface"
                       />
-                      <label className="w-full py-2 px-3 rounded-xl bg-[#2563EB] text-white font-extrabold text-xs cursor-pointer flex items-center justify-center gap-1.5">
+                      <label className="w-full py-2 px-3 rounded-xl bg-[#1E4E8C] text-white font-extrabold text-xs cursor-pointer flex items-center justify-center gap-1.5">
                         <Upload className="w-3.5 h-3.5" />
                         <span>أو ارفع لوجو من جهازك</span>
                         <input
@@ -1228,7 +1228,7 @@ export function renderAdminStorefrontCms(ctx) {
                       ['forceDarkHeader', 'خلفية كحلي ملكي دائماً']
                     ].map(([fk, flbl]) => (
                       <label key={fk} className="flex items-center gap-1.5 bg-surface px-2.5 py-1.5 rounded-lg border border-line font-bold text-[11px] cursor-pointer">
-                        <input type="checkbox" checked={Boolean(hCfg[fk])} onChange={e => updateHdr({ [fk]: e.target.checked })} className="w-3.5 h-3.5 accent-[#2563EB]" />
+                        <input type="checkbox" checked={Boolean(hCfg[fk])} onChange={e => updateHdr({ [fk]: e.target.checked })} className="w-3.5 h-3.5 accent-[#1E4E8C]" />
                         <span>{flbl}</span>
                       </label>
                     ))}
@@ -1258,7 +1258,7 @@ export function renderAdminStorefrontCms(ctx) {
                       ['showWarrantyBtn', '🛡️ زر فحص الضمان']
                     ].map(([ik, ilbl]) => (
                       <label key={ik} className="flex items-center gap-1.5 bg-surface px-2.5 py-2 rounded-xl border border-line font-bold text-[11px] cursor-pointer">
-                        <input type="checkbox" checked={Boolean(hCfg[ik])} onChange={e => updateHdr({ [ik]: e.target.checked })} className="w-3.5 h-3.5 accent-[#2563EB]" />
+                        <input type="checkbox" checked={Boolean(hCfg[ik])} onChange={e => updateHdr({ [ik]: e.target.checked })} className="w-3.5 h-3.5 accent-[#1E4E8C]" />
                         <span>{ilbl}</span>
                       </label>
                     ))}
@@ -1281,7 +1281,7 @@ export function renderAdminStorefrontCms(ctx) {
                         type="checkbox"
                         checked={Boolean(hCfg[toggleK])}
                         onChange={e => updateHdr({ [toggleK]: e.target.checked })}
-                        className="w-4 h-4 accent-[#2563EB] shrink-0"
+                        className="w-4 h-4 accent-[#1E4E8C] shrink-0"
                       />
                       <input
                         type="text"
@@ -1299,7 +1299,7 @@ export function renderAdminStorefrontCms(ctx) {
                         type="checkbox"
                         checked={Boolean(hCfg.customNavEnabled)}
                         onChange={e => updateHdr({ customNavEnabled: e.target.checked })}
-                        className="w-4 h-4 accent-[#2563EB]"
+                        className="w-4 h-4 accent-[#1E4E8C]"
                       />
                       <span>➕ إضافة زر مميز إضافي في الهيدر:</span>
                     </label>
@@ -1309,7 +1309,7 @@ export function renderAdminStorefrontCms(ctx) {
                           type="text"
                           value={hCfg.customNavLabel}
                           onChange={e => updateHdr({ customNavLabel: e.target.value })}
-                          placeholder="مثال: 🔥 عروض الجمعة"
+                          placeholder="مثال: عروض الجمعة"
                           className="px-2.5 py-1.5 rounded-lg border border-line text-xs font-bold bg-surface"
                         />
                         <select
@@ -1387,7 +1387,7 @@ export function renderAdminStorefrontCms(ctx) {
               </div>
 
               {/* Live Footer Preview */}
-              <div className="rounded-2xl border-2 border-indigo-500/35 overflow-hidden shadow-md">
+              <div className="rounded-2xl border-2 border-slate-500/35 overflow-hidden shadow-md">
                 <div className="px-3 py-1.5 bg-surface2 text-[10px] font-extrabold text-muted border-b border-line">👁️ معاينة حية للجزء السفلي (الفوتر) كما يراه العميل:</div>
                 <div className="max-h-[380px] overflow-y-auto">{renderClientFooter(true)}</div>
               </div>
@@ -1397,7 +1397,7 @@ export function renderAdminStorefrontCms(ctx) {
                 <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/20 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-black text-fg text-xs">🏪 1. عمود الهوية ولون الفوتر</span>
-                    <input type="checkbox" checked={fCfg.showBrandCol} onChange={e => updateFtr({ showBrandCol: e.target.checked })} className="w-4 h-4 accent-[#2563EB]" />
+                    <input type="checkbox" checked={fCfg.showBrandCol} onChange={e => updateFtr({ showBrandCol: e.target.checked })} className="w-4 h-4 accent-[#1E4E8C]" />
                   </div>
                   <div className="grid grid-cols-3 gap-1.5">
                     {[
@@ -1410,7 +1410,7 @@ export function renderAdminStorefrontCms(ctx) {
                         type="button"
                         onClick={() => updateFtr({ footerTheme: tk })}
                         className={`py-1.5 px-2 rounded-lg border text-[11px] font-extrabold ${
-                          fCfg.footerTheme === tk ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'
+                          fCfg.footerTheme === tk ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'
                         }`}
                       >
                         {tlbl}
@@ -1428,26 +1428,26 @@ export function renderAdminStorefrontCms(ctx) {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <label className="flex items-center gap-1.5 bg-surface px-2.5 py-1.5 rounded-lg border border-line font-bold text-[11px] cursor-pointer">
-                      <input type="checkbox" checked={fCfg.showFooterLogo} onChange={e => updateFtr({ showFooterLogo: e.target.checked })} className="w-3.5 h-3.5 accent-[#2563EB]" />
+                      <input type="checkbox" checked={fCfg.showFooterLogo} onChange={e => updateFtr({ showFooterLogo: e.target.checked })} className="w-3.5 h-3.5 accent-[#1E4E8C]" />
                       <span>إظهار اللوجو</span>
                     </label>
                     <label className="flex items-center gap-1.5 bg-surface px-2.5 py-1.5 rounded-lg border border-line font-bold text-[11px] cursor-pointer">
-                      <input type="checkbox" checked={fCfg.showSocialIcons} onChange={e => updateFtr({ showSocialIcons: e.target.checked })} className="w-3.5 h-3.5 accent-[#2563EB]" />
+                      <input type="checkbox" checked={fCfg.showSocialIcons} onChange={e => updateFtr({ showSocialIcons: e.target.checked })} className="w-3.5 h-3.5 accent-[#1E4E8C]" />
                       <span>أيقونات السوشيال ميديا</span>
                     </label>
                   </div>
                 </div>
 
                 {/* Card 2: Quick Links & Support Columns */}
-                <div className="p-4 rounded-2xl bg-violet-500/5 border border-violet-500/20 space-y-3">
+                <div className="p-4 rounded-2xl bg-slate-500/5 border border-slate-500/20 space-y-3">
                   <div className="font-black text-fg text-xs">🔗 2. عمودا الروابط السريعة وخدمة العملاء</div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-1.5">
-                      <input type="checkbox" checked={fCfg.showQuickLinksCol} onChange={e => updateFtr({ showQuickLinksCol: e.target.checked })} className="w-4 h-4 accent-violet-600" />
+                      <input type="checkbox" checked={fCfg.showQuickLinksCol} onChange={e => updateFtr({ showQuickLinksCol: e.target.checked })} className="w-4 h-4 accent-slate-600" />
                       <input type="text" value={fCfg.quickLinksTitle} onChange={e => updateFtr({ quickLinksTitle: e.target.value })} className="w-full px-2 py-1.5 rounded-lg border border-line text-xs font-black bg-surface" />
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <input type="checkbox" checked={fCfg.showSupportCol} onChange={e => updateFtr({ showSupportCol: e.target.checked })} className="w-4 h-4 accent-violet-600" />
+                      <input type="checkbox" checked={fCfg.showSupportCol} onChange={e => updateFtr({ showSupportCol: e.target.checked })} className="w-4 h-4 accent-slate-600" />
                       <input type="text" value={fCfg.supportColTitle} onChange={e => updateFtr({ supportColTitle: e.target.value })} className="w-full px-2 py-1.5 rounded-lg border border-line text-xs font-black bg-surface" />
                     </div>
                   </div>
@@ -1464,7 +1464,7 @@ export function renderAdminStorefrontCms(ctx) {
                       ['showShippingPolicyLink', 'سياسة الشحن']
                     ].map(([lk, llbl]) => (
                       <label key={lk} className="flex items-center gap-1.5 bg-surface px-2 py-1.5 rounded-lg border border-line font-bold text-[11px] cursor-pointer">
-                        <input type="checkbox" checked={Boolean(fCfg[lk])} onChange={e => updateFtr({ [lk]: e.target.checked })} className="w-3.5 h-3.5 accent-violet-600" />
+                        <input type="checkbox" checked={Boolean(fCfg[lk])} onChange={e => updateFtr({ [lk]: e.target.checked })} className="w-3.5 h-3.5 accent-slate-600" />
                         <span className="truncate">{llbl}</span>
                       </label>
                     ))}
@@ -1572,7 +1572,7 @@ export function renderAdminStorefrontCms(ctx) {
                 <button
                   type="button"
                   onClick={openNewAd}
-                  className="px-5 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-extrabold shadow-md shadow-blue-600/20 transition"
+                  className="px-5 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold shadow-md shadow-blue-600/20 transition"
                 >
                   + إنشاء إعلان أو بانر جديد
                 </button>
@@ -1580,17 +1580,17 @@ export function renderAdminStorefrontCms(ctx) {
             </div>
 
             {adEditorOpen && (
-              <form onSubmit={saveAdForm} className="rounded-3xl border-2 border-[#2563EB]/40 bg-surface2/40 p-4 sm:p-6 space-y-5">
+              <form onSubmit={saveAdForm} className="rounded-3xl border-2 border-[#1E4E8C]/40 bg-surface2/40 p-4 sm:p-6 space-y-5">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <h4 className="font-black text-fg text-sm sm:text-base">
-                    {adForm.id ? '✏️ تعديل تصميم الإعلان والصورة' : '✨ تصميم إعلان جديد'}
+                    {adForm.id ? '✏️ تعديل تصميم الإعلان والصورة' : 'تصميم إعلان جديد'}
                   </h4>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setAdPreviewDevice('desktop')}
                       className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ${
-                        adPreviewDevice === 'desktop' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'
+                        adPreviewDevice === 'desktop' ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'
                       }`}
                     >
                       💻 معاينة الكمبيوتر
@@ -1599,7 +1599,7 @@ export function renderAdminStorefrontCms(ctx) {
                       type="button"
                       onClick={() => setAdPreviewDevice('mobile')}
                       className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition ${
-                        adPreviewDevice === 'mobile' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'
+                        adPreviewDevice === 'mobile' ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'
                       }`}
                     >
                       📱 معاينة الموبايل
@@ -1615,7 +1615,7 @@ export function renderAdminStorefrontCms(ctx) {
                 </div>
 
                 {/* Sticky Live Preview Directly Above Side-by-Side Controls (Zero Up/Down Scrolling!) */}
-                <div className="sticky top-[104px] z-20 p-2.5 sm:p-3 rounded-2xl bg-bg/95 backdrop-blur-md border-2 border-[#2563EB]/35 shadow-lg flex flex-col items-center">
+                <div className="sticky top-[104px] z-20 p-2.5 sm:p-3 rounded-2xl bg-bg/95 backdrop-blur-md border-2 border-[#1E4E8C]/35 shadow-lg flex flex-col items-center">
                   <div
                     style={{ background: getAdTheme(adForm).cssGrad }}
                     className={`relative rounded-[26px] overflow-hidden border border-white/15 shadow-xl transition-all duration-300 ${
@@ -1660,7 +1660,7 @@ export function renderAdminStorefrontCms(ctx) {
                         type="text"
                         value={adForm.badge}
                         onChange={e => setAdForm(p => ({ ...p, badge: e.target.value }))}
-                        placeholder="عرض حصري 🔥"
+                        placeholder="عرض حصري "
                         className="w-full px-3.5 py-2.5 rounded-xl border border-line text-xs font-bold"
                       />
                     </div>
@@ -1752,7 +1752,7 @@ export function renderAdminStorefrontCms(ctx) {
                           title={AD_THEMES[k].label}
                           style={{ background: AD_THEMES[k].cssGrad }}
                           className={`h-9 px-3 rounded-xl border-2 text-[11px] font-extrabold flex items-center gap-1.5 transition ${
-                            adForm.theme === k ? 'border-[#2563EB] ring-2 ring-[#2563EB]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'
+                            adForm.theme === k ? 'border-[#1E4E8C] ring-2 ring-[#1E4E8C]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'
                           } ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}
                         >
                           <span>{AD_THEMES[k].label}</span>
@@ -1772,7 +1772,7 @@ export function renderAdminStorefrontCms(ctx) {
                 <div className="flex items-center gap-2.5">
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs sm:text-sm shadow-lg shadow-blue-600/20 transition"
+                    className="flex-1 py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs sm:text-sm shadow-lg shadow-blue-600/20 transition"
                   >
                     {adForm.id ? 'حفظ تعديلات الإعلان ✓' : 'اعتماد ونشر الإعلان الآن ✓'}
                   </button>
@@ -1822,7 +1822,7 @@ export function renderAdminStorefrontCms(ctx) {
                             >
                               {ad.active ? '✓ نشط وظاهر' : '✕ مخفي مؤقتاً'}
                             </button>
-                            <span className="px-2.5 py-1 rounded-lg bg-[#2563EB]/10 text-[#2563EB] dark:text-[#60A5FA] font-bold text-[10px]">
+                            <span className="px-2.5 py-1 rounded-lg bg-[#1E4E8C]/10 text-[#1E4E8C] dark:text-[#7FB0E8] font-bold text-[10px]">
                               {placeLbl}
                             </span>
                           </div>
@@ -1833,14 +1833,14 @@ export function renderAdminStorefrontCms(ctx) {
                           <button
                             type="button"
                             onClick={() => openEditAd(ad)}
-                            className="px-4 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-extrabold transition"
+                            className="px-4 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold transition"
                           >
                             ✏️ تعديل التصميم والصورة
                           </button>
                           <button
                             type="button"
                             onClick={() => duplicateAd(ad)}
-                            className="px-3 py-1.5 rounded-xl bg-surface2 hover:border-[#3B82F6] border border-line text-fg text-xs"
+                            className="px-3 py-1.5 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg text-xs"
                           >
                             نسخ
                           </button>
@@ -1890,10 +1890,10 @@ export function renderAdminStorefrontCms(ctx) {
               srcBanner.active ? 'مفعّل ✓' : 'متوقف'
             )}
 
-            <div className="sticky top-[104px] z-20 p-2.5 sm:p-3 rounded-2xl bg-bg/95 backdrop-blur-md border-2 border-[#2563EB]/35 shadow-lg">
+            <div className="sticky top-[104px] z-20 p-2.5 sm:p-3 rounded-2xl bg-bg/95 backdrop-blur-md border-2 border-[#1E4E8C]/35 shadow-lg">
               <div className="flex items-center justify-between text-[11px] font-bold text-muted mb-1.5">
                 <span>👁️ معاينة حية ثابتة (حرّك الأزرار بالأسفل وشاهد التغيير فوراً بدون نزول أو طلوع):</span>
-                <span className="text-[#2563EB] dark:text-[#60A5FA] font-extrabold">مباشر 100%</span>
+                <span className="text-[#1E4E8C] dark:text-[#7FB0E8] font-extrabold">مباشر 100%</span>
               </div>
               <div style={{ background: getAdTheme(srcBanner).cssGrad }} className="relative rounded-[24px] overflow-hidden shadow-md">
                 <AdContent ad={{ ...srcBanner, bannerHeight: srcBanner.bannerHeight || 'compact', linkedPartId: 'x' }} isPromoCard rtl />
@@ -1914,7 +1914,7 @@ export function renderAdminStorefrontCms(ctx) {
                 type="button"
                 onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, showHomeSourcing: !(prev.showHomeSourcing !== false) }))}
                 className={`px-4 py-2 rounded-xl font-extrabold border ${
-                  siteSettings.showHomeSourcing !== false ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 text-fg border-line'
+                  siteSettings.showHomeSourcing !== false ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'
                 }`}
               >
                 {siteSettings.showHomeSourcing !== false ? 'ظاهر في الصفحة الرئيسية ✓' : 'مخفي من الرئيسية'}
@@ -1923,7 +1923,7 @@ export function renderAdminStorefrontCms(ctx) {
                 type="button"
                 onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, showSearchSourcing: !(prev.showSearchSourcing !== false) }))}
                 className={`px-4 py-2 rounded-xl font-extrabold border ${
-                  siteSettings.showSearchSourcing !== false ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 text-fg border-line'
+                  siteSettings.showSearchSourcing !== false ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'
                 }`}
               >
                 {siteSettings.showSearchSourcing !== false ? 'ظاهر في صفحة المنتجات ✓' : 'مخفي من صفحة المنتجات'}
@@ -1972,7 +1972,7 @@ export function renderAdminStorefrontCms(ctx) {
                     onClick={() => updateSrcBanner({ theme: k })}
                     style={{ background: AD_THEMES[k].cssGrad }}
                     className={`h-9 px-3 rounded-xl border-2 text-[11px] font-extrabold transition ${
-                      srcBanner.theme === k ? 'border-[#2563EB] ring-2 ring-[#2563EB]/40' : 'border-white/20 opacity-85'
+                      srcBanner.theme === k ? 'border-[#1E4E8C] ring-2 ring-[#1E4E8C]/40' : 'border-white/20 opacity-85'
                     } ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}
                   >
                     {AD_THEMES[k].label}
@@ -1989,7 +1989,7 @@ export function renderAdminStorefrontCms(ctx) {
         <div className="bg-surface rounded-3xl p-5 border border-line shadow-sm space-y-4">
           {renderCmsAccordionHeader(
             'shortcuts',
-            '🎯',
+            '',
             '3. التحكم في الأيقونات المختصرة بالصفحة الرئيسية (40 شكل جاهز أو صور مخصصة)',
             'اختر من بين 40 أيقونة ثلاثية الأبعاد مخصصة للموبايلات وقطع الغيار والإكسسوارات أو ارفع صورة وعدّل النص',
             `${(Array.isArray(siteSettings.homeShortcutIcons) && siteSettings.homeShortcutIcons.length > 0 ? siteSettings.homeShortcutIcons : DEFAULT_HOME_SHORTCUT_ICONS).length} أيقونات`
@@ -2009,7 +2009,7 @@ export function renderAdminStorefrontCms(ctx) {
                       const next = [...cur, { id: `sc_${Date.now()}`, label: 'قسم جديد', mode: 'preset', preset: 'phone', image: '', category: 'ALL', filterMode: 'ALL', visible: true }];
                       saveSiteSettingsImmediate(prev => ({ ...prev, homeShortcutIcons: next }));
                     }}
-                    className="px-4 py-2 rounded-full bg-[#2563EB] text-white text-xs font-extrabold hover:bg-[#1D4ED8] transition"
+                    className="px-4 py-2 rounded-full bg-[#1E4E8C] text-white text-xs font-extrabold hover:bg-[#163B6B] transition"
                   >
                     + إضافة أيقونة جديدة
                   </button>
@@ -2019,7 +2019,7 @@ export function renderAdminStorefrontCms(ctx) {
                       saveSiteSettingsImmediate(prev => ({ ...prev, homeShortcutIcons: DEFAULT_HOME_SHORTCUT_ICONS }));
                       showToast('تم استعادة الأيقونات المختصرة الافتراضية ✓', 'info');
                     }}
-                    className="px-4 py-2 rounded-full bg-surface2 border border-line text-fg text-xs font-bold hover:border-[#3B82F6]"
+                    className="px-4 py-2 rounded-full bg-surface2 border border-line text-fg text-xs font-bold hover:border-[#2F6BB3]"
                   >
                     استعادة الافتراضي
                   </button>
@@ -2084,14 +2084,14 @@ export function renderAdminStorefrontCms(ctx) {
                         <button
                           type="button"
                           onClick={() => updateShortcut({ mode: 'preset' })}
-                          className={`py-1.5 rounded-lg font-extrabold border ${sc.mode !== 'image' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'}`}
+                          className={`py-1.5 rounded-lg font-extrabold border ${sc.mode !== 'image' ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'}`}
                         >
                           40 شكل جاهز (3D)
                         </button>
                         <button
                           type="button"
                           onClick={() => updateShortcut({ mode: 'image' })}
-                          className={`py-1.5 rounded-lg font-extrabold border ${sc.mode === 'image' ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface text-fg border-line'}`}
+                          className={`py-1.5 rounded-lg font-extrabold border ${sc.mode === 'image' ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface text-fg border-line'}`}
                         >
                           صورة مخصصة
                         </button>
@@ -2107,7 +2107,7 @@ export function renderAdminStorefrontCms(ctx) {
                             placeholder="https://... رابط الصورة"
                             className="flex-1 px-2 py-1.5 rounded-lg border border-line font-mono text-[10px]"
                           />
-                          <label className="px-2.5 py-1.5 rounded-lg bg-[#2563EB] text-white font-bold cursor-pointer shrink-0">
+                          <label className="px-2.5 py-1.5 rounded-lg bg-[#1E4E8C] text-white font-bold cursor-pointer shrink-0">
                             رفع
                             <input
                               type="file"
@@ -2146,7 +2146,7 @@ export function renderAdminStorefrontCms(ctx) {
                           className="w-full px-2.5 py-1.5 rounded-lg border border-line font-bold text-xs"
                         >
                           <option value="ALL">كل المنتجات</option>
-                          <option value="__DISCOUNTS__">العروض والخصومات 🔥</option>
+                          <option value="__DISCOUNTS__">العروض والخصومات </option>
                           {Array.from(new Set([...(Array.isArray(siteSettings.customCategories) ? siteSettings.customCategories : []), ...parts.map(p => p.category).filter(Boolean)])).map(c => (
                             <option key={c} value={c}>{c}</option>
                           ))}
@@ -2202,7 +2202,7 @@ export function renderAdminStorefrontCms(ctx) {
                     <button
                       type="button"
                       onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, homeFeaturedBrands: [...brands] }))}
-                      className="px-2.5 py-1 rounded-lg bg-[#2563EB]/15 text-[#2563EB] font-extrabold text-[11px]"
+                      className="px-2.5 py-1 rounded-lg bg-[#1E4E8C]/15 text-[#1E4E8C] font-extrabold text-[11px]"
                     >
                       تحديد الكل
                     </button>
@@ -2217,10 +2217,10 @@ export function renderAdminStorefrontCms(ctx) {
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedHomeBrands.map((br, idx) => (
-                    <div key={`hb_ord_${br}`} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2563EB]/15 border border-[#2563EB]/40 text-fg text-[11px] font-extrabold">
-                      <button type="button" onClick={() => moveHomeBrand(idx, -1)} disabled={idx === 0} className="px-1 hover:text-[#2563EB] disabled:opacity-30" title="تقديم">→</button>
+                    <div key={`hb_ord_${br}`} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1E4E8C]/15 border border-[#1E4E8C]/40 text-fg text-[11px] font-extrabold">
+                      <button type="button" onClick={() => moveHomeBrand(idx, -1)} disabled={idx === 0} className="px-1 hover:text-[#1E4E8C] disabled:opacity-30" title="تقديم">→</button>
                       <span>{String(br).replace(/^OR\s*-\s*/i, '')}</span>
-                      <button type="button" onClick={() => moveHomeBrand(idx, 1)} disabled={idx === selectedHomeBrands.length - 1} className="px-1 hover:text-[#2563EB] disabled:opacity-30" title="تأخير">←</button>
+                      <button type="button" onClick={() => moveHomeBrand(idx, 1)} disabled={idx === selectedHomeBrands.length - 1} className="px-1 hover:text-[#1E4E8C] disabled:opacity-30" title="تأخير">←</button>
                       <button type="button" onClick={() => toggleHomeBrand(br)} className="text-rose-500 hover:text-rose-600 pr-0.5" title="إخفاء">×</button>
                     </div>
                   ))}
@@ -2234,7 +2234,7 @@ export function renderAdminStorefrontCms(ctx) {
                           key={`hb_hid_${br}`}
                           type="button"
                           onClick={() => toggleHomeBrand(br)}
-                          className="px-2.5 py-1 rounded-full bg-surface2 border border-line text-muted hover:text-fg hover:border-[#3B82F6] text-[11px] font-bold"
+                          className="px-2.5 py-1 rounded-full bg-surface2 border border-line text-muted hover:text-fg hover:border-[#2F6BB3] text-[11px] font-bold"
                         >
                           + {String(br).replace(/^OR\s*-\s*/i, '')}
                         </button>
@@ -2312,7 +2312,7 @@ export function renderAdminStorefrontCms(ctx) {
                         }}
                         className={`px-3 py-1.5 rounded-full text-[11px] font-extrabold border transition ${
                           active
-                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                            ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
                             : 'bg-surface2 text-muted border-line hover:text-fg'
                         }`}
                       >
@@ -2355,7 +2355,7 @@ export function renderAdminStorefrontCms(ctx) {
                     id: newBarForm.editingId || `bar_${Date.now()}`,
                     title: newBarForm.title.trim(),
                     subtitle: newBarForm.subtitle.trim() || 'منتجات مختارة بعناية من الإدارة',
-                    badgeColor: newBarForm.badgeColor || 'bg-[#2563EB] text-white',
+                    badgeColor: newBarForm.badgeColor || 'bg-[#1E4E8C] text-white',
                     sourceType: srcType,
                     sourceValue: newBarForm.sourceValue || '',
                     maxItems: Number(newBarForm.maxItems) || 8,
@@ -2381,7 +2381,7 @@ export function renderAdminStorefrontCms(ctx) {
                     required
                     value={newBarForm.title}
                     onChange={e => setNewBarForm(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder="عنوان البار (مثال: 🔥 أقوى عروض الشاشات والإكسسوارات)..."
+                    placeholder="عنوان البار (مثال: أقوى عروض الشاشات والإكسسوارات)..."
                     className="p-2.5 rounded-xl border border-line bg-surface font-bold"
                   />
                   <input
@@ -2397,7 +2397,7 @@ export function renderAdminStorefrontCms(ctx) {
                     className="p-2.5 rounded-xl border border-line bg-surface font-extrabold"
                   >
                     <option value="manual">اختيار منتجات محددة يدوياً</option>
-                    <option value="discounts">🔥 عرض المنتجات التي عليها خصم تلقائياً</option>
+                    <option value="discounts">عرض المنتجات التي عليها خصم تلقائياً</option>
                     <option value="category">📂 عرض منتجات تصنيف معين تلقائياً</option>
                     <option value="brand">📱 عرض منتجات براند معين تلقائياً</option>
                   </select>
@@ -2446,7 +2446,7 @@ export function renderAdminStorefrontCms(ctx) {
                             }))
                           }
                           className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition ${
-                            selected ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 text-muted border-line'
+                            selected ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-muted border-line'
                           }`}
                         >
                           {selected ? '✓ ' : '+ '} {pt.name}
@@ -2456,7 +2456,7 @@ export function renderAdminStorefrontCms(ctx) {
                   </div>
                 )}
 
-                <button type="submit" className="px-6 py-2.5 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black shadow-sm">
+                <button type="submit" className="px-6 py-2.5 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black shadow-sm">
                   {newBarForm.editingId ? 'حفظ تعديلات البار ✓' : '+ إنشاء بار عرض جديد'}
                 </button>
               </form>
@@ -2481,7 +2481,7 @@ export function renderAdminStorefrontCms(ctx) {
                           maxItems: bar.maxItems || 8,
                           selectedPartIds: Array.isArray(bar.partIds) ? bar.partIds : []
                         })}
-                        className="px-3 py-1 rounded-full font-extrabold text-[11px] bg-[#2563EB]/15 text-[#2563EB] dark:text-[#60A5FA]"
+                        className="px-3 py-1 rounded-full font-extrabold text-[11px] bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8]"
                       >
                         تعديل
                       </button>
@@ -2557,7 +2557,7 @@ export function renderAdminStorefrontCms(ctx) {
                       window.open(mailtoUrl, '_blank');
                       showToast(`📧 تم فتح برنامج البريد لإرسال الحملة إلى (${emails.length}) مشترك ✓`, 'success');
                     }}
-                    className="flex-1 py-2.5 px-4 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black shadow-md transition"
+                    className="flex-1 py-2.5 px-4 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black shadow-md transition"
                   >
                     📧 إرسال الإيميل لجميع المشتركين الآن
                   </button>
@@ -2578,7 +2578,7 @@ export function renderAdminStorefrontCms(ctx) {
                       }));
                       showToast('تمت إضافة المشترك ✓', 'success');
                     }}
-                    className="px-3 py-1 rounded-full bg-[#2563EB]/15 text-[#2563EB] dark:text-[#60A5FA] font-extrabold"
+                    className="px-3 py-1 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] font-extrabold"
                   >
                     + إضافة يدوي
                   </button>
@@ -2639,7 +2639,7 @@ export function renderAdminStorefrontCms(ctx) {
                         showToast(`تم تفعيل وضع "${label}" لكل كروت المنتجات ✓`, 'success');
                       }}
                       className={`px-4 py-2 rounded-full border font-extrabold transition ${
-                        activeFit ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 text-fg border-line'
+                        activeFit ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'
                       }`}
                     >
                       {label}
@@ -2667,11 +2667,11 @@ export function renderAdminStorefrontCms(ctx) {
                         saveSiteSettingsImmediate(prev => ({ ...prev, [settingKey]: nextVal }));
                       }}
                       className={`p-3 rounded-2xl border text-right flex items-center justify-between gap-2 font-extrabold transition ${
-                        isEnabled ? 'bg-[#2563EB]/10 border-[#3B82F6]/40 text-fg' : 'bg-surface2 border-line text-muted'
+                        isEnabled ? 'bg-[#1E4E8C]/10 border-[#2F6BB3]/40 text-fg' : 'bg-surface2 border-line text-muted'
                       }`}
                     >
                       <span>{labelTxt}</span>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] ${isEnabled ? 'bg-[#2563EB] text-white' : 'bg-surface text-muted'}`}>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] ${isEnabled ? 'bg-[#1E4E8C] text-white' : 'bg-surface text-muted'}`}>
                         {isEnabled ? 'مفعّل ✓' : 'مغلق'}
                       </span>
                     </button>
@@ -2694,7 +2694,7 @@ export function renderAdminStorefrontCms(ctx) {
                         <button
                           type="button"
                           onClick={(e) => toggleHideCategory(catName, e)}
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${hiddenCat ? 'bg-rose-600 text-white' : 'bg-[#2563EB]/15 text-[#2563EB] dark:text-[#60A5FA]'}`}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${hiddenCat ? 'bg-rose-600 text-white' : 'bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8]'}`}
                         >
                           {hiddenCat ? '🚫 مخفي' : '👁️ ظاهر'}
                         </button>

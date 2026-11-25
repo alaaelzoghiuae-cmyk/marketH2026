@@ -52,7 +52,7 @@ export function renderSpinToWinModal(ctx) {
 
     return (
       <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[160] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div className="bg-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 border-2 border-[#3B82F6] shadow-2xl space-y-4 text-center relative my-auto">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 border-2 border-[#2F6BB3] shadow-2xl space-y-4 text-center relative my-auto">
           <button
             type="button"
             onClick={() => setSpinModalOpen(false)}
@@ -77,15 +77,15 @@ export function renderSpinToWinModal(ctx) {
           {/* Large 310x310 High-Clarity SVG Wheel */}
           <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center">
             {/* Top Pointer Arrow */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-[#3B82F6] drop-shadow-lg" />
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-[#2F6BB3] drop-shadow-lg" />
 
             <div
-              className="w-full h-full rounded-full border-[6px] border-[#2563EB] shadow-[0_0_30px_rgba(37,99,235,0.4)] relative overflow-hidden"
+              className="w-full h-full rounded-full border-[6px] border-[#1E4E8C] shadow-[0_0_30px_rgba(37,99,235,0.4)] relative overflow-hidden"
               style={{
                 transform: `rotate(${spinRotationDeg}deg)`,
                 transition: isSpinningWheel ? 'transform 4s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
                 background: `conic-gradient(${activeSpinPrizes
-                  .map((p, idx) => `${p.color || '#0284c7'} ${idx * sliceDeg}deg ${(idx + 1) * sliceDeg}deg`)
+                  .map((p, idx) => `${p.color || '#1e4e8c'} ${idx * sliceDeg}deg ${(idx + 1) * sliceDeg}deg`)
                   .join(', ')})`
               }}
             >
@@ -113,7 +113,7 @@ export function renderSpinToWinModal(ctx) {
               type="button"
               disabled={isSpinningWheel || Boolean(spinWheelState?.spun)}
               onClick={handleSpinTheWheel}
-              className="absolute w-20 h-20 rounded-full bg-[#060C1E] border-4 border-[#3B82F6] text-white font-black text-sm shadow-2xl flex items-center justify-center z-10 hover:scale-105 transition disabled:opacity-80"
+              className="absolute w-20 h-20 rounded-full bg-[#060C1E] border-4 border-[#2F6BB3] text-white font-black text-sm shadow-2xl flex items-center justify-center z-10 hover:scale-105 transition disabled:opacity-80"
             >
               {isSpinningWheel ? '🎰...' : spinWheelState?.spun ? '✓ مبروك' : 'لفّ الآن'}
             </button>
@@ -149,7 +149,7 @@ export function renderSpinToWinModal(ctx) {
                 key={prz.id || idx}
                 className="px-2.5 py-1.5 rounded-xl bg-surface2 border border-line font-extrabold text-fg flex items-center gap-1.5 justify-center"
               >
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: prz.color || '#0284c7' }} />
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: prz.color || '#1e4e8c' }} />
                 <span className="truncate">{prz.label}</span>
               </div>
             ))}
@@ -169,7 +169,7 @@ export function renderSpinToWinModal(ctx) {
                   applySpinPrizePromo(spinWheelState.prize, false);
                   setSpinModalOpen(false);
                 }}
-                className="w-full py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-black shadow-md"
+                className="w-full py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs sm:text-sm font-black shadow-md"
               >
                 تفعيل الجائزة ومتابعة التسوق ✓
               </button>
@@ -179,7 +179,7 @@ export function renderSpinToWinModal(ctx) {
               type="button"
               disabled={isSpinningWheel}
               onClick={handleSpinTheWheel}
-              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-[#3B82F6] hover:to-[#2563EB] text-white font-black text-sm sm:text-base shadow-lg shadow-blue-600/30 transition"
+              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-[#163B6B] hover:from-[#2F6BB3] hover:to-[#1E4E8C] text-white font-black text-sm sm:text-base shadow-lg shadow-blue-600/30 transition"
             >
               {isSpinningWheel ? 'جاري لف العجلة... 🎰' : '🎰 اضغط للف العجلة وربح هديتك الآن!'}
             </button>
@@ -197,7 +197,7 @@ export function renderFloatingSpinTrigger(ctx) {
       <button
         type="button"
         onClick={() => setSpinModalOpen(true)}
-        className="fixed bottom-6 right-5 z-40 px-5 py-3 rounded-full bg-gradient-to-r from-[#0B1736] via-[#1D4ED8] to-[#2563EB] text-white font-black text-xs shadow-2xl border border-[#60A5FA]/60 flex items-center gap-2 hover:scale-105 transition"
+        className="fixed bottom-6 right-5 z-40 px-5 py-3 rounded-full bg-gradient-to-r from-[#0B1736] via-[#163B6B] to-[#1E4E8C] text-white font-black text-xs shadow-2xl border border-[#7FB0E8]/60 flex items-center gap-2 hover:scale-105 transition"
         title="عجلة الحظ وهدايا الزوار الجدد"
       >
         <span>🎁</span>
@@ -311,7 +311,7 @@ export function renderExitIntentModal(ctx) {
 
           <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-extrabold">
             <span className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">🤝 الدفع عند الاستلام</span>
-            <span className="px-2.5 py-1 rounded-xl bg-[#2563EB]/15 text-[#1D4ED8] dark:text-[#3B82F6]">👁️ معاينة قبل الدفع</span>
+            <span className="px-2.5 py-1 rounded-xl bg-[#1E4E8C]/15 text-[#163B6B] dark:text-[#2F6BB3]">👁️ معاينة قبل الدفع</span>
             <span className="px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">🛡️ ضمان بالرقم</span>
           </div>
 
@@ -323,7 +323,7 @@ export function renderExitIntentModal(ctx) {
           <button
             type="button"
             onClick={handleApplyExitIntentOffer}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#2563EB] to-[#1D4ED8] hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm shadow-lg transition"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#1E4E8C] to-[#163B6B] hover:from-emerald-500 hover:to-slate-500 text-white font-black text-sm shadow-lg transition"
           >
             🎁 تفعيل خصم {pct}% الآن وإكمال التسوق
           </button>
@@ -392,7 +392,7 @@ export function renderCustomerRestockNotifyModal(ctx) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs shadow-md"
+            className="w-full py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow-md"
           >
             📲 سجّل رقمي وأرسل لي واتساب فور توفره ✓
           </button>
@@ -447,7 +447,7 @@ export function renderAdminRestockWhatsappModal(ctx) {
                     <button
                       type="button"
                       onClick={() => sendAdminRestockWhatsappToEntry(entry)}
-                      className="px-3 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-[11px] flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px] flex items-center gap-1"
                     >
                       <span>📲 ابعت واتساب الآن</span>
                     </button>
@@ -466,9 +466,9 @@ export function renderAdminRestockWhatsappModal(ctx) {
                     setTimeout(() => sendAdminRestockWhatsappToEntry(entry), idx * 600);
                   });
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs"
               >
-                🚀 فتح وإرسال واتساب لكل القائمة ({partWaitlist.length} عملاء)
+                فتح وإرسال واتساب لكل القائمة ({partWaitlist.length} عملاء)
               </button>
               <button
                 type="button"
@@ -598,7 +598,7 @@ export function renderWarrantyLookupModal(ctx) {
                                     <button
                                       type="button"
                                       onClick={() => handleRequestWarrantyReplacement(ord, it)}
-                                      className="px-3.5 py-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-black text-[11px] shrink-0"
+                                      className="px-3.5 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px] shrink-0"
                                     >
                                       🔄 اطلب استبدال فوري
                                     </button>
@@ -628,7 +628,7 @@ export function renderFamilyDevicesModal(ctx) {
 
     return (
       <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[185] flex items-center justify-center p-4">
-        <div className="bg-surface rounded-3xl max-w-lg w-full p-6 border-2 border-[#3B82F6]/45 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-6 border-2 border-[#2F6BB3]/45 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
               <h3 className="text-base font-black text-fg flex items-center gap-2">
@@ -692,7 +692,7 @@ export function renderFamilyDevicesModal(ctx) {
                   <div key={dev.id} className="p-3 rounded-2xl bg-surface2 border border-line space-y-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="px-2 py-0.5 rounded-full bg-[#2563EB]/15 text-[#2563EB] font-black text-[10px] ml-2">
+                        <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] font-black text-[10px] ml-2">
                           {dev.ownerLabel}
                         </span>
                         <span className="font-black text-fg text-xs">{dev.modelName}</span>
@@ -750,7 +750,7 @@ export function renderConfettiOverlay(ctx) {
   const { confettiActive } = ctx;
     if (!confettiActive) return null;
     const pieces = Array.from({ length: 36 }, (_, i) => i);
-    const colors = ['#10b981', '#22d3ee', '#fbbf24', '#f43f5e', '#a855f7', '#3b82f6'];
+    const colors = ['#10b981', '#22d3ee', '#fbbf24', '#f43f5e', '#a855f7', '#2f6bb3'];
     return (
       <div className="fixed inset-0 pointer-events-none z-[250] overflow-hidden">
         {pieces.map(i => {
@@ -795,7 +795,7 @@ export function renderLoginModal(ctx) {
             <div className="w-12 h-1.5 rounded-full bg-surface2 mx-auto mb-2.5 sm:hidden" />
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-xl bg-slate-600 text-white flex items-center justify-center shrink-0">
                   <Lock className="w-4 h-4" />
                 </div>
                 <div>
@@ -1360,8 +1360,8 @@ export function renderLoginModal(ctx) {
                 type="submit"
                 className={`w-full py-3.5 rounded-2xl text-white font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 ${
                   regForm.accountCategory === 'individual'
-                    ? 'bg-gradient-to-l from-[#2563EB] to-[#1D4ED8] hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/30'
-                    : 'bg-gradient-to-l from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/30'
+                    ? 'bg-gradient-to-l from-[#1E4E8C] to-[#163B6B] hover:from-emerald-700 hover:to-slate-700 shadow-emerald-600/30'
+                    : 'bg-gradient-to-l from-blue-600 to-slate-600 hover:from-blue-700 hover:to-slate-700 shadow-blue-600/30'
                 }`}
               >
                 <Check className="w-4 h-4 stroke-[3]" />
