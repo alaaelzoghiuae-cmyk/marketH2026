@@ -19,20 +19,48 @@ export default {
         'accent-text': 'rgb(var(--accent-text) / <alpha-value>)',
         go: 'rgb(var(--go) / <alpha-value>)',
         'go-ink': 'rgb(var(--go-ink) / <alpha-value>)',
-        nav: '#050914',
-        nav2: '#0B1224',
-        navline: '#1E2D4A',
-        'nav-fg': '#F8FAFC',
-        'nav-cyan': '#3B82F6',
+        // Graphite surfaces (dark sections, overlays, dark buttons)
+        nav: '#161617',
+        nav2: '#1d1d1f',
+        navline: '#424245',
+        'nav-fg': '#f5f5f7',
+        'nav-cyan': '#2997ff',
         'nav-cyan-ink': '#FFFFFF',
-        'nav-cart': '#2563EB',
+        'nav-cart': '#0071e3',
         'nav-cart-ink': '#FFFFFF',
-        'announce-bg': '#fbbf24',
-        'announce-ink': '#2b1d00',
-        'maint-bg': '#e11d48',
+        'announce-bg': '#f5f5f7',
+        'announce-ink': '#1d1d1f',
+        'maint-bg': '#d70015',
+
+        // ---- Neutral scale: graphite / silver ----
+        slate: {
+          50: '#fbfbfd', 100: '#f5f5f7', 200: '#e8e8ed', 300: '#d2d2d7', 400: '#86868b',
+          500: '#6e6e73', 600: '#515154', 700: '#424245', 800: '#2c2c2e', 900: '#1d1d1f', 950: '#111113',
+        },
+        // ---- Brand blue ----
+        blue: {
+          50: '#f2f8fe', 100: '#e3f0fc', 200: '#c2dffa', 300: '#8fc4f5', 400: '#2997ff',
+          500: '#0071e3', 600: '#0071e3', 700: '#0066cc', 800: '#004f9f', 900: '#1d1d1f', 950: '#161617',
+        },
+        // ---- System semantic colours ----
+        emerald: {
+          50: '#eefaf1', 100: '#d9f4e0', 200: '#b3e8c2', 300: '#7fd898', 400: '#30d158',
+          500: '#34c759', 600: '#248a3d', 700: '#1d7032', 800: '#165a28', 900: '#0f411d', 950: '#082a12',
+        },
+        rose: {
+          50: '#fff2f1', 100: '#ffe3e0', 200: '#ffc7c2', 300: '#ff9c94', 400: '#ff6961',
+          500: '#ff3b30', 600: '#d70015', 700: '#b3000f', 800: '#8c000c', 900: '#6b0009', 950: '#450006',
+        },
+        amber: {
+          50: '#fff8eb', 100: '#ffefd0', 200: '#ffdd9e', 300: '#ffc86b', 400: '#ffb340',
+          500: '#ff9f0a', 600: '#c77700', 700: '#9f5f00', 800: '#7a4900', 900: '#5a3600', 950: '#3a2200',
+        },
       },
       fontFamily: {
-        sans: ['Cairo', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        sans: [
+          '-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Display"', '"SF Arabic"',
+          'Inter', '"IBM Plex Sans Arabic"', 'Cairo', 'system-ui', '"Segoe UI"', 'Roboto', 'sans-serif',
+        ],
       },
     },
   },
