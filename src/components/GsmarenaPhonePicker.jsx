@@ -181,8 +181,8 @@ export default function GsmarenaPhonePicker({
           <span>جاري جلب المواصفات الكاملة للجهاز...</span>
         </div>
       ) : value ? (
-        <div className={`flex items-center gap-2.5 rounded-2xl border border-[#1E4E8C]/40 bg-surface2/80 ${compact ? 'p-2' : 'p-2.5'}`}>
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#0D1528] border border-line flex items-center justify-center overflow-hidden shrink-0">
+        <div className={`flex items-center gap-2.5 rounded-2xl border border-[#0071E3]/40 bg-surface2/80 ${compact ? 'p-2' : 'p-2.5'}`}>
+          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#1D1D1F] border border-line flex items-center justify-center overflow-hidden shrink-0">
             {selectedImg ? <img src={selectedImg} alt={value.name} referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-5 h-5 text-muted" />}
           </div>
           <div className="flex-1 min-w-0">

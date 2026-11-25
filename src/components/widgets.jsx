@@ -170,7 +170,7 @@ export function ImageViewer({ images, index, onClose, onIndexChange }) {
               src={src}
               alt=""
               onClick={() => onIndexChange(i)}
-              className={`w-12 h-12 rounded-lg object-cover cursor-pointer border-2 ${i === idx ? 'border-[#2F6BB3]' : 'border-transparent opacity-60'}`}
+              className={`w-12 h-12 rounded-lg object-cover cursor-pointer border-2 ${i === idx ? 'border-[#0071E3]' : 'border-transparent opacity-60'}`}
             />
           ))}
         </div>
@@ -289,7 +289,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
           } ${
             dark
               ? 'bg-white/12 text-blue-200 border border-white/20 backdrop-blur-md'
-              : 'bg-[#1E4E8C]/12 text-[#163B6B] border border-[#1E4E8C]/25'
+              : 'bg-[#0071E3]/12 text-[#004F9F] border border-[#0071E3]/25'
           }`}
         >
           <Bidi text={ad.badge} />
@@ -330,7 +330,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
             } ${
               dark
                 ? 'bg-white text-slate-950 hover:bg-blue-50 shadow-black/25'
-                : 'bg-[#0F172A] text-white hover:bg-[#1E293B] shadow-slate-900/20'
+                : 'bg-[#1D1D1F] text-white hover:bg-[#1D1D1F] shadow-slate-900/20'
             }`}
           >
             <span>{ad.buttonText || 'تسوق الآن'}</span>
@@ -588,7 +588,7 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
             </div>
 
             {ad.mediaMode === 'image_and_icon' && !compact && !isPromoCard && (
-              <div className="hidden sm:flex absolute -bottom-2 -left-2 z-20 w-16 h-16 rounded-2xl bg-[#08122B]/95 border border-white/25 p-2.5 shadow-xl items-center justify-center [&>svg]:w-full [&>svg]:h-full">
+              <div className="hidden sm:flex absolute -bottom-2 -left-2 z-20 w-16 h-16 rounded-2xl bg-[#1D1D1F]/95 border border-white/25 p-2.5 shadow-xl items-center justify-center [&>svg]:w-full [&>svg]:h-full">
                 {iconPresetObj.svg || (typeof iconPresetObj.render === 'function' ? iconPresetObj.render() : null)}
               </div>
             )}

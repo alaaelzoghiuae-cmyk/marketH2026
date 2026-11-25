@@ -14,7 +14,7 @@ import { Edit3, generateAiProductDetails, localDayKey, normalizeDigits } from '.
 export function renderAdminSubTabBar(ctx, tabs, activeId, onSelect) {
   const {  } = ctx;
     const tabPalettes = [
-      { idle: 'border-blue-500/25 bg-blue-500/5 text-fg hover:border-blue-500/60', act: 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-md shadow-blue-600/20' },
+      { idle: 'border-blue-500/25 bg-blue-500/5 text-fg hover:border-blue-500/60', act: 'bg-[#0071E3] text-white border-[#0071E3] shadow-md shadow-blue-600/20' },
       { idle: 'border-slate-500/25 bg-slate-500/5 text-fg hover:border-slate-500/60', act: 'bg-slate-600 text-white border-slate-600 shadow-md shadow-slate-600/20' },
       { idle: 'border-emerald-500/25 bg-emerald-500/5 text-fg hover:border-emerald-500/60', act: 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20' },
       { idle: 'border-amber-500/30 bg-amber-500/5 text-fg hover:border-amber-500/60', act: 'bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/20' },
@@ -72,7 +72,7 @@ export function renderAdminDashboard(ctx) {
               <img
                 src={ELZOGHBI_LOGO}
                 alt="ELZOGHBI Logo"
-                className="w-16 h-16 rounded-2xl object-contain mx-auto bg-[#050B1C] p-1 border border-[#2F6BB3]/50 shadow-lg"
+                className="w-16 h-16 rounded-2xl object-contain mx-auto bg-[#161617] p-1 border border-[#0071E3]/50 shadow-lg"
               />
               <h1 className="text-xl font-black tracking-tight text-fg">
                 بوابة الإدارة المركزية — ELZOGHBI ERP
@@ -113,7 +113,7 @@ export function renderAdminDashboard(ctx) {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow-lg flex items-center justify-center gap-2 transition"
+                className="w-full py-3.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs shadow-lg flex items-center justify-center gap-2 transition"
               >
                 <Shield className="w-4 h-4" />
                 <span>دخول لوحة التحكم</span>
@@ -122,7 +122,7 @@ export function renderAdminDashboard(ctx) {
               <button
                 type="button"
                 onClick={() => switchPortal('storefront')}
-                className="w-full py-2.5 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg font-bold text-xs transition"
+                className="w-full py-2.5 rounded-xl bg-surface2 hover:border-[#0071E3] border border-line text-fg font-bold text-xs transition"
               >
                 العودة إلى واجهة المتجر
               </button>
@@ -437,7 +437,7 @@ export function renderAdminDashboard(ctx) {
         titleIcon: '📊',
         headerCls: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25',
         iconBoxIdle: 'bg-blue-500/12 text-blue-600 dark:text-blue-400 border-blue-500/25',
-        activeRow: 'bg-[#1E4E8C] text-white shadow-md shadow-blue-600/25 border-[#1E4E8C]',
+        activeRow: 'bg-[#0071E3] text-white shadow-md shadow-blue-600/25 border-[#0071E3]',
         dot: 'bg-blue-500'
       },
       {
@@ -486,11 +486,11 @@ export function renderAdminDashboard(ctx) {
               <img
                 src={ELZOGHBI_LOGO}
                 alt="ELZOGHBI"
-                className="w-9 h-9 rounded-xl object-contain bg-[#050814] p-0.5 border border-[#7FB0E8]/50 shrink-0"
+                className="w-9 h-9 rounded-xl object-contain bg-[#1D1D1F] p-0.5 border border-[#2997FF]/50 shrink-0"
               />
               <div className="min-w-0">
                 <div className="text-xs font-black tracking-wide text-fg truncate leading-tight">ELZOGHBI ERP</div>
-                <div className="text-[9.5px] text-[#1E4E8C] dark:text-[#7FB0E8] font-extrabold truncate">لوحة الإدارة الذكية</div>
+                <div className="text-[9.5px] text-[#0066CC] dark:text-[#2997FF] font-extrabold truncate">لوحة الإدارة الذكية</div>
               </div>
             </div>
 
@@ -506,7 +506,7 @@ export function renderAdminDashboard(ctx) {
               <button
                 type="button"
                 onClick={() => setAdminSidebarMode('docked')}
-                className="px-2.5 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-[10.5px] font-black flex items-center gap-1 shadow-sm transition shrink-0"
+                className="px-2.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-[10.5px] font-black flex items-center gap-1 shadow-sm transition shrink-0"
                 title="ضم الشريط الجانبي للداخل"
               >
                 <span>ضم</span>
@@ -523,7 +523,7 @@ export function renderAdminDashboard(ctx) {
               value={adminSidebarSearch}
               onChange={e => setAdminSidebarSearch(e.target.value)}
               placeholder="ابحث عن صفحة أو أداة..."
-              className="w-full pr-8 pl-6 py-1.5 rounded-xl bg-bg border border-line focus:border-[#2F6BB3] text-[11px] font-bold text-fg placeholder:text-muted focus:outline-none"
+              className="w-full pr-8 pl-6 py-1.5 rounded-xl bg-bg border border-line focus:border-[#0071E3] text-[11px] font-bold text-fg placeholder:text-muted focus:outline-none"
             />
             {adminSidebarSearch && (
               <button
@@ -538,7 +538,7 @@ export function renderAdminDashboard(ctx) {
 
           {/* Direct Sub-Tool Jump Matches */}
           {matchedQuickTools.length > 0 && (
-            <div className="p-1.5 rounded-xl bg-[#1E4E8C]/10 border border-[#1E4E8C]/30 space-y-0.5">
+            <div className="p-1.5 rounded-xl bg-[#0071E3]/10 border border-[#0071E3]/30 space-y-0.5">
               {matchedQuickTools.map((qt, idx) => (
                 <button
                   key={idx}
@@ -550,7 +550,7 @@ export function renderAdminDashboard(ctx) {
                     if (isMobileDrawer) setAdminMenuOpen(false);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className="w-full text-right px-2 py-1 rounded-lg hover:bg-[#1E4E8C] text-fg hover:text-white text-[10.5px] font-bold transition flex items-center justify-between gap-1"
+                  className="w-full text-right px-2 py-1 rounded-lg hover:bg-[#0071E3] text-fg hover:text-white text-[10.5px] font-bold transition flex items-center justify-between gap-1"
                 >
                   <span className="truncate">⚡ {qt.label}</span>
                   <ChevronLeft className="w-3 h-3 shrink-0" />
@@ -651,9 +651,9 @@ export function renderAdminDashboard(ctx) {
               setAdminNewPassword(adminCredentials.password);
               setAdminSecurityModalOpen(true);
             }}
-            className="py-1.5 px-2 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg text-[10.5px] font-extrabold flex items-center justify-center gap-1 transition"
+            className="py-1.5 px-2 rounded-xl bg-surface2 hover:border-[#0071E3] border border-line text-fg text-[10.5px] font-extrabold flex items-center justify-center gap-1 transition"
           >
-            <Lock className="w-3 h-3 text-[#1E4E8C]" />
+            <Lock className="w-3 h-3 text-[#0066CC]" />
             <span>الدخول</span>
           </button>
           )}
@@ -682,7 +682,7 @@ export function renderAdminDashboard(ctx) {
           <button
             type="button"
             onClick={() => setAdminSidebarMode('expanded')}
-            className="w-12 h-10 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white shadow-md flex flex-col items-center justify-center gap-0.5 transition"
+            className="w-12 h-10 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white shadow-md flex flex-col items-center justify-center gap-0.5 transition"
             title="فرد الشريط الجانبي الكامل"
           >
             <span className="text-xs font-black leading-none">{i18nActive ? '▶' : '◀'}</span>
@@ -756,7 +756,7 @@ export function renderAdminDashboard(ctx) {
         {/* Rock-Solid Fixed Full-Height Right Sidebar (Zero Vertical or Horizontal Scrollbars Guaranteed!) */}
         <aside
           id="elz-admin-sidebar"
-          className={`hidden lg:flex flex-col fixed top-0 bottom-0 ${i18nActive ? 'left-0 border-r' : 'right-0 border-l'} z-40 h-screen bg-surface dark:bg-[#070D1D] border-line overflow-y-auto overflow-x-hidden transition-[width] duration-300 ${
+          className={`hidden lg:flex flex-col fixed top-0 bottom-0 ${i18nActive ? 'left-0 border-r' : 'right-0 border-l'} z-40 h-screen bg-surface dark:bg-[#161617] border-line overflow-y-auto overflow-x-hidden transition-[width] duration-300 ${
             isDocked ? 'w-[70px]' : 'w-[272px]'
           }`}
         >
@@ -769,7 +769,7 @@ export function renderAdminDashboard(ctx) {
             <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setAdminMenuOpen(false)} />
             <aside
               id="elz-admin-sidebar-mobile"
-              className="relative z-10 w-[280px] max-w-[86vw] h-full bg-surface dark:bg-[#070D1D] border-l border-line overflow-y-auto overflow-x-hidden shadow-2xl"
+              className="relative z-10 w-[280px] max-w-[86vw] h-full bg-surface dark:bg-[#161617] border-l border-line overflow-y-auto overflow-x-hidden shadow-2xl"
             >
               {renderExpandedSidebar(true)}
             </aside>
@@ -779,7 +779,7 @@ export function renderAdminDashboard(ctx) {
         {/* Main Workspace Area (Offset cleanly by Fixed Sidebar width — Single Natural Browser Scrollbar Only!) */}
         <div className={`flex-1 min-w-0 flex flex-col transition-[margin] duration-300 ${desktopContentMarginCls}`}>
           {/* Clean Single-Row Sticky Top Header */}
-          <header className="sticky top-0 z-30 bg-surface/95 dark:bg-[#070D1D]/95 backdrop-blur-xl border-b border-line px-3 sm:px-6 py-3 shadow-2xs">
+          <header className="sticky top-0 z-30 bg-surface/95 dark:bg-[#161617]/95 backdrop-blur-xl border-b border-line px-3 sm:px-6 py-3 shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {/* Right: Tuck/Expand Toggle + Colored Active Section Title */}
               <div className="flex items-center gap-2.5 min-w-0">
@@ -795,10 +795,10 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={() => setAdminSidebarMode(prev => (prev === 'docked' ? 'expanded' : 'docked'))}
-                  className="hidden lg:flex h-9 px-3 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg text-xs font-extrabold items-center gap-1.5 transition shrink-0"
+                  className="hidden lg:flex h-9 px-3 rounded-xl bg-surface2 hover:border-[#0071E3] border border-line text-fg text-xs font-extrabold items-center gap-1.5 transition shrink-0"
                   title={isDocked ? 'فرد القائمة الجانبية' : 'ضم القائمة الجانبية للداخل'}
                 >
-                  <Menu className="w-3.5 h-3.5 text-[#1E4E8C]" />
+                  <Menu className="w-3.5 h-3.5 text-[#0066CC]" />
                   <span>{isDocked ? '◀ فرد القائمة' : 'ضم القائمة ▶'}</span>
                 </button>
 
@@ -816,10 +816,10 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={() => setCmdPaletteOpen(true)}
-                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg font-extrabold flex items-center gap-1.5 transition"
+                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-surface2 hover:border-[#0071E3] border border-line text-fg font-extrabold flex items-center gap-1.5 transition"
                   title="بحث شامل وأوامر سريعة (Ctrl+K)"
                 >
-                  <Search className="w-3.5 h-3.5 text-[#1E4E8C]" />
+                  <Search className="w-3.5 h-3.5 text-[#0066CC]" />
                   <span className="hidden md:inline">بحث سريع</span>
                   <span className="hidden lg:inline text-[10px] px-1.5 py-0.5 rounded bg-surface border border-line text-muted font-mono">Ctrl+K</span>
                 </button>
@@ -827,7 +827,7 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={() => setSmartNotifsOpen(prev => !prev)}
-                  className="relative h-9 w-9 rounded-xl bg-surface2 hover:border-[#2F6BB3] border border-line text-fg flex items-center justify-center transition"
+                  className="relative h-9 w-9 rounded-xl bg-surface2 hover:border-[#0071E3] border border-line text-fg flex items-center justify-center transition"
                   title="التنبيهات الذكية للمتجر"
                 >
                   <Bell className="w-4 h-4 text-amber-500" />
@@ -839,7 +839,7 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={() => setAiCommandOpen(true)}
-                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-l from-slate-600 to-[#1E4E8C] hover:opacity-95 text-white font-black flex items-center gap-1.5 shadow-sm transition"
+                  className="h-9 px-2.5 sm:px-3 rounded-xl bg-gradient-to-l from-slate-600 to-[#0071E3] hover:opacity-95 text-white font-black flex items-center gap-1.5 shadow-sm transition"
                   title="مركز الأوامر الذكي (AI Command Center)"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -902,7 +902,7 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={toggleUiTheme}
-                  className="w-9 h-9 rounded-xl flex items-center justify-center border border-line bg-surface2 hover:border-[#2F6BB3] transition"
+                  className="w-9 h-9 rounded-xl flex items-center justify-center border border-line bg-surface2 hover:border-[#0071E3] transition"
                   title={uiTheme === 'dark' ? 'الوضع الفاتح' : 'الوضع الليلي'}
                 >
                   <span>{uiTheme === 'dark' ? '🌙' : '☀️'}</span>
@@ -916,7 +916,7 @@ export function renderAdminDashboard(ctx) {
                     className={`h-9 px-3 rounded-xl font-extrabold flex items-center gap-1.5 border transition ${
                       unreadAdminNotifs > 0
                         ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-xs'
-                        : 'bg-surface2 hover:border-[#2F6BB3] text-fg border-line'
+                        : 'bg-surface2 hover:border-[#0071E3] text-fg border-line'
                     }`}
                   >
                     <Bell className="w-3.5 h-3.5" />
@@ -933,7 +933,7 @@ export function renderAdminDashboard(ctx) {
                             <button
                               type="button"
                               onClick={() => setNotifications(prev => prev.map(n => (n.target === 'admin' ? { ...n, read: true } : n)))}
-                              className="text-[11px] text-[#7FB0E8] hover:underline font-bold"
+                              className="text-[11px] text-[#2997FF] hover:underline font-bold"
                             >
                               تحديد كمقروء
                             </button>
@@ -982,7 +982,7 @@ export function renderAdminDashboard(ctx) {
                                 }
                                 setAdminNotifPanelOpen(false);
                               }}
-                              className={`p-3 cursor-pointer hover:bg-surface2 transition ${!n.read ? 'bg-[#1E4E8C]/5' : 'bg-surface'}`}
+                              className={`p-3 cursor-pointer hover:bg-surface2 transition ${!n.read ? 'bg-[#0071E3]/5' : 'bg-surface'}`}
                             >
                               <div className="flex items-center justify-between gap-2">
                                 <span className="font-extrabold text-fg text-xs">{n.title}</span>
@@ -1000,17 +1000,17 @@ export function renderAdminDashboard(ctx) {
                 <button
                   type="button"
                   onClick={() => pullFromSupabaseCloud(true)}
-                  className="h-9 px-2.5 rounded-xl bg-surface2 hover:border-[#2F6BB3] text-fg font-bold flex items-center gap-1 border border-line transition"
+                  className="h-9 px-2.5 rounded-xl bg-surface2 hover:border-[#0071E3] text-fg font-bold flex items-center gap-1 border border-line transition"
                   title="تحديث البيانات من السيرفر"
                 >
-                  <RefreshCw className="w-3.5 h-3.5 text-[#1E4E8C]" />
+                  <RefreshCw className="w-3.5 h-3.5 text-[#0066CC]" />
                   <span className="hidden md:inline">تحديث</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => pushToSupabaseCloud(null, true)}
-                  className="h-9 px-3.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition"
+                  className="h-9 px-3.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>{cloudSyncStatus === 'syncing' ? 'يحفظ...' : 'حفظ التعديلات'}</span>
@@ -1320,8 +1320,8 @@ export function renderAdminDashboard(ctx) {
           {floatingBottomMenuOpen && (
             <>
               <div className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[-1] pointer-events-auto" onClick={() => setFloatingBottomMenuOpen(false)} />
-              <div className="pointer-events-auto mb-2 w-full max-w-[660px] max-h-[70vh] rounded-3xl bg-surface dark:bg-[#0B1224] border-2 border-[#2F6BB3]/50 shadow-2xl flex flex-col overflow-hidden">
-                <div className="shrink-0 flex items-center justify-between gap-2 px-3.5 py-2.5 border-b border-line bg-surface dark:bg-[#0B1224]">
+              <div className="pointer-events-auto mb-2 w-full max-w-[660px] max-h-[70vh] rounded-3xl bg-surface dark:bg-[#1D1D1F] border-2 border-[#0071E3]/50 shadow-2xl flex flex-col overflow-hidden">
+                <div className="shrink-0 flex items-center justify-between gap-2 px-3.5 py-2.5 border-b border-line bg-surface dark:bg-[#1D1D1F]">
                   <span className="font-black text-xs sm:text-sm text-fg truncate">🧭 جميع صفحات الداشبورد</span>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
@@ -1330,7 +1330,7 @@ export function renderAdminDashboard(ctx) {
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         setFloatingBottomMenuOpen(false);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-[#1E4E8C] text-white text-[10px] sm:text-[11px] font-extrabold"
+                      className="px-2.5 py-1 rounded-lg bg-[#0071E3] text-white text-[10px] sm:text-[11px] font-extrabold"
                     >
                       ↑ أعلى الصفحة
                     </button>
@@ -1391,7 +1391,7 @@ export function renderAdminDashboard(ctx) {
           )}
 
           {/* Compact Responsive 4-Button Dock: Always 100% Visible on Mobile Without Clipping */}
-          <div className="pointer-events-auto w-full max-w-[430px] sm:w-auto sm:max-w-none px-1.5 sm:px-2.5 py-1.5 rounded-2xl sm:rounded-full bg-[#070D1D]/95 text-white border border-[#2F6BB3]/50 shadow-2xl backdrop-blur-xl grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-extrabold">
+          <div className="pointer-events-auto w-full max-w-[430px] sm:w-auto sm:max-w-none px-1.5 sm:px-2.5 py-1.5 rounded-2xl sm:rounded-full bg-[#161617]/95 text-white border border-[#0071E3]/50 shadow-2xl backdrop-blur-xl grid grid-cols-4 sm:flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-[11px] font-extrabold">
             {bottomPrimaryShortcuts.map(sc => {
               const IconC = sc.icon;
               const isAct = adminTab === sc.id;
@@ -1429,8 +1429,8 @@ export function renderAdminDashboard(ctx) {
               onClick={() => setFloatingBottomMenuOpen(prev => !prev)}
               className={`px-1.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 transition border min-w-0 ${
                 floatingBottomMenuOpen
-                  ? 'bg-[#1E4E8C] text-white border-[#7FB0E8]'
-                  : 'bg-[#1E4E8C]/25 hover:bg-[#1E4E8C] text-[#93C5FD] hover:text-white border-[#2F6BB3]/40'
+                  ? 'bg-[#0071E3] text-white border-[#2997FF]'
+                  : 'bg-[#0071E3]/25 hover:bg-[#0071E3] text-[#93C5FD] hover:text-white border-[#0071E3]/40'
               }`}
             >
               <Menu className="w-3.5 h-3.5 shrink-0" />
@@ -1516,7 +1516,7 @@ export function renderVisitorStats(ctx) {
               {bars.map(b => (
                 <div key={b.k} className="flex-1 flex flex-col items-center justify-end gap-1" title={`${b.k}: ${b.u}`}>
                   <span className="text-[9px] text-muted font-bold">{b.u || ''}</span>
-                  <div className="w-full rounded-t bg-gradient-to-t from-[#163B6B] to-[#7FB0E8]" style={{ height: `${Math.max(3, (b.u / maxU) * 80)}px` }} />
+                  <div className="w-full rounded-t bg-gradient-to-t from-[#0077ED] to-[#2997FF]" style={{ height: `${Math.max(3, (b.u / maxU) * 80)}px` }} />
                   <span className="text-[8px] text-muted">{b.k.slice(8)}</span>
                 </div>
               ))}
@@ -1598,7 +1598,7 @@ export function renderAdminOverview(ctx) {
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-400 text-slate-950 text-[11px] font-black">
             <span>📊 جديد للمدير العام</span>
           </div>
-          <h3 className="text-base sm:text-lg font-black text-[#7FB0E8]">
+          <h3 className="text-base sm:text-lg font-black text-[#2997FF]">
             مركز تقارير المدير العام والطباعة (تقرير يومي أو بتحديد التواريخ)
           </h3>
           <p className="text-xs text-slate-300">
@@ -2098,7 +2098,7 @@ export function renderAdminOrders(ctx) {
               <button
                 type="button"
                 onClick={() => handleSaveLiveInvoiceEdit(true)}
-                className="px-6 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition"
+                className="px-6 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-extrabold flex items-center gap-2 shadow-md transition"
               >
                 <Save className="w-4 h-4" />
                 حفظ الفاتورة الآن

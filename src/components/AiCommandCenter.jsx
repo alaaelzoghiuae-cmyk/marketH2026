@@ -325,10 +325,10 @@ export default function AiCommandCenter({
     <div className="fixed inset-0 z-[80] flex justify-end bg-black/50 backdrop-blur-sm" onClick={onClose}>
       <div
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-[460px] h-full bg-surface dark:bg-[#070D1D] border-r border-line shadow-2xl flex flex-col elz-slide-up"
+        className="w-full max-w-[460px] h-full bg-surface dark:bg-[#161617] border-r border-line shadow-2xl flex flex-col elz-slide-up"
       >
         {/* Header */}
-        <div className="px-4 py-3.5 border-b border-line flex items-center justify-between gap-2 bg-gradient-to-l from-[#0B1F52] to-[#1E3A8A] text-white">
+        <div className="px-4 py-3.5 border-b border-line flex items-center justify-between gap-2 bg-gradient-to-l from-[#1D1D1F] to-[#0066CC] text-white">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5 text-amber-300" />
@@ -353,8 +353,8 @@ export default function AiCommandCenter({
             <div className="text-amber-500 text-xs font-black">{liveMetrics.lowStock.length}</div>
             <div className="text-muted">مخزون منخفض</div>
           </button>
-          <button type="button" onClick={() => handleCommand('طلبات تحتاج متابعة')} className="p-1.5 rounded-xl bg-surface border border-line hover:border-[#1E4E8C] transition">
-            <div className="text-[#1E4E8C] dark:text-[#7FB0E8] text-xs font-black">{liveMetrics.attentionOrders.length}</div>
+          <button type="button" onClick={() => handleCommand('طلبات تحتاج متابعة')} className="p-1.5 rounded-xl bg-surface border border-line hover:border-[#0071E3] transition">
+            <div className="text-[#0066CC] dark:text-[#2997FF] text-xs font-black">{liveMetrics.attentionOrders.length}</div>
             <div className="text-muted">طلبات للمتابعة</div>
           </button>
           <button type="button" onClick={() => handleCommand('منتجات ينقصها صور أو وصف')} className="p-1.5 rounded-xl bg-surface border border-line hover:border-rose-500 transition">
@@ -370,7 +370,7 @@ export default function AiCommandCenter({
               <div
                 className={`max-w-[92%] rounded-2xl p-3 space-y-2 ${
                   m.role === 'user'
-                    ? 'bg-[#1E4E8C] text-white font-bold'
+                    ? 'bg-[#0071E3] text-white font-bold'
                     : 'bg-surface2 border border-line text-fg'
                 }`}
               >
@@ -389,7 +389,7 @@ export default function AiCommandCenter({
                             it.badgeTone === 'rose' ? 'bg-rose-500/15 text-rose-500' :
                             it.badgeTone === 'amber' ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400' :
                             it.badgeTone === 'emerald' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' :
-                            'bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8]'
+                            'bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF]'
                           }`}>
                             {it.badge}
                           </span>
@@ -403,7 +403,7 @@ export default function AiCommandCenter({
                   <button
                     type="button"
                     onClick={() => { onNavigateTab(m.cta.tab); onClose(); }}
-                    className="w-full py-1.5 px-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-[11px] flex items-center justify-center gap-1 transition"
+                    className="w-full py-1.5 px-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-[11px] flex items-center justify-center gap-1 transition"
                   >
                     <span>{m.cta.label}</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
@@ -417,7 +417,7 @@ export default function AiCommandCenter({
                         key={idx}
                         type="button"
                         onClick={() => handleCommand(ch)}
-                        className="px-2.5 py-1 rounded-full bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line hover:border-[#1E4E8C] text-[10px] font-extrabold transition"
+                        className="px-2.5 py-1 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] text-[10px] font-extrabold transition"
                       >
                         {ch}
                       </button>
@@ -467,11 +467,11 @@ export default function AiCommandCenter({
             value={input}
             onChange={e => setInput(e.target.value)}
             placeholder="اسأل عن المخزون، الطلبات، الأرباح، أو أضف منتج برابط..."
-            className="flex-1 px-3.5 py-2.5 rounded-xl bg-bg border border-line text-fg text-xs font-bold focus:outline-none focus:border-[#1E4E8C]"
+            className="flex-1 px-3.5 py-2.5 rounded-xl bg-bg border border-line text-fg text-xs font-bold focus:outline-none focus:border-[#0071E3]"
           />
           <button
             type="submit"
-            className="px-4 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-xs shrink-0 transition"
+            className="px-4 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-xs shrink-0 transition"
           >
             إرسال
           </button>

@@ -174,7 +174,7 @@ export function renderAdminCatalog(ctx) {
               <button
                 type="button"
                 onClick={() => pushToSupabaseCloud(null, true)}
-                className="px-4 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+                className="px-4 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
               >
                 <Save className="w-4 h-4" />
                 <span>حفظ وتأكيد الكتالوج ✓</span>
@@ -872,8 +872,8 @@ export function renderAdminCatalog(ctx) {
                                                   onClick={(e) => togglePartCashierPin(part, e)}
                                                   className={`px-2 py-1 rounded-lg text-[11px] font-extrabold border transition ${
                                                     isPartPinnedToCashier(part)
-                                                      ? 'bg-[#1E4E8C] text-slate-950 border-[#2F6BB3] shadow-xs'
-                                                      : 'bg-surface2 hover:border-[#2F6BB3] text-muted border-line'
+                                                      ? 'bg-[#0071E3] text-slate-950 border-[#0071E3] shadow-xs'
+                                                      : 'bg-surface2 hover:border-[#0071E3] text-muted border-line'
                                                   }`}
                                                   title="إظهار أو تثبيت هذا المنتج في رف الكاشير السريع داخل السلة والدفع"
                                                 >
@@ -882,7 +882,7 @@ export function renderAdminCatalog(ctx) {
                                                 <button
                                                   type="button"
                                                   onClick={(e) => { e.stopPropagation(); setAdminRestockWhatsappPart(part); }}
-                                                  className="px-2 py-1 rounded-lg text-[11px] font-extrabold border bg-surface2 hover:border-[#2F6BB3] text-[#1E4E8C] border-line"
+                                                  className="px-2 py-1 rounded-lg text-[11px] font-extrabold border bg-surface2 hover:border-[#0071E3] text-[#0066CC] border-line"
                                                   title="إرسال رسالة واتساب للعملاء المنتظرين توفر هذا المنتج"
                                                 >
                                                   📲 منتظرين ({(Array.isArray(siteSettings.restockWaitlist) ? siteSettings.restockWaitlist.filter(w => String(w.partId) === String(part.id)).length : 0) || part.waitlistCount || 0})
@@ -1006,8 +1006,8 @@ export function renderAdminQuickStock(ctx) {
                 onClick={() => setBulkPriceToolOpen(prev => !prev)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition flex items-center gap-1.5 ${
                   bulkPriceToolOpen
-                    ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-                    : 'bg-[#1E4E8C]/10 hover:bg-[#1E4E8C] text-[#1E4E8C] dark:text-[#7FB0E8] hover:text-white border-[#1E4E8C]/30'
+                    ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                    : 'bg-[#0071E3]/10 hover:bg-[#0071E3] text-[#0066CC] dark:text-[#2997FF] hover:text-white border-[#0071E3]/30'
                 }`}
               >
                 <TrendingUp className="w-3.5 h-3.5" />
@@ -1037,7 +1037,7 @@ export function renderAdminQuickStock(ctx) {
 
           {/* Merchant Bulk Market Price Adjuster (Instant % or Fixed EGP across filtered Brand/Category + Undo!) */}
           {bulkPriceToolOpen && (
-            <div className="p-3.5 rounded-2xl bg-surface border-2 border-[#1E4E8C]/35 space-y-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-surface border-2 border-[#0071E3]/35 space-y-3 text-xs">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <span className="font-black text-fg">📈 أداة تعديل الأسعار الجماعي للسوق (تُطبّق على الأصناف المفلترة حالياً: {filteredAuditParts.length} صنف)</span>
@@ -1085,7 +1085,7 @@ export function renderAdminQuickStock(ctx) {
                 />
 
                 <label className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-bg border border-line font-bold cursor-pointer">
-                  <input type="checkbox" checked={bulkPriceRound5} onChange={e => setBulkPriceRound5(e.target.checked)} className="w-4 h-4 accent-[#1E4E8C]" />
+                  <input type="checkbox" checked={bulkPriceRound5} onChange={e => setBulkPriceRound5(e.target.checked)} className="w-4 h-4 accent-[#0071E3]" />
                   <span>تقريب السعر لأقرب 5 ج.م</span>
                 </label>
 
@@ -1123,7 +1123,7 @@ export function renderAdminQuickStock(ctx) {
                       'نعم، طبّق على الكل'
                     );
                   }}
-                  className="px-5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black shadow-sm transition"
+                  className="px-5 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black shadow-sm transition"
                 >
                   تطبيق على الـ ({filteredAuditParts.length}) صنف الآن ✓
                 </button>
@@ -1338,8 +1338,8 @@ export function renderAdminQuickStock(ctx) {
                           onClick={(e) => togglePartCashierPin(part, e)}
                           className={`px-2 py-1 rounded-lg border text-[11px] font-extrabold whitespace-nowrap transition ${
                             isPartPinnedToCashier(part)
-                              ? 'bg-[#1E4E8C] text-white border-[#2F6BB3]'
-                              : 'bg-surface text-muted border-line hover:border-[#2F6BB3]'
+                              ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                              : 'bg-surface text-muted border-line hover:border-[#0071E3]'
                           }`}
                           title="تثبيت في رف الكاشير السريع"
                         >
@@ -1709,7 +1709,7 @@ export function renderAdminGroups(ctx) {
 
 export function renderProfitProtectionShieldCard(ctx) {
   const { openFeatureSections, saveSiteSettingsImmediate, siteSettings, toggleFeatureSection } = ctx;
-  return (<div className="bg-surface rounded-3xl p-5 border border-[#2F6BB3]/40 shadow-sm space-y-4 text-xs">
+  return (<div className="bg-surface rounded-3xl p-5 border border-[#0071E3]/40 shadow-sm space-y-4 text-xs">
       <div
         onClick={() => toggleFeatureSection('profit_shield')}
         className="flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none"
@@ -1720,7 +1720,7 @@ export function renderProfitProtectionShieldCard(ctx) {
             <h3 className="text-sm sm:text-base font-black text-fg">
               درع حماية الأرباح: التحكم الموحد في (الحد الأدنى + الحد الأقصى + نسبة % أو مبلغ ثابت ج.م) لجميع الخصومات والشحن المجاني
             </h3>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] font-black text-[11px]">
+            <span className="px-2.5 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] font-black text-[11px]">
               حماية كاملة من الخسارة ✓
             </span>
           </div>
@@ -1733,8 +1733,8 @@ export function renderProfitProtectionShieldCard(ctx) {
           onClick={(e) => { e.stopPropagation(); toggleFeatureSection('profit_shield'); }}
           className={`w-9 h-9 rounded-xl font-black text-base flex items-center justify-center border transition shrink-0 ${
             openFeatureSections.profit_shield
-              ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-              : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
+              ? 'bg-[#0071E3] text-white border-[#0071E3]'
+              : 'bg-surface2 text-fg border-line hover:border-[#0071E3]'
           }`}
         >
           {openFeatureSections.profit_shield ? '−' : '+'}

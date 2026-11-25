@@ -305,9 +305,9 @@ export default function KaramboStoreReviewsView({
   };
 
   const renderLoginGateBox = (reasonText) => (
-    <div className="rounded-3xl bg-gradient-to-l from-[#1D4ED8]/10 to-sky-500/10 border-2 border-[#2563EB]/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="rounded-3xl bg-gradient-to-l from-[#0071E3]/10 to-sky-500/10 border-2 border-[#0071E3]/30 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex items-start gap-3">
-        <div className="w-11 h-11 rounded-2xl bg-[#2563EB] text-white flex items-center justify-center shrink-0 shadow">
+        <div className="w-11 h-11 rounded-2xl bg-[#0071E3] text-white flex items-center justify-center shrink-0 shadow">
           <Lock className="w-5 h-5" />
         </div>
         <div className="space-y-1">
@@ -321,7 +321,7 @@ export default function KaramboStoreReviewsView({
         <button
           type="button"
           onClick={() => onRequireAuth && onRequireAuth('login')}
-          className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black shadow"
+          className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0071E3] text-white text-xs font-black shadow"
         >
           تسجيل الدخول
         </button>
@@ -495,7 +495,7 @@ export default function KaramboStoreReviewsView({
     const band = trustBand(m.trustScore);
     const typeLbl = { online: 'منصة أونلاين', store: 'محل / فروع', social: 'صفحة سوشيال' }[ent.type] || 'متجر';
     return (
-      <div key={ent.id} className={`bg-surface border rounded-3xl p-4 flex flex-col gap-3 transition hover:border-[#3B82F6] ${ent.featured ? 'border-emerald-500/60 ring-1 ring-emerald-500/20' : ent.isExternal ? 'border-sky-500/40' : 'border-line'}`}>
+      <div key={ent.id} className={`bg-surface border rounded-3xl p-4 flex flex-col gap-3 transition hover:border-[#0071E3] ${ent.featured ? 'border-emerald-500/60 ring-1 ring-emerald-500/20' : ent.isExternal ? 'border-sky-500/40' : 'border-line'}`}>
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 flex-wrap mb-1">
@@ -508,7 +508,7 @@ export default function KaramboStoreReviewsView({
                 <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black"><Award className="w-3 h-3" /> اختيار كرومبو الموثوق</span>
               )}
             </div>
-            <button type="button" onClick={() => openEntity(ent)} className="text-start text-sm sm:text-base font-black text-fg hover:text-[#2563EB] leading-snug">
+            <button type="button" onClick={() => openEntity(ent)} className="text-start text-sm sm:text-base font-black text-fg hover:text-[#0066CC] leading-snug">
               {ent.name}
             </button>
           </div>
@@ -540,7 +540,7 @@ export default function KaramboStoreReviewsView({
         )}
 
         <div className="mt-auto pt-2 border-t border-line flex gap-1.5">
-          <button type="button" onClick={() => openEntity(ent)} className="flex-1 py-2 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black transition">عرض التقييمات الحقيقية</button>
+          <button type="button" onClick={() => openEntity(ent)} className="flex-1 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0071E3] text-white text-xs font-black transition">عرض التقييمات الحقيقية</button>
           {!ent.isExternal && (
             <button type="button" onClick={() => { setCmpA(ent.id); setTab('compare'); }} className="px-3 py-2 rounded-xl bg-surface2 border border-line hover:border-violet-500 text-fg text-xs font-black transition" title="قارن المحل"><Scale className="w-4 h-4" /></button>
           )}
@@ -573,7 +573,7 @@ export default function KaramboStoreReviewsView({
     return (
       <div className="space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <button type="button" onClick={() => setTab('directory')} className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#3B82F6]">
+          <button type="button" onClick={() => setTab('directory')} className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-surface2 border border-line text-xs font-black text-fg hover:border-[#0071E3]">
             <ChevronLeft className="w-4 h-4 rotate-180" /> كل المحلات والمنصات
           </button>
           <div className="ms-auto flex flex-wrap gap-1.5">
@@ -611,14 +611,14 @@ export default function KaramboStoreReviewsView({
               </div>
               <p className="text-xs font-bold text-muted">{ent.description}</p>
               <div className="flex flex-wrap gap-2 text-[11px] font-bold text-muted">
-                <span><MapPin className="w-3.5 h-3.5 inline text-[#2563EB]" /> العنوان / الفروع: {(liveDetail && liveDetail.address) || (ent.branches || [ent.governorate]).join(' · ')}</span>
+                <span><MapPin className="w-3.5 h-3.5 inline text-[#0066CC]" /> العنوان / الفروع: {(liveDetail && liveDetail.address) || (ent.branches || [ent.governorate]).join(' · ')}</span>
                 {((liveDetail && liveDetail.phone) || (ent.phones && ent.phones[0])) && (
                   <span>· <Phone className="w-3.5 h-3.5 inline text-emerald-600" /> {(liveDetail && liveDetail.phone) || ent.phones[0]}</span>
                 )}
                 {m.warPct !== null && <span className="text-sky-600 dark:text-sky-400 font-black">· التزام الضمان: {m.warPct}% ({m.warTested} تجربة)</span>}
               </div>
             </div>
-            <button type="button" onClick={() => setRevOpen(v => !v)} className="px-4 py-2.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-black shadow shrink-0">
+            <button type="button" onClick={() => setRevOpen(v => !v)} className="px-4 py-2.5 rounded-2xl bg-[#0071E3] hover:bg-[#0071E3] text-white text-xs font-black shadow shrink-0">
               {revOpen ? 'إغلاق النموذج' : '+ اكتب تجربتك معاهم'}
             </button>
           </div>
@@ -630,7 +630,7 @@ export default function KaramboStoreReviewsView({
               return (
                 <div key={k} className="rounded-2xl bg-surface2/70 border border-line p-3 space-y-1.5">
                   <div className="flex justify-between text-xs font-black"><span className="text-muted">{lbl}</span><span className="text-fg">{val} / 5</span></div>
-                  <div className="h-2 rounded-full bg-surface overflow-hidden"><div className="h-full bg-[#2563EB]" style={{ width: `${(val / 5) * 100}%` }} /></div>
+                  <div className="h-2 rounded-full bg-surface overflow-hidden"><div className="h-full bg-[#0071E3]" style={{ width: `${(val / 5) * 100}%` }} /></div>
                 </div>
               );
             })}
@@ -662,7 +662,7 @@ export default function KaramboStoreReviewsView({
           requireLogin && !isLoggedIn ? (
             renderLoginGateBox(`سجّل دخولك أو اعمل حساب مجاني عشان تقدر تنشر تجربتك الحقيقية مع «${ent.name}» وتساعد غيرك.`)
           ) : (
-            <form onSubmit={handleReviewSubmit} className="bg-surface border-2 border-[#2563EB]/40 rounded-3xl p-5 space-y-4">
+            <form onSubmit={handleReviewSubmit} className="bg-surface border-2 border-[#0071E3]/40 rounded-3xl p-5 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <h3 className="font-black text-fg">شارك تجربتك الحقيقية مع {ent.name}</h3>
                 {isLoggedIn && (
@@ -698,8 +698,8 @@ export default function KaramboStoreReviewsView({
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {AXES_META.map(([k, lbl]) => (
                   <div key={k} className="rounded-2xl bg-surface2 p-3 space-y-1">
-                    <div className="flex justify-between text-[11px] font-black"><span className="text-muted">{lbl}</span><span className="text-[#2563EB]">{revForm[k]}/5</span></div>
-                    <input type="range" min="1" max="5" step="1" value={revForm[k]} onChange={e => setRevForm(p => ({ ...p, [k]: Number(e.target.value) }))} className="w-full accent-[#2563EB]" />
+                    <div className="flex justify-between text-[11px] font-black"><span className="text-muted">{lbl}</span><span className="text-[#0066CC]">{revForm[k]}/5</span></div>
+                    <input type="range" min="1" max="5" step="1" value={revForm[k]} onChange={e => setRevForm(p => ({ ...p, [k]: Number(e.target.value) }))} className="w-full accent-[#0071E3]" />
                   </div>
                 ))}
               </div>
@@ -722,7 +722,7 @@ export default function KaramboStoreReviewsView({
               {/* Independent Warranty Question + Proof Upload */}
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 <label className="inline-flex items-center gap-2 text-xs font-black text-fg cursor-pointer">
-                  <input type="checkbox" checked={revForm.testedWarranty} onChange={e => setRevForm(p => ({ ...p, testedWarranty: e.target.checked }))} className="w-4 h-4 accent-[#2563EB]" />
+                  <input type="checkbox" checked={revForm.testedWarranty} onChange={e => setRevForm(p => ({ ...p, testedWarranty: e.target.checked }))} className="w-4 h-4 accent-[#0071E3]" />
                   <span>جربت معاهم الضمان أو الاستبدال فعلياً</span>
                 </label>
                 {revForm.testedWarranty && (
@@ -732,8 +732,8 @@ export default function KaramboStoreReviewsView({
                   </div>
                 )}
                 {rCfg.allowProofUpload !== false && (
-                  <label className="ms-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface2 border border-line text-xs font-black text-fg cursor-pointer hover:border-[#3B82F6]">
-                    <Upload className="w-3.5 h-3.5 text-[#2563EB]" />
+                  <label className="ms-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface2 border border-line text-xs font-black text-fg cursor-pointer hover:border-[#0071E3]">
+                    <Upload className="w-3.5 h-3.5 text-[#0066CC]" />
                     <span>{revForm.proofDataUrl ? 'تم إرفاق صورة الفاتورة ✓ (للإدارة فقط)' : 'إرفاق فاتورة لشارة «تجربة موثّقة» (اختياري)'}</span>
                     <input type="file" accept="image/*" onChange={handleProofFile} className="hidden" />
                   </label>
@@ -741,7 +741,7 @@ export default function KaramboStoreReviewsView({
               </div>
 
               <textarea required rows={3} value={revForm.comment} onChange={e => setRevForm(p => ({ ...p, comment: e.target.value }))} placeholder="احكي تجربتك بصراحة عشان تفيد غيرك (حالة العلبة، السعر، التعامل، الضمان)..." className="w-full p-3 rounded-2xl border border-line bg-surface2 text-sm font-bold" />
-              <button type="submit" className="w-full py-2.5 rounded-2xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-sm font-black shadow">نشر التجربة بحسابي</button>
+              <button type="submit" className="w-full py-2.5 rounded-2xl bg-[#0071E3] hover:bg-[#0071E3] text-white text-sm font-black shadow">نشر التجربة بحسابي</button>
             </form>
           )
         )}
@@ -788,7 +788,7 @@ export default function KaramboStoreReviewsView({
                   <div className="mt-auto pt-1 flex items-center justify-between text-[10px] font-bold text-muted">
                     <span>{er.date}</span>
                     {er.sourceUrl && (
-                      <a href={er.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#2563EB] font-black hover:underline">المصدر الأصلي ↗</a>
+                      <a href={er.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[#0066CC] font-black hover:underline">المصدر الأصلي ↗</a>
                     )}
                   </div>
                 </div>
@@ -806,12 +806,12 @@ export default function KaramboStoreReviewsView({
 
         {/* Smart ELZOGHBI Conversion Banner */}
         {rCfg.showStoreCta !== false && ent.id !== 'ent_elzoghbi' && onGoToStore && (
-          <div className="rounded-2xl bg-gradient-to-l from-[#1D4ED8]/15 to-emerald-500/10 border border-[#2563EB]/30 p-3.5 flex items-center justify-between gap-3 flex-wrap">
+          <div className="rounded-2xl bg-gradient-to-l from-[#0071E3]/15 to-emerald-500/10 border border-[#0071E3]/30 p-3.5 flex items-center justify-between gap-3 flex-wrap">
             <div className="text-xs font-black text-fg flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#2563EB] shrink-0" />
+              <Sparkles className="w-4 h-4 text-[#0066CC] shrink-0" />
               <span>اشتريت موبايلك من أي مكان؟ احميه بجرابات واسكرينات وشواحن أصلية بضمان من متجر ELZOGHBI</span>
             </div>
-            <button type="button" onClick={onGoToStore} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#2563EB] text-white text-xs font-black shrink-0">
+            <button type="button" onClick={onGoToStore} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0071E3] text-white text-xs font-black shrink-0">
               <ShoppingCart className="w-3.5 h-3.5" /> تسوق الإكسسوارات
             </button>
           </div>
@@ -843,7 +843,7 @@ export default function KaramboStoreReviewsView({
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black text-white ${r.sentiment === 'positive' ? 'bg-emerald-600' : r.sentiment === 'negative' ? 'bg-rose-600' : 'bg-amber-500'}`}>
                     {r.sentiment === 'positive' ? 'تجربة إيجابية' : r.sentiment === 'negative' ? 'شكوى / سلبية' : 'تجربة متوسطة'}
                   </span>
-                  {r.verifiedPurchase && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black"><CheckCircle2 className="w-3 h-3" /> تجربة موثّقة</span>}
+                  {r.verifiedPurchase && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-[#0071E3] text-white text-[10px] font-black"><CheckCircle2 className="w-3 h-3" /> تجربة موثّقة</span>}
                   {r.resolved && <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[10px] font-black"><Check className="w-3 h-3" /> تم حل الشكوى</span>}
                 </div>
                 <span className="text-[10px] font-bold text-muted">{String(r.createdAt || '').slice(0, 10)}</span>
@@ -871,7 +871,7 @@ export default function KaramboStoreReviewsView({
                   type="button"
                   disabled={!!votedIds[r.id]}
                   onClick={() => { setVotedIds(p => ({ ...p, [r.id]: true })); onVoteHelpful && onVoteHelpful(r.id); }}
-                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-black border transition ${votedIds[r.id] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-surface2 border-line text-fg hover:border-[#3B82F6]'}`}
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-[11px] font-black border transition ${votedIds[r.id] ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-surface2 border-line text-fg hover:border-[#0071E3]'}`}
                 >
                   التقييم ده فادني ({r.helpfulCount || 0})
                 </button>
@@ -882,7 +882,7 @@ export default function KaramboStoreReviewsView({
 
         {/* Q&A Section — Gated by Login */}
         <div className="bg-surface border border-line rounded-3xl p-5 space-y-4">
-          <h3 className="font-black text-fg flex items-center gap-2"><MessageSquare className="w-4 h-4 text-[#2563EB]" /> اسأل اللي اشتروا من {ent.name} ({entQuestions.length})</h3>
+          <h3 className="font-black text-fg flex items-center gap-2"><MessageSquare className="w-4 h-4 text-[#0066CC]" /> اسأل اللي اشتروا من {ent.name} ({entQuestions.length})</h3>
           {requireLogin && !isLoggedIn ? (
             renderLoginGateBox('سجّل دخولك عشان تسأل اللي اشتروا من المحل أو ترد على استفساراتهم.')
           ) : (
@@ -905,7 +905,7 @@ export default function KaramboStoreReviewsView({
               className="flex flex-col sm:flex-row gap-2"
             >
               <input required value={qaForm.question} onChange={e => setQaForm({ question: e.target.value })} placeholder="اكتب سؤالك (مثال: هل عندهم تقسيط فاليو أو استبدال فوري؟)" className="flex-1 px-3 py-2 rounded-xl border border-line bg-surface2 text-xs font-bold" />
-              <button type="submit" className="px-5 py-2 rounded-xl bg-[#2563EB] text-white text-xs font-black shrink-0">إرسال السؤال بحسابي</button>
+              <button type="submit" className="px-5 py-2 rounded-xl bg-[#0071E3] text-white text-xs font-black shrink-0">إرسال السؤال بحسابي</button>
             </form>
           )}
           <div className="space-y-3">
@@ -913,8 +913,8 @@ export default function KaramboStoreReviewsView({
               <div key={q.id} className="rounded-2xl bg-surface2/60 border border-line p-3.5 space-y-2">
                 <div className="text-xs font-black text-fg">س: {q.question} <span className="text-[10px] font-bold text-muted">— {q.authorName} ({q.createdAt})</span></div>
                 {(q.answers || []).map(ans => (
-                  <div key={ans.id} className="ps-3 border-s-2 border-[#2563EB] text-xs font-bold text-fg/90">
-                    <span className="text-[#2563EB] font-black">{ans.author}: </span>{ans.text}
+                  <div key={ans.id} className="ps-3 border-s-2 border-[#0071E3] text-xs font-bold text-fg/90">
+                    <span className="text-[#0066CC] font-black">{ans.author}: </span>{ans.text}
                   </div>
                 ))}
                 {(!requireLogin || isLoggedIn) && (
@@ -951,7 +951,7 @@ export default function KaramboStoreReviewsView({
           ['compare', 'مقارنة محلّين'],
           ['checker', 'فاحص الأرقام والصفحات']
         ].map(([k, l]) => (
-          <button key={k} type="button" onClick={() => setTab(k)} className={`px-3.5 py-2 rounded-2xl text-xs font-black border transition ${tab === k ? 'bg-[#2563EB] text-white border-[#2563EB] shadow' : 'bg-surface border-line text-fg hover:border-[#3B82F6]'}`}>{l}</button>
+          <button key={k} type="button" onClick={() => setTab(k)} className={`px-3.5 py-2 rounded-2xl text-xs font-black border transition ${tab === k ? 'bg-[#0071E3] text-white border-[#0071E3] shadow' : 'bg-surface border-line text-fg hover:border-[#0071E3]'}`}>{l}</button>
         ))}
         {rCfg.allowNewStoreSubmission !== false && (
           <button type="button" onClick={() => setAddStoreOpen(v => !v)} className="ms-auto inline-flex items-center gap-1 px-3.5 py-2 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black shadow">
@@ -991,7 +991,7 @@ export default function KaramboStoreReviewsView({
               className="grid sm:grid-cols-5 gap-2.5"
             >
               <div className="sm:col-span-2 flex items-center gap-2 rounded-2xl px-3 py-2 bg-surface2 border border-line">
-                <Search className="w-4 h-4 text-[#3B82F6] shrink-0" />
+                <Search className="w-4 h-4 text-[#0071E3] shrink-0" />
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder="اكتب اسم أي محل في مصر (حتى لو مش مضاف عندنا)..." className="flex-1 bg-transparent border-0 text-xs font-bold focus:outline-none" />
                 {search && <button type="button" onClick={() => setSearch('')}><X className="w-3.5 h-3.5 text-muted" /></button>}
               </div>
@@ -1015,7 +1015,7 @@ export default function KaramboStoreReviewsView({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">
                 {REVIEW_ENTITY_TYPES.map(t => (
-                  <button key={t.id} type="button" onClick={() => setTypeFilter(t.id)} className={`px-3 py-1 rounded-full text-xs font-black border transition ${typeFilter === t.id ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-surface2 border-line text-fg'}`}>{t.label}</button>
+                  <button key={t.id} type="button" onClick={() => setTypeFilter(t.id)} className={`px-3 py-1 rounded-full text-xs font-black border transition ${typeFilter === t.id ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface2 border-line text-fg'}`}>{t.label}</button>
                 ))}
               </div>
               <button
@@ -1158,7 +1158,7 @@ export default function KaramboStoreReviewsView({
               <input value={checkerQuery} onChange={e => setCheckerQuery(e.target.value)} placeholder="مثال: 16942 أو رابط الصفحة أو اسم المتجر..." className="flex-1 bg-transparent border-0 text-sm font-bold focus:outline-none" />
               {checkerQuery && <button type="button" onClick={() => { setCheckerQuery(''); setScamResult(null); }}><X className="w-4 h-4 text-muted" /></button>}
             </div>
-            <button type="submit" disabled={scamLoading || checkerQuery.trim().length < 3} className="px-5 py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] disabled:opacity-50 text-white text-xs font-black inline-flex items-center justify-center gap-1.5 shrink-0">
+            <button type="submit" disabled={scamLoading || checkerQuery.trim().length < 3} className="px-5 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0066CC] disabled:opacity-50 text-white text-xs font-black inline-flex items-center justify-center gap-1.5 shrink-0">
               {scamLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               <span>{scamLoading ? 'جاري الفحص الحي...' : 'افحص الآن'}</span>
             </button>
@@ -1206,7 +1206,7 @@ export default function KaramboStoreReviewsView({
                       <div key={c.id} className="rounded-xl bg-surface2 border border-line p-3 space-y-1">
                         <div className="text-xs font-black text-fg line-clamp-1">{c.title}</div>
                         <p className="text-[11px] font-bold text-muted line-clamp-3">{c.text}</p>
-                        {c.sourceUrl && <a href={c.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#2563EB] hover:underline">اقرأ المنشور الأصلي ↗</a>}
+                        {c.sourceUrl && <a href={c.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#0066CC] hover:underline">اقرأ المنشور الأصلي ↗</a>}
                       </div>
                     ))}
                   </div>
@@ -1221,7 +1221,7 @@ export default function KaramboStoreReviewsView({
                       <div key={i} className={`rounded-xl border p-3 text-xs space-y-1 ${w.isWarning ? 'bg-rose-500/5 border-rose-500/30' : 'bg-surface2/60 border-line'}`}>
                         <div className="font-black text-fg">{w.title}</div>
                         <div className="text-[11px] font-bold text-muted">{w.snippet}</div>
-                        {w.url && <a href={w.url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#2563EB] hover:underline">فتح المصدر ↗</a>}
+                        {w.url && <a href={w.url} target="_blank" rel="noopener noreferrer" className="text-[10px] font-black text-[#0066CC] hover:underline">فتح المصدر ↗</a>}
                       </div>
                     ))}
                   </div>

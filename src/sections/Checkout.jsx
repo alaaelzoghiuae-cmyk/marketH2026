@@ -440,7 +440,7 @@ export function renderCheckoutView(ctx) {
                   </div>
                 )}
                 {cartSummary.qtyDiscountTotalBase > 0 && (
-                  <div className="flex justify-between text-[#163B6B] dark:text-[#2F6BB3] font-extrabold">
+                  <div className="flex justify-between text-[#004F9F] dark:text-[#0066CC] font-extrabold">
                     <span>🏷️ خصم الكميات (اشتري أكتر ووفّر):</span>
                     <span>-{formatMoney(cartSummary.qtyDiscountTotalBase)}</span>
                   </div>
@@ -493,7 +493,7 @@ export function renderCheckoutView(ctx) {
               <button
                 onClick={handlePlaceOrder}
                 disabled={placingOrder}
-                className="w-full py-3.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
+                className="w-full py-3.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2"
               >
                 <CheckCircle2 className="w-5 h-5" />
                 أكّد وابعت الطلب

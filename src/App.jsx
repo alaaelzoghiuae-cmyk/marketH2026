@@ -192,7 +192,7 @@ useEffect(() => {
       document.documentElement.classList.toggle('dark', isDark);
       document.documentElement.setAttribute('data-theme', uiTheme);
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', isDark ? '#040711' : '#f8fafc');
+      if (meta) meta.setAttribute('content', isDark ? '#000000' : '#ffffff');
     } catch (e) {}
   }, [uiTheme]);
 const [favoritePartIds, setFavoritePartIds] = useState(() => {
@@ -366,7 +366,7 @@ const toggleUiTheme = () => {
       document.documentElement.classList.toggle('dark', next === 'dark');
       document.documentElement.setAttribute('data-theme', next);
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', next === 'dark' ? '#040711' : '#f8fafc');
+      if (meta) meta.setAttribute('content', next === 'dark' ? '#000000' : '#ffffff');
     } catch (e) {}
     if (homeElRef && homeElRef.current) homeElRef.current = null;
     if (searchElRef && searchElRef.current) searchElRef.current = null;
@@ -5067,7 +5067,7 @@ const getClientLoyaltyStatus = (clientObj) => {
       { idx: 0, id: 'bronze', name: 'برونزي', icon: '🥉', minSpentEgp: 0, minOrders: 0, autoDiscountPct: 0, bonusCashbackPct: 0, freeShipping: false, color: 'from-amber-700 to-orange-800', badgeBg: 'bg-amber-600/20 text-amber-500 border-amber-500/40' },
       { idx: 1, id: 'silver', name: 'فضي', icon: '🥈', minSpentEgp: silverMinSpent, minOrders: 5, autoDiscountPct: silverDiscPct, bonusCashbackPct: 1, freeShipping: false, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-slate-300 border-slate-400/40' },
       { idx: 2, id: 'gold', name: 'ذهبي', icon: '🥇', minSpentEgp: goldMinSpent, minOrders: 12, autoDiscountPct: goldDiscPct, bonusCashbackPct: 2, freeShipping: false, color: 'from-amber-400 to-yellow-600', badgeBg: 'bg-amber-400/20 text-amber-300 border-amber-400/40' },
-      { idx: 3, id: 'diamond', name: 'ألماسي', icon: '', minSpentEgp: diamondMinSpent, minOrders: 20, autoDiscountPct: diamondDiscPct, bonusCashbackPct: 3, freeShipping: true, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-[#7FB0E8] border-[#2F6BB3]/40' }
+      { idx: 3, id: 'diamond', name: 'ألماسي', icon: '', minSpentEgp: diamondMinSpent, minOrders: 20, autoDiscountPct: diamondDiscPct, bonusCashbackPct: 3, freeShipping: true, color: 'from-slate-400 to-slate-600', badgeBg: 'bg-slate-400/20 text-[#2997FF] border-[#0071E3]/40' }
     ];
 
     let effectiveTierIdx = 0;
@@ -10388,29 +10388,29 @@ return (
           background: transparent !important;
         }
         :root {
-          --bg: 248 250 252;
-          --surface: 255 255 255;
-          --surface2: 239 246 255;
-          --fg: 15 23 42;
-          --muted: 100 116 139;
-          --line: 226 232 240;
-          --accent: 37 99 235;
+          --bg: 255 255 255;
+          --surface: 245 245 247;
+          --surface2: 232 232 237;
+          --fg: 29 29 31;
+          --muted: 110 110 115;
+          --line: 217 217 222;
+          --accent: 0 113 227;
           --accent-ink: 255 255 255;
-          --accent-text: 37 99 235;
-          --go: 37 99 235;
+          --accent-text: 0 102 204;
+          --go: 0 113 227;
           --go-ink: 255 255 255;
         }
         .dark {
-          --bg: 4 7 17;
-          --surface: 11 17 32;
-          --surface2: 17 26 46;
-          --fg: 248 250 252;
-          --muted: 148 163 184;
-          --line: 30 45 74;
-          --accent: 37 99 235;
+          --bg: 0 0 0;
+          --surface: 29 29 31;
+          --surface2: 44 44 46;
+          --fg: 245 245 247;
+          --muted: 161 161 166;
+          --line: 56 56 58;
+          --accent: 0 113 227;
           --accent-ink: 255 255 255;
-          --accent-text: 96 165 250;
-          --go: 37 99 235;
+          --accent-text: 41 151 255;
+          --go: 0 113 227;
           --go-ink: 255 255 255;
         }
         .bg-bg { background-color: rgb(var(--bg)); }
@@ -10431,12 +10431,13 @@ return (
         .bg-go { background-color: rgb(var(--go)); }
         .text-go-ink { color: rgb(var(--go-ink)); }
         .border-go { border-color: rgb(var(--go)); }
-        .bg-nav { background-color: #050914; }
-        .bg-nav2 { background-color: #0B1224; }
-        .from-nav { --tw-gradient-from: #050914 var(--tw-gradient-from-position); --tw-gradient-to: rgb(5 9 20 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
-        .via-nav2 { --tw-gradient-to: rgb(11 18 36 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #0B1224 var(--tw-gradient-via-position), var(--tw-gradient-to); }
-        .to-nav { --tw-gradient-to: #050914 var(--tw-gradient-to-position); }
-        .border-navline { border-color: #1E2D4A; }
+        .bg-nav { background-color: #161617; }
+        .bg-nav2 { background-color: #1d1d1f; }
+        .dark .bg-nav2 { background-color: #3a3a3c; }
+        .from-nav { --tw-gradient-from: #161617 var(--tw-gradient-from-position); --tw-gradient-to: rgb(22 22 23 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to); }
+        .via-nav2 { --tw-gradient-to: rgb(29 29 31 / 0) var(--tw-gradient-to-position); --tw-gradient-stops: var(--tw-gradient-from), #1d1d1f var(--tw-gradient-via-position), var(--tw-gradient-to); }
+        .to-nav { --tw-gradient-to: #161617 var(--tw-gradient-to-position); }
+        .border-navline { border-color: #424245; }
         input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
         select,
         textarea {
@@ -10454,18 +10455,20 @@ return (
           background-color: rgb(var(--surface)) !important;
           color: rgb(var(--fg)) !important;
         }
-        .text-nav-fg { color: #F8FAFC; }
-        .bg-nav-cyan { background-color: #1E4E8C; }
-        .text-nav-cyan { color: #7FB0E8; }
-        .border-nav-cyan { border-color: #2F6BB3; }
+        .text-nav-fg { color: #f5f5f7; }
+        .bg-nav-cyan { background-color: #0071e3; }
+        .text-nav-cyan { color: #2997ff; }
+        .border-nav-cyan { border-color: #0071e3; }
         .text-nav-cyan-ink { color: #FFFFFF; }
-        .bg-nav-cart { background-color: #1E4E8C; }
+        .bg-nav-cart { background-color: #0071e3; }
         .text-nav-cart-ink { color: #FFFFFF; }
-        .bg-announce-bg { background-color: #fbbf24; }
-        .text-announce-ink { color: #2b1d00; }
-        .border-announce-bg { border-color: #fbbf24; }
-        .bg-maint-bg { background-color: #be123c; }
-        .border-maint-bg { border-color: #be123c; }
+        .bg-announce-bg { background-color: #f5f5f7; }
+        .dark .bg-announce-bg { background-color: #1d1d1f; }
+        .text-announce-ink { color: #1d1d1f; }
+        .dark .text-announce-ink { color: #f5f5f7; }
+        .border-announce-bg { border-color: #d2d2d7; }
+        .bg-maint-bg { background-color: #d70015; }
+        .border-maint-bg { border-color: #d70015; }
         @media (max-width: 1024px) {
           input, select, textarea { font-size: 16px !important; }
         }
@@ -10478,8 +10481,8 @@ return (
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        input[type='range'].hm-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 9999px; background: rgba(59,130,246,0.22); outline: none; }
-        input[type='range'].hm-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 9999px; background: #1e4e8c; border: 2px solid #ffffff; cursor: pointer; }
+        input[type='range'].hm-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 9999px; background: rgba(0,113,227,0.22); outline: none; }
+        input[type='range'].hm-range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 9999px; background: #0071e3; border: 2px solid #ffffff; cursor: pointer; }
 
         .hm-card { content-visibility: auto; contain-intrinsic-size: auto 330px; }
         @media (max-width: 639px) {
@@ -10645,7 +10648,7 @@ return (
         <button
           type="button"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-20 right-5 z-40 px-4 py-2.5 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow-[0_8px_25px_rgba(37,99,235,0.5)] border border-[#7FB0E8]/60 flex items-center gap-1.5 transition transform hover:scale-105"
+          className="fixed bottom-20 right-5 z-40 px-4 py-2.5 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs shadow-[0_8px_25px_rgba(37,99,235,0.5)] border border-[#2997FF]/60 flex items-center gap-1.5 transition transform hover:scale-105"
           title="الرجوع لأول الصفحة"
         >
           <span>↑</span>

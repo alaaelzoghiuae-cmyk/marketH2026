@@ -136,7 +136,7 @@ export default function ExcelProductManager({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm sm:text-base font-black text-fg flex items-center gap-2">
-              <Layers className="w-5 h-5 text-[#1E4E8C]" />
+              <Layers className="w-5 h-5 text-[#0066CC]" />
               <span>إدارة المنتجات السريعة بنمط Excel ({filtered.length} / {parts.length})</span>
             </h2>
             <p className="text-[11px] text-muted">عدّل الاسم أو السعر أو التكلفة أو المخزون أو التصنيف مباشرة في الجدول بدون فتح كل منتج منفرداً.</p>
@@ -197,9 +197,9 @@ export default function ExcelProductManager({
 
         {/* Bulk Actions Bar */}
         {selectedIds.length > 0 && (
-          <div className="p-3 rounded-2xl bg-[#1E4E8C]/10 border border-[#1E4E8C]/35 flex flex-wrap items-center justify-between gap-2.5">
+          <div className="p-3 rounded-2xl bg-[#0071E3]/10 border border-[#0071E3]/35 flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-[#1E4E8C] text-white font-black text-[11px]">
+              <span className="px-2.5 py-1 rounded-full bg-[#0071E3] text-white font-black text-[11px]">
                 تم تحديد {selectedIds.length} منتج
               </span>
               <select
@@ -232,7 +232,7 @@ export default function ExcelProductManager({
                 <button
                   type="button"
                   onClick={() => setConfirmBulk(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-[#1E4E8C] text-white font-extrabold"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] text-white font-extrabold"
                 >
                   تطبيق التعديل
                 </button>
@@ -280,7 +280,7 @@ export default function ExcelProductManager({
                 <button
                   type="button"
                   onClick={() => { onDuplicateParts(selectedIds); setSelectedIds([]); }}
-                  className="px-2.5 py-1.5 rounded-xl bg-surface border border-line hover:border-[#1E4E8C] text-fg font-bold"
+                  className="px-2.5 py-1.5 rounded-xl bg-surface border border-line hover:border-[#0071E3] text-fg font-bold"
                 >
                   نسخ المحدد
                 </button>
@@ -328,7 +328,7 @@ export default function ExcelProductManager({
                 const margin = base > 0 && cost > 0 ? Math.round(((base - cost) / base) * 100) : null;
                 const normCat = normalizePartCategory ? normalizePartCategory(p.category, p.name) : (p.category || '');
                 return (
-                  <tr key={`${p.id}_${gridVersion}`} className={`hover:bg-surface2/50 transition ${selectedIds.includes(p.id) ? 'bg-[#1E4E8C]/5' : ''}`}>
+                  <tr key={`${p.id}_${gridVersion}`} className={`hover:bg-surface2/50 transition ${selectedIds.includes(p.id) ? 'bg-[#0071E3]/5' : ''}`}>
                     <td className="p-2 text-center">
                       <input
                         type="checkbox"
@@ -351,7 +351,7 @@ export default function ExcelProductManager({
                             const v = e.target.value.trim();
                             if (v && v !== p.name) applyInlineField(p, 'name', v);
                           }}
-                          className="w-full px-2 py-1 rounded-lg bg-transparent hover:bg-bg focus:bg-bg border border-transparent focus:border-[#1E4E8C] font-extrabold text-fg text-xs"
+                          className="w-full px-2 py-1 rounded-lg bg-transparent hover:bg-bg focus:bg-bg border border-transparent focus:border-[#0071E3] font-extrabold text-fg text-xs"
                         />
                       </div>
                     </td>
@@ -375,7 +375,7 @@ export default function ExcelProductManager({
                           const v = Math.max(0, Number(e.target.value) || 0);
                           if (v !== base) applyInlineField(p, 'basePrice', v);
                         }}
-                        className="w-full px-2 py-1 rounded-lg bg-bg border border-line font-mono font-black text-[#1E4E8C] dark:text-[#7FB0E8]"
+                        className="w-full px-2 py-1 rounded-lg bg-bg border border-line font-mono font-black text-[#0066CC] dark:text-[#2997FF]"
                       />
                     </td>
                     <td className="p-2">

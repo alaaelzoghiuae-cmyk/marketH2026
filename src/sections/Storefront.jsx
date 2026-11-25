@@ -16,7 +16,7 @@ export function renderVvipBrandEmblem(ctx, size = 'md', forceLightText = false) 
     return (
       <div className="flex items-center gap-3 select-none group">
         {hCfg.logoMode !== 'text_only' && (
-          <div className={`relative ${isLg ? 'w-13 h-13 rounded-2xl' : 'w-11 h-11 rounded-xl'} bg-[#060B19] p-1 shadow-[0_6px_22px_rgba(37,99,235,0.38)] flex items-center justify-center shrink-0 border border-[#7FB0E8]/45 overflow-hidden group-hover:scale-105 transition duration-300`}>
+          <div className={`relative ${isLg ? 'w-13 h-13 rounded-2xl' : 'w-11 h-11 rounded-xl'} bg-[#1D1D1F] p-1 shadow-[0_6px_22px_rgba(37,99,235,0.38)] flex items-center justify-center shrink-0 border border-[#2997FF]/45 overflow-hidden group-hover:scale-105 transition duration-300`}>
             {hCfg.logoMode === 'custom_image' && hCfg.customLogoUrl ? (
               <img src={hCfg.customLogoUrl} alt={titleTxt} className="w-full h-full object-contain rounded-lg" />
             ) : hCfg.logoMode === 'emblem_webp' ? (
@@ -47,10 +47,10 @@ export function renderVvipBrandEmblem(ctx, size = 'md', forceLightText = false) 
         <div className="leading-none text-right">
           <div className={`${isLg ? 'text-xl sm:text-2xl' : 'text-base sm:text-lg'} font-black tracking-wider ${forceLightText ? 'text-white' : 'text-fg'} uppercase flex items-center gap-1`}>
             <span>{titleTxt}</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#7FB0E8] inline-block shadow-[0_0_8px_#7FB0E8]" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2997FF] inline-block shadow-[0_0_8px_#7FB0E8]" />
           </div>
           {hCfg.showSubtitle && (
-            <div className="text-[9px] sm:text-[10px] font-extrabold tracking-[0.24em] text-[#1E4E8C] dark:text-[#7FB0E8] uppercase mt-1">
+            <div className="text-[9px] sm:text-[10px] font-extrabold tracking-[0.24em] text-[#0066CC] dark:text-[#2997FF] uppercase mt-1">
               {subTxt}
             </div>
           )}
@@ -128,10 +128,10 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
           setDetailImageIdx(currentImgIdx);
           setSelectedDetailItem({ type: 'part', part });
         }}
-        className={`hm-card group bg-white dark:bg-[#0B1222] text-fg rounded-[24px] border p-3.5 sm:p-4 transition-all duration-300 flex flex-col justify-between cursor-pointer ${
+        className={`hm-card group bg-surface text-fg rounded-[24px] border p-3.5 sm:p-4 transition-all duration-300 flex flex-col justify-between cursor-pointer ${
           inCartQty > 0
-            ? 'border-[#1E4E8C] ring-2 ring-[#1E4E8C]/25'
-            : 'border-slate-200/90 dark:border-[#1B294B] hover:border-[#2F6BB3]'
+            ? 'border-[#0071E3] ring-2 ring-[#0071E3]/25'
+            : 'border-transparent hover:border-line'
         }`}
       >
         {/* Top Studio Product Stage (Pure White Studio Card so white-bg & transparent product photos both look crisp!) */}
@@ -196,7 +196,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                     e.stopPropagation();
                     setCardImageIdx(prev => ({ ...prev, [part.id]: (currentImgIdx - 1 + imagesList.length) % imagesList.length }));
                   }}
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#1E4E8C] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
                   title="الصورة السابقة"
                 >
                   ‹
@@ -207,7 +207,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                     e.stopPropagation();
                     setCardImageIdx(prev => ({ ...prev, [part.id]: (currentImgIdx + 1) % imagesList.length }));
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#1E4E8C] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-slate-900/70 hover:bg-[#0071E3] text-white text-xs font-black flex items-center justify-center opacity-85 sm:opacity-0 sm:group-hover:opacity-100 transition z-10"
                   title="الصورة التالية"
                 >
                   ›
@@ -236,7 +236,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
               <span className="truncate">{part.category || 'منتج أصلي'}</span>
               {part.sku && <span className="font-mono text-[10px] opacity-75 shrink-0">{part.sku}</span>}
             </div>
-            <h3 className="text-sm sm:text-[15px] font-extrabold text-fg leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#1E4E8C] dark:group-hover:text-[#7FB0E8] transition">
+            <h3 className="text-sm sm:text-[15px] font-extrabold text-fg leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#0066CC] dark:group-hover:text-[#2997FF] transition">
               <Bidi text={part.name} />
             </h3>
           </div>
@@ -265,7 +265,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                     }}
                     className={`py-1 px-1 rounded-lg text-[10px] font-extrabold truncate transition ${
                       isSel
-                        ? 'bg-[#1E4E8C] text-white shadow-xs'
+                        ? 'bg-[#0071E3] text-white shadow-xs'
                         : 'text-muted hover:text-fg'
                     }`}
                   >
@@ -318,17 +318,17 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                 e.stopPropagation();
                 updateCartQty(part.id, 1);
               }}
-              className="w-full py-2.5 px-4 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition"
+              className="w-full py-2.5 px-4 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 transition"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>أضف إلى السلة</span>
             </button>
           ) : (
-            <div className="flex items-center justify-between gap-2 bg-[#1E4E8C]/10 dark:bg-[#0F1B36] border-2 border-[#1E4E8C] rounded-xl p-1">
+            <div className="flex items-center justify-between gap-2 bg-[#0071E3]/10 dark:bg-[#2C2C2E] border-2 border-[#0071E3] rounded-xl p-1">
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); updateCartQty(part.id, 1); }}
-                className="w-8 h-8 rounded-lg bg-[#1E4E8C] hover:bg-[#163B6B] text-white flex items-center justify-center transition"
+                className="w-8 h-8 rounded-lg bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center transition"
                 title="زيادة الكمية"
               >
                 <Plus className="w-4 h-4" />
@@ -344,7 +344,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
                   onChange={e => setCartQtyDirect(part.id, e.target.value)}
                   className="w-10 text-center font-black text-sm text-fg bg-transparent border-0 focus:outline-none"
                 />
-                <span className="text-[11px] font-extrabold text-[#1E4E8C] dark:text-[#7FB0E8]">بالسلة</span>
+                <span className="text-[11px] font-extrabold text-[#0066CC] dark:text-[#2997FF]">بالسلة</span>
               </div>
               <button
                 type="button"
@@ -430,20 +430,20 @@ export function renderClientHeader(ctx) {
     const navLinkCls = (isActive) =>
       `relative py-2 transition ${
         isActive
-          ? hCfg.forceDarkHeader ? 'text-[#7FB0E8]' : 'text-[#1E4E8C] dark:text-white'
-          : hCfg.forceDarkHeader ? 'text-slate-200 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-[#1E4E8C] dark:hover:text-white'
+          ? hCfg.forceDarkHeader ? 'text-[#2997FF]' : 'text-[#0066CC] dark:text-white'
+          : hCfg.forceDarkHeader ? 'text-slate-200 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-[#0066CC] dark:hover:text-white'
       }`;
 
     return (
       <header
         className={`${hCfg.stickyHeader ? 'sticky top-0' : 'relative'} z-40 w-full max-w-[100vw] ${
           hCfg.forceDarkHeader
-            ? 'bg-[#050914]/95 text-white border-b border-[#16223B]'
-            : 'bg-white/95 dark:bg-[#050914]/95 text-fg border-b border-slate-200/80 dark:border-[#16223B]'
+            ? 'bg-[#161617]/95 text-white border-b border-[#38383A]'
+            : 'bg-white/95 dark:bg-[#161617]/95 text-fg border-b border-slate-200/80 dark:border-[#38383A]'
         } backdrop-blur-xl transition-colors duration-200`}
       >
         <div ref={headerInnerRef} className="w-full max-w-full">
-          <div className={`max-w-[1380px] mx-auto px-3 sm:px-8 ${hCfg.compactHeight ? 'h-14 sm:h-16' : 'h-16 sm:h-20'} flex items-center justify-between gap-2 sm:gap-4`}>
+          <div className={`max-w-[1380px] mx-auto px-3 sm:px-8 ${hCfg.compactHeight ? 'h-12 sm:h-14' : 'h-14 sm:h-[60px]'} flex items-center justify-between gap-2 sm:gap-4`}>
             {/* Right: Brand Logo + Customizable Navigation Links */}
             <div className="flex items-center gap-3 lg:gap-8 min-w-0 shrink">
               <div
@@ -468,7 +468,7 @@ export function renderClientHeader(ctx) {
                   >
                     <span>{hCfg.homeLabel}</span>
                     {(clientTab === 'home' || clientTab === 'store') && (
-                      <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-[#1E4E8C] shadow-[0_0_12px_#2F6BB3]" />
+                      <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-[#0071E3] shadow-[0_0_12px_#2F6BB3]" />
                     )}
                   </button>
                 )}
@@ -487,7 +487,7 @@ export function renderClientHeader(ctx) {
                   >
                     <span>{hCfg.productsLabel}</span>
                     {clientTab === 'search' && storeStockFilter === 'ALL' && (
-                      <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-[#1E4E8C] shadow-[0_0_12px_#2F6BB3]" />
+                      <span className="absolute inset-x-0 -bottom-1 h-[3px] rounded-full bg-[#0071E3] shadow-[0_0_12px_#2F6BB3]" />
                     )}
                   </button>
                 )}
@@ -511,14 +511,14 @@ export function renderClientHeader(ctx) {
                       type="button"
                       onClick={() => scrollToSection('vvip-categories-section')}
                       className={`py-2 flex items-center gap-1.5 ${
-                        hCfg.forceDarkHeader ? 'text-slate-200 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-[#1E4E8C] dark:hover:text-white'
+                        hCfg.forceDarkHeader ? 'text-slate-200 hover:text-white' : 'text-slate-600 dark:text-slate-300 hover:text-[#0066CC] dark:hover:text-white'
                       } transition`}
                     >
                       <span>{hCfg.categoriesLabel}</span>
                       <ChevronDown className="w-3.5 h-3.5 opacity-70" />
                     </button>
                     <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute right-0 top-full pt-2 w-60 z-50">
-                      <div className="bg-surface dark:bg-[#0B1224] border border-line dark:border-[#1E2D4A] rounded-2xl shadow-2xl p-2 space-y-1 text-xs font-extrabold">
+                      <div className="bg-surface dark:bg-[#1D1D1F] border border-line dark:border-[#424245] rounded-2xl shadow-2xl p-2 space-y-1 text-xs font-extrabold">
                         <button
                           type="button"
                           onClick={() => { setStoreStockFilter('BEST_SELLERS'); setClientTab('search'); }}
@@ -596,7 +596,7 @@ export function renderClientHeader(ctx) {
                       href={hCfg.customNavExternalUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] border border-[#1E4E8C]/30 text-xs font-black hover:bg-[#1E4E8C] hover:text-white transition"
+                      className="px-3 py-1.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] border border-[#0071E3]/30 text-xs font-black hover:bg-[#0071E3] hover:text-white transition"
                     >
                       {hCfg.customNavLabel}
                     </a>
@@ -613,7 +613,7 @@ export function renderClientHeader(ctx) {
                           setClientTab('search');
                         }
                       }}
-                      className="px-3 py-1.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] border border-[#1E4E8C]/30 text-xs font-black hover:bg-[#1E4E8C] hover:text-white transition"
+                      className="px-3 py-1.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] border border-[#0071E3]/30 text-xs font-black hover:bg-[#0071E3] hover:text-white transition"
                     >
                       {hCfg.customNavLabel}
                     </button>
@@ -631,9 +631,9 @@ export function renderClientHeader(ctx) {
                 }}
                 className={`hidden md:flex flex-1 max-w-[340px] items-center ${
                   hCfg.forceDarkHeader
-                    ? 'bg-[#0D1528] border-[#1E2D4A] text-white'
-                    : 'bg-[#E8F0FE] dark:bg-[#0D1528] border-slate-200/80 dark:border-[#1E2D4A] text-fg'
-                } border focus-within:border-[#2F6BB3] rounded-full px-4 py-2 gap-2.5 transition`}
+                    ? 'bg-[#1D1D1F] border-[#424245] text-white'
+                    : 'bg-[#E8F0FE] dark:bg-[#1D1D1F] border-slate-200/80 dark:border-[#424245] text-fg'
+                } border focus-within:border-[#0071E3] rounded-full px-4 py-2 gap-2.5 transition`}
               >
                 <input
                   type="text"
@@ -649,7 +649,7 @@ export function renderClientHeader(ctx) {
                 />
                 <button
                   type="submit"
-                  className="text-slate-500 dark:text-slate-300 hover:text-[#2F6BB3] transition shrink-0"
+                  className="text-slate-500 dark:text-slate-300 hover:text-[#0066CC] transition shrink-0"
                   title="بحث"
                 >
                   <Search className="w-4 h-4" />
@@ -663,10 +663,10 @@ export function renderClientHeader(ctx) {
                 <button
                   type="button"
                   onClick={() => setWarrantyModalOpen(true)}
-                  className="hidden sm:flex h-9 sm:h-10 px-3 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#2F6BB3] text-fg border border-slate-200 dark:border-[#1E2D4A] items-center gap-1.5 text-xs font-extrabold transition"
+                  className="hidden sm:flex h-9 sm:h-10 px-3 rounded-full bg-surface2 dark:bg-[#1D1D1F] hover:border-[#0071E3] text-fg border border-slate-200 dark:border-[#424245] items-center gap-1.5 text-xs font-extrabold transition"
                   title="فحص الضمان بالرقم"
                 >
-                  <Shield className="w-3.5 h-3.5 text-[#1E4E8C]" />
+                  <Shield className="w-3.5 h-3.5 text-[#0066CC]" />
                   <span className="hidden xl:inline">الضمان</span>
                 </button>
               )}
@@ -687,11 +687,11 @@ export function renderClientHeader(ctx) {
                 <button
                   type="button"
                   onClick={() => setCartDrawerOpen(true)}
-                  className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#2F6BB3] text-fg border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center transition"
+                  className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface2 dark:bg-[#1D1D1F] hover:border-[#0071E3] text-fg border border-slate-200 dark:border-[#424245] flex items-center justify-center transition"
                   title="سلة المشتريات"
                 >
                   <ShoppingCart className="w-4 h-4" />
-                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#1E4E8C] text-white text-[9px] font-black flex items-center justify-center shadow">
+                  <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-[#0071E3] text-white text-[9px] font-black flex items-center justify-center shadow">
                     {cartSummary.totalQty}
                   </span>
                 </button>
@@ -711,7 +711,7 @@ export function renderClientHeader(ctx) {
                   className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition ${
                     storeStockFilter === 'FAVORITES' && clientTab === 'search'
                       ? 'bg-rose-500 text-white border-rose-400'
-                      : 'bg-surface2 dark:bg-[#0D1528] hover:border-rose-400 text-fg border-slate-200 dark:border-[#1E2D4A]'
+                      : 'bg-surface2 dark:bg-[#1D1D1F] hover:border-rose-400 text-fg border-slate-200 dark:border-[#424245]'
                   }`}
                   title="قائمة المفضلة"
                 >
@@ -740,8 +740,8 @@ export function renderClientHeader(ctx) {
                   }}
                   className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition ${
                     clientTab === 'account'
-                      ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-                      : 'bg-surface2 dark:bg-[#0D1528] hover:border-[#2F6BB3] text-fg border-slate-200 dark:border-[#1E2D4A]'
+                      ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                      : 'bg-surface2 dark:bg-[#1D1D1F] hover:border-[#0071E3] text-fg border-slate-200 dark:border-[#424245]'
                   }`}
                   title={currentClient ? currentClient.name : 'حساب العميل / تسجيل الدخول'}
                 >
@@ -757,7 +757,7 @@ export function renderClientHeader(ctx) {
               <button
                 type="button"
                 onClick={() => changeLang(lang === 'en' ? 'ar' : 'en')}
-                className="h-9 sm:h-10 px-3 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#2F6BB3] border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center text-xs font-black text-fg transition"
+                className="h-9 sm:h-10 px-3 rounded-full bg-surface2 dark:bg-[#1D1D1F] hover:border-[#0071E3] border border-slate-200 dark:border-[#424245] flex items-center justify-center text-xs font-black text-fg transition"
                 title={lang === 'en' ? 'التبديل إلى العربية' : 'Switch to English'}
               >
                 {lang === 'en' ? 'عربي' : 'EN'}
@@ -767,11 +767,11 @@ export function renderClientHeader(ctx) {
                 <button
                   type="button"
                   onClick={toggleUiTheme}
-                  className="w-9 h-9 sm:w-auto sm:h-10 sm:px-2.5 rounded-full bg-surface2 dark:bg-[#0D1528] hover:border-[#2F6BB3] border border-slate-200 dark:border-[#1E2D4A] flex items-center justify-center gap-1 transition"
+                  className="w-9 h-9 sm:w-auto sm:h-10 sm:px-2.5 rounded-full bg-surface2 dark:bg-[#1D1D1F] hover:border-[#0071E3] border border-slate-200 dark:border-[#424245] flex items-center justify-center gap-1 transition"
                   title={uiTheme === 'dark' ? 'التبديل إلى الوضع الفاتح' : 'التبديل إلى الوضع الليلي'}
                 >
                   <span className={`sm:hidden text-sm`}>{uiTheme === 'dark' ? '🌙' : '☀️'}</span>
-                  <span className={`hidden sm:flex w-6 h-6 rounded-full items-center justify-center text-xs transition-all ${uiTheme === 'dark' ? 'bg-[#1E4E8C] text-white shadow' : 'text-slate-400'}`}>
+                  <span className={`hidden sm:flex w-6 h-6 rounded-full items-center justify-center text-xs transition-all ${uiTheme === 'dark' ? 'bg-[#0071E3] text-white shadow' : 'text-slate-400'}`}>
                     🌙
                   </span>
                   <span className={`hidden sm:flex w-6 h-6 rounded-full items-center justify-center text-xs transition-all ${uiTheme === 'light' ? 'bg-amber-400 text-slate-950 shadow' : 'text-slate-500'}`}>
@@ -793,11 +793,11 @@ export function renderClientHeader(ctx) {
                 }}
                 className={`flex items-center gap-2 rounded-2xl px-3 py-1.5 border transition ${
                   hCfg.forceDarkHeader
-                    ? 'bg-[#0D1528] border-[#1E2D4A] text-white'
-                    : 'bg-surface2 dark:bg-[#0D1528] border-line dark:border-[#1E2D4A] text-fg'
-                } focus-within:border-[#2F6BB3]`}
+                    ? 'bg-[#1D1D1F] border-[#424245] text-white'
+                    : 'bg-surface2 dark:bg-[#1D1D1F] border-line dark:border-[#424245] text-fg'
+                } focus-within:border-[#0071E3]`}
               >
-                <Search className="w-4 h-4 text-[#2F6BB3] shrink-0" />
+                <Search className="w-4 h-4 text-[#0066CC] shrink-0" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -822,7 +822,7 @@ export function renderClientHeader(ctx) {
                 )}
                 <button
                   type="submit"
-                  className="px-3 py-1 rounded-xl bg-[#1E4E8C] text-white text-[11px] font-extrabold shrink-0"
+                  className="px-3 py-1 rounded-xl bg-[#0071E3] text-white text-[11px] font-extrabold shrink-0"
                 >
                   بحث
                 </button>
@@ -836,7 +836,7 @@ export function renderClientHeader(ctx) {
               <button
                 type="button"
                 onClick={() => { setStoreStockFilter('ALL'); setClientTab('home'); }}
-                className={`px-3 py-1.5 rounded-full shrink-0 transition ${(clientTab === 'home' || clientTab === 'store') ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}
+                className={`px-3 py-1.5 rounded-full shrink-0 transition ${(clientTab === 'home' || clientTab === 'store') ? 'bg-[#0071E3] text-white' : 'bg-surface2 text-fg border border-line'}`}
               >
                 {hCfg.homeLabel}
               </button>
@@ -845,7 +845,7 @@ export function renderClientHeader(ctx) {
               <button
                 type="button"
                 onClick={() => { setStoreStockFilter('ALL'); setClientTab('search'); }}
-                className={`px-3 py-1.5 rounded-full shrink-0 transition ${clientTab === 'search' && storeStockFilter === 'ALL' ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}
+                className={`px-3 py-1.5 rounded-full shrink-0 transition ${clientTab === 'search' && storeStockFilter === 'ALL' ? 'bg-[#0071E3] text-white' : 'bg-surface2 text-fg border border-line'}`}
               >
                 {hCfg.productsLabel}
               </button>
@@ -1028,14 +1028,14 @@ export function renderRecentlyViewedStrip(ctx) {
                     setDetailImageIdx(0);
                     setSelectedDetailItem({ type: 'part', part: rp });
                   }}
-                  className="p-2.5 rounded-2xl bg-bg hover:border-[#1E4E8C] border border-line cursor-pointer transition flex flex-col justify-between gap-2 group"
+                  className="p-2.5 rounded-2xl bg-bg hover:border-[#0071E3] border border-line cursor-pointer transition flex flex-col justify-between gap-2 group"
                 >
                   <div className="h-20 rounded-xl bg-white p-1.5 flex items-center justify-center overflow-hidden">
                     <img src={rp.image || PART_IMAGES.screen} alt={rp.name} loading="lazy" className="max-h-full max-w-full object-contain group-hover:scale-105 transition" />
                   </div>
                   <div>
                     <div className="text-[11px] font-extrabold text-fg line-clamp-1">{rp.name}</div>
-                    <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8] font-mono mt-0.5">
+                    <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] font-mono mt-0.5">
                       {rpPrice.displayPrice.toLocaleString()} {rpPrice.currencySymbol}
                     </div>
                   </div>
@@ -1060,7 +1060,7 @@ export function renderHomeView(ctx) {
       return (
         <div className="max-w-[1380px] mx-auto px-4 sm:px-8 py-12 space-y-8 w-full max-w-[100vw] overflow-x-hidden text-center">
           <div className="inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-surface border border-line shadow-md">
-            <RefreshCw className="w-5 h-5 text-[#2F6BB3] animate-spin" />
+            <RefreshCw className="w-5 h-5 text-[#0066CC] animate-spin" />
             <span className="text-xs sm:text-sm font-black text-fg">جاري تحميل أحدث المنتجات والعروض...</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1147,7 +1147,7 @@ export function renderHomeView(ctx) {
       <div className="max-w-[1380px] mx-auto px-4 sm:px-8 py-5 sm:py-7 space-y-9 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {/* 1. ARCHITECTURAL HERO BANNER SHOWCASE + NON-OVERLAPPING CONTROLS + 4 TRUST PILLARS */}
         {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
-          <section className="rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1B2B4B] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
+          <section className="rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1D1D1F] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
             <div
               {...swipeProps(
                 () => setHeroAdIndex(prev => (prev + 1) % heroSlides.length),
@@ -1165,12 +1165,12 @@ export function renderHomeView(ctx) {
 
             {/* Sleek Non-Overlapping Slider Navigation Bar (Only shown when > 1 slide exists — NEVER covers ad text or photo!) */}
             {heroSlides.length > 1 && (
-              <div className="px-4 sm:px-8 py-2.5 bg-surface2/90 dark:bg-[#070E20] border-t border-line flex items-center justify-between gap-3">
+              <div className="px-4 sm:px-8 py-2.5 bg-surface2/90 dark:bg-[#1D1D1F] border-t border-line flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setHeroAdIndex(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
-                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
+                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
                     title="الإعلان السابق"
                   >
                     ›
@@ -1178,7 +1178,7 @@ export function renderHomeView(ctx) {
                   <button
                     type="button"
                     onClick={() => setHeroAdIndex(prev => (prev + 1) % heroSlides.length)}
-                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
+                    className="w-8 h-8 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line flex items-center justify-center font-black transition"
                     title="الإعلان التالي"
                   >
                     ‹
@@ -1196,8 +1196,8 @@ export function renderHomeView(ctx) {
                       onClick={() => setHeroAdIndex(idx)}
                       className={`h-2 rounded-full transition-all ${
                         idx === currentSlideIdx
-                          ? 'w-7 bg-[#1E4E8C]'
-                          : 'w-2 bg-slate-300 dark:bg-[#1E2D4A] hover:bg-[#2F6BB3]/60'
+                          ? 'w-7 bg-[#0071E3]'
+                          : 'w-2 bg-slate-300 dark:bg-[#424245] hover:bg-[#0071E3]/60'
                       }`}
                       title={sl.title || `شريحة ${idx + 1}`}
                     />
@@ -1207,10 +1207,10 @@ export function renderHomeView(ctx) {
             )}
 
             {/* 4 Trust Pillars Strip (Compact on Mobile) */}
-            <div className="border-t border-line bg-surface dark:bg-[#070D1D] px-3 sm:px-8 py-2.5 sm:py-3.5">
+            <div className="border-t border-line bg-surface dark:bg-[#161617] px-3 sm:px-8 py-2.5 sm:py-3.5">
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1E4E8C]/10 text-[#1E4E8C] dark:text-[#7FB0E8] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-5 h-5" />
                   </div>
                   <div>
@@ -1220,7 +1220,7 @@ export function renderHomeView(ctx) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1E4E8C]/10 text-[#1E4E8C] dark:text-[#7FB0E8] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
                     <Truck className="w-5 h-5" />
                   </div>
                   <div>
@@ -1230,7 +1230,7 @@ export function renderHomeView(ctx) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1E4E8C]/10 text-[#1E4E8C] dark:text-[#7FB0E8] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
                     <Shield className="w-5 h-5" />
                   </div>
                   <div>
@@ -1240,7 +1240,7 @@ export function renderHomeView(ctx) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#1E4E8C]/10 text-[#1E4E8C] dark:text-[#7FB0E8] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#0071E3]/10 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center shrink-0">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
@@ -1283,7 +1283,7 @@ export function renderHomeView(ctx) {
                         pendingScrollToProductsRef.current = true;
                         setClientTab('search');
                       }}
-                      className="hm-card group h-[76px] sm:h-[96px] p-1.5 sm:p-2.5 rounded-2xl bg-surface border border-line hover:border-[#2F6BB3] flex flex-col items-center justify-between text-center gap-1"
+                      className="hm-card group h-[76px] sm:h-[96px] p-1.5 sm:p-2.5 rounded-2xl bg-surface border border-line hover:border-[#0071E3] flex flex-col items-center justify-between text-center gap-1"
                     >
                       <div className="flex-1 w-full flex items-center justify-center overflow-hidden group-hover:scale-105 transition duration-300">
                         {useCustomImg ? (
@@ -1300,7 +1300,7 @@ export function renderHomeView(ctx) {
                           </div>
                         )}
                       </div>
-                      <div className="text-[10px] sm:text-xs font-extrabold text-fg group-hover:text-[#1E4E8C] dark:group-hover:text-[#7FB0E8] truncate w-full leading-tight">
+                      <div className="text-[10px] sm:text-xs font-extrabold text-fg group-hover:text-[#0066CC] dark:group-hover:text-[#2997FF] truncate w-full leading-tight">
                         {sc.label}
                       </div>
                     </button>
@@ -1332,7 +1332,7 @@ export function renderHomeView(ctx) {
                     pendingScrollToProductsRef.current = true;
                     setClientTab('search');
                   }}
-                  className="text-[11px] font-extrabold text-[#1E4E8C] dark:text-[#7FB0E8] hover:underline"
+                  className="text-[11px] font-extrabold text-[#0066CC] dark:text-[#2997FF] hover:underline"
                 >
                   عرض كل البراندات
                 </button>
@@ -1357,7 +1357,7 @@ export function renderHomeView(ctx) {
                         pendingScrollToProductsRef.current = true;
                         setClientTab('search');
                       }}
-                      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line hover:border-[#1E4E8C] shadow-2xs transition text-[11px] sm:text-xs font-extrabold group"
+                      className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] shadow-2xs transition text-[11px] sm:text-xs font-extrabold group"
                     >
                       {brImg ? (
                         <img
@@ -1368,7 +1368,7 @@ export function renderHomeView(ctx) {
                           className="w-5 h-5 rounded-full object-cover bg-white border border-line/60 shrink-0"
                         />
                       ) : (
-                        <span className="w-5 h-5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center text-[10px] font-black shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-[#0071E3]/15 text-[#0066CC] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center text-[10px] font-black shrink-0">
                           {cleanBrLabel.charAt(0)}
                         </span>
                       )}
@@ -1385,7 +1385,7 @@ export function renderHomeView(ctx) {
         {siteSettings.showHomeSourcing !== false && (
           <section
             onClick={openSourcing}
-            className="cursor-pointer rounded-2xl bg-gradient-to-l from-[#0B1F52] via-[#172554] to-[#1E1B4B] hover:from-[#163B6B] hover:to-[#312E81] text-white px-3.5 py-2.5 sm:px-5 sm:py-3.5 border border-[#2F6BB3]/45 shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3"
+            className="cursor-pointer rounded-2xl bg-gradient-to-l from-[#1D1D1F] via-[#1D1D1F] to-[#1D1D1F] hover:from-[#0077ED] hover:to-[#0066CC] text-white px-3.5 py-2.5 sm:px-5 sm:py-3.5 border border-[#0071E3]/45 shadow-md hover:shadow-lg transition-all flex items-center justify-between gap-3"
           >
             <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center text-lg sm:text-xl shrink-0">
@@ -1403,7 +1403,7 @@ export function renderHomeView(ctx) {
             </div>
             <button
               type="button"
-              className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white text-[#0F172A] hover:bg-amber-300 font-black text-[11px] sm:text-xs shadow transition whitespace-nowrap"
+              className="shrink-0 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-white text-[#1D1D1F] hover:bg-amber-300 font-black text-[11px] sm:text-xs shadow transition whitespace-nowrap"
             >
               اطلب منتجك ←
             </button>
@@ -1449,7 +1449,7 @@ export function renderHomeView(ctx) {
                   setStoreStockFilter('BEST_SELLERS');
                   setClientTab('search');
                 }}
-                className="px-4 py-2 rounded-xl bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line hover:border-[#1E4E8C] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
+                className="px-4 py-2 rounded-xl bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
               >
                 <span>عرض الكل</span>
                 <ChevronLeft className="w-4 h-4" />
@@ -1495,13 +1495,13 @@ export function renderHomeView(ctx) {
             <section key={bar.id} className="space-y-5">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-lg sm:text-2xl font-black text-fg flex items-center gap-2">
-                  <span className="text-[#1E4E8C]">✦</span>
+                  <span className="text-[#0066CC]">✦</span>
                   <span>{bar.title}</span>
                 </h3>
                 <button
                   type="button"
                   onClick={() => setClientTab('search')}
-                  className="px-4 py-2 rounded-xl bg-surface hover:bg-[#1E4E8C] text-fg hover:text-white border border-line hover:border-[#1E4E8C] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
+                  className="px-4 py-2 rounded-xl bg-surface hover:bg-[#0071E3] text-fg hover:text-white border border-line hover:border-[#0071E3] text-xs font-extrabold inline-flex items-center gap-1.5 transition"
                 >
                   <span>عرض الكل</span>
                   <ChevronLeft className="w-4 h-4" />
@@ -1519,11 +1519,11 @@ export function renderHomeView(ctx) {
 
         {/* 7. NEWSLETTER SUBSCRIPTION BANNER */}
         {siteSettings.showHomeNewsletter !== false && (
-          <section className="relative rounded-[26px] overflow-hidden bg-gradient-to-r from-[#04091A] via-[#0B1F52] to-[#06112E] text-white p-6 sm:p-9 border border-[#1E3A8A]/60 shadow-xl">
+          <section className="relative rounded-[26px] overflow-hidden bg-gradient-to-r from-[#1D1D1F] via-[#1D1D1F] to-[#1D1D1F] text-white p-6 sm:p-9 border border-[#0066CC]/60 shadow-xl">
             <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
               <div className="flex items-center gap-4 text-right">
-                <div className="w-14 h-14 rounded-2xl bg-[#1E4E8C]/25 border border-[#7FB0E8]/40 flex items-center justify-center shrink-0">
-                  <Sparkles className="w-7 h-7 text-[#7FB0E8]" />
+                <div className="w-14 h-14 rounded-2xl bg-[#0071E3]/25 border border-[#2997FF]/40 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-7 h-7 text-[#2997FF]" />
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-lg sm:text-2xl font-black text-white">اشترك في نشرتنا البريدية</h3>
@@ -1533,7 +1533,7 @@ export function renderHomeView(ctx) {
 
               <form
                 onSubmit={handleNewsletterSubscribe}
-                className="w-full lg:w-auto flex-1 max-w-md flex items-center bg-white/95 dark:bg-[#050B1C] p-1.5 rounded-2xl border border-white/20"
+                className="w-full lg:w-auto flex-1 max-w-md flex items-center bg-white/95 dark:bg-[#161617] p-1.5 rounded-2xl border border-white/20"
               >
                 <input
                   type="text"
@@ -1544,7 +1544,7 @@ export function renderHomeView(ctx) {
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-xs sm:text-sm transition shrink-0"
+                  className="px-6 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-xs sm:text-sm transition shrink-0"
                 >
                   اشترك الآن
                 </button>
@@ -1565,10 +1565,10 @@ export function renderStickyCartBar(ctx) {
   return (<button
       type="button"
       onClick={() => setCartDrawerOpen(true)}
-      className="fixed bottom-6 left-6 z-40 group flex items-center gap-3 bg-gradient-to-l from-[#060C1E] via-[#0F2356] to-[#1E4E8C] hover:from-[#1E4E8C] hover:to-[#163B6B] text-white p-3.5 rounded-full shadow-2xl border-2 border-[#7FB0E8]/70 hover:scale-105 transition-all duration-300"
+      className="fixed bottom-6 left-6 z-40 group flex items-center gap-3 bg-gradient-to-l from-[#1D1D1F] via-[#1D1D1F] to-[#0071E3] hover:from-[#0071E3] hover:to-[#0077ED] text-white p-3.5 rounded-full shadow-2xl border-2 border-[#2997FF]/70 hover:scale-105 transition-all duration-300"
       title="اضغط لفتح السلة ومراجعة الأصناف"
     >
-      <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-[#1E4E8C] text-white shadow-md">
+      <div className="relative flex items-center justify-center w-11 h-11 rounded-full bg-[#0071E3] text-white shadow-md">
         <ShoppingCart className="w-5 h-5 stroke-[2.5]" />
         <span className="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1 rounded-full bg-rose-600 text-white text-[11px] font-black flex items-center justify-center border-2 border-white shadow">
           {cartSummary.totalQty}
@@ -1676,8 +1676,8 @@ export function renderStorefront(ctx) {
               }}
               className={`shrink-0 px-4 py-2 rounded-full text-xs font-extrabold border transition ${
                 storeStockFilter === tab.id
-                  ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-md shadow-blue-600/25'
-                  : 'bg-surface text-fg border-line hover:border-[#2F6BB3]'
+                  ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-md shadow-blue-600/25'
+                  : 'bg-surface text-fg border-line hover:border-[#0071E3]'
               }`}
             >
               {tab.label}
@@ -1712,7 +1712,7 @@ export function renderStorefront(ctx) {
                 onClick={() => setMobileFiltersExpanded(prev => !prev)}
                 className={`sm:hidden px-2.5 py-1 rounded-full border text-[11px] font-extrabold flex items-center gap-1 transition ${
                   mobileFiltersExpanded
-                    ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
+                    ? 'bg-[#0071E3] text-white border-[#0071E3]'
                     : 'bg-surface2 text-fg border-line'
                 }`}
               >
@@ -1730,7 +1730,7 @@ export function renderStorefront(ctx) {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="ابحث باسم المنتج، الموديل، أو الكود..."
-                className="w-full pr-9 pl-12 py-2 sm:py-2.5 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#2F6BB3]"
+                className="w-full pr-9 pl-12 py-2 sm:py-2.5 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#0071E3]"
               />
               {searchQuery && (
                 <button
@@ -1749,7 +1749,7 @@ export function renderStorefront(ctx) {
                 const t = productsGridAnchorRef.current || storeGridTopRef.current;
                 if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-xs sm:text-sm shadow shadow-blue-600/20 transition shrink-0"
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-xs sm:text-sm shadow shadow-blue-600/20 transition shrink-0"
             >
               بحث
             </button>
@@ -1769,8 +1769,8 @@ export function renderStorefront(ctx) {
                   onClick={() => { setSelectedCategory('ALL'); setStorePage(1); }}
                   className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-extrabold border transition ${
                     selectedCategory === 'ALL'
-                      ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-                      : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
+                      ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                      : 'bg-surface2 text-fg border-line hover:border-[#0071E3]'
                   }`}
                 >
                   الكل
@@ -1789,8 +1789,8 @@ export function renderStorefront(ctx) {
                       }}
                       className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-extrabold border flex items-center gap-1.5 transition ${
                         isAct
-                          ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-sm'
-                          : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
+                          ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-sm'
+                          : 'bg-surface2 text-fg border-line hover:border-[#0071E3]'
                       }`}
                     >
                       <span className="w-4 h-4 flex items-center justify-center [&>svg]:w-full [&>svg]:h-full shrink-0">
@@ -1873,7 +1873,7 @@ export function renderStorefront(ctx) {
                       fetchSparePartsSliceOnDemand({ brand: nextBr, limit: 250 });
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#2F6BB3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">كل البراندات</option>
                   {publicBrands.map(br => (
@@ -1900,7 +1900,7 @@ export function renderStorefront(ctx) {
                       fetchSparePartsSliceOnDemand({ modelId: nextMid, limit: 200 });
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#2F6BB3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">
                     {selectedBrand === 'ALL'
@@ -1924,7 +1924,7 @@ export function renderStorefront(ctx) {
                 <select
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#2F6BB3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">كل التصنيفات</option>
                   {dynamicCategories.filter(c => c !== 'ALL').map(cat => (
@@ -1944,7 +1944,7 @@ export function renderStorefront(ctx) {
                 <select
                   value={storeSortBy}
                   onChange={e => setStoreSortBy(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#2F6BB3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="date_desc">الأحدث أولاً</option>
                   <option value="best_selling">الأكثر مبيعاً</option>
@@ -1976,8 +1976,8 @@ export function renderStorefront(ctx) {
                 onClick={() => setStorePriceRangeFilter(rk)}
                 className={`px-3 py-1 rounded-full border transition ${
                   storePriceRangeFilter === rk
-                    ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-                    : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
+                    ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                    : 'bg-surface2 text-fg border-line hover:border-[#0071E3]'
                 }`}
               >
                 {rLbl}
@@ -2012,7 +2012,7 @@ export function renderStorefront(ctx) {
                 type="button"
                 onClick={() => changeCols(1)}
                 className={`px-3 py-1 rounded-full text-[11px] font-extrabold transition flex items-center gap-1 ${
-                  mobileCols === 1 ? 'bg-[#1E4E8C] text-white' : 'text-muted'
+                  mobileCols === 1 ? 'bg-[#0071E3] text-white' : 'text-muted'
                 }`}
               >
                 <span>☰</span>
@@ -2022,7 +2022,7 @@ export function renderStorefront(ctx) {
                 type="button"
                 onClick={() => changeCols(2)}
                 className={`px-3 py-1 rounded-full text-[11px] font-extrabold transition flex items-center gap-1 ${
-                  mobileCols === 2 ? 'bg-[#1E4E8C] text-white' : 'text-muted'
+                  mobileCols === 2 ? 'bg-[#0071E3] text-white' : 'text-muted'
                 }`}
               >
                 <span>▦</span>
@@ -2037,19 +2037,19 @@ export function renderStorefront(ctx) {
         <div className="flex items-center justify-between gap-2 sm:hidden px-1">
           <span className="text-xs text-muted font-bold">
             المنتجات: <span className="text-accent-text font-black">{totalItems}</span>
-            {selectedCategory !== 'ALL' && <span className="mr-1.5 text-[11px] text-[#1E4E8C] font-extrabold">• {selectedCategory}</span>}
+            {selectedCategory !== 'ALL' && <span className="mr-1.5 text-[11px] text-[#0066CC] font-extrabold">• {selectedCategory}</span>}
             {selectedBrand !== 'ALL' && <span className="mr-1.5 text-[11px] text-emerald-500 font-extrabold">• {String(selectedBrand).replace(/^OR\s*-\s*/i, '')}</span>}
           </span>
           <div className="flex items-center bg-surface2 rounded-full p-0.5 border border-line gap-0.5">
-            <button type="button" onClick={() => changeCols(1)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 1 ? 'bg-[#1E4E8C] text-white' : 'text-muted'}`}>☰</button>
-            <button type="button" onClick={() => changeCols(2)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 2 ? 'bg-[#1E4E8C] text-white' : 'text-muted'}`}>▦</button>
+            <button type="button" onClick={() => changeCols(1)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 1 ? 'bg-[#0071E3] text-white' : 'text-muted'}`}>☰</button>
+            <button type="button" onClick={() => changeCols(2)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 2 ? 'bg-[#0071E3] text-white' : 'text-muted'}`}>▦</button>
           </div>
         </div>
 
         {/* Product Grid (4 Columns on Desktop matching Reference Mockups!) */}
         {totalItems === 0 ? (
           <div className="bg-surface rounded-3xl p-12 text-center border border-line space-y-3">
-            <Search className="w-12 h-12 text-[#2F6BB3] mx-auto" />
+            <Search className="w-12 h-12 text-[#0066CC] mx-auto" />
             <h3 className="text-base font-black text-fg">
               {storeStockFilter === 'FAVORITES'
                 ? 'قائمة المفضلة فارغة حالياً — اضغط على رمز القلب ❤️ على أي منتج لحفظه هنا'
@@ -2057,7 +2057,7 @@ export function renderStorefront(ctx) {
             </h3>
             <button
               onClick={clearAllStoreFilters}
-              className="px-6 py-2.5 rounded-full bg-[#1E4E8C] text-white text-xs font-extrabold shadow-md shadow-blue-600/25"
+              className="px-6 py-2.5 rounded-full bg-[#0071E3] text-white text-xs font-extrabold shadow-md shadow-blue-600/25"
             >
               عرض كل المنتجات
             </button>
@@ -2073,7 +2073,7 @@ export function renderStorefront(ctx) {
                 <button
                   type="button"
                   onClick={() => setStoreExtraEightShown(true)}
-                  className="px-7 py-3 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-blue-600/25 transition flex items-center gap-2"
+                  className="px-7 py-3 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-blue-600/25 transition flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   <span>إظهار المزيد (+{Math.min(LOAD_MORE_STEP, totalItems - FIRST_PAGE_INITIAL)} منتجات)</span>
@@ -2092,7 +2092,7 @@ export function renderStorefront(ctx) {
                     type="button"
                     disabled={safePage <= 1}
                     onClick={() => setStorePage(p => Math.max(1, p - 1))}
-                    className="px-4 py-2 rounded-full border border-line bg-surface2 hover:border-[#2F6BB3] text-fg text-xs font-extrabold disabled:opacity-35"
+                    className="px-4 py-2 rounded-full border border-line bg-surface2 hover:border-[#0071E3] text-fg text-xs font-extrabold disabled:opacity-35"
                   >
                     السابق
                   </button>
@@ -2112,8 +2112,8 @@ export function renderStorefront(ctx) {
                           }}
                           className={`w-9 h-9 rounded-full text-xs font-extrabold transition ${
                             safePage === p
-                              ? 'bg-[#1E4E8C] text-white shadow'
-                              : 'bg-surface border border-line text-fg hover:border-[#2F6BB3]'
+                              ? 'bg-[#0071E3] text-white shadow'
+                              : 'bg-surface border border-line text-fg hover:border-[#0071E3]'
                           }`}
                         >
                           {p}
@@ -2128,7 +2128,7 @@ export function renderStorefront(ctx) {
                       setStoreExtraEightShown(true);
                       setStorePage(p => Math.min(totalPages, p + 1));
                     }}
-                    className="px-5 py-2 rounded-full bg-[#1E4E8C] text-white text-xs font-extrabold disabled:opacity-35 transition"
+                    className="px-5 py-2 rounded-full bg-[#0071E3] text-white text-xs font-extrabold disabled:opacity-35 transition"
                   >
                     الصفحة التالية ←
                   </button>
@@ -2154,12 +2154,12 @@ export function renderFreeShippingProgressBar(ctx) {
     return (
       <div className={`p-3.5 rounded-2xl border transition-all ${
         isUnlocked
-          ? 'bg-[#1E4E8C]/10 border-[#2F6BB3]/40 text-fg'
+          ? 'bg-[#0071E3]/10 border-[#0071E3]/40 text-fg'
           : 'bg-surface2 border-line text-fg'
       } space-y-2`}>
         <div className="flex items-center justify-between gap-2 text-xs font-extrabold">
           {isUnlocked ? (
-            <div className="flex items-center gap-1.5 text-[#1E4E8C] dark:text-[#7FB0E8]">
+            <div className="flex items-center gap-1.5 text-[#0066CC] dark:text-[#2997FF]">
               <span>🎉</span>
               <span>
                 {cartSummary.isDiamondFreeShip
@@ -2173,15 +2173,15 @@ export function renderFreeShippingProgressBar(ctx) {
             <div className="flex items-center gap-1.5">
               <span>🚚</span>
               <span>
-                أضف منتجات بقيمة <span className="text-[#1E4E8C] dark:text-[#7FB0E8] font-black">{formatMoney(rem)}</span> فقط للحصول على <span className="text-[#1E4E8C] dark:text-[#7FB0E8] font-black">شحن مجاني!</span>
+                أضف منتجات بقيمة <span className="text-[#0066CC] dark:text-[#2997FF] font-black">{formatMoney(rem)}</span> فقط للحصول على <span className="text-[#0066CC] dark:text-[#2997FF] font-black">شحن مجاني!</span>
               </span>
             </div>
           )}
-          <span className="font-mono text-[11px] font-black text-[#1E4E8C] dark:text-[#7FB0E8] shrink-0">{isUnlocked ? '100%' : `${pct}%`}</span>
+          <span className="font-mono text-[11px] font-black text-[#0066CC] dark:text-[#2997FF] shrink-0">{isUnlocked ? '100%' : `${pct}%`}</span>
         </div>
         <div className="w-full h-2.5 bg-bg rounded-full overflow-hidden border border-line">
           <div
-            className="h-full transition-all duration-500 rounded-full bg-gradient-to-r from-[#1E4E8C] to-[#7FB0E8]"
+            className="h-full transition-all duration-500 rounded-full bg-gradient-to-r from-[#0071E3] to-[#2997FF]"
             style={{ width: `${Math.max(6, isUnlocked ? 100 : pct)}%` }}
           />
         </div>
@@ -2197,13 +2197,13 @@ export function renderSmartCrossSellBundles(ctx) {
     const discPct = Number(siteSettings.crossSellBundleDiscountPct) || 10;
 
     return (
-      <div className="p-3.5 rounded-2xl bg-surface2/70 border border-[#2F6BB3]/35 space-y-2.5">
+      <div className="p-3.5 rounded-2xl bg-surface2/70 border border-[#0071E3]/35 space-y-2.5">
         <div className="flex items-center justify-between gap-2">
           <div className="text-xs font-extrabold text-fg flex items-center gap-1.5">
-            <Sparkles className="w-4 h-4 text-[#2F6BB3] shrink-0" />
+            <Sparkles className="w-4 h-4 text-[#0066CC] shrink-0" />
             <span>🎁 باقة مقترحة تكمل طلبك بخصم خاص (-{discPct}%)</span>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[10px] font-black">
+          <span className="px-2.5 py-0.5 rounded-full bg-[#0071E3] text-white text-[10px] font-black">
             خصم فوري بالسلة ⚡
           </span>
         </div>
@@ -2232,13 +2232,13 @@ export function renderSmartCrossSellBundles(ctx) {
                   <div className="min-w-0">
                     <div className="text-xs font-extrabold text-fg truncate">{sug.name}</div>
                     <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <span className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8]">
+                      <span className="text-xs font-black text-[#0066CC] dark:text-[#2997FF]">
                         {formatMoney(bundledEgp)}
                       </span>
                       <span className="text-[10px] text-muted line-through font-mono">
                         {formatMoney(pInfo.baseEgpPrice)}
                       </span>
-                      <span className="px-1.5 py-0.5 rounded bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] text-[9px] font-black">
+                      <span className="px-1.5 py-0.5 rounded bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] text-[9px] font-black">
                         وفّر {formatMoney(savedEgp)}
                       </span>
                     </div>
@@ -2247,7 +2247,7 @@ export function renderSmartCrossSellBundles(ctx) {
                 <button
                   type="button"
                   onClick={() => handleAddCrossSellBundleItem(sug)}
-                  className="px-3.5 py-2 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-[11px] font-black shrink-0 flex items-center gap-1 shadow-sm transition"
+                  className="px-3.5 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-[11px] font-black shrink-0 flex items-center gap-1 shadow-sm transition"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>أضف بـ {formatMoney(bundledEgp)}</span>
@@ -2287,7 +2287,7 @@ export function renderCashierImpulseShelf(ctx) {
             return (
               <div
                 key={imp.id}
-                className="p-2.5 rounded-xl bg-surface border border-line hover:border-[#2F6BB3] flex flex-col justify-between gap-2 transition"
+                className="p-2.5 rounded-xl bg-surface border border-line hover:border-[#0071E3] flex flex-col justify-between gap-2 transition"
               >
                 <div className="flex items-center gap-2">
                   <img
@@ -2312,7 +2312,7 @@ export function renderCashierImpulseShelf(ctx) {
                       updateCartQty(imp.id, 1);
                       showToast(`🛒 تمت إضافة "${imp.name}" لطلبك من رف الكاشير!`, 'success');
                     }}
-                    className="px-3 py-1 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-[10px] font-black transition"
+                    className="px-3 py-1 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white text-[10px] font-black transition"
                   >
                     + أضف
                   </button>
@@ -2334,14 +2334,14 @@ export function renderCartDrawer(ctx) {
         <div className="w-full max-w-md bg-surface text-fg h-full shadow-2xl border-r border-line flex flex-col justify-between p-5" onClick={e => e.stopPropagation()}>
           <div className="flex items-center justify-between border-b border-line pb-3.5">
             <h3 className="text-base font-black text-fg flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] flex items-center justify-center">
                 <ShoppingCart className="w-4 h-4" />
               </div>
               <span>سلة المشتريات ({cartSummary.totalQty} قطع)</span>
             </h3>
             <button
               onClick={() => setCartDrawerOpen(false)}
-              className="w-8 h-8 rounded-full bg-surface2 hover:bg-[#1E4E8C] text-muted hover:text-white flex items-center justify-center transition"
+              className="w-8 h-8 rounded-full bg-surface2 hover:bg-[#0071E3] text-muted hover:text-white flex items-center justify-center transition"
             >
               <X className="w-4 h-4" />
             </button>
@@ -2351,14 +2351,14 @@ export function renderCartDrawer(ctx) {
             {renderFreeShippingProgressBar()}
 
             {spinWheelState?.spun && spinWheelState?.prize && !appliedPromo && (
-              <div className="p-3 rounded-2xl bg-[#1E4E8C]/10 border border-[#2F6BB3]/35 flex items-center justify-between gap-2 text-xs">
+              <div className="p-3 rounded-2xl bg-[#0071E3]/10 border border-[#0071E3]/35 flex items-center justify-between gap-2 text-xs">
                 <span className="font-bold text-fg">
                   🎁 هديتك من العجلة جاهزة: <b>{spinWheelState.prize.shortLabel}</b>
                 </span>
                 <button
                   type="button"
                   onClick={() => applySpinPrizePromo(spinWheelState.prize, false)}
-                  className="px-3 py-1 rounded-full bg-[#1E4E8C] text-white font-black text-[11px]"
+                  className="px-3 py-1 rounded-full bg-[#0071E3] text-white font-black text-[11px]"
                 >
                   تطبيق الهدية
                 </button>
@@ -2386,17 +2386,17 @@ export function renderCartDrawer(ctx) {
                           </span>
                         )}
                         {item.bundlePct > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[9px] font-black">
+                          <span className="px-2 py-0.5 rounded-full bg-[#0071E3] text-white text-[9px] font-black">
                             🎁 خصم الباقة -{item.bundlePct}%
                           </span>
                         )}
                         {item.qtyDiscountPct > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] text-[9px] font-black">
+                          <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] text-[9px] font-black">
                             🏷️ خصم الكميات -{item.qtyDiscountPct}%
                           </span>
                         )}
                         {item.cashbackEnabled && (
-                          <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] border border-[#2F6BB3]/30 text-[9px] font-black">
+                          <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] border border-[#0071E3]/30 text-[9px] font-black">
                             💰 كاش باك {item.cashbackPct}% (+{formatMoney(item.lineCashbackBase)})
                           </span>
                         )}
@@ -2411,7 +2411,7 @@ export function renderCartDrawer(ctx) {
                     <div className="flex items-center gap-1 bg-surface border border-line rounded-full p-1 shrink-0">
                       <button
                         onClick={() => updateCartQty(item.part.id, 1)}
-                        className="w-7 h-7 rounded-full bg-[#1E4E8C] hover:bg-[#2F6BB3] text-white flex items-center justify-center transition"
+                        className="w-7 h-7 rounded-full bg-[#0071E3] hover:bg-[#0071E3] text-white flex items-center justify-center transition"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -2443,7 +2443,7 @@ export function renderCartDrawer(ctx) {
                       <button
                         type="button"
                         onClick={() => updateCartQty(item.part.id, 1)}
-                        className="px-2.5 py-1 rounded-full bg-[#1E4E8C]/15 hover:bg-[#1E4E8C] text-[#1E4E8C] dark:text-[#7FB0E8] hover:text-white font-black shrink-0 transition"
+                        className="px-2.5 py-1 rounded-full bg-[#0071E3]/15 hover:bg-[#0071E3] text-[#0066CC] dark:text-[#2997FF] hover:text-white font-black shrink-0 transition"
                       >
                         + زوّد قطعة ووفّر
                       </button>
@@ -2459,7 +2459,7 @@ export function renderCartDrawer(ctx) {
 
           <div className="border-t border-line pt-3.5 space-y-2.5">
             {(cartSummary.bundleDiscountTotalBase > 0 || cartSummary.qtyDiscountTotalBase > 0) && (
-              <div className="p-2.5 rounded-2xl bg-[#1E4E8C]/10 border border-[#2F6BB3]/30 text-[11px] font-bold text-[#1E4E8C] dark:text-[#7FB0E8] space-y-0.5">
+              <div className="p-2.5 rounded-2xl bg-[#0071E3]/10 border border-[#0071E3]/30 text-[11px] font-bold text-[#0066CC] dark:text-[#2997FF] space-y-0.5">
                 {cartSummary.bundleDiscountTotalBase > 0 && (
                   <div className="flex justify-between">
                     <span>🎁 وفّرت من خصم الباقة الذكية:</span>
@@ -2475,14 +2475,14 @@ export function renderCartDrawer(ctx) {
               </div>
             )}
             {cartSummary.expectedCashbackBase > 0 && (
-              <div className="p-2.5 rounded-2xl bg-surface2 border border-[#2F6BB3]/35 flex items-center justify-between text-xs font-extrabold text-[#1E4E8C] dark:text-[#7FB0E8]">
+              <div className="p-2.5 rounded-2xl bg-surface2 border border-[#0071E3]/35 flex items-center justify-between text-xs font-extrabold text-[#0066CC] dark:text-[#2997FF]">
                 <span>💰 كاش باك يُضاف لمحفظتك فور الاستلام:</span>
                 <span>+{formatMoney(cartSummary.expectedCashbackBase)}</span>
               </div>
             )}
             <div className="flex justify-between items-baseline text-sm font-black text-fg px-1">
               <span>إجمالي السلة الصافي:</span>
-              <span className="text-lg font-black text-[#1E4E8C] dark:text-[#7FB0E8] font-mono">{formatMoney(cartSummary.subtotalBase)}</span>
+              <span className="text-lg font-black text-[#0066CC] dark:text-[#2997FF] font-mono">{formatMoney(cartSummary.subtotalBase)}</span>
             </div>
             <button
               onClick={() => {
@@ -2493,7 +2493,7 @@ export function renderCartDrawer(ctx) {
                   setClientTab('checkout');
                 }
               }}
-              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-[#163B6B] hover:from-[#2F6BB3] hover:to-[#1E4E8C] text-white text-xs sm:text-sm font-black shadow-[0_8px_22px_rgba(37,99,235,0.38)] transition"
+              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#0071E3] to-[#0077ED] hover:from-[#0071E3] hover:to-[#0071E3] text-white text-xs sm:text-sm font-black shadow-[0_8px_22px_rgba(37,99,235,0.38)] transition"
             >
               إتمام الطلب والدفع ←
             </button>
@@ -2671,10 +2671,10 @@ export function renderClientFooter(ctx, isPreview = false) {
     const forceDark = fCfg.footerTheme === 'dark';
     const forceLight = fCfg.footerTheme === 'light';
     const ftrWrapCls = forceDark
-      ? 'bg-[#040711] text-white border-[#16223B]'
+      ? 'bg-[#161617] text-white border-[#38383A]'
       : forceLight
       ? 'bg-white text-slate-900 border-slate-200/80'
-      : 'bg-white dark:bg-[#040711] text-fg border-slate-200/80 dark:border-[#16223B]';
+      : 'bg-white dark:bg-[#161617] text-fg border-slate-200/80 dark:border-[#38383A]';
     const mutedCls = forceDark ? 'text-slate-400' : forceLight ? 'text-slate-600' : 'text-muted';
     const titleCls = forceDark ? 'text-white' : forceLight ? 'text-slate-900' : 'text-fg';
 
@@ -2684,7 +2684,7 @@ export function renderClientFooter(ctx, isPreview = false) {
         className={`${isPreview ? '' : 'mt-12'} ${ftrWrapCls} border-t pt-12 ${isPreview ? 'pb-6' : 'pb-24 sm:pb-20'} relative`}
       >
         <div className="max-w-[1380px] mx-auto px-4 sm:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-slate-200/80 dark:border-[#16223B]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-slate-200/80 dark:border-[#38383A]">
             {/* Column 1: معلومات التواصل */}
             {fCfg.showContactCol && (
               <div className="space-y-3">
@@ -2692,19 +2692,19 @@ export function renderClientFooter(ctx, isPreview = false) {
                 <div className={`space-y-2.5 text-xs font-bold ${mutedCls}`}>
                   {(fCfg.customFooterPhone || siteSettings.whatsappNumber) && (
                     <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-[#1E4E8C] shrink-0" />
+                      <Phone className="w-4 h-4 text-[#0066CC] shrink-0" />
                       <span className="font-mono" dir="ltr">{fCfg.customFooterPhone || siteSettings.whatsappNumber}</span>
                     </div>
                   )}
                   {(fCfg.customFooterHours || siteSettings.workingHours) && (
                     <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-[#1E4E8C] shrink-0" />
+                      <Clock className="w-4 h-4 text-[#0066CC] shrink-0" />
                       <span>{fCfg.customFooterHours || siteSettings.workingHours}</span>
                     </div>
                   )}
                   {fCfg.footerLocationText && (
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-[#1E4E8C] shrink-0" />
+                      <MapPin className="w-4 h-4 text-[#0066CC] shrink-0" />
                       <span>{fCfg.footerLocationText}</span>
                     </div>
                   )}
@@ -2718,18 +2718,18 @@ export function renderClientFooter(ctx, isPreview = false) {
                 <h4 className={`text-sm font-black ${titleCls}`}>{fCfg.paymentsColTitle}</h4>
                 <div className="flex flex-wrap items-center gap-2" dir="ltr">
                   {fCfg.showBadgeVisa && (
-                    <span className="h-8 px-3 rounded-lg bg-surface2 dark:bg-[#0B1224] border border-line text-[11px] font-black tracking-wider text-[#163B6B] dark:text-[#7FB0E8] inline-flex items-center justify-center">
+                    <span className="h-8 px-3 rounded-lg bg-surface2 dark:bg-[#1D1D1F] border border-line text-[11px] font-black tracking-wider text-[#004F9F] dark:text-[#2997FF] inline-flex items-center justify-center">
                       VISA
                     </span>
                   )}
                   {fCfg.showBadgeMastercard && (
-                    <span className="h-8 px-2.5 rounded-lg bg-surface2 dark:bg-[#0B1224] border border-line inline-flex items-center justify-center" title="Mastercard">
+                    <span className="h-8 px-2.5 rounded-lg bg-surface2 dark:bg-[#1D1D1F] border border-line inline-flex items-center justify-center" title="Mastercard">
                       <span className="w-3.5 h-3.5 rounded-full bg-[#EB001B] inline-block" />
                       <span className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] -ml-1.5 inline-block opacity-90" />
                     </span>
                   )}
                   {fCfg.showBadgeApplePay && (
-                    <span className="h-8 px-2.5 rounded-lg bg-surface2 dark:bg-[#0B1224] border border-line text-[11px] font-black text-fg inline-flex items-center gap-1" title="Apple Pay">
+                    <span className="h-8 px-2.5 rounded-lg bg-surface2 dark:bg-[#1D1D1F] border border-line text-[11px] font-black text-fg inline-flex items-center gap-1" title="Apple Pay">
                       <svg className="w-3.5 h-3.5 fill-current shrink-0" viewBox="0 0 24 24">
                         <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
                       </svg>
@@ -2762,28 +2762,28 @@ export function renderClientFooter(ctx, isPreview = false) {
                 <ul className={`space-y-2 text-xs font-bold ${mutedCls}`}>
                   {fCfg.showWarrantyLink && (
                     <li>
-                      <button type="button" onClick={() => setWarrantyModalOpen(true)} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => setWarrantyModalOpen(true)} className="hover:text-[#0066CC] transition">
                         فحص الضمان بالرقم
                       </button>
                     </li>
                   )}
                   {fCfg.showReturnPolicyLink && (
                     <li>
-                      <button type="button" onClick={() => showToast(`${siteSettings.returnPolicyTitle}: ${siteSettings.returnPolicyText}`, 'info')} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => showToast(`${siteSettings.returnPolicyTitle}: ${siteSettings.returnPolicyText}`, 'info')} className="hover:text-[#0066CC] transition">
                         سياسة الاسترجاع
                       </button>
                     </li>
                   )}
                   {fCfg.showTermsLink && (
                     <li>
-                      <button type="button" onClick={() => showToast(`${siteSettings.termsTitle}: ${siteSettings.termsText}`, 'info')} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => showToast(`${siteSettings.termsTitle}: ${siteSettings.termsText}`, 'info')} className="hover:text-[#0066CC] transition">
                         شروط الاستخدام والضمان
                       </button>
                     </li>
                   )}
                   {fCfg.showShippingPolicyLink && (
                     <li>
-                      <button type="button" onClick={() => showToast(`${siteSettings.deliveryPolicyTitle}: ${siteSettings.deliveryPolicyText}`, 'info')} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => showToast(`${siteSettings.deliveryPolicyTitle}: ${siteSettings.deliveryPolicyText}`, 'info')} className="hover:text-[#0066CC] transition">
                         سياسة الشحن والتوصيل
                       </button>
                     </li>
@@ -2799,42 +2799,42 @@ export function renderClientFooter(ctx, isPreview = false) {
                 <ul className={`space-y-2 text-xs font-bold ${mutedCls}`}>
                   {fCfg.showLinkHome && (
                     <li>
-                      <button type="button" onClick={() => { setStoreStockFilter('ALL'); setClientTab('home'); }} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => { setStoreStockFilter('ALL'); setClientTab('home'); }} className="hover:text-[#0066CC] transition">
                         الرئيسية
                       </button>
                     </li>
                   )}
                   {fCfg.showLinkProducts && (
                     <li>
-                      <button type="button" onClick={() => { setStoreStockFilter('ALL'); setClientTab('search'); }} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => { setStoreStockFilter('ALL'); setClientTab('search'); }} className="hover:text-[#0066CC] transition">
                         المنتجات
                       </button>
                     </li>
                   )}
                   {fCfg.showLinkBestSellers && (
                     <li>
-                      <button type="button" onClick={() => { setStoreStockFilter('BEST_SELLERS'); setClientTab('search'); }} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => { setStoreStockFilter('BEST_SELLERS'); setClientTab('search'); }} className="hover:text-[#0066CC] transition">
                         الأكثر مبيعاً
                       </button>
                     </li>
                   )}
                   {fCfg.showLinkOffers && (
                     <li>
-                      <button type="button" onClick={() => { setStoreStockFilter('DISCOUNTS'); setClientTab('search'); }} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => { setStoreStockFilter('DISCOUNTS'); setClientTab('search'); }} className="hover:text-[#0066CC] transition">
                         العروض والخصومات
                       </button>
                     </li>
                   )}
                   {fCfg.showLinkFavorites && (
                     <li>
-                      <button type="button" onClick={() => { setStoreStockFilter('FAVORITES'); setClientTab('search'); }} className="hover:text-[#2F6BB3] transition">
+                      <button type="button" onClick={() => { setStoreStockFilter('FAVORITES'); setClientTab('search'); }} className="hover:text-[#0066CC] transition">
                         المفضلة ({favoritePartIds.length})
                       </button>
                     </li>
                   )}
                   {fCfg.customFooterLinkLabel && fCfg.customFooterLinkUrl && (
                     <li>
-                      <a href={fCfg.customFooterLinkUrl} target="_blank" rel="noopener noreferrer" className="text-[#1E4E8C] dark:text-[#7FB0E8] hover:underline">
+                      <a href={fCfg.customFooterLinkUrl} target="_blank" rel="noopener noreferrer" className="text-[#0066CC] dark:text-[#2997FF] hover:underline">
                         {fCfg.customFooterLinkLabel}
                       </a>
                     </li>
@@ -2864,7 +2864,7 @@ export function renderClientFooter(ctx, isPreview = false) {
           {/* Bottom Copyright Bar (Centered / Spaced Cleanly So Floating Widgets Never Overlap!) */}
           <div className={`pt-6 flex flex-wrap items-center justify-between gap-4 text-xs ${mutedCls}`}>
             <div className={`font-extrabold ${titleCls}`}>
-              {fCfg.bottomSloganPrefix} <span className="text-[#1E4E8C] dark:text-[#2F6BB3]">{siteSettings.storeName || 'ELZOGHBI'}</span>
+              {fCfg.bottomSloganPrefix} <span className="text-[#0066CC] dark:text-[#0066CC]">{siteSettings.storeName || 'ELZOGHBI'}</span>
             </div>
 
             <div className="flex items-center gap-3">
@@ -2878,7 +2878,7 @@ export function renderClientFooter(ctx, isPreview = false) {
               <button
                 type="button"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="w-9 h-9 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white flex items-center justify-center shadow-md shadow-blue-600/30 transition"
+                className="w-9 h-9 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white flex items-center justify-center shadow-md shadow-blue-600/30 transition"
                 title="الصعود لأعلى الصفحة"
               >
                 ↑

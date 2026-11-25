@@ -215,14 +215,14 @@ function PhoneCard(ctx, phone, opts = {}) {
     window.scrollTo({ top: 0 });
   };
   return (
-    <div key={phone.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#2F6BB3] transition group">
-      <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="relative bg-white dark:bg-[#0D1528] aspect-[4/3] flex items-center justify-center overflow-hidden">
+    <div key={phone.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#0071E3] transition group">
+      <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="relative bg-white dark:bg-[#1D1D1F] aspect-[4/3] flex items-center justify-center overflow-hidden">
         {phone.images && phone.images[0] ? <img src={phone.images[0]} alt={phone.name} loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-300" /> : <Smartphone className="w-12 h-12 text-muted" />}
-        <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[10px] font-black">{phone.brand}</span>
+        <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#0071E3] text-white text-[10px] font-black">{phone.brand}</span>
         {opts.badgeText && <span className="absolute top-2 end-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black">{opts.badgeText}</span>}
       </button>
       <div className="p-3.5 flex flex-col gap-2 flex-1">
-        <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="text-start font-black text-fg leading-snug hover:text-[#1E4E8C]">{phone.name}</button>
+        <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="text-start font-black text-fg leading-snug hover:text-[#0066CC]">{phone.name}</button>
         <div className="flex flex-wrap gap-1.5 text-[10px] font-bold text-muted">
           {phone.camera ? <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-surface2 border border-line"><Camera className="w-3 h-3" /> {phone.camera} ميجا</span> : null}
           {phone.battery ? <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-surface2 border border-line"><BatteryFull className="w-3 h-3" /> {Number(phone.battery).toLocaleString('en-US')}</span> : null}
@@ -237,13 +237,13 @@ function PhoneCard(ctx, phone, opts = {}) {
           <div className="flex items-end justify-between">
             <div>
               <div className="text-[10px] font-bold text-muted">سعر السوق الاسترشادي</div>
-              <div className="text-lg font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{formatMoney(phone.price || 0)}</div>
+              <div className="text-lg font-black text-[#0066CC] dark:text-[#2997FF]">{formatMoney(phone.price || 0)}</div>
             </div>
             {phone.priceDate ? <div className="text-[10px] text-muted font-bold">آخر مراجعة: {phone.priceDate}</div> : null}
           </div>
           <ValueBadge score={phone.valueScore} />
           <div className="flex gap-1.5 pt-1">
-            <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="flex-1 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-black transition">التفاصيل</button>
+            <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="flex-1 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-black transition">التفاصيل</button>
             <button type="button" onClick={() => opts.onToggleCompare && opts.onToggleCompare(phone.id)} className={`px-3 py-2 rounded-xl text-xs font-black border transition ${inCompare ? 'bg-slate-600 text-white border-slate-600' : 'bg-surface2 text-fg border-line hover:border-slate-400'}`} title="أضف للمقارنة"><Scale className="w-4 h-4" /></button>
             <button type="button" onClick={() => go('phone', { phoneId: phone.id, alertOpen: true })} className="px-3 py-2 rounded-xl bg-surface2 text-fg border border-line hover:border-amber-400 text-xs font-black transition" title="نبّهني عند نزول السعر"><Bell className="w-4 h-4" /></button>
           </div>
@@ -443,7 +443,7 @@ export function renderKaramboPage(ctx) {
             <button
               type="button"
               onClick={() => go('hub')}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black border transition ${page === 'hub' ? 'bg-white text-[#163B6B] border-white shadow' : 'bg-white/15 hover:bg-white/25 text-white border-white/30'}`}
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black border transition ${page === 'hub' ? 'bg-white text-[#004F9F] border-white shadow' : 'bg-white/15 hover:bg-white/25 text-white border-white/30'}`}
             >
               <LayoutGrid className="w-4 h-4" /> كل الخدمات
             </button>
@@ -462,7 +462,7 @@ export function renderKaramboPage(ctx) {
       <div className="lg:hidden bg-surface border-b border-line px-3 py-2.5 sticky top-0 z-30 shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[11px] font-black text-muted">خدمات {cfg.title} ({enabledServices.length})</span>
-          <button type="button" onClick={() => set({ mobileNavOpen: !ui.mobileNavOpen })} className="text-[11px] font-black text-[#1E4E8C]">
+          <button type="button" onClick={() => set({ mobileNavOpen: !ui.mobileNavOpen })} className="text-[11px] font-black text-[#0066CC]">
             {ui.mobileNavOpen ? 'إغلاق القائمة ▲' : 'عرض الكل بالصور ▼'}
           </button>
         </div>
@@ -472,7 +472,7 @@ export function renderKaramboPage(ctx) {
               const Icon = ICONS[s.icon] || Sparkles;
               const active = page === s.id;
               return (
-                <button key={s.id} type="button" onClick={() => { go(s.id, { mobileNavOpen: false }); }} className={`flex items-center gap-2 p-2 rounded-2xl border text-start transition ${active ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow' : 'bg-surface2 border-line text-fg'}`}>
+                <button key={s.id} type="button" onClick={() => { go(s.id, { mobileNavOpen: false }); }} className={`flex items-center gap-2 p-2 rounded-2xl border text-start transition ${active ? 'bg-[#0071E3] text-white border-[#0071E3] shadow' : 'bg-surface2 border-line text-fg'}`}>
                   <span className={`w-8 h-8 rounded-xl ${active ? 'bg-white/20' : s.color} flex items-center justify-center shrink-0`}><Icon className="w-4 h-4 text-white" /></span>
                   <span className="text-[11px] font-black leading-tight line-clamp-2">{s.title}</span>
                 </button>
@@ -485,7 +485,7 @@ export function renderKaramboPage(ctx) {
               const Icon = ICONS[s.icon] || Sparkles;
               const active = page === s.id;
               return (
-                <button key={s.id} type="button" onClick={() => go(s.id)} className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl border text-[11px] font-black transition ${active ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow' : 'bg-surface2 border-line text-fg'}`}>
+                <button key={s.id} type="button" onClick={() => go(s.id)} className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-2xl border text-[11px] font-black transition ${active ? 'bg-[#0071E3] text-white border-[#0071E3] shadow' : 'bg-surface2 border-line text-fg'}`}>
                   <span className={`w-6 h-6 rounded-lg ${active ? 'bg-white/20' : s.color} flex items-center justify-center`}><Icon className="w-3.5 h-3.5 text-white" /></span>
                   <span className="whitespace-nowrap">{s.title}</span>
                   {s.badge && <span className="px-1 py-0.5 rounded bg-amber-400 text-slate-900 text-[8px] font-black">{s.badge}</span>}
@@ -502,7 +502,7 @@ export function renderKaramboPage(ctx) {
         <aside className="hidden lg:block sticky top-5 bg-surface border border-line rounded-3xl p-3 space-y-1.5 shadow-sm">
           <div className="px-2.5 py-2 flex items-center justify-between border-b border-line mb-1">
             <span className="text-xs font-black text-fg">كل خدمات {cfg.title}</span>
-            <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/12 text-[#1E4E8C] text-[10px] font-black">{enabledServices.length}</span>
+            <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/12 text-[#0066CC] text-[10px] font-black">{enabledServices.length}</span>
           </div>
           {enabledServices.map(s => {
             const Icon = ICONS[s.icon] || Sparkles;
@@ -512,7 +512,7 @@ export function renderKaramboPage(ctx) {
                 key={s.id}
                 type="button"
                 onClick={() => go(s.id)}
-                className={`w-full flex items-center gap-2.5 p-2.5 rounded-2xl text-start transition border ${active ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-md' : 'bg-transparent hover:bg-surface2 border-transparent text-fg'}`}
+                className={`w-full flex items-center gap-2.5 p-2.5 rounded-2xl text-start transition border ${active ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-md' : 'bg-transparent hover:bg-surface2 border-transparent text-fg'}`}
               >
                 <span className={`w-9 h-9 rounded-xl ${active ? 'bg-white/20' : s.color} flex items-center justify-center shrink-0 shadow-sm`}>
                   <Icon className="w-4 h-4 text-white" />
@@ -520,7 +520,7 @@ export function renderKaramboPage(ctx) {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-black truncate">{s.title}</span>
-                    {s.badge && <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black shrink-0 ${active ? 'bg-white text-[#163B6B]' : 'bg-amber-400 text-slate-900'}`}>{s.badge}</span>}
+                    {s.badge && <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-black shrink-0 ${active ? 'bg-white text-[#004F9F]' : 'bg-amber-400 text-slate-900'}`}>{s.badge}</span>}
                   </div>
                   <div className={`text-[10px] font-bold truncate ${active ? 'text-blue-100' : 'text-muted'}`}>{s.desc}</div>
                 </div>
@@ -574,7 +574,7 @@ export function renderKaramboPage(ctx) {
     return wrapKoromboPortal(
       <div className="space-y-4">
         <div className="bg-surface border border-line rounded-3xl p-5 flex items-center gap-4 flex-wrap">
-          <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-16 h-16 rounded-2xl object-cover border border-line bg-[#1E4E8C]" />
+          <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-16 h-16 rounded-2xl object-cover border border-line bg-[#0071E3]" />
           <div className="flex-1 min-w-[200px]">
             <h2 className="text-lg font-black text-fg">أهلاً بك في عالم {cfg.title} المستقل</h2>
             <p className="text-xs font-bold text-muted mt-0.5">{cfg.subtitle}</p>
@@ -584,11 +584,11 @@ export function renderKaramboPage(ctx) {
           {enabledServices.map(s => {
             const Icon = ICONS[s.icon] || Sparkles;
             return (
-              <button key={s.id} type="button" onClick={() => go(s.id)} className="relative group bg-surface border border-line hover:border-[#1E4E8C] rounded-3xl p-4 text-start flex items-start gap-3 transition hover:-translate-y-0.5 shadow-sm">
+              <button key={s.id} type="button" onClick={() => go(s.id)} className="relative group bg-surface border border-line hover:border-[#0071E3] rounded-3xl p-4 text-start flex items-start gap-3 transition hover:-translate-y-0.5 shadow-sm">
                 {s.badge && <span className="absolute top-3 end-3 px-2 py-0.5 rounded-full bg-amber-400 text-slate-900 text-[9px] font-black">{s.badge}</span>}
                 <span className={`w-12 h-12 rounded-2xl ${s.color} flex items-center justify-center shrink-0 shadow-md group-hover:scale-110 transition`}><Icon className="w-6 h-6 text-white" /></span>
                 <div className="min-w-0 flex-1 space-y-1">
-                  <div className="text-sm font-black text-fg group-hover:text-[#1E4E8C]">{s.title}</div>
+                  <div className="text-sm font-black text-fg group-hover:text-[#0066CC]">{s.title}</div>
                   <div className="text-xs font-bold text-muted leading-relaxed">{s.desc}</div>
                 </div>
               </button>
@@ -691,14 +691,14 @@ export function renderKaramboPage(ctx) {
         />
         <div className="grid lg:grid-cols-2 gap-4">
           <div className="bg-surface border border-line rounded-3xl p-4 space-y-3">
-            <div className="relative bg-white dark:bg-[#0D1528] rounded-2xl aspect-[4/3] flex items-center justify-center overflow-hidden">
+            <div className="relative bg-white dark:bg-[#1D1D1F] rounded-2xl aspect-[4/3] flex items-center justify-center overflow-hidden">
               {phone.images && phone.images[imgIdx] ? <img src={phone.images[imgIdx]} alt={phone.name} referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = 'none'; }} className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-16 h-16 text-muted" />}
-              <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[10px] font-black">{phone.brand}</span>
+              <span className="absolute top-2 start-2 px-2 py-0.5 rounded-full bg-[#0071E3] text-white text-[10px] font-black">{phone.brand}</span>
             </div>
             {(phone.images || []).length > 1 && (
               <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {phone.images.map((im, i) => (
-                  <button key={i} type="button" onClick={() => set({ imgIdx: i })} className={`w-16 h-16 rounded-xl border-2 overflow-hidden bg-white shrink-0 ${i === imgIdx ? 'border-[#1E4E8C]' : 'border-line'}`}><img src={im} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-contain" /></button>
+                  <button key={i} type="button" onClick={() => set({ imgIdx: i })} className={`w-16 h-16 rounded-xl border-2 overflow-hidden bg-white shrink-0 ${i === imgIdx ? 'border-[#0071E3]' : 'border-line'}`}><img src={im} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-contain" /></button>
                 ))}
               </div>
             )}
@@ -709,7 +709,7 @@ export function renderKaramboPage(ctx) {
               </div>
               <div className="space-y-1">
                 {(phone.variants || []).length > 0 ? (phone.variants || []).map((v, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm font-bold"><span className="text-muted">{v.label}</span><span className="font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{formatMoney(v.price)}</span></div>
+                  <div key={i} className="flex items-center justify-between text-sm font-bold"><span className="text-muted">{v.label}</span><span className="font-black text-[#0066CC] dark:text-[#2997FF]">{formatMoney(v.price)}</span></div>
                 )) : phone.price > 0 ? (
                   <div className="flex items-center justify-between text-sm font-bold"><span className="text-muted">السعر في مصر</span><span className="font-black text-emerald-600 dark:text-emerald-400">{formatMoney(phone.price)}</span></div>
                 ) : (
@@ -732,7 +732,7 @@ export function renderKaramboPage(ctx) {
                 <button type="button" onClick={() => set({ alertOpen: !ui.alertOpen })} className="inline-flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-white text-xs font-black transition"><Bell className="w-4 h-4" /> نبّهني لو نزل</button>
               )}
               {cfg.guideCfg.allowImportCta !== false && (
-                <button type="button" onClick={() => { ctx.openSourcing && ctx.openSourcing(); setTimeout(() => { ctx.setSrcForm && ctx.setSrcForm(p => ({ ...p, name: phone.name, desc: `طلب استيراد جهاز: ${phone.name} — سعر السوق الاسترشادي حاليًا ${formatMoney(phone.price)}` })); }, 60); }} className="inline-flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-black transition"><PhoneCall className="w-4 h-4" /> اطلبه استيراد</button>
+                <button type="button" onClick={() => { ctx.openSourcing && ctx.openSourcing(); setTimeout(() => { ctx.setSrcForm && ctx.setSrcForm(p => ({ ...p, name: phone.name, desc: `طلب استيراد جهاز: ${phone.name} — سعر السوق الاسترشادي حاليًا ${formatMoney(phone.price)}` })); }, 60); }} className="inline-flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-black transition"><PhoneCall className="w-4 h-4" /> اطلبه استيراد</button>
               )}
               <button type="button" onClick={() => { toggleCompare(phone.id); go('compare'); }} className="inline-flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-slate-600 hover:bg-slate-500 text-white text-xs font-black transition"><Scale className="w-4 h-4" /> قارن الآن</button>
               <button type="button" onClick={() => go('installment', { instPhoneId: phone.id, instPrice: String(phone.price || '') })} className="inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-surface2 border border-line hover:border-slate-500 text-fg text-xs font-black transition"><Calculator className="w-3.5 h-3.5 text-slate-600" /> احسب قسطه</button>
@@ -771,7 +771,7 @@ export function renderKaramboPage(ctx) {
               <h3 className="font-black text-fg">المواصفات الكاملة</h3>
               {(phone.specs || []).map((grp, gi) => (
                 <div key={gi}>
-                  <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8] mb-1.5">{grp.group}</div>
+                  <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] mb-1.5">{grp.group}</div>
                   <div className="rounded-xl overflow-hidden border border-line">
                     {grp.rows.map((r, ri) => (
                       <div key={ri} className={`flex justify-between gap-3 px-3 py-1.5 text-xs font-bold ${ri % 2 ? 'bg-surface2/60' : ''}`}><span className="text-muted shrink-0">{r[0]}</span><span className="text-fg text-end">{r[1]}</span></div>
@@ -791,10 +791,10 @@ export function renderKaramboPage(ctx) {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {accessories.map((part, i) => (
-                <button key={part.id || i} type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="text-start bg-surface2/60 border border-line rounded-2xl p-2.5 hover:border-[#2F6BB3] transition">
-                  <div className="aspect-square rounded-xl bg-white dark:bg-[#0D1528] flex items-center justify-center overflow-hidden mb-2">{part.image ? <img src={part.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-8 h-8 text-muted" />}</div>
+                <button key={part.id || i} type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="text-start bg-surface2/60 border border-line rounded-2xl p-2.5 hover:border-[#0071E3] transition">
+                  <div className="aspect-square rounded-xl bg-white dark:bg-[#1D1D1F] flex items-center justify-center overflow-hidden mb-2">{part.image ? <img src={part.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-8 h-8 text-muted" />}</div>
                   <div className="text-[11px] font-black text-fg line-clamp-2 leading-snug">{part.name}</div>
-                  <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8] mt-1">{formatMoney(partPrice(ctx, part))}</div>
+                  <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] mt-1">{formatMoney(partPrice(ctx, part))}</div>
                 </button>
               ))}
             </div>
@@ -865,7 +865,7 @@ export function renderKaramboPage(ctx) {
 
     const renderPartMini = (part, i) => (
       <div key={part.id || i} className="bg-surface border border-line rounded-2xl p-3 flex flex-col gap-2 hover:border-slate-500 transition">
-        <button type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="aspect-square rounded-xl bg-white dark:bg-[#0D1528] flex items-center justify-center overflow-hidden">
+        <button type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="aspect-square rounded-xl bg-white dark:bg-[#1D1D1F] flex items-center justify-center overflow-hidden">
           {part.image ? <img src={part.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Package className="w-8 h-8 text-muted" />}
         </button>
         <div className="text-xs font-black text-fg line-clamp-2 leading-snug">{part.name}</div>
@@ -988,7 +988,7 @@ export function renderKaramboPage(ctx) {
           </div>
           {cats.length > 1 && (
             <div className="flex gap-1.5 overflow-x-auto no-scrollbar pt-1">
-              {cats.map(c => <button key={c} type="button" onClick={() => set({ budgetCat: c })} className={`px-3 py-1 rounded-full text-[11px] font-black shrink-0 border ${catFilter === c ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'}`}>{c === 'ALL' ? `كل الأقسام (${pricedAll.length})` : c}</button>)}
+              {cats.map(c => <button key={c} type="button" onClick={() => set({ budgetCat: c })} className={`px-3 py-1 rounded-full text-[11px] font-black shrink-0 border ${catFilter === c ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface2 text-fg border-line'}`}>{c === 'ALL' ? `كل الأقسام (${pricedAll.length})` : c}</button>)}
             </div>
           )}
         </div>

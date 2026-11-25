@@ -83,7 +83,7 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm sm:text-base font-black text-fg flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-[#1E4E8C]" />
+              <ClipboardList className="w-5 h-5 text-[#0066CC]" />
               <span>لوحة سير عمل الطلبات (Order Workflow — {filteredOrders.length})</span>
             </h2>
             <p className="text-[11px] text-muted">تبديل فوري بين عرض المراحل (Kanban) وعرض الجدول، مع تحديث حالة الطلب بضغطة واحدة وتصدير CSV.</p>
@@ -93,14 +93,14 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
               <button
                 type="button"
                 onClick={() => setViewMode('kanban')}
-                className={`px-3 py-1 rounded-lg font-extrabold ${viewMode === 'kanban' ? 'bg-[#1E4E8C] text-white' : 'text-muted'}`}
+                className={`px-3 py-1 rounded-lg font-extrabold ${viewMode === 'kanban' ? 'bg-[#0071E3] text-white' : 'text-muted'}`}
               >
                 مراحل (Kanban)
               </button>
               <button
                 type="button"
                 onClick={() => setViewMode('table')}
-                className={`px-3 py-1 rounded-lg font-extrabold ${viewMode === 'table' ? 'bg-[#1E4E8C] text-white' : 'text-muted'}`}
+                className={`px-3 py-1 rounded-lg font-extrabold ${viewMode === 'table' ? 'bg-[#0071E3] text-white' : 'text-muted'}`}
               >
                 جدول
               </button>
@@ -155,7 +155,7 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
                   {colOrders.map(o => (
                     <div key={o.id} className="p-3 rounded-xl bg-bg border border-line space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="font-mono font-black text-[#1E4E8C] dark:text-[#7FB0E8]">#{o.id}</span>
+                        <span className="font-mono font-black text-[#0066CC] dark:text-[#2997FF]">#{o.id}</span>
                         <span className="font-mono font-black text-fg">{orderTotal(o).toLocaleString()} ج.م</span>
                       </div>
                       <div className="font-extrabold text-fg truncate">{o.customerName || o.clientName || 'عميل'}</div>
@@ -195,7 +195,7 @@ export function OrderWorkflowBoard({ orders = [], onUpdateOrderStatus, showToast
             <tbody className="divide-y divide-line">
               {filteredOrders.map(o => (
                 <tr key={o.id} className="hover:bg-surface2/40">
-                  <td className="p-3 font-mono font-black text-[#1E4E8C]">#{o.id}</td>
+                  <td className="p-3 font-mono font-black text-[#0066CC]">#{o.id}</td>
                   <td className="p-3 font-extrabold text-fg">{o.customerName || o.clientName || 'عميل'}</td>
                   <td className="p-3 font-mono text-muted">{orderPhone(o) || '—'}</td>
                   <td className="p-3 font-bold">{(o.items || []).length}</td>
@@ -307,7 +307,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
       <div className="bg-surface rounded-3xl p-4 sm:p-5 border border-line shadow-sm flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-sm sm:text-base font-black text-fg flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#1E4E8C]" />
+            <TrendingUp className="w-5 h-5 text-[#0066CC]" />
             <span>لوحة تحليلات الأعمال الحقيقية (Business Intelligence)</span>
           </h2>
           <p className="text-[11px] text-muted">جميع الأرقام محسوبة مباشرة من قاعدة بياناتك الفعلية بدون أي أرقام تقديرية وهمية.</p>
@@ -325,7 +325,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
               type="button"
               onClick={() => setDateRange(k)}
               className={`px-3 py-1.5 rounded-xl font-extrabold border transition ${
-                dateRange === k ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'
+                dateRange === k ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface2 text-fg border-line'
               }`}
             >
               {lbl}
@@ -338,7 +338,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <div className="p-4 rounded-2xl bg-surface border border-line shadow-sm">
           <div className="text-[11px] font-bold text-muted">قيمة الطلبات (غير الملغاة)</div>
-          <div className="text-xl font-black text-[#1E4E8C] dark:text-[#7FB0E8] font-mono mt-1">{bi.revenue.toLocaleString()} ج.م</div>
+          <div className="text-xl font-black text-[#0066CC] dark:text-[#2997FF] font-mono mt-1">{bi.revenue.toLocaleString()} ج.م</div>
           <div className="text-[10px] text-muted mt-1">{bi.validCount} طلب فعال • {bi.cancelledCount} ملغي • منها مُسلّمة فعلياً: {bi.deliveredRevenue.toLocaleString()} ج.م</div>
         </div>
         <div className="p-4 rounded-2xl bg-surface border border-line shadow-sm">
@@ -372,7 +372,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
                 </div>
                 <div className="h-2.5 rounded-full bg-surface2 overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gradient-to-l from-[#1E4E8C] to-[#7FB0E8]"
+                    className="h-full rounded-full bg-gradient-to-l from-[#0071E3] to-[#2997FF]"
                     style={{ width: `${Math.max(6, (cat.count / bi.maxCatCount) * 100)}%` }}
                   />
                 </div>
@@ -395,7 +395,7 @@ export function BusinessIntelligenceView({ parts = [], orders = [], clients = []
             </div>
           </div>
 
-          <div className="bg-gradient-to-l from-[#0B1F52] to-[#1E3A8A] text-white rounded-3xl p-4 sm:p-5 border border-[#2F6BB3]/40 space-y-2">
+          <div className="bg-gradient-to-l from-[#1D1D1F] to-[#0066CC] text-white rounded-3xl p-4 sm:p-5 border border-[#0071E3]/40 space-y-2">
             <div className="flex items-center gap-1.5 font-black text-xs text-amber-300">
               <Sparkles className="w-4 h-4" />
               <span>توصيات الذكاء الاصطناعي التشغيلية (مبنية على بياناتك)</span>
@@ -449,9 +449,9 @@ export function AdminCommandPalette({ open, onClose, parts = [], orders = [], cl
 
   return (
     <div className="fixed inset-0 z-[90] bg-black/60 backdrop-blur-sm flex items-start justify-center pt-16 px-3" onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} className="w-full max-w-xl bg-surface dark:bg-[#070D1D] border-2 border-[#2F6BB3]/45 rounded-3xl shadow-2xl overflow-hidden elz-slide-up">
+      <div onClick={e => e.stopPropagation()} className="w-full max-w-xl bg-surface dark:bg-[#161617] border-2 border-[#0071E3]/45 rounded-3xl shadow-2xl overflow-hidden elz-slide-up">
         <div className="flex items-center gap-2.5 px-4 py-3 border-b border-line">
-          <Search className="w-4 h-4 text-[#1E4E8C] shrink-0" />
+          <Search className="w-4 h-4 text-[#0066CC] shrink-0" />
           <input
             autoFocus
             type="text"
@@ -471,7 +471,7 @@ export function AdminCommandPalette({ open, onClose, parts = [], orders = [], cl
                 key={idx}
                 type="button"
                 onClick={cmd.action}
-                className="w-full px-3 py-2 rounded-xl hover:bg-[#1E4E8C] hover:text-white text-right font-extrabold text-fg flex items-center justify-between transition"
+                className="w-full px-3 py-2 rounded-xl hover:bg-[#0071E3] hover:text-white text-right font-extrabold text-fg flex items-center justify-between transition"
               >
                 <span>{cmd.label}</span>
                 <ArrowUpRight className="w-3.5 h-3.5 opacity-70" />
@@ -490,7 +490,7 @@ export function AdminCommandPalette({ open, onClose, parts = [], orders = [], cl
                   className="w-full px-3 py-2 rounded-xl hover:bg-surface2 text-right flex items-center justify-between"
                 >
                   <span className="font-bold text-fg truncate">{p.name}</span>
-                  <span className="font-mono text-[11px] text-[#1E4E8C] shrink-0">{Number(p.basePrice || 0).toLocaleString()} ج.م</span>
+                  <span className="font-mono text-[11px] text-[#0066CC] shrink-0">{Number(p.basePrice || 0).toLocaleString()} ج.م</span>
                 </button>
               ))}
             </div>
@@ -557,11 +557,11 @@ export function SmartNotificationsPopover({ open, onClose, parts = [], orders = 
     <div className="fixed inset-0 z-[75]" onClick={onClose}>
       <div
         onClick={e => e.stopPropagation()}
-        className="absolute top-16 left-4 w-[320px] max-w-[92vw] bg-surface dark:bg-[#0B1224] border border-line rounded-2xl shadow-2xl p-3 space-y-2 elz-fade-in"
+        className="absolute top-16 left-4 w-[320px] max-w-[92vw] bg-surface dark:bg-[#1D1D1F] border border-line rounded-2xl shadow-2xl p-3 space-y-2 elz-fade-in"
       >
         <div className="flex items-center justify-between pb-2 border-b border-line">
           <span className="font-black text-xs text-fg flex items-center gap-1.5">
-            <Bell className="w-4 h-4 text-[#1E4E8C]" />
+            <Bell className="w-4 h-4 text-[#0066CC]" />
             <span>التنبيهات الذكية ({alerts.length})</span>
           </span>
           <button type="button" onClick={onClose} className="p-1 rounded-lg hover:bg-surface2">
@@ -586,7 +586,7 @@ export function SmartNotificationsPopover({ open, onClose, parts = [], orders = 
                   <div className="font-extrabold text-xs text-fg">{al.title}</div>
                   <div className="text-[10px] text-muted">{al.desc}</div>
                 </div>
-                <ArrowUpRight className="w-4 h-4 text-[#1E4E8C] shrink-0" />
+                <ArrowUpRight className="w-4 h-4 text-[#0066CC] shrink-0" />
               </button>
             ))}
           </div>

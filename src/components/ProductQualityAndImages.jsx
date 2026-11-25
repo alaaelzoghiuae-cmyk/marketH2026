@@ -138,14 +138,14 @@ export default function ProductQualityAndImages({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm sm:text-base font-black text-fg flex items-center gap-2">
-              <Camera className="w-5 h-5 text-[#1E4E8C]" />
+              <Camera className="w-5 h-5 text-[#0066CC]" />
               <span>مساعد جودة الكتالوج وإدارة روابط الصور المتعددة</span>
             </h2>
             <p className="text-[11px] text-muted">فحص شفاف لجودة بيانات الكتالوج (الصور، الأوصاف، التكلفة، التكرارات) مع محرر مرئي لروابط الصور بدون استهلاك مساحة تخزين.</p>
           </div>
-          <div className="px-4 py-2 rounded-2xl bg-[#1E4E8C]/10 border border-[#1E4E8C]/30 text-center">
+          <div className="px-4 py-2 rounded-2xl bg-[#0071E3]/10 border border-[#0071E3]/30 text-center">
             <div className="text-[10px] font-bold text-muted">متوسط جودة الكتالوج</div>
-            <div className="text-lg font-black text-[#1E4E8C] dark:text-[#7FB0E8] font-mono">{summary.avg} / 100</div>
+            <div className="text-lg font-black text-[#0066CC] dark:text-[#2997FF] font-mono">{summary.avg} / 100</div>
           </div>
         </div>
 
@@ -164,8 +164,8 @@ export default function ProductQualityAndImages({
               onClick={() => { setIssueFilter(k); setVisibleCount(80); }}
               className={`px-3 py-1.5 rounded-full font-extrabold border transition ${
                 issueFilter === k
-                  ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]'
-                  : 'bg-surface2 text-fg border-line hover:border-[#2F6BB3]'
+                  ? 'bg-[#0071E3] text-white border-[#0071E3]'
+                  : 'bg-surface2 text-fg border-line hover:border-[#0071E3]'
               }`}
             >
               {lbl}
@@ -176,10 +176,10 @@ export default function ProductQualityAndImages({
 
       {/* Visual Multi-Image URL Editor Panel */}
       {editingItem && (
-        <div className="bg-surface rounded-3xl p-4 sm:p-5 border-2 border-[#1E4E8C]/45 shadow-md space-y-4">
+        <div className="bg-surface rounded-3xl p-4 sm:p-5 border-2 border-[#0071E3]/45 shadow-md space-y-4">
           <div className="flex items-center justify-between gap-2 pb-2 border-b border-line">
             <div>
-              <span className="text-[10px] font-black text-[#1E4E8C]">محرر الصور المرئي (روابط CDN مباشرة)</span>
+              <span className="text-[10px] font-black text-[#0066CC]">محرر الصور المرئي (روابط CDN مباشرة)</span>
               <h3 className="text-sm font-black text-fg">{editingItem.part.name}</h3>
             </div>
             <button type="button" onClick={() => setEditingPartId(null)} className="px-3 py-1 rounded-xl bg-surface2 font-bold">إغلاق</button>
@@ -191,7 +191,7 @@ export default function ProductQualityAndImages({
               const isDataUrl = String(u).startsWith('data:');
               const isBroken = Boolean(brokenUrls[u]);
               return (
-                <div key={u + idx} className={`p-2.5 rounded-2xl border space-y-2 ${idx === 0 ? 'border-[#1E4E8C] bg-[#1E4E8C]/5' : 'border-line bg-bg'}`}>
+                <div key={u + idx} className={`p-2.5 rounded-2xl border space-y-2 ${idx === 0 ? 'border-[#0071E3] bg-[#0071E3]/5' : 'border-line bg-bg'}`}>
                   <div className="relative h-28 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden">
                     {isBroken ? (
                       <span className="text-[10px] font-black text-rose-500 text-center">⚠️ رابط صورة معطوب</span>
@@ -207,7 +207,7 @@ export default function ProductQualityAndImages({
                       {isDataUrl ? 'ملف مرفوع' : 'رابط URL'}
                     </span>
                     {idx === 0 && (
-                      <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-[#1E4E8C] text-white text-[9px] font-black">الرئيسية</span>
+                      <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-[#0071E3] text-white text-[9px] font-black">الرئيسية</span>
                     )}
                   </div>
                   <div className="flex items-center justify-between gap-1 text-[10px] font-extrabold">
@@ -218,7 +218,7 @@ export default function ProductQualityAndImages({
                         const next = [u, ...editingItem.imgs.filter((_, i) => i !== idx)];
                         saveImagesForPart(editingItem.part, next);
                       }}
-                      className="px-2 py-1 rounded-lg bg-surface border border-line disabled:opacity-40 hover:border-[#1E4E8C]"
+                      className="px-2 py-1 rounded-lg bg-surface border border-line disabled:opacity-40 hover:border-[#0071E3]"
                     >
                       تعيين رئيسية
                     </button>
@@ -253,7 +253,7 @@ export default function ProductQualityAndImages({
               <button
                 type="button"
                 onClick={handlePasteUrls}
-                className="px-5 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black shrink-0"
+                className="px-5 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black shrink-0"
               >
                 + إضافة الروابط
               </button>
@@ -298,7 +298,7 @@ export default function ProductQualityAndImages({
               <button
                 type="button"
                 onClick={() => setEditingPartId(a.part.id)}
-                className="px-3 py-1.5 rounded-xl bg-[#1E4E8C]/15 hover:bg-[#1E4E8C] text-[#1E4E8C] hover:text-white font-extrabold text-[11px] transition"
+                className="px-3 py-1.5 rounded-xl bg-[#0071E3]/15 hover:bg-[#0071E3] text-[#0066CC] hover:text-white font-extrabold text-[11px] transition"
               >
                 إدارة الصور ({a.imgs.length})
               </button>
@@ -322,7 +322,7 @@ export default function ProductQualityAndImages({
               <button
                 type="button"
                 onClick={() => setVisibleCount(c => c + 80)}
-                className="px-5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs"
+                className="px-5 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs"
               >
                 عرض 80 منتجاً إضافياً
               </button>

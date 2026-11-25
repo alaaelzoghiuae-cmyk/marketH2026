@@ -52,7 +52,7 @@ export function renderSpinToWinModal(ctx) {
 
     return (
       <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[160] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        <div className="bg-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 border-2 border-[#2F6BB3] shadow-2xl space-y-4 text-center relative my-auto">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-5 sm:p-6 border-2 border-[#0071E3] shadow-2xl space-y-4 text-center relative my-auto">
           <button
             type="button"
             onClick={() => setSpinModalOpen(false)}
@@ -77,10 +77,10 @@ export function renderSpinToWinModal(ctx) {
           {/* Large 310x310 High-Clarity SVG Wheel */}
           <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto flex items-center justify-center">
             {/* Top Pointer Arrow */}
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-[#2F6BB3] drop-shadow-lg" />
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-t-[26px] border-t-[#0071E3] drop-shadow-lg" />
 
             <div
-              className="w-full h-full rounded-full border-[6px] border-[#1E4E8C] shadow-[0_0_30px_rgba(37,99,235,0.4)] relative overflow-hidden"
+              className="w-full h-full rounded-full border-[6px] border-[#0071E3] shadow-[0_0_30px_rgba(37,99,235,0.4)] relative overflow-hidden"
               style={{
                 transform: `rotate(${spinRotationDeg}deg)`,
                 transition: isSpinningWheel ? 'transform 4s cubic-bezier(0.16, 1, 0.3, 1)' : 'none',
@@ -113,7 +113,7 @@ export function renderSpinToWinModal(ctx) {
               type="button"
               disabled={isSpinningWheel || Boolean(spinWheelState?.spun)}
               onClick={handleSpinTheWheel}
-              className="absolute w-20 h-20 rounded-full bg-[#060C1E] border-4 border-[#2F6BB3] text-white font-black text-sm shadow-2xl flex items-center justify-center z-10 hover:scale-105 transition disabled:opacity-80"
+              className="absolute w-20 h-20 rounded-full bg-[#1D1D1F] border-4 border-[#0071E3] text-white font-black text-sm shadow-2xl flex items-center justify-center z-10 hover:scale-105 transition disabled:opacity-80"
             >
               {isSpinningWheel ? '🎰...' : spinWheelState?.spun ? '✓ مبروك' : 'لفّ الآن'}
             </button>
@@ -169,7 +169,7 @@ export function renderSpinToWinModal(ctx) {
                   applySpinPrizePromo(spinWheelState.prize, false);
                   setSpinModalOpen(false);
                 }}
-                className="w-full py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs sm:text-sm font-black shadow-md"
+                className="w-full py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs sm:text-sm font-black shadow-md"
               >
                 تفعيل الجائزة ومتابعة التسوق ✓
               </button>
@@ -179,7 +179,7 @@ export function renderSpinToWinModal(ctx) {
               type="button"
               disabled={isSpinningWheel}
               onClick={handleSpinTheWheel}
-              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-[#163B6B] hover:from-[#2F6BB3] hover:to-[#1E4E8C] text-white font-black text-sm sm:text-base shadow-lg shadow-blue-600/30 transition"
+              className="w-full py-3.5 rounded-full bg-gradient-to-r from-[#0071E3] to-[#0077ED] hover:from-[#0071E3] hover:to-[#0071E3] text-white font-black text-sm sm:text-base shadow-lg shadow-blue-600/30 transition"
             >
               {isSpinningWheel ? 'جاري لف العجلة... 🎰' : '🎰 اضغط للف العجلة وربح هديتك الآن!'}
             </button>
@@ -197,7 +197,7 @@ export function renderFloatingSpinTrigger(ctx) {
       <button
         type="button"
         onClick={() => setSpinModalOpen(true)}
-        className="fixed bottom-6 right-5 z-40 px-5 py-3 rounded-full bg-gradient-to-r from-[#0B1736] via-[#163B6B] to-[#1E4E8C] text-white font-black text-xs shadow-2xl border border-[#7FB0E8]/60 flex items-center gap-2 hover:scale-105 transition"
+        className="fixed bottom-6 right-5 z-40 px-5 py-3 rounded-full bg-gradient-to-r from-[#1D1D1F] via-[#0077ED] to-[#0071E3] text-white font-black text-xs shadow-2xl border border-[#2997FF]/60 flex items-center gap-2 hover:scale-105 transition"
         title="عجلة الحظ وهدايا الزوار الجدد"
       >
         <span>🎁</span>
@@ -311,7 +311,7 @@ export function renderExitIntentModal(ctx) {
 
           <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] font-extrabold">
             <span className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">🤝 الدفع عند الاستلام</span>
-            <span className="px-2.5 py-1 rounded-xl bg-[#1E4E8C]/15 text-[#163B6B] dark:text-[#2F6BB3]">👁️ معاينة قبل الدفع</span>
+            <span className="px-2.5 py-1 rounded-xl bg-[#0071E3]/15 text-[#004F9F] dark:text-[#0066CC]">👁️ معاينة قبل الدفع</span>
             <span className="px-2.5 py-1 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">🛡️ ضمان بالرقم</span>
           </div>
 
@@ -323,7 +323,7 @@ export function renderExitIntentModal(ctx) {
           <button
             type="button"
             onClick={handleApplyExitIntentOffer}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#1E4E8C] to-[#163B6B] hover:from-emerald-500 hover:to-slate-500 text-white font-black text-sm shadow-lg transition"
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#0071E3] to-[#0077ED] hover:from-emerald-500 hover:to-slate-500 text-white font-black text-sm shadow-lg transition"
           >
             🎁 تفعيل خصم {pct}% الآن وإكمال التسوق
           </button>
@@ -392,7 +392,7 @@ export function renderCustomerRestockNotifyModal(ctx) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow-md"
+            className="w-full py-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs shadow-md"
           >
             📲 سجّل رقمي وأرسل لي واتساب فور توفره ✓
           </button>
@@ -447,7 +447,7 @@ export function renderAdminRestockWhatsappModal(ctx) {
                     <button
                       type="button"
                       onClick={() => sendAdminRestockWhatsappToEntry(entry)}
-                      className="px-3 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px] flex items-center gap-1"
+                      className="px-3 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px] flex items-center gap-1"
                     >
                       <span>📲 ابعت واتساب الآن</span>
                     </button>
@@ -466,7 +466,7 @@ export function renderAdminRestockWhatsappModal(ctx) {
                     setTimeout(() => sendAdminRestockWhatsappToEntry(entry), idx * 600);
                   });
                 }}
-                className="flex-1 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs"
+                className="flex-1 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs"
               >
                 فتح وإرسال واتساب لكل القائمة ({partWaitlist.length} عملاء)
               </button>
@@ -598,7 +598,7 @@ export function renderWarrantyLookupModal(ctx) {
                                     <button
                                       type="button"
                                       onClick={() => handleRequestWarrantyReplacement(ord, it)}
-                                      className="px-3.5 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px] shrink-0"
+                                      className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px] shrink-0"
                                     >
                                       🔄 اطلب استبدال فوري
                                     </button>
@@ -628,7 +628,7 @@ export function renderFamilyDevicesModal(ctx) {
 
     return (
       <div className="fixed inset-0 bg-nav/85 backdrop-blur-xs z-[185] flex items-center justify-center p-4">
-        <div className="bg-surface rounded-3xl max-w-lg w-full p-6 border-2 border-[#2F6BB3]/45 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
+        <div className="bg-surface rounded-3xl max-w-lg w-full p-6 border-2 border-[#0071E3]/45 shadow-2xl space-y-4 text-xs max-h-[88vh] flex flex-col">
           <div className="flex items-center justify-between border-b border-line pb-3">
             <div>
               <h3 className="text-base font-black text-fg flex items-center gap-2">
@@ -692,7 +692,7 @@ export function renderFamilyDevicesModal(ctx) {
                   <div key={dev.id} className="p-3 rounded-2xl bg-surface2 border border-line space-y-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] font-black text-[10px] ml-2">
+                        <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] font-black text-[10px] ml-2">
                           {dev.ownerLabel}
                         </span>
                         <span className="font-black text-fg text-xs">{dev.modelName}</span>
@@ -1360,7 +1360,7 @@ export function renderLoginModal(ctx) {
                 type="submit"
                 className={`w-full py-3.5 rounded-2xl text-white font-extrabold text-sm shadow-lg transition flex items-center justify-center gap-2 ${
                   regForm.accountCategory === 'individual'
-                    ? 'bg-gradient-to-l from-[#1E4E8C] to-[#163B6B] hover:from-emerald-700 hover:to-slate-700 shadow-emerald-600/30'
+                    ? 'bg-gradient-to-l from-[#0071E3] to-[#0077ED] hover:from-emerald-700 hover:to-slate-700 shadow-emerald-600/30'
                     : 'bg-gradient-to-l from-blue-600 to-slate-600 hover:from-blue-700 hover:to-slate-700 shadow-blue-600/30'
                 }`}
               >

@@ -419,7 +419,7 @@ export function renderAdminSourcing(ctx) {
                 <div className="font-bold text-muted">لون الخلفية</div>
                 <div className="flex flex-wrap gap-2">
                   {Object.keys(AD_THEMES).map(k => (
-                    <button key={k} type="button" onClick={() => setBanner({ theme: k })} title={AD_THEMES[k].label} style={{ background: AD_THEMES[k].cssGrad }} className={`px-3 py-2 rounded-xl border-2 flex items-center gap-2 text-xs font-extrabold transition ${banner.theme === k ? 'border-[#2F6BB3] ring-2 ring-[#2F6BB3]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'} ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}><span className="w-3.5 h-3.5 rounded-full border border-white/40" style={{ background: AD_THEMES[k].accentColor }} /><span>{AD_THEMES[k].label}</span></button>
+                    <button key={k} type="button" onClick={() => setBanner({ theme: k })} title={AD_THEMES[k].label} style={{ background: AD_THEMES[k].cssGrad }} className={`px-3 py-2 rounded-xl border-2 flex items-center gap-2 text-xs font-extrabold transition ${banner.theme === k ? 'border-[#0071E3] ring-2 ring-[#0071E3]/40 scale-105' : 'border-white/20 opacity-85 hover:opacity-100'} ${AD_THEMES[k].light ? 'text-slate-900' : 'text-white'}`}><span className="w-3.5 h-3.5 rounded-full border border-white/40" style={{ background: AD_THEMES[k].accentColor }} /><span>{AD_THEMES[k].label}</span></button>
                   ))}
                 </div>
               </div>

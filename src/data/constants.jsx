@@ -372,7 +372,7 @@ export const INITIAL_SHOWCASE_BARS = [
     id: 'bar_1',
     title: '🔥 الأكثر مبيعاً من الشاشات وقطع الغيار الأصلية',
     subtitle: 'المنتجات الأكثر طلباً ومبيعاً مع توفر فوري في المخزن وشحن سريع',
-    badgeColor: 'bg-[#2563EB] text-fg',
+    badgeColor: 'bg-[#0071E3] text-fg',
     partIds: ['prt_1', 'prt_5', 'prt_3', 'prt_2'],
     active: true
   },
@@ -534,7 +534,7 @@ These terms are governed by Egyptian law. We try to resolve any dispute amicably
 export const AD_THEMES = {
   indigo: {
     label: 'أزرق ملكي (VVIP)',
-    grad: 'from-[#060D24] via-[#0F2557] to-[#1D4ED8]',
+    grad: 'from-[#1D1D1F] via-[#1D1D1F] to-[#0071E3]',
     cssGrad: '#0F2557',
     endColor: '#0F2557',
     accentColor: '#3B82F6',
@@ -542,7 +542,7 @@ export const AD_THEMES = {
   },
   violet: {
     label: 'بنفسجي ملكي',
-    grad: 'from-[#14052B] via-[#3B0F70] to-[#6D28D9]',
+    grad: 'from-[#1D1D1F] via-[#3B0F70] to-[#6D28D9]',
     cssGrad: '#3B0F70',
     endColor: '#3B0F70',
     accentColor: '#A855F7',
@@ -550,7 +550,7 @@ export const AD_THEMES = {
   },
   emerald: {
     label: 'أخضر زمردي',
-    grad: 'from-[#022C22] via-[#065F46] to-[#059669]',
+    grad: 'from-[#1D1D1F] via-[#1D1D1F] to-[#059669]',
     cssGrad: '#065F46',
     endColor: '#065F46',
     accentColor: '#10B981',
@@ -566,7 +566,7 @@ export const AD_THEMES = {
   },
   cyan: {
     label: 'سماوي محيطي',
-    grad: 'from-[#041E2B] via-[#155E75] to-[#0891B2]',
+    grad: 'from-[#1D1D1F] via-[#155E75] to-[#0891B2]',
     cssGrad: '#155E75',
     endColor: '#155E75',
     accentColor: '#06B6D4',
@@ -582,7 +582,7 @@ export const AD_THEMES = {
   },
   slate: {
     label: 'كربوني فخم',
-    grad: 'from-[#050811] via-[#1E293B] to-[#334155]',
+    grad: 'from-[#1D1D1F] via-[#1D1D1F] to-[#1D1D1F]',
     cssGrad: '#1E293B',
     endColor: '#1E293B',
     accentColor: '#64748B',
@@ -930,10 +930,10 @@ export const SHORTCUT_ICON_PRESETS = {
     label: '12. المزيد (شبكة دائرية)',
     render: () => (
       <div className="grid grid-cols-2 gap-2">
-        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#2563EB] dark:border-[#3B82F6]" />
-        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#2563EB] dark:border-[#3B82F6]" />
-        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#2563EB] dark:border-[#3B82F6]" />
-        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#2563EB] dark:border-[#3B82F6]" />
+        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#0071E3] dark:border-[#0071E3]" />
+        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#0071E3] dark:border-[#0071E3]" />
+        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#0071E3] dark:border-[#0071E3]" />
+        <span className="w-4 h-4 rounded-full border-[2.5px] border-[#0071E3] dark:border-[#0071E3]" />
       </div>
     )
   },

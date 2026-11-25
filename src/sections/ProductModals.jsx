@@ -1377,7 +1377,7 @@ export function renderBrandImageModal(ctx) {
           </div>
 
           <div className="flex gap-2">
-            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold">
+            <button type="submit" className="flex-1 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold">
               حفظ صورة البراند ✓
             </button>
             {imageUrl && (
@@ -1692,7 +1692,7 @@ export function renderAddPartToModelModal(ctx) {
                     }));
                     showToast('تم توليد الوصف وتعبئة المواصفات والضمان بالذكاء الاصطناعي ✓', 'success');
                   }}
-                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-slate-600 hover:from-[#2F6BB3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#0071E3] to-slate-600 hover:from-[#0071E3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>توليد الوصف وتعبئة الخانات بالذكاء الاصطناعي (AI)</span>
@@ -1855,7 +1855,7 @@ export function renderAddPartToModelModal(ctx) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold"
+            className="w-full py-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold"
           >
             حفظ وإدراج المنتج الآن ✓
           </button>
@@ -2137,7 +2137,7 @@ export function renderEditPartModal(ctx) {
                     }));
                     showToast('تم توليد وصف جديد وتعبئة الخانات الفاضية فقط — بيانات المنتج الحالية لم تتغير.', 'success');
                   }}
-                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1E4E8C] to-slate-600 hover:from-[#2F6BB3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
+                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#0071E3] to-slate-600 hover:from-[#0071E3] hover:to-slate-500 text-white text-[11px] font-black shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>توليد الوصف والمواصفات بالذكاء الاصطناعي (AI)</span>

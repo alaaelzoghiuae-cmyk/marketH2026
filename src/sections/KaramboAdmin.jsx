@@ -206,14 +206,14 @@ function KaramboAdminPanel({ ctx }) {
     <div className="space-y-5">
       {/* Header */}
       <div className="flex items-center gap-3 flex-wrap">
-        <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-12 h-12 rounded-2xl object-cover border border-line bg-[#1E4E8C]" />
+        <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-12 h-12 rounded-2xl object-cover border border-line bg-[#0071E3]" />
         <div>
           <h2 className="text-xl font-black text-fg">كرومبو الشغلانة — مركز التحكم الكامل</h2>
           <p className="text-xs font-bold text-muted">تحكم شامل في الشريط، ألوانه، ترتيب وتخصيص الـ 11 خدمة، أسس الحسابات، الكتالوج العالمي، الأخبار، والرادار</p>
         </div>
         <label className="ms-auto inline-flex items-center gap-2 cursor-pointer bg-surface border border-line rounded-2xl px-3.5 py-2">
           <span className="text-xs font-black text-fg">الشريط ظاهر في المتجر</span>
-          <input type="checkbox" checked={cfg.enabled !== false} onChange={e => patchCfg({ enabled: e.target.checked })} className="w-4 h-4 accent-[#1E4E8C]" />
+          <input type="checkbox" checked={cfg.enabled !== false} onChange={e => patchCfg({ enabled: e.target.checked })} className="w-4 h-4 accent-[#0071E3]" />
         </label>
       </div>
 
@@ -224,7 +224,7 @@ function KaramboAdminPanel({ ctx }) {
             key={t.id}
             type="button"
             onClick={() => setSubTab(t.id)}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-black shrink-0 transition border ${subTab === t.id ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow' : 'bg-surface border-line text-fg hover:border-[#2F6BB3]'}`}
+            className={`px-4 py-2.5 rounded-2xl text-xs font-black shrink-0 transition border ${subTab === t.id ? 'bg-[#0071E3] text-white border-[#0071E3] shadow' : 'bg-surface border-line text-fg hover:border-[#0071E3]'}`}
           >
             {t.label}
           </button>
@@ -307,7 +307,7 @@ function KaramboAdminPanel({ ctx }) {
 
             <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-line">
               <label className="inline-flex items-center gap-2 text-xs font-black text-fg cursor-pointer">
-                <input type="checkbox" checked={cfg.showMascot !== false} onChange={e => patchCfg({ showMascot: e.target.checked })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.showMascot !== false} onChange={e => patchCfg({ showMascot: e.target.checked })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار صورة شخصية كرومبو في الشريط</span>
               </label>
             </div>
@@ -321,7 +321,7 @@ function KaramboAdminPanel({ ctx }) {
                     key={key}
                     type="button"
                     onClick={() => patchCfg({ theme: key })}
-                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-black transition ${cfg.theme === key ? 'border-[#1E4E8C] ring-2 ring-[#1E4E8C]/30 bg-surface2' : 'border-line bg-surface'}`}
+                    className={`inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-black transition ${cfg.theme === key ? 'border-[#0071E3] ring-2 ring-[#0071E3]/30 bg-surface2' : 'border-line bg-surface'}`}
                   >
                     <span className="w-5 h-5 rounded-full border border-white/50 shadow" style={{ background: `linear-gradient(to left, ${th.from}, ${th.to})` }} />
                     <span>{th.label}</span>
@@ -384,7 +384,7 @@ function KaramboAdminPanel({ ctx }) {
                       <div className="text-[11px] font-bold text-muted">{s.desc}</div>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <button type="button" onClick={() => setExpandedSvcId(isExp ? null : s.id)} className="px-3 py-1.5 rounded-xl bg-surface border border-line text-xs font-black text-fg hover:border-[#2F6BB3]">
+                      <button type="button" onClick={() => setExpandedSvcId(isExp ? null : s.id)} className="px-3 py-1.5 rounded-xl bg-surface border border-line text-xs font-black text-fg hover:border-[#0071E3]">
                         {isExp ? 'إغلاق التخصيص' : 'تخصيص'}
                       </button>
                       <button type="button" onClick={() => toggleSvc(s.id)} className={`px-3 py-1.5 rounded-xl text-xs font-black text-white ${s.enabled ? 'bg-emerald-600' : 'bg-slate-400'}`}>
@@ -412,7 +412,7 @@ function KaramboAdminPanel({ ctx }) {
                           {KARAMBO_ICON_OPTIONS.map(ic => {
                             const Ic = ICON_MAP[ic] || Sparkles;
                             return (
-                              <button key={ic} type="button" onClick={() => updateSvcOverride(s.id, { icon: ic })} className={`p-1.5 rounded-lg border ${s.icon === ic ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'}`}>
+                              <button key={ic} type="button" onClick={() => updateSvcOverride(s.id, { icon: ic })} className={`p-1.5 rounded-lg border ${s.icon === ic ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface2 text-fg border-line'}`}>
                                 <Ic className="w-4 h-4" />
                               </button>
                             );
@@ -444,15 +444,15 @@ function KaramboAdminPanel({ ctx }) {
             <h3 className="font-black text-fg flex items-center gap-2"><Scale className="w-4 h-4 text-slate-500" /> أسس خدمة «قارن بنفسك» (الكتالوج العالمي)</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.compareCfg.gsmarenaLive !== false} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, gsmarenaLive: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.compareCfg.gsmarenaLive !== false} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, gsmarenaLive: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل البحث الحي في الكتالوج العالمي</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={!!cfg.compareCfg.defaultDiffOnly} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, defaultDiffOnly: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={!!cfg.compareCfg.defaultDiffOnly} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, defaultDiffOnly: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار الاختلافات فقط افتراضياً</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.compareCfg.showVerdict !== false} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, showVerdict: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.compareCfg.showVerdict !== false} onChange={e => patchCfg({ compareCfg: { ...cfg.compareCfg, showVerdict: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار «حكم كرومبو النهائي»</span>
               </label>
               <div className="p-2.5 rounded-2xl bg-surface2 border border-line">
@@ -559,7 +559,7 @@ function KaramboAdminPanel({ ctx }) {
                 <input type="number" min="0" defaultValue={cfg.gulfCfg.defaultShippingEgp || 0} onBlur={e => patchCfg({ gulfCfg: { ...cfg.gulfCfg, defaultShippingEgp: parseFloat(e.target.value) || 0 } })} className="w-full px-3 py-2 rounded-xl border border-line bg-surface2 text-xs font-bold" />
               </div>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer self-end">
-                <input type="checkbox" checked={cfg.gulfCfg.enableLiveFx !== false} onChange={e => patchCfg({ gulfCfg: { ...cfg.gulfCfg, enableLiveFx: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.gulfCfg.enableLiveFx !== false} onChange={e => patchCfg({ gulfCfg: { ...cfg.gulfCfg, enableLiveFx: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل زر «تحديث سعر الصرف الحي»</span>
               </label>
             </div>
@@ -578,15 +578,15 @@ function KaramboAdminPanel({ ctx }) {
             <h3 className="font-black text-fg flex items-center gap-2"><Gauge className="w-4 h-4 text-emerald-600" /> أسس الدليل ومعادلة «قيمة مقابل السعر» والميزانية</h3>
             <div className="grid sm:grid-cols-3 gap-3">
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.allowImportCta !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, allowImportCta: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.allowImportCta !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, allowImportCta: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار زر «اطلبه استيراد»</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.allowPriceAlerts !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, allowPriceAlerts: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.allowPriceAlerts !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, allowPriceAlerts: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار زر «نبّهني لو سعره نزل»</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.enableBundleBuilder !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, enableBundleBuilder: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.enableBundleBuilder !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, enableBundleBuilder: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل «اقترحلي باكدج» في الميزانية</span>
               </label>
             </div>
@@ -612,27 +612,27 @@ function KaramboAdminPanel({ ctx }) {
             <h3 className="font-black text-fg flex items-center gap-2"><Megaphone className="w-4 h-4 text-blue-600" /> أسس خدمة «آخر الأخبار» وربط الكتالوج والأسعار الحية</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.enableGlobalCatalog !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, enableGlobalCatalog: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.enableGlobalCatalog !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, enableGlobalCatalog: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>عرض كل الموديلات العالمية في الدليل</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.autoFetchEgyptPrice !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, autoFetchEgyptPrice: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.autoFetchEgyptPrice !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, autoFetchEgyptPrice: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>جلب السعر المصري تلقائياً تحت كل جهاز</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.guideCfg.showNewsBannerInGuide !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, showNewsBannerInGuide: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.guideCfg.showNewsBannerInGuide !== false} onChange={e => patchCfg({ guideCfg: { ...cfg.guideCfg, showNewsBannerInGuide: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار شريط «آخر الأخبار» داخل الدليل</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.newsCfg.enabledLive !== false} onChange={e => patchCfg({ newsCfg: { ...cfg.newsCfg, enabledLive: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.newsCfg.enabledLive !== false} onChange={e => patchCfg({ newsCfg: { ...cfg.newsCfg, enabledLive: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل الجلب الحي لـ «آخر الأخبار»</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.marketCfg.enableLiveAdvisor !== false} onChange={e => patchCfg({ marketCfg: { ...cfg.marketCfg, enableLiveAdvisor: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.marketCfg.enableLiveAdvisor !== false} onChange={e => patchCfg({ marketCfg: { ...cfg.marketCfg, enableLiveAdvisor: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل السوق الحي في «ساعدني أختار»</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.marketCfg.enableLiveRadar !== false} onChange={e => patchCfg({ marketCfg: { ...cfg.marketCfg, enableLiveRadar: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.marketCfg.enableLiveRadar !== false} onChange={e => patchCfg({ marketCfg: { ...cfg.marketCfg, enableLiveRadar: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>تفعيل بورصة الأسعار الحية في «الرادار»</span>
               </label>
             </div>
@@ -746,7 +746,7 @@ function KaramboAdminPanel({ ctx }) {
           <div className="bg-surface border border-line rounded-3xl p-5 space-y-3">
             <h3 className="font-black text-fg">المزامنة وإضافة الأجهزة</h3>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => importGuideSeed()} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-black transition"><Download className="w-4 h-4" /> استيراد البيانات المرفقة (30 جهاز)</button>
+              <button type="button" onClick={() => importGuideSeed()} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-black transition"><Download className="w-4 h-4" /> استيراد البيانات المرفقة (30 جهاز)</button>
               <button type="button" disabled={sync.status === 'running'} onClick={() => syncGuideLive()} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-600 hover:bg-slate-500 disabled:opacity-50 text-white text-xs font-black transition"><RefreshCw className={`w-4 h-4 ${sync.status === 'running' ? 'animate-spin' : ''}`} /> {sync.status === 'running' ? (sync.msg || 'بيزامن...') : 'مزامنة حية من المصدر'}</button>
               <button type="button" onClick={() => setManualOpen(v => !v)} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition"><Plus className="w-4 h-4" /> إضافة جهاز يدوياً</button>
             </div>
@@ -790,7 +790,7 @@ function KaramboAdminPanel({ ctx }) {
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <input type="number" min="0" value={priceDrafts[ph.id] !== undefined ? priceDrafts[ph.id] : (ph.price || '')} onChange={e => setPriceDrafts(p => ({ ...p, [ph.id]: e.target.value }))} className="w-24 px-2 py-1.5 rounded-lg border border-line bg-surface2 text-xs font-black text-fg" title="سعر السوق الاسترشادي" />
-                    <button type="button" onClick={() => updateGuidePhone(ph.id, { price: parseFloat(priceDrafts[ph.id]) || ph.price })} className="p-2 rounded-lg bg-[#1E4E8C] text-white" title="حفظ السعر"><Save className="w-3.5 h-3.5" /></button>
+                    <button type="button" onClick={() => updateGuidePhone(ph.id, { price: parseFloat(priceDrafts[ph.id]) || ph.price })} className="p-2 rounded-lg bg-[#0071E3] text-white" title="حفظ السعر"><Save className="w-3.5 h-3.5" /></button>
                     <button type="button" onClick={() => toggleGuidePhone(ph.id)} className={`p-2 rounded-lg text-white ${ph.enabled === false ? 'bg-slate-400' : 'bg-emerald-600'}`} title={ph.enabled === false ? 'إظهار' : 'إخفاء'}>{ph.enabled === false ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}</button>
                     <button type="button" onClick={() => { if (window.confirm(`حذف ${ph.name} من الدليل؟`)) deleteGuidePhone(ph.id); }} className="p-2 rounded-lg bg-rose-600 text-white" title="حذف"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
@@ -810,23 +810,23 @@ function KaramboAdminPanel({ ctx }) {
             <h3 className="font-black text-fg flex items-center gap-2"><Shield className="w-4 h-4 text-emerald-600" /> إعدادات خدمة تقييم المحلات والمنصات</h3>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.reviewsCfg.requireLoginToReview !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, requireLoginToReview: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.reviewsCfg.requireLoginToReview !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, requireLoginToReview: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إجبار العميل على تسجيل الدخول لكتابة تقييم أو سؤال</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.reviewsCfg.requireApproval !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, requireApproval: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.reviewsCfg.requireApproval !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, requireApproval: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>مراجعة التقييم قبل النشر (موصى به)</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.reviewsCfg.allowNewStoreSubmission !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, allowNewStoreSubmission: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.reviewsCfg.allowNewStoreSubmission !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, allowNewStoreSubmission: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>السماح للزوار باقتراح محل جديد</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.reviewsCfg.allowProofUpload !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, allowProofUpload: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.reviewsCfg.allowProofUpload !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, allowProofUpload: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>السماح برفع فاتورة للتوثيق</span>
               </label>
               <label className="flex items-center gap-2 p-3 rounded-2xl bg-surface2 border border-line text-xs font-black cursor-pointer">
-                <input type="checkbox" checked={cfg.reviewsCfg.showStoreCta !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, showStoreCta: e.target.checked } })} className="w-4 h-4 accent-[#1E4E8C]" />
+                <input type="checkbox" checked={cfg.reviewsCfg.showStoreCta !== false} onChange={e => patchCfg({ reviewsCfg: { ...cfg.reviewsCfg, showStoreCta: e.target.checked } })} className="w-4 h-4 accent-[#0071E3]" />
                 <span>إظهار شريط إكسسوارات ELZOGHBI</span>
               </label>
             </div>
@@ -866,11 +866,11 @@ function KaramboAdminPanel({ ctx }) {
                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-black text-white ${r.status === 'approved' ? 'bg-emerald-600' : r.status === 'rejected' ? 'bg-rose-600' : 'bg-amber-500'}`}>
                           {r.status === 'approved' ? 'منشور' : r.status === 'rejected' ? 'مرفوض' : 'بانتظار الموافقة'}
                         </span>
-                        {r.verifiedPurchase && <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C] text-white text-[9px] font-black">موثّق ✓</span>}
+                        {r.verifiedPurchase && <span className="px-2 py-0.5 rounded-full bg-[#0071E3] text-white text-[9px] font-black">موثّق ✓</span>}
                       </div>
                       <div className="flex items-center gap-1.5">
                         {r.status !== 'approved' && <button type="button" onClick={() => moderateStoreReview && moderateStoreReview(r.id, { status: 'approved' })} className="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-black">موافقة ونشر</button>}
-                        <button type="button" onClick={() => moderateStoreReview && moderateStoreReview(r.id, { verifiedPurchase: !r.verifiedPurchase })} className="px-2.5 py-1 rounded-lg bg-[#1E4E8C] text-white text-[10px] font-black">{r.verifiedPurchase ? 'إلغاء التوثيق' : 'توثيق ✓'}</button>
+                        <button type="button" onClick={() => moderateStoreReview && moderateStoreReview(r.id, { verifiedPurchase: !r.verifiedPurchase })} className="px-2.5 py-1 rounded-lg bg-[#0071E3] text-white text-[10px] font-black">{r.verifiedPurchase ? 'إلغاء التوثيق' : 'توثيق ✓'}</button>
                         <button type="button" onClick={() => moderateStoreReview && moderateStoreReview(r.id, { resolved: !r.resolved })} className="px-2.5 py-1 rounded-lg bg-slate-600 text-white text-[10px] font-black">{r.resolved ? 'إلغاء الحل' : 'تم حل الشكوى'}</button>
                         <button type="button" onClick={() => deleteStoreReview && deleteStoreReview(r.id)} className="p-1.5 rounded-lg bg-rose-600 text-white"><Trash2 className="w-3.5 h-3.5" /></button>
                       </div>
@@ -878,7 +878,7 @@ function KaramboAdminPanel({ ctx }) {
                     <div className="text-xs font-bold text-fg">{r.comment}</div>
                     {r.proofImage && (
                       <div className="pt-1">
-                        <a href={r.proofImage} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-[#1E4E8C] underline">عرض صورة إثبات الشراء المرفقة (سرية للإدارة فقط)</a>
+                        <a href={r.proofImage} target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-[#0066CC] underline">عرض صورة إثبات الشراء المرفقة (سرية للإدارة فقط)</a>
                       </div>
                     )}
                     <div className="flex gap-1.5 pt-1">
@@ -953,7 +953,7 @@ function KaramboAdminPanel({ ctx }) {
                   topPhonesArr.map(([name, cnt], i) => (
                     <div key={name} className="flex items-center justify-between text-xs font-bold py-1 border-b border-line/60 last:border-0">
                       <span className="text-fg truncate">{i + 1}. {name}</span>
-                      <span className="px-2 py-0.5 rounded-full bg-[#1E4E8C]/15 text-[#1E4E8C] dark:text-[#7FB0E8] text-[10px] font-black">{cnt} مرة</span>
+                      <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] dark:text-[#2997FF] text-[10px] font-black">{cnt} مرة</span>
                     </div>
                   ))
                 )}

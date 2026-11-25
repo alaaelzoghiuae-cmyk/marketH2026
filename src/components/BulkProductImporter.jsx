@@ -232,7 +232,7 @@ export default function BulkProductImporter({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-sm sm:text-base font-black text-fg flex items-center gap-2">
-              <Upload className="w-5 h-5 text-[#1E4E8C]" />
+              <Upload className="w-5 h-5 text-[#0066CC]" />
               <span>المستورد الذكي للمنتجات وروابط الصور (Bulk Product Importer)</span>
             </h2>
             <p className="text-[11px] text-muted mt-0.5">
@@ -261,7 +261,7 @@ export default function BulkProductImporter({
               key={sNum}
               className={`px-2.5 py-2 rounded-xl border text-center font-extrabold text-[10px] sm:text-xs transition ${
                 step === sNum
-                  ? 'bg-[#1E4E8C] text-white border-[#1E4E8C] shadow-sm'
+                  ? 'bg-[#0071E3] text-white border-[#0071E3] shadow-sm'
                   : step > sNum
                   ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
                   : 'bg-surface2 text-muted border-line'
@@ -310,14 +310,14 @@ export default function BulkProductImporter({
 
           <div>
             <label className="block font-extrabold text-fg mb-1.5">
-              الصق روابط الصور (حتى 4 روابط في كل سطر مفصولة بمسافة أو |) أو سطور CSV بصيغة: <span className="text-[#1E4E8C]" dir="ltr">Name, Price, Cost, Stock, Category, URL1|URL2</span>
+              الصق روابط الصور (حتى 4 روابط في كل سطر مفصولة بمسافة أو |) أو سطور CSV بصيغة: <span className="text-[#0066CC]" dir="ltr">Name, Price, Cost, Stock, Category, URL1|URL2</span>
             </label>
             <textarea
               rows={8}
               value={rawInput}
               onChange={e => setRawInput(e.target.value)}
               placeholder={`مثال سطر CSV:\nشاحن سريع 65 واط GaN, 850, 620, 10, شواحن, https://example.com/img1.jpg|https://example.com/img2.jpg\n\nأو لصق روابط صور مباشرة (كل سطر = منتج):\nhttps://example.com/cable1.jpg https://example.com/cable2.jpg`}
-              className="w-full p-3.5 rounded-2xl bg-bg border border-line text-fg font-mono text-xs focus:outline-none focus:border-[#1E4E8C]"
+              className="w-full p-3.5 rounded-2xl bg-bg border border-line text-fg font-mono text-xs focus:outline-none focus:border-[#0071E3]"
             />
           </div>
 
@@ -325,7 +325,7 @@ export default function BulkProductImporter({
             <button
               type="button"
               onClick={parseInputToRows}
-              className="px-6 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow transition"
+              className="px-6 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs shadow transition"
             >
               تحليل ومعاينة المنتجات ←
             </button>
@@ -351,7 +351,7 @@ export default function BulkProductImporter({
                 <button
                   type="button"
                   onClick={() => setStep(3)}
-                  className="px-4 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold"
+                  className="px-4 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold"
                 >
                   التحقق والمراجعة ←
                 </button>
@@ -422,7 +422,7 @@ export default function BulkProductImporter({
                             />
                           )}
                           {imIdx === 0 && (
-                            <span className="absolute -top-1 -right-1 px-1 rounded bg-[#1E4E8C] text-white text-[8px] font-black">رئيسية</span>
+                            <span className="absolute -top-1 -right-1 px-1 rounded bg-[#0071E3] text-white text-[8px] font-black">رئيسية</span>
                           )}
                         </div>
                       );
@@ -502,7 +502,7 @@ export default function BulkProductImporter({
           <button
             type="button"
             onClick={() => { setStep(1); setRawInput(''); setRows([]); setImportSummary(null); }}
-            className="px-5 py-2.5 rounded-xl bg-[#1E4E8C] text-white font-extrabold text-xs"
+            className="px-5 py-2.5 rounded-xl bg-[#0071E3] text-white font-extrabold text-xs"
           >
             استيراد دفعة جديدة
           </button>

@@ -16,12 +16,12 @@ export const KARAMBO_SERVICES = [
 ];
 
 export const KARAMBO_THEMES = {
-  blue: { label: 'أزرق مؤسسي', from: '#1E4E8C', via: '#1E4E8C', to: '#1E4E8C', border: 'rgba(30,78,140,0.45)', text: '#FFFFFF' },
-  dark: { label: 'فحمي داكن', from: '#1B1F24', via: '#1B1F24', to: '#1B1F24', border: 'rgba(148,163,184,0.30)', text: '#FFFFFF' },
-  emerald: { label: 'أخضر ثقة', from: '#0F6B4F', via: '#0F6B4F', to: '#0F6B4F', border: 'rgba(16,185,129,0.40)', text: '#FFFFFF' },
-  violet: { label: 'بنفسجي هادئ', from: '#44407A', via: '#44407A', to: '#44407A', border: 'rgba(100,96,170,0.40)', text: '#FFFFFF' },
-  sunset: { label: 'برتقالي ترابي', from: '#A8480F', via: '#A8480F', to: '#A8480F', border: 'rgba(200,100,30,0.40)', text: '#FFFFFF' },
-  custom: { label: 'ألوان مخصصة', from: '#1E4E8C', via: '#1E4E8C', to: '#1E4E8C', border: 'rgba(30,78,140,0.45)', text: '#FFFFFF' }
+  blue: { label: 'أزرق مؤسسي', from: '#0071E3', via: '#0071E3', to: '#0071E3', border: 'rgba(0,113,227,0.45)', text: '#FFFFFF' },
+  dark: { label: 'فحمي داكن', from: '#1D1D1F', via: '#1D1D1F', to: '#1D1D1F', border: 'rgba(148,163,184,0.30)', text: '#FFFFFF' },
+  emerald: { label: 'أخضر ثقة', from: '#248A3D', via: '#248A3D', to: '#248A3D', border: 'rgba(16,185,129,0.40)', text: '#FFFFFF' },
+  violet: { label: 'بنفسجي هادئ', from: '#5E5CE6', via: '#5E5CE6', to: '#5E5CE6', border: 'rgba(100,96,170,0.40)', text: '#FFFFFF' },
+  sunset: { label: 'برتقالي ترابي', from: '#C93400', via: '#C93400', to: '#C93400', border: 'rgba(200,100,30,0.40)', text: '#FFFFFF' },
+  custom: { label: 'ألوان مخصصة', from: '#0071E3', via: '#0071E3', to: '#0071E3', border: 'rgba(0,113,227,0.45)', text: '#FFFFFF' }
 };
 
 export const KARAMBO_ICON_OPTIONS = [

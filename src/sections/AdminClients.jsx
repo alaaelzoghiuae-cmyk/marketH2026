@@ -108,7 +108,7 @@ export function renderAdminClients(ctx) {
           >
             <div className={`text-[11px] font-bold ${adminClientsFilterType === 'ALL' ? 'text-muted' : 'text-muted'}`}>إجمالي الحسابات المسجلة</div>
             <div className="text-2xl font-black mt-1 font-mono">{clients.length}</div>
-            <div className={`text-[10px] mt-1 font-bold ${adminClientsFilterType === 'ALL' ? 'text-[#7FB0E8]' : 'text-blue-600'}`}>اضغط لعرض الجميع</div>
+            <div className={`text-[10px] mt-1 font-bold ${adminClientsFilterType === 'ALL' ? 'text-[#2997FF]' : 'text-blue-600'}`}>اضغط لعرض الجميع</div>
           </div>
 
           <div
@@ -143,7 +143,7 @@ export function renderAdminClients(ctx) {
           >
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-blue-100">إضافة حساب جديد</span>
-              <Plus className="w-5 h-5 text-[#7FB0E8]" />
+              <Plus className="w-5 h-5 text-[#2997FF]" />
             </div>
             <div className="text-sm sm:text-base font-extrabold mt-1">+ إنشاء حساب تاجر / عميل</div>
             <div className="text-[10px] text-blue-100 font-bold">تحديد الفئة وسقف الآجل فوراً</div>
@@ -263,7 +263,7 @@ export function renderAdminClients(ctx) {
                           avatarBg: 'from-emerald-600 to-slate-700'
                         })
                       }
-                      className="flex-1 py-2 px-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold flex items-center justify-center gap-1"
+                      className="flex-1 py-2 px-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold flex items-center justify-center gap-1"
                     >
                       <Check className="w-3.5 h-3.5" />
                       موافقة وتفعيل
@@ -401,7 +401,7 @@ export function renderAdminClients(ctx) {
                     <div className="text-xs text-muted flex items-center gap-2 flex-wrap">
                       <span>{selectedClient.owner}</span>
                       <span>•</span>
-                      <span className="font-mono text-[#7FB0E8] font-bold">{selectedClient.phone}</span>
+                      <span className="font-mono text-[#2997FF] font-bold">{selectedClient.phone}</span>
                     </div>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ export function renderAdminClients(ctx) {
                     className="px-3 py-1.5 rounded-xl bg-surface hover:bg-surface text-white text-xs font-bold flex items-center gap-1"
                     title="معاينة المتجر بحساب هذا العميل"
                   >
-                    <Eye className="w-3.5 h-3.5 text-[#7FB0E8]" />
+                    <Eye className="w-3.5 h-3.5 text-[#2997FF]" />
                     <span>معاينة المتجر</span>
                   </button>
                 </div>
@@ -663,7 +663,7 @@ export function renderAdminClients(ctx) {
                       <button
                         type="button"
                         onClick={() => handleRecordManualPayment(true)}
-                        className="py-2.5 px-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold transition"
+                        className="py-2.5 px-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold transition"
                       >
                         + تحصيل / إضافة رصيد
                       </button>
@@ -1426,7 +1426,7 @@ export function renderAdminApproveRequestModal(ctx) {
 
           <button
             type="submit"
-            className="w-full py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-extrabold text-sm shadow-md"
+            className="w-full py-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-extrabold text-sm shadow-md"
           >
             تأكيد الموافقة وتفعيل الحساب الآن
           </button>

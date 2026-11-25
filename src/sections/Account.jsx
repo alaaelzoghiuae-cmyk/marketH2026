@@ -175,7 +175,7 @@ export function renderClientOrdersView(ctx) {
                       {canClientPrintInvoice && (
                         <button
                           onClick={() => setPrintModalOrder({ order, mode: 'invoice', isClientView: true })}
-                          className="px-3 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
+                          className="px-3 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-xs"
                         >
                           <Printer className="w-3.5 h-3.5" />
                           اطبع الفاتورة الرسمية
@@ -1148,7 +1148,7 @@ export function renderClientAccountPortal(ctx) {
                       const waText = `جرب تطلب من موقع ${siteSettings.storeName || 'ELZOGHBI'} واستخدم كود الدعوة بتاعي (${myCode}) عشان ناخد إحنا الاتنين هدية ${rewardTxt} في المحفظة! ${shareUrl}`;
                       window.open(`https://wa.me/?text=${encodeURIComponent(waText)}`, '_blank');
                     }}
-                    className="px-3.5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px]"
+                    className="px-3.5 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px]"
                   >
                     📲 ابعت لصاحبك واتساب
                   </button>

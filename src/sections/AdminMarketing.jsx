@@ -18,7 +18,7 @@ export function renderAdminPromoCodes(ctx) {
             <button
               type="button"
               onClick={() => pushToSupabaseCloud(null, true)}
-              className="px-4 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
+              className="px-4 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-extrabold flex items-center gap-1.5 shadow-sm transition"
             >
               <Save className="w-4 h-4" />
               <span>حفظ وتأكيد الكوبونات في السيرفر ✓</span>
@@ -405,7 +405,7 @@ export function renderAdminRestockAlertsView(ctx) {
                         <button
                           type="button"
                           onClick={() => setAdminRestockWhatsappPart({ id: grp.partId, name: grp.partName })}
-                          className="px-3.5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px]"
+                          className="px-3.5 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px]"
                         >
                           📲 مراسلة كل منتظري هذا المنتج ({grp.entries.length})
                         </button>
@@ -455,7 +455,7 @@ export function renderAdminRestockAlertsView(ctx) {
                             <button
                               type="button"
                               onClick={() => sendAdminRestockWhatsappToEntry(entry)}
-                              className="px-3 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px]"
+                              className="px-3 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px]"
                             >
                               📲 واتساب
                             </button>
@@ -568,13 +568,13 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
     return (
       <div className="space-y-4 text-xs">
         {/* Top Executive Header & Live Analytics Cards */}
-        <div className="bg-surface dark:bg-[#0B1224] text-fg rounded-3xl p-6 border border-[#2F6BB3]/40 shadow-sm space-y-5">
+        <div className="bg-surface dark:bg-[#1D1D1F] text-fg rounded-3xl p-6 border border-[#0071E3]/40 shadow-sm space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
                 SUPER ADMIN FEATURE FLAGS & CRO CENTER
               </span>
-              <h2 className="text-xl sm:text-2xl font-black text-[#7FB0E8] mt-2">
+              <h2 className="text-xl sm:text-2xl font-black text-[#2997FF] mt-2">
                 مركز التحكم المقسّم والمنظم في جميع ميزات الموقع (اضغط + أو − لفتح أو طي أي قسم)
               </h2>
               <p className="text-xs text-muted mt-1">
@@ -597,7 +597,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                     repurchase_waitlist: true
                   })
                 }
-                className="px-4 py-2 rounded-full bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black shadow-sm"
+                className="px-4 py-2 rounded-full bg-[#0071E3] hover:bg-[#0077ED] text-white font-black shadow-sm"
               >
                 + فتح كل الأقسام
               </button>
@@ -616,7 +616,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                     repurchase_waitlist: false
                   })
                 }
-                className="px-4 py-2 rounded-full bg-surface2 hover:border-[#2F6BB3] text-fg font-bold border border-line"
+                className="px-4 py-2 rounded-full bg-surface2 hover:border-[#0071E3] text-fg font-bold border border-line"
               >
                 − طي كل الأقسام
               </button>
@@ -636,14 +636,14 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                     }
                   });
                 }}
-                className="px-4 py-2 rounded-full bg-[#1E4E8C]/15 hover:bg-[#1E4E8C] text-[#1E4E8C] dark:text-[#7FB0E8] hover:text-white border border-[#2F6BB3]/35 font-black transition"
+                className="px-4 py-2 rounded-full bg-[#0071E3]/15 hover:bg-[#0071E3] text-[#0066CC] dark:text-[#2997FF] hover:text-white border border-[#0071E3]/35 font-black transition"
               >
                 ✅ تشغيل كل الميزات
               </button>
               <button
                 type="button"
                 onClick={() => setAdminTab('restock_alerts')}
-                className="px-4 py-2 rounded-full bg-surface2 hover:border-[#2F6BB3] text-fg border border-line font-black transition"
+                className="px-4 py-2 rounded-full bg-surface2 hover:border-[#0071E3] text-fg border border-line font-black transition"
               >
                 🔔 صفحة نبهني عند التوفر ({waitlistEntries.length})
               </button>
@@ -659,17 +659,17 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
             </div>
             <div className="p-4 rounded-2xl bg-surface2/80 border border-line space-y-1">
               <div className="text-[11px] text-muted font-bold">🎟️ الكوبونات المستخدمة (Coupons Used)</div>
-              <div className="text-2xl font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{totalCouponUses} مرة</div>
+              <div className="text-2xl font-black text-[#0066CC] dark:text-[#2997FF]">{totalCouponUses} مرة</div>
               <div className="text-[11px] text-muted font-bold">من إجمالي {promoCodes.length} كود نشط</div>
             </div>
             <div className="p-4 rounded-2xl bg-surface2/80 border border-line space-y-1">
               <div className="text-[11px] text-muted font-bold">💰 المنتجات المفعل عليها كاش باك</div>
-              <div className="text-2xl font-black text-[#7FB0E8]">{cashbackEnabledPartsCount} / {parts.length}</div>
+              <div className="text-2xl font-black text-[#2997FF]">{cashbackEnabledPartsCount} / {parts.length}</div>
               <div className="text-[11px] text-accent-text font-bold">إجمالي كاش باك ممنوح: {formatMoney(totalCashbackPaid)}</div>
             </div>
             <div
               onClick={() => setAdminTab('restock_alerts')}
-              className="p-4 rounded-2xl bg-surface2/80 hover:border-[#2F6BB3] border border-line space-y-1 cursor-pointer transition"
+              className="p-4 rounded-2xl bg-surface2/80 hover:border-[#0071E3] border border-line space-y-1 cursor-pointer transition"
             >
               <div className="text-[11px] text-accent-text font-bold">🔔 طلبات نبهني عند التوفر (اضغط للفتح)</div>
               <div className="text-2xl font-black text-rose-300">{waitlistEntries.length} طلب</div>
@@ -711,7 +711,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                     key={f.key}
                     onClick={() => saveSiteSettingsImmediate(prev => ({ ...prev, [f.key]: !isOn }))}
                     className={`p-3.5 rounded-2xl border-2 cursor-pointer transition flex items-start justify-between gap-3 ${
-                      isOn ? 'bg-[#1E4E8C]/[0.07] border-[#2F6BB3]/45 shadow-2xs' : 'bg-surface2/60 border-line opacity-75'
+                      isOn ? 'bg-[#0071E3]/[0.07] border-[#0071E3]/45 shadow-2xs' : 'bg-surface2/60 border-line opacity-75'
                     }`}
                   >
                     <div className="space-y-1">
@@ -724,7 +724,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                     <button
                       type="button"
                       className={`px-3 py-1 rounded-full font-black text-[10px] shrink-0 ${
-                        isOn ? 'bg-[#1E4E8C] text-white shadow-xs' : 'bg-surface text-muted border border-line'
+                        isOn ? 'bg-[#0071E3] text-white shadow-xs' : 'bg-surface text-muted border border-line'
                       }`}
                     >
                       {isOn ? 'مفعّل ✓' : 'متوقف ✕'}
@@ -800,7 +800,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                       'نعم، نفّذ على الكل'
                     )
                   }
-                  className="py-3 px-4 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs shadow-sm"
+                  className="py-3 px-4 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs shadow-sm"
                 >
                   ✅ تفعيل الكاش باك فوراً للأرخص من {(Number(siteSettings.cashbackMaxPartPrice) || 1500).toLocaleString()} ج.م فقط
                 </button>
@@ -973,7 +973,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
         {adminFlagsSubTab === 'cart_tiers' && (
         <>
         {/* BOX 3: Cashier Impulse Shelf Manual Product Picker + Quality Tiers + Buy More Save More */}
-        <div className="bg-surface rounded-2xl p-5 border-2 border-[#2F6BB3]/45 space-y-4">
+        <div className="bg-surface rounded-2xl p-5 border-2 border-[#0071E3]/45 space-y-4">
           {renderCollapsibleHeader(
             'cashier_tiers',
             '🛒',
@@ -1059,7 +1059,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                   <div className="font-black text-fg">
                     🛒 اختر المنتجات التي تظهر للعميل في "رف الكاشير السريع" (اضغط لتثبيت أو إلغاء تثبيت أي منتج):
                   </div>
-                  <span className="text-[11px] font-bold text-[#1E4E8C]">
+                  <span className="text-[11px] font-bold text-[#0066CC]">
                     مثبت حالياً: {pinnedCashierCount} منتج
                   </span>
                 </div>
@@ -1073,7 +1073,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                         onClick={(e) => togglePartCashierPin(p, e)}
                         className={`px-3 py-1.5 rounded-xl border text-[11px] font-bold flex items-center gap-1.5 transition ${
                           pinned
-                            ? 'bg-[#1E4E8C] text-slate-950 border-[#2F6BB3] font-black shadow-xs'
+                            ? 'bg-[#0071E3] text-slate-950 border-[#0071E3] font-black shadow-xs'
                             : 'bg-surface2 text-muted border-line hover:text-fg'
                         }`}
                       >
@@ -1295,7 +1295,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                       <div className="flex flex-wrap gap-2">
                         {savedList.map(dev => (
                           <div key={dev.id} className="p-2.5 rounded-xl bg-surface border border-line flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded bg-[#1E4E8C]/15 text-[#1E4E8C] font-black text-[10px]">{dev.ownerLabel}</span>
+                            <span className="px-2 py-0.5 rounded bg-[#0071E3]/15 text-[#0066CC] font-black text-[10px]">{dev.ownerLabel}</span>
                             <span className="font-black text-fg">{dev.modelName}</span>
                             <button
                               type="button"
@@ -1305,7 +1305,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                                 const msg = `مرحباً ${cli.name} 👋، وصلنا اليوم منتج جديد مميز لقسم (${dev.modelName} — ${dev.ownerLabel}) الذي قمت بحفظه في قائمة اهتماماتك لدى ${siteSettings.storeName || 'ELZOGHBI'} ! تصفحه الآن: ${window.location.origin}`;
                                 window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                               }}
-                              className="px-2.5 py-1 rounded-lg bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[10px]"
+                              className="px-2.5 py-1 rounded-lg bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[10px]"
                             >
                               📲 إشعار واتساب بمنتج جديد
                             </button>
@@ -1348,7 +1348,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                   <button
                     type="button"
                     onClick={() => triggerLiveSocialToastImmediate(null, true)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-slate-400 text-slate-950 font-black text-[11px]"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-slate-400 text-slate-950 font-black text-[11px]"
                   >
                     🔔 اضغط لتجربة الإشعار أمامك الآن!
                   </button>
@@ -1659,7 +1659,7 @@ export function renderAdminFeatureFlagsDashboard(ctx) {
                           const msg = `مرحباً ${cand.clientName} 👋، "${cand.itemName}" اللي اشتريته مننا في ${siteSettings.storeName || 'ELZOGHBI'} بقاله فترة، تحب تجدده النهاردة بخصم خاص ${siteSettings.repurchaseDiscountPct || 10}% بكود (${siteSettings.repurchasePromoCode || 'RENEW10'})؟ 🎁 اطلبه الآن: ${window.location.origin}`;
                           window.open(`https://wa.me/${waPhone}?text=${encodeURIComponent(msg)}`, '_blank');
                         }}
-                        className="px-3.5 py-1.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-[11px]"
+                        className="px-3.5 py-1.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-[11px]"
                       >
                         📲 إرسال تذكير التجديد على واتساب (-{siteSettings.repurchaseDiscountPct || 10}%)
                       </button>

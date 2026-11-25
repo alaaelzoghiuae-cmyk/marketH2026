@@ -2,38 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---- Design tokens: graphite & silver, single blue accent (light + dark) ---- */
 :root {
-  --bg: 244 245 246;
-  --surface: 255 255 255;
-  --surface2: 240 241 243;
-  --fg: 24 27 31;
-  --muted: 100 107 116;
-  --line: 223 226 230;
-  --accent: 30 78 140;
+  --bg: 255 255 255;
+  --surface: 245 245 247;
+  --surface2: 232 232 237;
+  --fg: 29 29 31;
+  --muted: 110 110 115;
+  --line: 217 217 222;
+  --accent: 0 113 227;
   --accent-ink: 255 255 255;
-  --accent-text: 30 78 140;
-  --go: 30 78 140;
+  --accent-text: 0 102 204;
+  --go: 0 113 227;
   --go-ink: 255 255 255;
-  --radius-card: 10px;
-  --radius-ctrl: 8px;
-  --shadow-card: 0 1px 2px rgba(20, 24, 28, 0.06);
-  --shadow-lift: 0 2px 8px rgba(20, 24, 28, 0.10);
+  --radius-card: 20px;
+  --radius-ctrl: 12px;
+  --shadow-card: none;
+  --shadow-lift: 0 8px 28px rgba(0, 0, 0, 0.10);
+  --shadow-pop: 0 20px 60px rgba(0, 0, 0, 0.22);
+  --nav-glass: rgba(255, 255, 255, 0.78);
+  --nav-hairline: rgba(0, 0, 0, 0.10);
 }
 
 .dark {
-  --bg: 18 20 23;
-  --surface: 26 29 33;
-  --surface2: 34 38 43;
-  --fg: 236 238 241;
-  --muted: 150 157 166;
-  --line: 52 58 66;
-  --accent: 79 134 201;
+  --bg: 0 0 0;
+  --surface: 29 29 31;
+  --surface2: 44 44 46;
+  --fg: 245 245 247;
+  --muted: 161 161 166;
+  --line: 56 56 58;
+  --accent: 0 113 227;
   --accent-ink: 255 255 255;
-  --accent-text: 127 176 232;
-  --go: 47 107 179;
+  --accent-text: 41 151 255;
+  --go: 0 113 227;
   --go-ink: 255 255 255;
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-lift: 0 2px 10px rgba(0, 0, 0, 0.5);
+  --shadow-lift: 0 8px 28px rgba(0, 0, 0, 0.6);
+  --shadow-pop: 0 20px 60px rgba(0, 0, 0, 0.8);
+  --nav-glass: rgba(22, 22, 23, 0.78);
+  --nav-hairline: rgba(255, 255, 255, 0.12);
 }
 
 html, body {
@@ -51,7 +57,8 @@ body {
   flex-direction: column;
   background-color: rgb(var(--bg));
   color: rgb(var(--fg));
-  font-family: 'IBM Plex Sans Arabic', 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'SF Arabic', 'Inter', 'IBM Plex Sans Arabic', 'Cairo', system-ui, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.47;
   transition: background-color 0.22s ease, color 0.22s ease;
 }
 
@@ -72,7 +79,6 @@ main {
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .hm-card:hover {
-  transform: translateY(-2px);
   box-shadow: var(--shadow-lift);
 }
 
@@ -128,7 +134,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid rgb(var(--accent));
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 /* Respect Reduced Motion Accessibility (keep announcement ticker running on desktop) */
@@ -147,44 +153,130 @@ textarea:focus-visible {
 }
 
 
-/* ===================== Design system v2 — flat, neutral, trade-grade =====================
-   Calibrates the whole storefront + dashboard without touching any feature:
-   neutral surfaces, one corporate blue, small radii, hairline borders, almost no shadow,
-   no gradients / glows / glass, lighter type weights. */
-.font-bold { font-weight: 600; }
-.font-black, .font-extrabold { font-weight: 700; }
-.font-semibold { font-weight: 600; }
-body { font-weight: 500; letter-spacing: 0; }
+/* =====================================================================
+   ELZOGHBI — Retail design language v3
+   Quiet graphite/silver surfaces, one blue accent, pill actions, soft
+   large radii, hairline dividers, glass navigation, generous whitespace.
+   Pure presentation: no markup, state or behaviour is touched.
+   ===================================================================== */
 
-/* Radii: from 24px bubbles to 8-14px */
-.rounded-3xl, [class*="rounded-[2"], [class*="rounded-[3"] { border-radius: 14px; }
-.rounded-2xl { border-radius: 10px; }
-.rounded-xl { border-radius: 8px; }
-.rounded-lg { border-radius: 6px; }
+/* ---------- Typography ---------- */
+body { font-weight: 400; letter-spacing: -0.005em; font-feature-settings: "kern" 1, "liga" 1; }
+h1, h2, h3, h4 { letter-spacing: -0.015em; line-height: 1.14; }
+.font-medium { font-weight: 500; }
+.font-semibold, .font-bold { font-weight: 600; }
+.font-extrabold, .font-black { font-weight: 600; }
+button, a[class*="bg-"] { font-weight: 500; }
+button.font-black, button.font-extrabold, button.font-bold { font-weight: 500; }
+/* Arabic script must never be letter-spaced (breaks letter joining) */
+[dir="rtl"] *, html[lang="ar"] * { letter-spacing: 0 !important; }
+.tracking-tight, .tracking-tighter { letter-spacing: -0.01em; }
+.font-mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.text-\[9px\], .text-\[10px\] { font-size: 11px; line-height: 1.3; }
 
-/* Shadows: hairline instead of glow */
-.shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl, [class*="shadow-["],
-.hover\:shadow-lg:hover, .hover\:shadow-xl:hover, .hover\:shadow-md:hover { box-shadow: var(--shadow-card); }
-.shadow-sm { box-shadow: 0 1px 1px rgba(20, 24, 28, 0.05); }
+/* ---------- Radii: soft, large, consistent ---------- */
+.rounded-3xl,
+[class*="rounded-[22"], [class*="rounded-[24"], [class*="rounded-[26"], [class*="rounded-[28"],
+[class*="rounded-[30"], [class*="rounded-[32"], [class*="rounded-[36"], [class*="rounded-[40"] { border-radius: 24px; }
+.rounded-2xl, [class*="rounded-[18"], [class*="rounded-[20"] { border-radius: 18px; }
+.rounded-xl, [class*="rounded-[14"], [class*="rounded-[16"] { border-radius: 12px; }
+.rounded-lg, [class*="rounded-[10"], [class*="rounded-[12"] { border-radius: 10px; }
+.rounded-md { border-radius: 8px; }
 
-/* Gradients -> flat (uses the first stop). Image scrims (… to-transparent) stay as real gradients. */
+/* ---------- Elevation: flat surfaces; only floating layers get depth ---------- */
+.shadow, .shadow-sm, .shadow-md, .shadow-inner, .shadow-xs,
+[class*="shadow-["], [class*="shadow-blue"], [class*="shadow-emerald"], [class*="shadow-amber"], [class*="shadow-rose"],
+.hover\:shadow-md:hover, .hover\:shadow-lg:hover { box-shadow: none; }
+.shadow-lg, .shadow-xl, .shadow-2xl, .hover\:shadow-xl:hover { box-shadow: var(--shadow-lift); }
+.fixed.inset-0 > .shadow-2xl, .fixed.inset-0 > div.shadow-xl, .fixed.inset-0 > div[class*="max-w-"] { box-shadow: var(--shadow-pop); }
+.absolute.shadow-2xl, .absolute.shadow-xl, .absolute.shadow-lg { box-shadow: var(--shadow-lift); }
+
+/* ---------- No gradients / glows / bouncy motion ---------- */
 [class*="bg-gradient-to-"]:not([class*="to-transparent"]) {
   background-image: none !important;
   background-color: var(--tw-gradient-from, transparent);
 }
-
-/* No glass cards / decorative glow blobs (sticky bars and modal overlays keep their blur) */
 [class*="backdrop-blur"]:not(.fixed):not(.sticky):not(header):not(nav) { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 [class*="blur-3xl"], [class*="blur-2xl"] { display: none !important; }
-
-/* No bouncy hover motion on cards / buttons */
 [class*="hover:-translate-y"]:hover, [class*="hover:scale-"]:hover, [class*="active:scale-"]:active { transform: none !important; }
+.animate-pulse, .animate-bounce { animation: none; }
 .hm-card:hover { transform: none; }
-.animate-pulse { animation: none; }
-.animate-bounce { animation: none; }
+.hm-card { border-radius: 24px; }
 
-/* Quiet scrollbars + selection */
-::selection { background: rgb(var(--accent) / 0.22); color: inherit; }
-button, a, input, select, textarea { transition-duration: 120ms; }
-input, select, textarea { border-radius: 8px; }
+/* ---------- Global navigation: translucent glass + hairline ---------- */
+header.sticky, header[class*="backdrop-blur"] {
+  background-color: var(--nav-glass) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+  backdrop-filter: saturate(180%) blur(20px) !important;
+  border-bottom: 1px solid var(--nav-hairline) !important;
+}
+header nav a, header nav button { font-weight: 500; }
+
+/* ---------- Footer: quiet grey field, small type ---------- */
+footer:not([class*="text-white"]) {
+  background-color: rgb(var(--surface)) !important;
+  border-top: 1px solid rgb(var(--line)) !important;
+}
+footer h4 { font-weight: 600; font-size: 12px; letter-spacing: 0; }
+footer .border-b, footer [class*="border-slate"] { border-color: rgb(var(--line)); }
+
+/* ---------- Sheets & overlays ---------- */
+.fixed.inset-0[class*="bg-nav"] {
+  background-color: rgba(0, 0, 0, 0.42) !important;
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+}
+.fixed.inset-0[class*="bg-black"] { -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.fixed.inset-0[class*="bg-nav"] > div { border-color: transparent; }
+
+/* ---------- Actions: filled pill buttons ---------- */
+:is(button, a):is(
+  [class*="bg-[#0071E3]"], [class*="bg-accent"], [class*="bg-go"], [class*="bg-nav2"], [class*="bg-fg"],
+  [class*="bg-blue-5"], [class*="bg-blue-6"], [class*="bg-blue-7"], [class*="bg-emerald-5"], [class*="bg-emerald-6"],
+  [class*="bg-rose-5"], [class*="bg-rose-6"], [class*="bg-amber-4"], [class*="bg-amber-5"], [class*="bg-slate-9"]
+):is(
+  [class~="py-1"], [class~="py-1.5"], [class~="py-2"], [class~="py-2.5"], [class~="py-3"], [class~="py-3.5"],
+  [class~="p-2"], [class~="p-2.5"], [class~="p-3"], [class~="h-8"], [class~="h-9"], [class~="h-10"], [class~="h-11"], [class~="h-12"]
+):not([class*="flex-col"]):not([class~="w-full"][class~="text-right"]) {
+  border-radius: 980px;
+}
+/* small tinted / outlined actions follow the same shape language */
+:is(button, a):is([class*="/15"], [class*="/10"]):is([class*="border-"]):is([class~="py-1"], [class~="py-1.5"], [class~="py-2"], [class~="py-2.5"], [class~="py-3"]):not([class*="flex-col"]) { border-radius: 980px; }
+button:not(:disabled), a[class*="bg-"] { cursor: pointer; }
+button:disabled, button[disabled] { opacity: 0.4; }
+button:active:not(:disabled) { opacity: 0.86; }
+[class*="bg-[#0071E3]"]:hover, .bg-accent:hover { background-color: #0077ED; }
+
+/* ---------- Form fields ---------- */
+input, select, textarea { border-radius: 12px; }
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),
+select, textarea { transition: border-color 140ms ease, box-shadow 140ms ease; }
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]):focus,
+select:focus, textarea:focus {
+  outline: none;
+  border-color: rgb(var(--accent)) !important;
+  box-shadow: 0 0 0 4px rgb(var(--accent) / 0.22);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: none; }
+input[type="checkbox"], input[type="radio"] { accent-color: rgb(var(--accent)); }
+input[type="range"] { accent-color: rgb(var(--accent)); }
+
+/* ---------- Tables: open rows, quiet header ---------- */
 table { border-collapse: collapse; }
+thead th { font-weight: 600; font-size: 12px; color: rgb(var(--muted)); letter-spacing: 0; }
+tbody tr { transition: background-color 120ms ease; }
+tbody tr:hover { background-color: rgb(var(--surface) / 0.7); }
+th, td { border-color: rgb(var(--line)); }
+.divide-y > :not([hidden]) ~ :not([hidden]) { border-color: rgb(var(--line)); }
+
+/* ---------- Links ---------- */
+a:not([class]) { color: rgb(var(--accent-text)); text-decoration: none; }
+a:not([class]):hover { text-decoration: underline; }
+
+/* ---------- Scrollbars & selection ---------- */
+* { scrollbar-width: thin; scrollbar-color: rgba(134, 134, 139, 0.45) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: rgba(134, 134, 139, 0.4); border-radius: 10px; border: 3px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+::selection { background: rgb(var(--accent) / 0.22); color: inherit; }
+button, a, input, select, textarea { transition-duration: 140ms; }

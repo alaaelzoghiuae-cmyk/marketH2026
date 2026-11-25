@@ -75,13 +75,13 @@ export function KaramboLiveAdvisorView({
             <div className="text-xs font-black text-muted">ميزانيتك لحد كام في السوق المصري؟</div>
             <div className="flex items-center gap-2">
               <input type="number" min="3000" max="200000" step="1000" value={budget} onChange={e => setBudget(Math.max(2000, Number(e.target.value) || 0))} className="w-28 px-2.5 py-1 rounded-xl border border-line bg-surface2 text-xs font-black text-fg" />
-              <span className="text-xs font-black text-[#1E4E8C]">{formatMoney(budget)}</span>
+              <span className="text-xs font-black text-[#0066CC]">{formatMoney(budget)}</span>
             </div>
           </div>
-          <input type="range" min="4000" max="150000" step="1000" value={Math.min(150000, budget)} onChange={e => setBudget(Number(e.target.value))} className="w-full accent-[#1E4E8C]" />
+          <input type="range" min="4000" max="150000" step="1000" value={Math.min(150000, budget)} onChange={e => setBudget(Number(e.target.value))} className="w-full accent-[#0071E3]" />
           <div className="flex flex-wrap gap-1.5">
             {budgets.map(b => (
-              <button key={b} type="button" onClick={() => setBudget(b)} className={`px-3 py-1 rounded-full text-[11px] font-black transition ${budget === b ? 'bg-[#1E4E8C] text-white' : 'bg-surface2 text-fg border border-line'}`}>
+              <button key={b} type="button" onClick={() => setBudget(b)} className={`px-3 py-1 rounded-full text-[11px] font-black transition ${budget === b ? 'bg-[#0071E3] text-white' : 'bg-surface2 text-fg border border-line'}`}>
                 {formatMoney(b)}
               </button>
             ))}
@@ -90,7 +90,7 @@ export function KaramboLiveAdvisorView({
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="flex items-center gap-2 rounded-2xl px-3 py-2 bg-surface2 border border-line">
-            <Search className="w-4 h-4 text-[#2F6BB3] shrink-0" />
+            <Search className="w-4 h-4 text-[#0066CC] shrink-0" />
             <input value={searchQ} onChange={e => setSearchQ(e.target.value)} placeholder="فلترة بكلمة محددة (مثال: 5G أو 256GB أو Pro)..." className="flex-1 bg-transparent border-0 text-xs font-bold focus:outline-none" />
             {searchQ && <button type="button" onClick={() => setSearchQ('')}><X className="w-3.5 h-3.5 text-muted" /></button>}
           </div>
@@ -103,7 +103,7 @@ export function KaramboLiveAdvisorView({
 
         <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
           {brands.map(b => (
-            <button key={b} type="button" onClick={() => setBrand(b)} className={`px-3 py-1 rounded-full text-xs font-black shrink-0 border transition ${brand === b ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface2 text-fg border-line'}`}>
+            <button key={b} type="button" onClick={() => setBrand(b)} className={`px-3 py-1 rounded-full text-xs font-black shrink-0 border transition ${brand === b ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface2 text-fg border-line'}`}>
               {b === 'ALL' ? 'كل الماركات' : b}
             </button>
           ))}
@@ -134,13 +134,13 @@ export function KaramboLiveAdvisorView({
                 {idx === 0 && (
                   <span className="absolute top-2 start-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-black shadow"><Star className="w-3 h-3" /> ترشيح كرومبو</span>
                 )}
-                <div className="aspect-[4/3] rounded-2xl bg-white dark:bg-[#0D1528] flex items-center justify-center overflow-hidden p-2">
+                <div className="aspect-[4/3] rounded-2xl bg-white dark:bg-[#1D1D1F] flex items-center justify-center overflow-hidden p-2">
                   {it.image ? <img src={it.image} alt={it.name} loading="lazy" referrerPolicy="no-referrer" onError={(e) => { e.currentTarget.style.display = "none"; }} className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-10 h-10 text-muted" />}
                 </div>
                 <div className="text-xs font-black text-fg line-clamp-2 leading-snug">{it.name}</div>
                 <div className="mt-auto space-y-1.5 pt-1 border-t border-line/60">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-base font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{formatMoney(it.price)}</span>
+                    <span className="text-base font-black text-[#0066CC] dark:text-[#2997FF]">{formatMoney(it.price)}</span>
                     {it.trend === 'down' && <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-black"><TrendingDown className="w-3 h-3" /> نزل {it.pct ? `${it.pct}%` : ''}</span>}
                     {it.trend === 'up' && <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[9px] font-black"><TrendingUp className="w-3 h-3" /> طلع {it.pct ? `${it.pct}%` : ''}</span>}
                   </div>
@@ -238,7 +238,7 @@ export function KaramboLiveRadarView({
         </div>
         <div className="bg-surface border border-line rounded-2xl p-3 text-center">
           <div className="text-[11px] font-bold text-muted">تخفيضات المتجر</div>
-          <div className="text-xl font-black text-[#1E4E8C]">{storeDeals.length}</div>
+          <div className="text-xl font-black text-[#0066CC]">{storeDeals.length}</div>
         </div>
       </div>
 
@@ -516,7 +516,7 @@ export function KaramboGulfView({
 
             {egNum > 0 && (
               <div className="rounded-2xl bg-surface2 border border-line p-3.5 text-center space-y-2">
-                <div className={`text-sm font-black ${diffTaxed > 2000 ? 'text-emerald-600' : 'text-[#1E4E8C]'}`}>
+                <div className={`text-sm font-black ${diffTaxed > 2000 ? 'text-emerald-600' : 'text-[#0066CC]'}`}>
                   {diffTaxed > 2000
                     ? `حتى بعد الضريبة الجمركية، الخليج أوفر بـ ${formatMoney(Math.round(diffTaxed))} — بس خد بالك من الضمان المحلي.`
                     : diffTaxed < 0
@@ -694,7 +694,7 @@ export function KaramboTradeInView({
             {upgradeDiff !== null && targetPhone && (
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface border border-line text-xs font-black text-fg">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                <span>للترقية إلى {targetPhone.name} هتزود تقريباً: <strong className="text-[#1E4E8C]">{formatMoney(upgradeDiff)}</strong></span>
+                <span>للترقية إلى {targetPhone.name} هتزود تقريباً: <strong className="text-[#0066CC]">{formatMoney(upgradeDiff)}</strong></span>
               </div>
             )}
             <div className="pt-1">

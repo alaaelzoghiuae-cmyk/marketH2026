@@ -194,7 +194,7 @@ export default function GsmarenaCompareView({
               ) : dev ? (
                 <div className="space-y-2.5">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#0D1528] border border-line flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#1D1D1F] border border-line flex items-center justify-center overflow-hidden shrink-0">
                       {dev.images && dev.images[0]
                         ? <img src={dev.images[0]} alt={dev.name} referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" />
                         : <Smartphone className="w-8 h-8 text-muted" />}
@@ -211,7 +211,7 @@ export default function GsmarenaCompareView({
                         )}
                       </div>
                       <div className="text-sm font-black text-fg leading-snug line-clamp-2">{dev.name}</div>
-                      <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8] mt-0.5">
+                      <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] mt-0.5">
                         {dev.price ? formatMoney(dev.price) : (dev.priceGlobal || 'مواصفات كاملة')}
                       </div>
                     </div>
@@ -238,7 +238,7 @@ export default function GsmarenaCompareView({
                       <button
                         type="button"
                         onClick={() => onOpenSourcing(dev)}
-                        className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#1E4E8C]/15 hover:bg-[#1E4E8C] hover:text-white text-[#1E4E8C] dark:text-[#7FB0E8] text-[11px] font-black transition"
+                        className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-xl bg-[#0071E3]/15 hover:bg-[#0071E3] hover:text-white text-[#0066CC] dark:text-[#2997FF] text-[11px] font-black transition"
                       >
                         <PhoneCall className="w-3.5 h-3.5" /> اطلبه استيراد
                       </button>
@@ -247,7 +247,7 @@ export default function GsmarenaCompareView({
                       <button
                         type="button"
                         onClick={() => onOpenPhoneDetail(dev.localId || dev.id)}
-                        className="px-2.5 py-1.5 rounded-xl bg-surface2 border border-line text-[11px] font-black text-fg hover:border-[#2F6BB3] transition"
+                        className="px-2.5 py-1.5 rounded-xl bg-surface2 border border-line text-[11px] font-black text-fg hover:border-[#0071E3] transition"
                       >
                         التفاصيل
                       </button>
@@ -281,10 +281,10 @@ export default function GsmarenaCompareView({
       ) : (
         <div className="space-y-4">
           {cCfg.showVerdict !== false && analysis.verdict && (
-            <div className="rounded-3xl bg-gradient-to-l from-emerald-600/15 via-[#1E4E8C]/10 to-slate-600/15 border border-[#1E4E8C]/30 p-4 flex items-start gap-3">
+            <div className="rounded-3xl bg-gradient-to-l from-emerald-600/15 via-[#0071E3]/10 to-slate-600/15 border border-[#0071E3]/30 p-4 flex items-start gap-3">
               <Award className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
               <div className="space-y-1 flex-1">
-                <div className="text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8]">حكم كرومبو النهائي</div>
+                <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF]">حكم كرومبو النهائي</div>
                 <div className="text-sm font-black text-fg leading-relaxed">{analysis.verdict}</div>
               </div>
             </div>
@@ -292,13 +292,13 @@ export default function GsmarenaCompareView({
 
           <div className="flex flex-wrap items-center gap-2">
             <label className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-surface border border-line text-xs font-black text-fg cursor-pointer">
-              <input type="checkbox" checked={diffOnly} onChange={e => setDiffOnly(e.target.checked)} className="w-4 h-4 accent-[#1E4E8C]" />
+              <input type="checkbox" checked={diffOnly} onChange={e => setDiffOnly(e.target.checked)} className="w-4 h-4 accent-[#0071E3]" />
               <span>إظهار الاختلافات فقط</span>
             </label>
             <button
               type="button"
               onClick={() => setShowFullSpecs(v => !v)}
-              className={`px-3 py-2 rounded-xl border text-xs font-black transition ${showFullSpecs ? 'bg-[#1E4E8C] text-white border-[#1E4E8C]' : 'bg-surface border-line text-fg'}`}
+              className={`px-3 py-2 rounded-xl border text-xs font-black transition ${showFullSpecs ? 'bg-[#0071E3] text-white border-[#0071E3]' : 'bg-surface border-line text-fg'}`}
             >
               {showFullSpecs ? 'إخفاء الجدول التفصيلي' : 'عرض كل المواصفات التفصيلية'}
             </button>
@@ -306,10 +306,10 @@ export default function GsmarenaCompareView({
               <button type="button" onClick={handleShareWhatsApp} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition">
                 <Share2 className="w-3.5 h-3.5" /> واتساب
               </button>
-              <button type="button" onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 border border-line hover:border-[#2F6BB3] text-fg text-xs font-black transition">
+              <button type="button" onClick={handleCopyLink} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 border border-line hover:border-[#0071E3] text-fg text-xs font-black transition">
                 <ClipboardList className="w-3.5 h-3.5" /> نسخ الرابط
               </button>
-              <button type="button" onClick={() => openPrintableComparisonWindow(selectedDevices, analysis)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 border border-line hover:border-[#2F6BB3] text-fg text-xs font-black transition">
+              <button type="button" onClick={() => openPrintableComparisonWindow(selectedDevices, analysis)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 border border-line hover:border-[#0071E3] text-fg text-xs font-black transition">
                 <Printer className="w-3.5 h-3.5" /> طباعة / PDF
               </button>
               <button type="button" onClick={clearAll} className="inline-flex items-center gap-1 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 hover:text-white text-rose-600 text-xs font-black transition">
@@ -366,7 +366,7 @@ export default function GsmarenaCompareView({
                     <button
                       type="button"
                       onClick={() => setCollapsedGroups(p => ({ ...p, [grp.group]: !p[grp.group] }))}
-                      className="w-full flex items-center justify-between px-4 py-2.5 bg-surface2/70 text-xs font-black text-[#1E4E8C] dark:text-[#7FB0E8]"
+                      className="w-full flex items-center justify-between px-4 py-2.5 bg-surface2/70 text-xs font-black text-[#0066CC] dark:text-[#2997FF]"
                     >
                       <span>{grp.group} ({visibleRows.length})</span>
                       <ChevronDown className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />

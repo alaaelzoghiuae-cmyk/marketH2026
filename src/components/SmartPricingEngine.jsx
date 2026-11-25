@@ -174,7 +174,7 @@ export default function SmartPricingEngine({
           </div>
           <div className="p-3 rounded-2xl bg-bg border border-line">
             <div className="text-[10px] text-muted font-bold">المحدد لتطبيق التسعير</div>
-            <div className="text-lg font-black text-[#1E4E8C] dark:text-[#7FB0E8] font-mono mt-0.5">{selectedIds.length}</div>
+            <div className="text-lg font-black text-[#0066CC] dark:text-[#2997FF] font-mono mt-0.5">{selectedIds.length}</div>
           </div>
         </div>
 
@@ -235,7 +235,7 @@ export default function SmartPricingEngine({
               type="button"
               disabled={selectedIds.length === 0}
               onClick={() => setConfirmApply(true)}
-              className="px-5 py-2 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] disabled:opacity-40 text-white font-black text-xs transition"
+              className="px-5 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] disabled:opacity-40 text-white font-black text-xs transition"
             >
               مراجعة واعتماد الأسعار المقترحة ({selectedIds.length})
             </button>
@@ -308,7 +308,7 @@ export default function SmartPricingEngine({
                       </span>
                     ) : '—'}
                   </td>
-                  <td className="p-2 font-mono font-black text-[#1E4E8C] dark:text-[#7FB0E8]">{r.applicable ? `${r.proposed.toLocaleString()} ج.م` : <span className="text-amber-500 text-[10px] font-bold">يلزم تكلفة/سعر أولاً</span>}</td>
+                  <td className="p-2 font-mono font-black text-[#0066CC] dark:text-[#2997FF]">{r.applicable ? `${r.proposed.toLocaleString()} ج.م` : <span className="text-amber-500 text-[10px] font-bold">يلزم تكلفة/سعر أولاً</span>}</td>
                   <td className="p-2 font-mono font-black">
                     <span className={r.delta > 0 ? 'text-emerald-500' : r.delta < 0 ? 'text-rose-500' : 'text-muted'}>
                       {r.delta > 0 ? `+${r.delta}` : r.delta} ج.م

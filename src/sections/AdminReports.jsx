@@ -8,9 +8,9 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
     return (
       <div className={`space-y-6 text-xs ${forPrintModal ? 'text-slate-900 bg-white p-6' : ''}`}>
         {/* Formal Report Header */}
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-nav via-nav2 to-nav text-white border-2 border-[#2F6BB3]/40 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-nav via-nav2 to-nav text-white border-2 border-[#0071E3]/40 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <img src={ELZOGHBI_LOGO} alt="Logo" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#2F6BB3] shadow-md" />
+            <img src={ELZOGHBI_LOGO} alt="Logo" className="w-14 h-14 rounded-2xl object-cover border-2 border-[#0071E3] shadow-md" />
             <div>
               <div className="text-[11px] font-black text-amber-300 tracking-wide">
                 EXECUTIVE GENERAL MANAGER REPORT • تقرير الإدارة العامة التنفيذي
@@ -24,7 +24,7 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
             </div>
           </div>
           <div className="text-left space-y-1">
-            <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 font-black text-[#7FB0E8] text-xs">
+            <div className="px-3 py-1 rounded-xl bg-white/10 border border-white/20 font-black text-[#2997FF] text-xs">
               الأقسام المضمنة: {selectedCount} / 12 قسم
             </div>
             <div className="text-[11px] text-muted font-bold">
@@ -377,7 +377,7 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
                 )}
               </div>
               <div className="p-3 rounded-xl bg-surface2 border border-line space-y-1.5">
-                <div className="font-black text-[#1E4E8C]">طلبات التوفير الخاصة من الخارج (Sourcing):</div>
+                <div className="font-black text-[#0066CC]">طلبات التوفير الخاصة من الخارج (Sourcing):</div>
                 {rep.activeSourcingList.length === 0 ? (
                   <div className="text-muted">لا توجد طلبات توفير مفتوحة.</div>
                 ) : (
@@ -497,7 +497,7 @@ export function renderAdminExecutiveReportsView(ctx) {
     return (
       <div className="space-y-5 text-xs">
         {/* Builder Controls Card */}
-        <div className="bg-surface rounded-3xl p-6 border-2 border-[#2F6BB3]/45 shadow-lg space-y-5">
+        <div className="bg-surface rounded-3xl p-6 border-2 border-[#0071E3]/45 shadow-lg space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line pb-4">
             <div>
               <span className="px-3 py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[11px]">
@@ -522,7 +522,7 @@ export function renderAdminExecutiveReportsView(ctx) {
               <button
                 type="button"
                 onClick={handleExportGmReportCsv}
-                className="px-4 py-3 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+                className="px-4 py-3 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
               >
                 <span>📥 تصدير التقرير لـ Excel (CSV)</span>
               </button>
@@ -687,7 +687,7 @@ export function renderGmReportPrintModal(ctx) {
     const rep = computeGmReportData();
     return (
       <div className="fixed inset-0 bg-nav/90 backdrop-blur-xs z-[230] flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
-        <div className="bg-surface rounded-3xl max-w-5xl w-full p-4 sm:p-6 border-2 border-[#2F6BB3] shadow-2xl space-y-4 my-auto max-h-[94vh] flex flex-col">
+        <div className="bg-surface rounded-3xl max-w-5xl w-full p-4 sm:p-6 border-2 border-[#0071E3] shadow-2xl space-y-4 my-auto max-h-[94vh] flex flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3 print:hidden">
             <div className="flex items-center gap-2">
               <Printer className="w-5 h-5 text-accent-text" />
@@ -770,7 +770,7 @@ export function renderGmReportPrintModal(ctx) {
                     </div>`;
                   openCleanA4PrintWindow(`تقرير_ELZOGHBI_${rep.fromStr}_${rep.toStr}`, htmlBody);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
+                className="px-5 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs flex items-center gap-1.5 shadow-md"
               >
                 <Printer className="w-4 h-4" />
                 <span>🖨️ طباعة تقرير A4 احترافي / تصدير PDF</span>
@@ -778,7 +778,7 @@ export function renderGmReportPrintModal(ctx) {
               <button
                 type="button"
                 onClick={handleExportGmReportCsv}
-                className="px-4 py-2.5 rounded-xl bg-[#1E4E8C] hover:bg-[#163B6B] text-white font-black text-xs"
+                className="px-4 py-2.5 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white font-black text-xs"
               >
                 📥 تحميل Excel
               </button>
