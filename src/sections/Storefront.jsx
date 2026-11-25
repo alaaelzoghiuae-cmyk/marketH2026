@@ -6,6 +6,7 @@ import { AdContent, BlurFitImage, ImageViewer } from '../components/widgets.jsx'
 import { Bidi } from '../i18n.jsx';
 import { adInSchedule, getAdTheme } from '../lib/utils.jsx';
 import { normalizePartCategory } from '../lib/catalogUtils.js';
+import { ServicesNav, AppleHomeShowcase } from '../components/AppleStore.jsx';
 
 export function renderVvipBrandEmblem(ctx, size = 'md', forceLightText = false) {
   const { getHeaderConfig, siteSettings } = ctx;
@@ -408,7 +409,7 @@ export function renderSocialIconsGroup(ctx) {
 }
 
 export function renderClientHeader(ctx) {
-  const { activeFamilyDevices, cartSummary, changeLang, clientTab, currentClient, favoritePartIds, getHeaderConfig, headerInnerRef, lang, notifications, pendingScrollToProductsRef, renderVvipBrandEmblem, searchQuery, setAccountSubTab, setAuthModalTab, setCartDrawerOpen, setClientTab, setFamilyModalOpen, setLoginModalOpen, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedModelId, setSourcingFormOpen, setStoreStockFilter, setWarrantyModalOpen, siteSettings, storeStockFilter, toggleUiTheme, uiTheme, vipLinkUnlocked } = ctx;
+  const { categoryEmoji, fetchSparePartsSliceOnDemand, getTopCategories, publicBrands, publicModels, publicParts, publicPartCountByModelIdMap, resolvePartModelObj, selectedBrand, selectedCategory, setStorePage, activeFamilyDevices, cartSummary, changeLang, clientTab, currentClient, favoritePartIds, getHeaderConfig, headerInnerRef, lang, notifications, pendingScrollToProductsRef, renderVvipBrandEmblem, searchQuery, setAccountSubTab, setAuthModalTab, setCartDrawerOpen, setClientTab, setFamilyModalOpen, setLoginModalOpen, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedModelId, setSourcingFormOpen, setStoreStockFilter, setWarrantyModalOpen, siteSettings, storeStockFilter, toggleUiTheme, uiTheme, vipLinkUnlocked } = ctx;
     const hCfg = getHeaderConfig(siteSettings);
     const clientTarget = currentClient ? currentClient.id : 'guest';
     const myNotifs = notifications.filter(n => n.target === clientTarget);
@@ -868,6 +869,45 @@ export function renderClientHeader(ctx) {
             )}
           </div>
         </div>
+
+        {/* Apple-Store style services strip + cascading mega menu (presentation only; all actions reuse the existing store state) */}
+        {siteSettings.showServicesNav !== false && (
+          <ServicesNav
+            rtl={!ctx.i18nActive}
+            brands={publicBrands}
+            models={publicModels}
+            modelCounts={publicPartCountByModelIdMap}
+            parts={publicParts}
+            resolveModel={resolvePartModelObj}
+            getTopCategories={getTopCategories}
+            categoryEmoji={categoryEmoji}
+            getBrandImg={(b) => (siteSettings.brandImages && siteSettings.brandImages[b]) || OR_BRAND_IMAGES[b] || ''}
+            active={{ tab: clientTab, brand: selectedBrand, category: selectedCategory, filter: storeStockFilter }}
+            actions={(() => {
+              const go = ({ brand = 'ALL', modelId = 'ALL', category = 'ALL', filter = 'ALL' }) => {
+                setSelectedBrand(brand);
+                setSelectedModelId(modelId);
+                setSelectedCategory(category);
+                setSearchQuery('');
+                setStoreStockFilter(filter);
+                setStorePage(1);
+                if (modelId !== 'ALL') fetchSparePartsSliceOnDemand({ modelId, limit: 200 });
+                else if (brand !== 'ALL') fetchSparePartsSliceOnDemand({ brand, limit: 250 });
+                pendingScrollToProductsRef.current = true;
+                setClientTab('search');
+              };
+              return {
+                showAll: () => go({}),
+                showFilter: (f) => go({ filter: f }),
+                showBrand: (b) => go({ brand: b }),
+                showModel: (m) => go({ brand: m.brand || 'ALL', modelId: m.id }),
+                showCategory: (c) => go({ category: c }),
+                showBrandCategory: (b, c) => go({ brand: b, category: c }),
+                showModelCategory: (m, c) => go({ brand: m.brand || 'ALL', modelId: m.id, category: c }),
+              };
+            })()}
+          />
+        )}
       </header>
     );
   
@@ -1050,7 +1090,7 @@ export function renderRecentlyViewedStrip(ctx) {
 }
 
 export function renderHomeView(ctx) {
-  const { calculatePartPrice, cartSummary, currentGroup, fetchSparePartsSliceOnDemand, handleNewsletterSubscribe, heroAdIndex, i18nActive, isInitialCloudBooting, models, newsletterEmail, openSourcing, parts, pendingScrollToProductsRef, publicBrands, publicPartCountByBrandMap, publicParts, renderKaramboStrip, renderProductCard, renderRecentlyViewedStrip, renderStickyCartBar, resolvePartModelObj, setClientTab, setDetailImageIdx, setHeroAdIndex, setNewsletterEmail, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedDetailItem, setSelectedModelId, setStorePage, setStoreStockFilter, showcaseBars, siteSettings, storeAds, swipeProps, swipeSuppressRef, uiTheme } = ctx;
+  const { categoryEmoji, getTopCategories, calculatePartPrice, cartSummary, currentGroup, fetchSparePartsSliceOnDemand, handleNewsletterSubscribe, heroAdIndex, i18nActive, isInitialCloudBooting, models, newsletterEmail, openSourcing, parts, pendingScrollToProductsRef, publicBrands, publicPartCountByBrandMap, publicParts, renderKaramboStrip, renderProductCard, renderRecentlyViewedStrip, renderStickyCartBar, resolvePartModelObj, setClientTab, setDetailImageIdx, setHeroAdIndex, setNewsletterEmail, setSearchQuery, setSelectedBrand, setSelectedCategory, setSelectedDetailItem, setSelectedModelId, setStorePage, setStoreStockFilter, showcaseBars, siteSettings, storeAds, swipeProps, swipeSuppressRef, uiTheme } = ctx;
     const activeAds = storeAds.filter(a => a.active && adInSchedule(a));
     const heroAssignedAds = activeAds.filter(a => !a.placement || a.placement === 'hero' || a.placement === 'both');
     const promoSplitAds = activeAds.filter(a => a.placement === 'promo_split' || a.placement === 'both');
@@ -1147,7 +1187,7 @@ export function renderHomeView(ctx) {
       <div className="max-w-[1380px] mx-auto px-4 sm:px-8 py-5 sm:py-7 space-y-9 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {/* 1. ARCHITECTURAL HERO BANNER SHOWCASE + NON-OVERLAPPING CONTROLS + 4 TRUST PILLARS */}
         {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
-          <section className="rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1D1D1F] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
+          <section className="elz-hero rounded-[28px] overflow-hidden border border-slate-200/90 dark:border-[#1D1D1F] shadow-[0_20px_50px_-15px_rgba(15,23,42,0.18)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.65)] bg-surface">
             <div
               {...swipeProps(
                 () => setHeroAdIndex(prev => (prev + 1) % heroSlides.length),
@@ -1410,6 +1450,40 @@ export function renderHomeView(ctx) {
           </section>
         )}
 
+        {/* 2D. APPLE-STORE STYLE EDITORIAL SHOWCASE (categories, bento offers, horizontal rails — real catalogue data only) */}
+        {siteSettings.showHomeShowcase !== false && (
+          <AppleHomeShowcase
+            rtl={!i18nActive}
+            parts={publicParts}
+            calculatePartPrice={calculatePartPrice}
+            currentGroup={currentGroup}
+            getTopCategories={getTopCategories}
+            categoryEmoji={categoryEmoji}
+            brands={publicBrands}
+            getBrandImg={(b) => (siteSettings.brandImages && siteSettings.brandImages[b]) || OR_BRAND_IMAGES[b] || ''}
+            renderProductCard={renderProductCard}
+            actions={(() => {
+              const go = ({ brand = 'ALL', category = 'ALL', filter = 'ALL' }) => {
+                setSelectedBrand(brand);
+                setSelectedModelId('ALL');
+                setSelectedCategory(category);
+                setSearchQuery('');
+                setStoreStockFilter(filter);
+                setStorePage(1);
+                if (brand !== 'ALL') fetchSparePartsSliceOnDemand({ brand, limit: 250 });
+                pendingScrollToProductsRef.current = true;
+                setClientTab('search');
+              };
+              return {
+                showAll: () => go({}),
+                showFilter: (f) => go({ filter: f }),
+                showBrand: (b) => go({ brand: b }),
+                showCategory: (c) => go({ category: c }),
+              };
+            })()}
+          />
+        )}
+
         {/* 3. DUAL PROMOTIONAL SPLIT BANNERS (Rendered via Real Architectural AdContent Engine!) */}
         {siteSettings.showHomePromoSplit !== false && promoSplitAds.length > 0 && (
           <section className={`grid grid-cols-1 ${promoSplitAds.length > 1 ? 'lg:grid-cols-2' : ''} gap-5`}>
@@ -1456,8 +1530,10 @@ export function renderHomeView(ctx) {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {bestSellerParts.map((part, idx) => renderProductCard(part, idx))}
+            <div className="elz-rail-track flex gap-4 sm:gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2">
+              {bestSellerParts.map((part, idx) => (
+                <div key={part.id || idx} className="snap-start shrink-0 w-[min(272px,78vw)] lg:flex-1 lg:w-auto lg:min-w-0">{renderProductCard(part, idx)}</div>
+              ))}
             </div>
           </section>
         )}

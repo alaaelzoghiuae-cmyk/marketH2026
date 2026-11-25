@@ -56,6 +56,13 @@ export default {
           500: '#ff9f0a', 600: '#c77700', 700: '#9f5f00', 800: '#7a4900', 900: '#5a3600', 950: '#3a2200',
         },
       },
+      // ---- Design tokens (mirrors the CSS variables in src/index.css) ----
+      borderRadius: { ctl: 'var(--r-md)', card: 'var(--r-lg)', tile: 'var(--r-xl)' },
+      boxShadow: { 'tok-1': 'var(--shadow-1)', 'tok-2': 'var(--shadow-2)', 'tok-3': 'var(--shadow-3)' },
+      maxWidth: { container: 'var(--container)', narrow: 'var(--container-narrow)' },
+      zIndex: { nav: '40', mega: '70', sheet: '80', modal: '90', toast: '100' },
+      transitionTimingFunction: { apple: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+      transitionDuration: { fast: '140ms', base: '240ms', slow: '420ms' },
       fontFamily: {
         sans: [
           '-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"SF Pro Display"', '"SF Arabic"',
