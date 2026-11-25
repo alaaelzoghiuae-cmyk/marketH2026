@@ -7,6 +7,7 @@ import storeReviewsLiveHandler from './api/store-reviews-live.js'
 import wearablesHandler from './api/wearables.js'
 import trustCheckHandler from './api/trust-check.js'
 import notifyHandler from './api/notify.js'
+import marketplaceHandler from './api/marketplace.js'
 
 /**
  * Local Dev API Middleware so all Vercel /api/* endpoints work LIVE
@@ -21,7 +22,8 @@ function localVercelApiPlugin() {
       '/api/wearables': wearablesHandler,
       '/api/trust-check': trustCheckHandler,
       '/api/ai-sourcing': aiSourcingHandler,
-      '/api/notify': notifyHandler
+      '/api/notify': notifyHandler,
+      '/api/marketplace': marketplaceHandler
     };
     middlewares.use(async (req, res, next) => {
       const parsed = new URL(req.url || '/', 'http://localhost');

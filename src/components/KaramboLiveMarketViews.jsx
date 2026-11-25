@@ -543,7 +543,8 @@ export function KaramboTradeInView({
   localPhones = [],
   formatMoney,
   showToast,
-  whatsappNumber = ''
+  whatsappNumber = '',
+  onSell
 }) {
   const tCfg = (cfg && cfg.tradeInCfg) || {};
   const mults = tCfg.condMult || { mint: 0.78, good: 0.68, fair: 0.56, cracked: 0.38 };
@@ -612,6 +613,12 @@ export function KaramboTradeInView({
 
   return (
     <div className="max-w-[840px] mx-auto space-y-4">
+      {onSell && (
+        <div className="rounded-3xl bg-emerald-500/10 border border-emerald-500/30 p-4 flex flex-wrap items-center justify-between gap-3">
+          <div><div className="font-black text-fg text-sm">عايز تبيع موبايلك بنفسك؟</div><div className="text-[12px] font-bold text-muted">اعرضه للبيع في «بيع عندنا» — الإعلان بيتراجع من الإدارة قبل النشر، والتواصل عبر واتساب.</div></div>
+          <button type="button" onClick={onSell} className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black">اعرض موبايلك للبيع</button>
+        </div>
+      )}
       <div className="bg-surface border border-line rounded-3xl p-5 space-y-4">
         <div className="grid sm:grid-cols-2 gap-3">
           <div>

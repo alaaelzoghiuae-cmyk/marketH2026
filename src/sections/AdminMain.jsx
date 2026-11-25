@@ -1,3 +1,4 @@
+import AdminMarketplace from './AdminMarketplace.jsx';
 import { User, Lock, Shield, TrendingUp, Printer, ClipboardList, LayoutGrid, Globe, RotateCcw, Layers, DollarSign, Upload, Camera, Database, Bell, Sparkles, Zap, Percent, Users, Tag, Building2, Cpu, X, Search, ChevronLeft, LogOut, Menu, RefreshCw, Save, Eye, AlertTriangle, Trash2, Plus, Phone } from 'lucide-react';
 import { BusinessIntelligenceView, OrderWorkflowBoard, AdminCommandPalette, SmartNotificationsPopover } from '../components/OrderWorkflowAndBI';
 import ExcelProductManager from '../components/ExcelProductManager';
@@ -317,6 +318,15 @@ export function renderAdminDashboard(ctx) {
             desc: 'دليل الموبايلات، أدوات كرومبو، المزامنة والتنبيهات',
             keywords: 'كرومبو دليل موبايلات اسعار سوق مقارنة تقسيط',
             icon: Search,
+            badge: 'جديد',
+            urgent: false
+          },
+          {
+            id: 'marketplace',
+            label: 'إعلانات بيع الموبايلات',
+            desc: 'مراجعة وقبول ورفض إعلانات «بيع عندنا» والبلاغات',
+            keywords: 'بيع عندنا اعلانات موبايلات مستعملة مراجعة بلاغات marketplace',
+            icon: Sparkles,
             badge: 'جديد',
             urgent: false
           },
@@ -1032,6 +1042,7 @@ export function renderAdminDashboard(ctx) {
           <div className="flex-1 w-full max-w-[1440px] mx-auto p-3 sm:p-6 pb-24 min-w-0">
             {adminTab === 'team' && isAdminOwner && renderAdminTeam()}
             {adminTab === 'karambo' && canAdmin('karambo') && renderAdminKarambo()}
+            {adminTab === 'marketplace' && canAdmin('marketplace') && (() => { const sc = ctx.getSupabaseConfig(); return <AdminMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} showToast={ctx.showToast} />; })()}
             {adminTab !== 'team' && !canAdmin(adminTab) && (
               <div className="bg-surface border border-line rounded-3xl p-10 text-center space-y-3">
                 <Shield className="w-10 h-10 mx-auto text-rose-500" />
@@ -2264,7 +2275,7 @@ const TEAM_PERMISSION_GROUPS = [
   { title: 'الملخص والتقارير', tabs: [['overview', 'الرئيسية والملخص'], ['bi_analytics', 'تحليلات الأعمال (BI)'], ['reports', 'تقارير المدير العام']] },
   { title: 'المبيعات والطلبات', tabs: [['orders', 'الطلبات والفواتير'], ['order_workflow', 'سير عمل الطلبات (Kanban)'], ['sourcing', 'طلبات الاستيراد (من برّه)'], ['returns', 'المرتجعات والشكاوى']] },
   { title: 'المنتجات والمخازن', tabs: [['catalog', 'الكتالوج والموديلات'], ['excel_products', 'جدول المنتجات (Excel)'], ['smart_pricing', 'محرك التسعير الذكي (AI)'], ['ai_product_sourcing', 'وكيل الاستيراد الذكي (AI)'], ['bulk_importer', 'المستورد الذكي بالروابط'], ['quality_images', 'جودة الكتالوج والصور'], ['quick_stock', 'الجرد السريع للمخزن'], ['restock_alerts', 'قائمة الانتظار (نبّهني)']] },
-  { title: 'تصميم المتجر والتسويق', tabs: [['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
+  { title: 'تصميم المتجر والتسويق', tabs: [['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['marketplace', 'إعلانات بيع الموبايلات (بيع عندنا)'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
   { title: 'العملاء والإعدادات', tabs: [['clients', 'العملاء والحسابات'], ['groups', 'شرائح الأسعار والشحن'], ['site_settings', 'إعدادات المتجر والدفع'], ['schema', 'قاعدة البيانات السحابية']] }
 ];
 const TEAM_ALL_TABS = TEAM_PERMISSION_GROUPS.flatMap(g => g.tabs.map(t => t[0]));

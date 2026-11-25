@@ -96,7 +96,7 @@ export const DEFAULT_KARAMBO_CFG = {
   },
   guideCfg: {
     enableGlobalCatalog: true,
-    autoFetchEgyptPrice: true,
+    autoFetchEgyptPrice: false,
     notInEgyptLabel: 'غير متوفر في مصر حالياً',
     showNewsBannerInGuide: true,
     allowImportCta: true,

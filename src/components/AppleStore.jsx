@@ -1,3 +1,4 @@
+import { CategoryIcon } from '../lib/categoryIcons.jsx';
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
@@ -398,7 +399,7 @@ export function ServicesNav({
                 onKeyDown={(e) => onTopKey(e, n)}
                 onClick={(e) => {
                   const pt = e.nativeEvent && e.nativeEvent.pointerType;
-                  if (hasKids && (compact || pt === 'touch' || pt === 'pen')) { if (isOpen) close(); else openTop(n, e.currentTarget); return; }
+                  if (hasKids && !n.alwaysGo && (compact || pt === 'touch' || pt === 'pen')) { if (isOpen) close(); else openTop(n, e.currentTarget); return; }
                   activate(n);
                 }}
                 className="elz-strip-item snap-start">
@@ -458,7 +459,7 @@ export function HRail({ rtl = true, title, subtitle, onViewAll, viewAllLabel, ch
 /*  Home page — editorial store sections                               */
 /* ------------------------------------------------------------------ */
 export function AppleHomeShowcase({
-  rtl = true, parts = [], calculatePartPrice, currentGroup, getTopCategories, categoryEmoji, brands = [], getBrandImg,
+  categoryIcons, rtl = true, parts = [], calculatePartPrice, currentGroup, getTopCategories, categoryEmoji, brands = [], getBrandImg,
   renderProductCard, actions,
 }) {
   const t = rtl
@@ -511,7 +512,7 @@ export function AppleHomeShowcase({
           <div className="elz-cat-rail flex gap-4 sm:gap-7 overflow-x-auto no-scrollbar snap-x justify-start lg:justify-center px-1 pb-1">
             {cats.map((c) => (
               <button key={c.cat} type="button" onClick={() => actions.showCategory(normalizePartCategory(c.cat))} className="elz-cat-tile snap-start group">
-                <span className="elz-cat-disc"><span aria-hidden="true">{categoryEmoji ? categoryEmoji(c.cat) : '•'}</span></span>
+                <span className="elz-cat-disc"><CategoryIcon category={c.cat} overrides={categoryIcons} className="w-8 h-8 sm:w-10 sm:h-10 text-fg" /></span>
                 <span className="text-[11px] sm:text-xs font-medium text-fg max-w-[88px] truncate">{c.cat}</span>
               </button>
             ))}
@@ -531,8 +532,7 @@ export function AppleHomeShowcase({
               <span className="elz-btn mt-5">{heroDeal ? t.offersCta : t.bestCta}</span>
             </div>
             {partImage(lead.p) && (
-              <img src={partImage(lead.p)} alt="" loading="lazy" referrerPolicy="no-referrer"
-                className="elz-tile-img absolute bottom-3 end-3 sm:bottom-6 sm:end-6 w-[46%] max-h-[62%] object-contain" />
+              <span className="elz-tile-stage absolute bottom-3 end-3 sm:bottom-6 sm:end-6 w-[46%] aspect-[4/3]"><img src={partImage(lead.p)} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-contain mix-blend-multiply" /></span>
             )}
           </article>
         )}
@@ -545,8 +545,7 @@ export function AppleHomeShowcase({
               <span className="elz-link mt-4 inline-block text-sm font-medium">{t.bestCta} {rtl ? '‹' : '›'}</span>
             </div>
             {partImage(heroBest.p) && (
-              <img src={partImage(heroBest.p)} alt="" loading="lazy" referrerPolicy="no-referrer"
-                className="elz-tile-img absolute bottom-3 end-3 w-[40%] max-h-[70%] object-contain" />
+              <span className="elz-tile-stage absolute bottom-3 end-3 w-[40%] aspect-[4/3]"><img src={partImage(heroBest.p)} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-contain mix-blend-multiply" /></span>
             )}
           </article>
         )}

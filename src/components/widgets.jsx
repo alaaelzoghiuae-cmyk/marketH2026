@@ -503,15 +503,15 @@ export function AdContent({ ad = {}, compact = false, rtl = true, isPromoCard = 
 
     const frameContainerCls =
       frameStyle === 'white_pedestal'
-        ? `bg-white shadow-[0_22px_50px_-12px_rgba(0,0,0,0.42)] ring-1 ring-black/5 ${compact ? 'p-1.5' : 'p-3 sm:p-4'}`
+        ? `elz-pstage ${compact ? 'p-1.5' : 'p-3 sm:p-4'}`
         : frameStyle === 'white_cutout'
-        ? `bg-gradient-to-br from-white via-slate-50 to-blue-50/95 shadow-[0_20px_48px_-10px_rgba(0,0,0,0.48)] ring-2 ring-white/60 ${compact ? 'p-2' : 'p-4 sm:p-5'}`
+        ? `elz-pstage ${compact ? 'p-2' : 'p-4 sm:p-5'}`
         : frameStyle === 'frosted_glass'
         ? `bg-white/12 backdrop-blur-xl border border-white/25 shadow-[0_22px_50px_-12px_rgba(0,0,0,0.45)] ${compact ? 'p-1.5' : 'p-3 sm:p-4'}`
         : frameStyle === 'ambient_fill'
         ? `bg-black/20 border border-white/20 shadow-[0_22px_50px_-12px_rgba(0,0,0,0.45)] p-0`
         : frameStyle === 'circle_pedestal'
-        ? `bg-white shadow-[0_22px_50px_-12px_rgba(0,0,0,0.45)] ring-4 ring-white/30 aspect-square ${compact ? 'p-2' : 'p-4'}`
+        ? `elz-pstage aspect-square ${compact ? 'p-2' : 'p-4'}`
         : `bg-transparent`;
 
     const stageHeightCls = compact

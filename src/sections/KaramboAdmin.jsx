@@ -14,6 +14,8 @@ import {
   getOrderedKaramboServices,
   resolveKaramboBarStyle
 } from '../data/karamboConfig.js';
+import { QuickServicesAdmin } from '../components/QuickServices.jsx';
+import { CategoryIconsAdmin } from '../lib/categoryIcons.jsx';
 import { searchGsmarenaPhones, fetchGsmarenaDevice } from '../services/gsmarenaClient.js';
 
 const ICON_MAP = {
@@ -204,6 +206,8 @@ function KaramboAdminPanel({ ctx }) {
 
   return (
     <div className="space-y-5">
+      <QuickServicesAdmin cfg={cfg} services={KARAMBO_SERVICES} icons={ICON_MAP} patchCfg={patchCfg} />
+      <CategoryIconsAdmin categories={(ctx.getTopCategories ? ctx.getTopCategories(60) : []).map(c => c.cat)} overrides={(ctx.siteSettings || {}).categoryIcons || {}} onChange={(next) => ctx.setSiteSettings && ctx.setSiteSettings(prev => ({ ...prev, categoryIcons: next }))} />
       {/* Header */}
       <div className="flex items-center gap-3 flex-wrap">
         <img src={cfg.mascotUrl || '/karambo.png'} alt="كرومبو" className="w-12 h-12 rounded-2xl object-cover border border-line bg-[#0071E3]" />

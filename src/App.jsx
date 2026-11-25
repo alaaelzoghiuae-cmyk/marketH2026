@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { OR_BRAND_IMAGES } from './orCatalogData';
 import { X, Check, Phone } from 'lucide-react';
 import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY_REG_FORM, INITIAL_ACCOUNT_REQUESTS, INITIAL_AUTO_TEMPLATES, INITIAL_BRANDS, INITIAL_CLIENTS, INITIAL_COMPLAINTS, INITIAL_CURRENCIES, INITIAL_GROUPS, INITIAL_MODELS, INITIAL_ORDERS, INITIAL_PARTS, INITIAL_PROMO_CODES, INITIAL_RETURNS, INITIAL_SHOWCASE_BARS, INITIAL_SITE_SETTINGS, INITIAL_STORE_ADS, PART_IMAGES, SHORTCUT_ICON_PRESETS, SRC_DEPOSIT_LABEL } from './data/constants.jsx';
+import { getAdminJwt, adminSignIn, adminSignOut, fetchMyAdminProfile, ensureFreshAdminJwt } from './lib/sbAuth.js';
+import { ensureCacheVersions } from './lib/cacheVersions.js';
+import { MarketplacePage, MarketplaceHost } from './sections/Marketplace.jsx';
 import { B64_UPLOAD_CACHE, applyVisit, b64Key, detectVisitSource, escapeHtml, getPaymentMethods, loadPersisted, localDayKey, normalizeDigits, nowStamp, readFileAsDataUrl } from './lib/utils.jsx';
 import { isOrCatalogDisabledInStorage, isOrPrefixedName, mergeOrBrandsList, mergeOrModelsList, mergeOrPartsList, normalizePartCategory, readPersistedDeletedSliceMap } from './lib/catalogUtils.js';
 import { I18N_ATTRS, i18nRestoreNode, i18nTranslateNode } from './i18n.jsx';
@@ -583,6 +586,7 @@ const isAdminOwner = !adminSession || adminSession.isOwner !== false;
 const canAdmin = (tabId) => {
     if (tabId === 'team') return isAdminOwner;
     if (!adminSession || adminSession.isOwner) return true;
+    if (Array.isArray(adminSession.permissions) && adminSession.permissions.includes('*')) return true;
     return Array.isArray(adminSession.permissions) && adminSession.permissions.includes(tabId);
   };
 useEffect(() => {
@@ -590,6 +594,18 @@ useEffect(() => {
       if (adminSession) window.localStorage.setItem('elzoghbi_v2_adminSession', JSON.stringify(adminSession));
       else window.localStorage.removeItem('elzoghbi_v2_adminSession');
     } catch (e) {}
+  }, [adminSession]);
+const adminWasAuthRef = useRef(false);
+useEffect(() => {
+    if (adminWasAuthRef.current && !adminAuthenticated) adminSignOut();
+    adminWasAuthRef.current = !!adminAuthenticated;
+  }, [adminAuthenticated]);
+useEffect(() => {
+    if (!adminSession || adminSession.authMode !== 'supabase') return undefined;
+    const { sbUrl, sbKey } = getSupabaseConfig();
+    ensureFreshAdminJwt(sbUrl, sbKey).then((t) => { if (!t) { setAdminAuthenticated(false); setAdminSession(null); } });
+    const iv = setInterval(() => { ensureFreshAdminJwt(sbUrl, sbKey); }, 5 * 60 * 1000);
+    return () => clearInterval(iv);
   }, [adminSession]);
 const [adminLoginUser, setAdminLoginUser] = useState('');
 const [adminLoginPass, setAdminLoginPass] = useState('');
@@ -1312,7 +1328,7 @@ const formatSyncHttpError = (status) => {
   };
 const sbHeaders = (sbKey, extra = {}) => ({
     apikey: sbKey,
-    Authorization: `Bearer ${sbKey}`,
+    Authorization: `Bearer ${getAdminJwt() || sbKey}`,
     'Content-Type': 'application/json',
     ...extra
   });
@@ -1943,43 +1959,42 @@ const STATIC_SESSION_TABLES = new Set([
     'spare_parts', 'mobile_models', 'brands', 'pricing_groups',
     'store_ads', 'showcase_bars', 'promo_codes', 'auto_templates', 'site_settings'
   ]);
-const SESSION_CACHE_PREFIX = 'elzoghbi_lcache_v29_';
+const SESSION_CACHE_PREFIX = 'elzoghbi_lcache_v31_';
 try {
-    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v30_vvip_v16_or_catalog') {
+    if (window.localStorage.getItem('elzoghbi_app_version') !== 'v31_market_security') {
       window.sessionStorage.clear();
       // Remove only obsolete v27 session keys without wiping valid local catalog cache unnecessarily
       const oldKeys = [];
       for (let i = 0; i < window.localStorage.length; i++) {
         const k = window.localStorage.key(i);
-        if (k && k.startsWith('elzoghbi_scache_')) oldKeys.push(k);
+        if (k && (k.startsWith('elzoghbi_scache_') || k.startsWith('elzoghbi_lcache_v29_'))) oldKeys.push(k);
       }
       oldKeys.forEach(k => window.localStorage.removeItem(k));
-      window.localStorage.setItem('elzoghbi_app_version', 'v30_vvip_v16_or_catalog');
+      window.localStorage.setItem('elzoghbi_app_version', 'v31_market_security');
     }
   } catch (e) {}
-const SESSION_CACHE_TTL = 6 * 60 * 60 * 1000;
-const readSessionTableCache = (cacheKey) => {
+const SESSION_CACHE_TTL = 24 * 60 * 60 * 1000;
+const CACHE_SCHEMA_VER = 3;
+const readSessionTableCache = (cacheKey, table) => {
     try {
-      const raw = window.localStorage.getItem(SESSION_CACHE_PREFIX + cacheKey) || window.sessionStorage.getItem(SESSION_CACHE_PREFIX + cacheKey);
+      const raw = window.localStorage.getItem(SESSION_CACHE_PREFIX + cacheKey);
       if (!raw) return null;
-      const parsed = JSON.parse(raw);
+      let parsed = null;
+      try { parsed = JSON.parse(raw); } catch (e) { window.localStorage.removeItem(SESSION_CACHE_PREFIX + cacheKey); return null; }
+      if (!parsed || !Array.isArray(parsed.rows) || parsed.ver !== CACHE_SCHEMA_VER) return null;
       const globalBustTs = Number(window.localStorage.getItem('elzoghbi_cache_bust_ts') || 0);
-      if (parsed && Array.isArray(parsed.rows) && (parsed.ts || 0) > globalBustTs && (Date.now() - (parsed.ts || 0) < SESSION_CACHE_TTL)) {
-        return parsed.rows;
-      }
-    } catch (e) {}
-    return null;
+      if ((parsed.ts || 0) <= globalBustTs || (Date.now() - (parsed.ts || 0)) >= SESSION_CACHE_TTL) return null;
+      const sv = window.__elzCacheVers && table ? window.__elzCacheVers[table] : undefined;
+      if (sv !== undefined && parsed.sv !== sv) return null; // table changed on the server → refetch
+      return parsed.rows;
+    } catch (e) { return null; }
   };
-const writeSessionTableCache = (cacheKey, rows) => {
+const writeSessionTableCache = (cacheKey, rows, table) => {
     try {
-      if (Array.isArray(rows)) {
-        const payloadStr = JSON.stringify({ rows, ts: Date.now() });
-        try {
-          window.localStorage.setItem(SESSION_CACHE_PREFIX + cacheKey, payloadStr);
-        } catch (quotaErr) {
-          window.sessionStorage.setItem(SESSION_CACHE_PREFIX + cacheKey, payloadStr);
-        }
-      }
+      if (!Array.isArray(rows)) return;
+      const sv = window.__elzCacheVers && table ? window.__elzCacheVers[table] : undefined;
+      const payloadStr = JSON.stringify({ rows, ts: Date.now(), ver: CACHE_SCHEMA_VER, sv });
+      try { window.localStorage.setItem(SESSION_CACHE_PREFIX + cacheKey, payloadStr); } catch (quotaErr) { /* quota: skip, never fall back to sessionStorage */ }
     } catch (e) {}
   };
 const invalidateSessionTableCache = (tableName) => {
@@ -1999,10 +2014,13 @@ const invalidateSessionTableCache = (tableName) => {
       clearMatching(window.sessionStorage);
     } catch (e) {}
   };
+// Storefront gets only public columns. cost_price / warranty_text / compatible_models are NOT in the public list
+// (cost lives in spare_parts_private → admin only; warranty/compat load on product open).
+const PART_ADMIN_COLUMNS = 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at';
 const TABLE_LIGHT_COLUMNS = {
   guide_phones: 'id,data,created_at,updated_at',
   price_alerts: 'id,data,created_at,updated_at',
-    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,compatible_models,warranty_text,image,stock,low_stock_threshold,max_order_qty,cost_price,base_price,custom_group_prices,waitlist_count,sold_out,created_at',
+    spare_parts: 'id,sku,model_id,category,name,quality_grade,colors,image,stock,low_stock_threshold,max_order_qty,base_price,custom_group_prices,waitlist_count,sold_out,created_at',
     mobile_models: 'id,brand,name,aliases',
     brands: 'name,sort_order',
     pricing_groups: 'id,name,currency,modifier_type,modifier_value,delivery_fee_base,is_default,description',
@@ -2104,20 +2122,22 @@ useEffect(() => {
       window.supabase = { from: createQueryBuilder };
     } catch (e) {}
   }, []);
-const sbFetchTable = async (tableName, select = null, query = null, forceNetwork = false) => {
+const sbFetchTableBase = async (tableName, select = null, query = null, forceNetwork = false) => {
     const { sbUrl, sbKey, isValid } = getSupabaseConfig();
     if (!isValid) return null;
     const realTable = resolveActualTableName(tableName);
-    let colsList = ((!select || select === '*') ? (TABLE_LIGHT_COLUMNS[realTable] || 'id') : select)
+    const isAdminCtx = (appPortal === 'admin' || adminAuthenticated);
+    await ensureCacheVersions(sbUrl, sbKey);
+    let colsList = ((!select || select === '*') ? ((realTable === 'spare_parts' && isAdminCtx) ? PART_ADMIN_COLUMNS : (TABLE_LIGHT_COLUMNS[realTable] || 'id')) : select)
       .split(',')
       .map(c => c.trim())
       .filter(Boolean);
     const qStr = (query === null || query === undefined || query === '') ? (TABLE_DEFAULT_QUERY[realTable] || '') : query;
-    const cacheKey = `${realTable}_${colsList.join(',')}_${qStr}`;
+    const cacheKey = `${realTable}_${colsList.join(',')}_${qStr}${isAdminCtx ? '_adm' : ''}`;
 
     // 1. Serve from SessionStorage cache if available (prevents repeated network requests!)
     if (!forceNetwork && STATIC_SESSION_TABLES.has(realTable)) {
-      const cached = readSessionTableCache(cacheKey);
+      const cached = readSessionTableCache(cacheKey, realTable);
       if (cached && cached.length > 0) {
         return cached;
       }
@@ -2131,21 +2151,22 @@ const sbFetchTable = async (tableName, select = null, query = null, forceNetwork
 
     const fetchPromise = (async () => {
       try {
-        const roleHeader = (appPortal === 'admin' || adminAuthenticated) ? 'elzoghbi-admin' : 'elzoghbi-client';
         let currentQuery = qStr;
+        let fetchTable = (realTable === 'site_settings' && !isAdminCtx) ? 'site_settings_public' : realTable;
 
         for (let attempt = 0; attempt < 3; attempt++) {
           const currentCols = colsList.join(',');
-          const res = await fetch(`${sbUrl}/rest/v1/${realTable}?select=${currentCols}${currentQuery}`, {
-            headers: sbHeaders(sbKey, { 'x-client-info': roleHeader })
+          const res = await fetch(`${sbUrl}/rest/v1/${fetchTable}?select=${currentCols}${currentQuery}`, {
+            headers: sbHeaders(sbKey)
           });
+          if (res.status === 404 && fetchTable !== realTable) { fetchTable = realTable; continue; } // sql/07 not applied yet
 
           if (res.ok) {
             let rows = await res.json();
             if (Array.isArray(rows)) {
               const mapped = rows.map(toCamelCaseRow);
               if (STATIC_SESSION_TABLES.has(realTable)) {
-                writeSessionTableCache(cacheKey, mapped);
+                writeSessionTableCache(cacheKey, mapped, realTable);
               }
               return mapped;
             }
@@ -2179,6 +2200,31 @@ const sbFetchTable = async (tableName, select = null, query = null, forceNetwork
 
     inFlightRequestsMapRef.current.set(cacheKey, { ts: Date.now(), promise: fetchPromise });
     return fetchPromise;
+  };
+const sbFetchTable = async (tableName, select = null, query = null, forceNetwork = false) => {
+    const rows = await sbFetchTableBase(tableName, select, query, forceNetwork);
+    try {
+      if (Array.isArray(rows) && resolveActualTableName(tableName) === 'spare_parts' && (appPortal === 'admin' || adminAuthenticated) && getAdminJwt()) {
+        const costs = await loadAdminCostMap();
+        if (costs) return rows.map(r => (r && costs[String(r.id)] !== undefined ? { ...r, costPrice: costs[String(r.id)] } : r));
+      }
+    } catch (e) {}
+    return rows;
+  };
+const adminCostCacheRef = useRef({ ts: 0, map: null });
+const loadAdminCostMap = async () => {
+    const jwt = getAdminJwt();
+    if (!jwt) return null;
+    if (adminCostCacheRef.current.map && Date.now() - adminCostCacheRef.current.ts < 60000) return adminCostCacheRef.current.map;
+    try {
+      const { sbUrl, sbKey } = getSupabaseConfig();
+      const r = await fetch(`${sbUrl}/rest/v1/spare_parts_private?select=part_id,cost_price&limit=5000`, { headers: sbHeaders(sbKey) });
+      if (!r.ok) return null;
+      const map = {};
+      (await r.json()).forEach(x => { map[String(x.part_id)] = x.cost_price; });
+      adminCostCacheRef.current = { ts: Date.now(), map };
+      return map;
+    } catch (e) { return null; }
   };
 const fetchVisiblePartImagesOnDemand = async () => {
     // No-op: `image` (external URL) is already included directly in the paginated `limit=20` query!
@@ -2257,7 +2303,7 @@ const fetchSinglePartFullDetailsOnDemand = async (partId) => {
     fetchedPartDetailsSetRef.current.add(String(partId));
     try {
       const res = await fetch(
-        `${sbUrl}/rest/v1/spare_parts?id=eq.${encodeURIComponent(partId)}&select=id,image,description,images,search_aliases`,
+        `${sbUrl}/rest/v1/spare_parts?id=eq.${encodeURIComponent(partId)}&select=id,image,description,images,search_aliases,warranty_text,compatible_models`,
         { headers: sbHeaders(sbKey) }
       );
       if (res.ok) {
@@ -2630,9 +2676,14 @@ const loadVisitStats = async () => {
       return;
     }
     try {
-      const r = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.visit_stats&select=payload`, { headers: visitSbHeaders(sbKey, { 'Cache-Control': 'no-cache' }) });
-      if (!r.ok) throw new Error('http ' + r.status);
-      const rows = await r.json();
+      let rows = null;
+      const rr = await fetch(`${sbUrl}/rest/v1/rpc/get_visit_stats`, { method: 'POST', headers: visitSbHeaders(sbKey, { 'Content-Type': 'application/json' }), body: '{}' });
+      if (rr.ok) { rows = [{ payload: await rr.json() }]; }
+      else {
+        const r = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.visit_stats&select=payload`, { headers: visitSbHeaders(sbKey, { 'Cache-Control': 'no-cache' }) });
+        if (!r.ok) throw new Error('http ' + r.status);
+        rows = await r.json();
+      }
       const payload = Array.isArray(rows) && rows[0] && rows[0].payload && typeof rows[0].payload === 'object' ? rows[0].payload : { days: {}, sources: {} };
       setVisitStats(payload);
       setVisitInfo({ loading: false, error: '', cloud: true });
@@ -2682,6 +2733,9 @@ useEffect(() => {
       const { sbUrl, sbKey, isValid } = getSupabaseConfig();
       if (!isValid) return;
       try {
+        // Atomic server-side increment (no JSON read-modify-write). Falls back to legacy only if the RPC is not installed (404).
+        const rr = await fetch(`${sbUrl}/rest/v1/rpc/track_visit`, { method: 'POST', headers: visitSbHeaders(sbKey, { 'Content-Type': 'application/json' }), body: JSON.stringify({ p_day: info.today, p_source: info.source, p_first_today: !!info.firstToday, p_new_device: !!info.isNewDevice }) });
+        if (rr.status !== 404) return;
         const r = await fetch(`${sbUrl}/rest/v1/app_state_sync?id=eq.visit_stats&select=payload`, { headers: visitSbHeaders(sbKey, { 'Cache-Control': 'no-cache' }) });
         const rows = r.ok ? await r.json() : [];
         const cur = Array.isArray(rows) && rows[0] && rows[0].payload ? rows[0].payload : { days: {}, sources: {} };
@@ -3272,8 +3326,8 @@ const pullFromSupabaseCloud = async (silent = false) => {
 
       const [modelsRows, fastCustomParts, fastLatestParts] = await Promise.all([
         sbFetchTable('mobile_models', null, '&order=id.asc&limit=500', forceRefresh),
-        sbFetchTable('spare_parts', null, '&created_at=neq.2026-11-01%2008:25&order=created_at.desc&limit=120', forceRefresh),
-        sbFetchTable('spare_parts', null, '&order=id.desc&limit=80', forceRefresh),
+        sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=60', forceRefresh),
+        Promise.resolve([]),
         fastUiPromise
       ]);
 
@@ -3328,7 +3382,7 @@ const pullFromSupabaseCloud = async (silent = false) => {
           // brand/model/category/search navigation fetches its slice server-side via
           // fetchSparePartsSliceOnDemand, so this wave (~665 KB) was pure waste for them.
           const [moreCustomDate, moreAsc] = await Promise.all([
-            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=120', false) : Promise.resolve([]),
+            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=60', false) : Promise.resolve([]),
             isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.asc&limit=650', false) : Promise.resolve([])
           ]);
           const moreCustomSku = [];
@@ -3985,7 +4039,7 @@ const refreshServerFeatureFlags = async () => {
     try {
       const { sbUrl, sbKey, isValid } = getSupabaseConfig();
       if (!isValid) return;
-      const res = await fetch(`${sbUrl}/rest/v1/feature_flags?select=*`, {
+      const res = await fetch(`${sbUrl}/rest/v1/feature_flags?select=key,enabled,config,updated_at`, {
         headers: sbHeaders(sbKey)
       });
       if (!res.ok) return;
@@ -7676,6 +7730,22 @@ const handleAdminLoginSubmit = async (e) => {
     const u = adminLoginUser.trim().toLowerCase();
     const p = adminLoginPass;
 
+    // Real login (Supabase Auth, JWT verified server-side). Role comes from public.admin_profiles — never from a header.
+    if (u.includes('@')) {
+      const { sbUrl, sbKey } = getSupabaseConfig();
+      const si = await adminSignIn(sbUrl, sbKey, u, p);
+      if (!si.ok) { showToast(si.error, 'error'); return; }
+      const prof = await fetchMyAdminProfile(sbUrl, sbKey);
+      if (!prof) { adminSignOut(); showToast('الحساب ده مش مسجّل كمدير (admin_profiles) — كلّم المالك.', 'error'); return; }
+      const defaults = { moderator: ['overview', 'marketplace'], editor: ['overview', 'catalog', 'storefront_cms', 'karambo', 'promos'], support: ['overview', 'orders', 'returns', 'sourcing', 'clients'] };
+      const perms = prof.role === 'admin' ? ['*'] : [...new Set([...(defaults[prof.role] || []), ...(Array.isArray(prof.permissions) ? prof.permissions : [])])];
+      setAdminCredentials({ username: '', password: '' });
+      setAdminSession({ username: u, displayName: prof.display_name || u, roleLabel: prof.role, isOwner: prof.role === 'owner', permissions: prof.role === 'owner' ? null : perms, authMode: 'supabase' });
+      setAdminAuthenticated(true);
+      showToast('دخلت لوحة التحكم بحساب Supabase Auth ✓', 'success');
+      return;
+    }
+
     // Security fix #7 (Stage B): verify on the server via RPC so the app
     // never needs the admin credentials downloaded to the browser.
     try {
@@ -10278,6 +10348,12 @@ const submitStoreAnswer = async (qId, ansObj) => {
   return true;
 };
 useEffect(() => {
+  const parseSellHash = () => { if ((window.location.hash || '').toLowerCase().startsWith('#/sell')) setClientTab('sell'); };
+  parseSellHash();
+  window.addEventListener('hashchange', parseSellHash);
+  return () => window.removeEventListener('hashchange', parseSellHash);
+}, []);
+useEffect(() => {
   const parseKaramboHash = () => {
     const h = window.location.hash || '';
     if (!h.toLowerCase().startsWith('#/karambo')) return;
@@ -10354,7 +10430,7 @@ useEffect(() => {
 
 const homeActiveNow = clientTab === 'home' || clientTab === 'store';
 const searchActiveNow = clientTab === 'search';
-  ctxBag = { storeReviewEntities, storeReviewEntries, storeReviewQuestions, ensureStoreEntity, submitStoreReview, voteReviewHelpful, moderateStoreReview, deleteStoreReview, submitStoreEntity, updateStoreEntity, deleteStoreEntity, submitStoreQuestion, submitStoreAnswer, APPEND_ONLY_SLICES, CAMEL_TO_SNAKE_MAP, CATEGORY_GRADS, FLAG_KEY_TO_SETTING_KEY, NUMERIC_CAMEL_FIELDS, SESSION_CACHE_PREFIX, SESSION_CACHE_TTL, SNAKE_TO_CAMEL_MAP, SPIN_STORAGE_KEY, STATIC_SESSION_TABLES, TABLE_ALLOWED_COLUMNS, TABLE_DEFAULT_QUERY, TABLE_LIGHT_COLUMNS, accountRequests, accountSubTab, activeBirthdayOrSeasonalBanner, activeCatalogPricingGroupId, activeFamilyDevices, activeRole, activeSpinPrizes, adEditorOpen, adForm, adPreviewDevice, addingPartToModel, adminAddPartId, adminAuthenticated, adminCatalogBrand, adminCatalogSearch, adminCatalogSort, adminClientDossierTab, adminClientSearch, adminClientsFilterType, adminClientsGroupFilter, adminCmsSubTab, adminCreateClientModalOpen, adminCredentials, adminEditClientForm, adminFamilyModelId, adminFamilyOwnerLabel, adminFamilyTargetClientId, adminFlagsSubTab, adminGroupSearch, adminKpis, adminLoginPass, adminLoginUser, adminMenuOpen, adminNewPassword, adminNewUsername, adminNotifPanelOpen, adminNotify, adminOrFilterMode, adminOrderSearch, adminOrderSort, adminOrderStatusFilter, adminPwMap, adminReqPwMap, adminRestockWhatsappPart, adminReturnsSubTab, adminSaveSrcPrice, adminSecurityModalOpen, adminSelectedModelId, adminSetDeposit, adminSetSrcStatus, adminSettingsSubTab, adminSidebarCollapsed, adminSidebarMode, adminSidebarSearch, adminSourcingSubTab, adminStockFilter, adminTab, adminToggleSrcImages, aiCommandOpen, announceBoxOpen, appPortal, appliedPromo, appliedReferralClient, applySpinPrizePromo, approvingRequestObj, askConfirmDelete, authModalTab, autoGenerateParts, autoTemplates, backAction, backActionRef, backCandidates, bannerClosedText, blankAdForm, blankSrcForm, brandDeleteProtectionModal, brandImages, brandManagerOpen, brands, browserNotifPermission, buildInvoiceHtml, bulkPriceMode, bulkPriceRound5, bulkPriceToolOpen, bulkPriceValue, bundleDiscountPartIds, calculatePartPrice, callServerCroRpc, canGoBackInApp, canTriggerExitIntentNow, cancelSourcingByClient, cardImageIdx, cart, cartDrawerOpen, cartSummary, categoryEmoji, changeCols, changeLang, checkoutAddressChoice, clientCompletedOrderCount, clientFollowupText, clientLoginIdentifier, clientLoginPassword, clientLoyaltyInfo, clientNotify, clientOrdersSearch, clientOrdersSort, clientOrdersStatusFilter, clientTab, clients, cloudSourcingUpdate, cloudSyncStatus, cmdPaletteOpen, collapsedAdminModels, commitCustomerCloudTransaction, complaintReplies, complaints, compressImageDataUrl, computeGmReportData, confettiActive, confirmDialog, currencies, currentClient, currentCurrency, currentGroup, currentPeriodTotalSalesEgp, customAddressText, dataUrlToBlob, deepLinkOpenedRef, deferredSearchQuery, deletedIdsMapRef, deliveryFeeBase, detailImageIdx, diffFlushTimerRef, directClientForm, downloadImage, duplicateAd, editingBrandIdx, editingBrandImageFor, editingBrandText, editingModelObj, editingOrder, editingPartObj, enqueueLiveSocialProofOrder, estimateDataUrlBytes, exitIntentContactInput, exitIntentModalOpen, expandedAdminBrands, expandedAdminModels, expandedClientOrders, externalizeBase64Deep, extractEgyptianCityFromAddress, familyModalOpen, favoritePartIds, fetchSinglePartFullDetailsOnDemand, fetchSingleSourcingDetailsOnDemand, fetchSparePartsSliceOnDemand, fetchVisiblePartImagesOnDemand, fetchedModelPartsSetRef, fetchedPartDetailsSetRef, fetchedPartImagesSetRef, fetchedStorePagesSetRef, filterFetchDebounceRef, filterSheet, filterSheetQuery, filteredAdminOrders, filteredParts, floatingBottomMenuOpen, flushPendingDiffsToSupabase, forgotConfirmPassword, forgotIdentityVerify, forgotNewPassword, forgotOtpCode, forgotPhone, forgotStepStatus, formatMoney, formatSyncHttpError, generateTemplatePartsForModel, getCashierImpulseItems, getCategoryFallbackImg, getClientLoyaltyStatus, getFirstLetterMaskedName, getFooterConfig, getHeaderConfig, getMobilePushConfig, getPartCashbackPct, getPartImagesList, getPartQualityTiers, getPartWaitlistEntries, getSmartCrossSellSuggestions, getSpinCooldownInfoForUser, getSupabaseConfig, getTopCategories, gmReportCustomNotes, gmReportDateFrom, gmReportDateTo, gmReportOrderFilter, gmReportPreset, gmReportPrintPreviewOpen, gmReportSections, gridLimit, groupDrafts, groupModalSearchQuery, groups, guessAdTheme, guestFamilyDevices, handleAdImageUpload, handleAddCrossSellBundleItem, handleAddFamilyDevice, handleAdminAddClientFamilyDevice, handleAdminLoginSubmit, handleAdminSaveClientFullEdits, handleAdminUploadClientAvatar, handleApplyExitIntentOffer, handleApplyGroupModifier, handleApplyReferralCode, handleBulkDisableExpensiveCashback, handleBulkEnableAffordableCashback, handleChangeClientPassword, handleClientAvatarFileUpload, handleClientLoginSubmit, handleCloudSyncOrCatalog, handleCreateGroup, handleCreateModelWithTemplate, handleCreatePromoCode, handleDeleteModel, handleDeletePart, handleDirectClientAvatarUpload, handleDownloadInvoicePdf, handleExportGmReportCsv, handleForgotPasswordSubmit, handleInjectMissingTemplatesIntoModel, handleLiveFetchMoreOrProducts, handleMigrateAllBase64ImagesToStorage, handleNewAdImageUpload, handleNewModelImageFileUpload, handleNewsletterSubscribe, handleOptimizeAllSiteImagesToWebP, handlePlaceOrder, handlePrintInvoice, handleQuickReorder, handleRemoveFamilyDevice, handleRequestWarrantyReplacement, handleResolveReturn, handleSaveClientProfile, handleSaveLiveInvoiceEdit, handleSelectGmReportPreset, handleShareProduct, handleSpinTheWheel, handleSrcFormImage, handleSubmitCustomerRestockNotify, handleSubmitRegistrationRequest, handleSwitchRole, handleToggleSoundAndRequestPermission, handleToggleTargetedAdModel, handleToggleTargetedAdPart, handleUpdateOrderStatus, handleWaitlistRequest, hasAdminTablesPulledRef, hasBackSentinelRef, hasClientAlreadyUsedReferral, hasCloudInitialPullCompletedRef, hasCompletedOrderInSessionRef, hasCustomerRegisteredRestock, hasInitialBootPullRanRef, hasInteractedWithCartRef, hasRestoredLegacyFallbackRef, headerCompact, headerCompactRef, headerFullH, headerInnerRef, heroAdIndex, hiddenBrandsSet, hiddenCategoriesSet, hiddenModelIdsSet, hiddenPartIdsSet, homeActiveNow, homeElRef, i18nActive, inFlightRequestsMapRef, incomingSyncUntilRef, invalidateSessionTableCache, invoicePartSearchQuery, isBrandHidden, isCategoryHidden, isCurrentClientVip, isCustomerMutatingCloudRef, isFirstFilterRenderRef, isIncomingSyncRef, isInitialCloudBooting, isModelHidden, isPartCashbackEnabled, isPartFavorited, isPartHidden, isPartPinnedToCashier, isPartVipOnly, isSavingRef, isSpinningWheel, lang, lastBulkPriceSnapshot, lastKnownRemoteTimestampMsRef, lastKnownRemoteUpdatedAtRef, lastKnownTableTimestampsRef, lastLocalMutationAtRef, lastSavedPayloadRef, lastSeenOrderCountRef, lastSeenReqCountRef, lastSocialToastTsRef, lightbox, liveSocialQueueRef, liveSocialToast, loadScriptOnce, loadSessionMap, loadVisitStats, localModifiedMapRef, loginModalOpen, manualPayAmount, manualPayNote, markExitIntentTriggered24h, markLocalDelete, markLocalUpsert, markSrcRead, mergeServerWithLocal, migratingImages, migrationProgress, mobileCols, mobileFiltersExpanded, modelByIdMap, models, moveAd, myTabId, newAdForm, newBarForm, newBrandInput, newComplaintMsg, newComplaintSubject, newComplaintType, newFamilyModelId, newFamilyOwnerLabel, newGroupCurrency, newGroupDeliveryFee, newGroupModType, newGroupModVal, newGroupName, newModelAliases, newModelBrand, newModelImage, newModelModalOpen, newModelName, newPartModalOpen, newPromoForm, newTplBasePrice, newTplCategory, newTplCost, newTplImageKey, newTplNamePattern, newTplQuality, newTplSkuPrefix, newTplStock, newsletterEmail, nlBody, nlPromoCode, nlSubject, normalizeArabicSearch, notifDropdownOpen, notifInitializedRef, notifications, notifiedPartIds, openAdminCards, openCmsSections, openCustomerRestockModal, openEditAd, openFeatureSections, openNewAd, openOrderStatusWhatsApp, openSidebarGroups, openSourcing, orCloudSyncState, orLiveFetchState, orderNotes, orders, ordersRef, pageLoadedAtRef, parsedSearchWords, partCountByBrandMap, partCountByModelIdMap, partGroupPricesModalPart, partPassesStoreFilters, parts, passwordForm, paymentBoxOpen, paymentMethod, pendingDiffDeletesRef, pendingDiffUpsertsRef, pendingReflushRef, pendingSaveBundleRef, pendingScrollToProductsRef, pendingSourcingOpen, persistMutationMaps, pickSrcImages, pickSrcPdf, placeOrderInner, placedOrderInfo, placingOrder, playAppNotificationSound, playNotificationSound, prevFreeShipUnlockedRef, prevSlicesRef, printModalOrder, processAndUploadImage, productsGridAnchorRef, profileForm, promoCodeInput, promoCodes, publicBrands, publicModels, publicPartCountByBrandMap, publicPartCountByModelIdMap, publicParts, pullFromSupabaseCloud, pushToSupabaseCloud, quickStockBrand, quickStockCat, quickStockModel, quickStockPage, quickStockSearch, quickStockSort, readSessionTableCache, realtimeConnected, recentlyViewedIds, recordRecentlyViewedPart, recordRecoveredCartEvent, referralCodeInput, refreshServerFeatureFlags, regErrors, regForm, renderAdSeg, renderAdToggle, renderAddPartToModelModal, renderAdminApproveRequestModal, renderAdminCatalog, renderAdminClients, renderAdminCreateClientModal, renderAdminDashboard, renderAdminDatabaseSchema, renderAdminExecutiveReportsView, renderAdminFeatureFlagsDashboard, renderAdminGroups, renderAdminOrders, renderAdminOverview, renderAdminPromoCodes, renderAdminQuickStock, renderAdminRestockAlertsView, renderAdminRestockWhatsappModal, renderAdminReturnsAndComplaints, renderAdminSecurityModal, renderAdminSiteSettings, renderAdminSourcing, renderAdminStorefrontCms, renderAdminSubTabBar, renderAnnouncements, renderBrandImageModal, renderBrandManagerModal, renderCartDrawer, renderCashierImpulseShelf, renderCheckoutFooter, renderCheckoutView, renderClientAccountPortal, renderClientAvatar, renderClientComplaintsView, renderClientFooter, renderClientHeader, renderClientLedgerView, renderClientOrdersView, renderClientProfileSettingsView, renderClientReturnsView, renderClientSourcingSection, renderCmsAccordionHeader, renderConfettiOverlay, renderConfirmDialogModal, renderCustomerRestockNotifyModal, renderEditModelModal, renderEditPartModal, renderExitIntentModal, renderFamilyDevicesModal, renderFilterSheet, renderFloatingSpinTrigger, renderFreeShippingProgressBar, renderGmReportDocumentContent, renderGmReportPrintModal, renderHomeView, renderLightbox, renderLiveSocialProofToast, renderLoginModal, renderPartGroupPricesModal, renderPrecisionImageControls, renderPrintModal, renderProductCard, renderProductOrAdDetailModal, renderProfitProtectionShieldCard, renderRecentlyViewedStrip, renderReturnRequestModal, renderRoleSwitcherBar, renderSmartCrossSellBundles, renderSocialIconsGroup, renderSourcingBanner, renderSourcingFormModal, renderSpinToWinModal, renderSrcChat, renderStickyCartBar, renderStorefront, renderTemplateManagerModal, renderVipRouteView, renderVisitorStats, renderVvipBrandEmblem, renderWarrantyLookupModal, repurchaseShowAllMode, reqAllImages, resolveActualTableName, resolvePartModelObj, restockNotifyModalPart, restockVisitorName, restockVisitorPhone, retPartId, retPhotos, retReason, returnAdminNotes, returnModalOrder, returnsList, rootRef, runSiteImagesAudit, saveAdForm, saveDebounceTimerRef, saveSiteSettingsImmediate, sbDelete, sbFetchTable, sbHeaders, sbUpdate, sbUpsert, searchActiveNow, searchElRef, searchQuery, seenNotifIdsRef, selectedAdminClient, selectedAdminClientId, selectedBrand, selectedCategory, selectedColors, selectedDetailItem, selectedModelId, selectedQualityTiers, selectedTargetModelName, sendAdminRestockWhatsappToEntry, sendMobileOrderPushAlert, sendSourcingMessage, serverFeatureFlags, setAccountRequests, setAccountSubTab, setActiveCatalogPricingGroupId, setActiveRole, setAdEditorOpen, setAdForm, setAdPreviewDevice, setAddingPartToModel, setAdminAddPartId, setAdminAuthenticated, setAdminCatalogBrand, setAdminCatalogSearch, setAdminCatalogSort, setAdminClientDossierTab, setAdminClientSearch, setAdminClientsFilterType, setAdminClientsGroupFilter, setAdminCmsSubTab, setAdminCreateClientModalOpen, setAdminCredentials, setAdminEditClientForm, setAdminFamilyModelId, setAdminFamilyOwnerLabel, setAdminFamilyTargetClientId, setAdminFlagsSubTab, setAdminGroupSearch, setAdminLoginPass, setAdminLoginUser, setAdminMenuOpen, setAdminNewPassword, setAdminNewUsername, setAdminNotifPanelOpen, setAdminOrFilterMode, setAdminOrderSearch, setAdminOrderSort, setAdminOrderStatusFilter, setAdminPwMap, setAdminReqPwMap, setAdminRestockWhatsappPart, setAdminReturnsSubTab, setAdminSecurityModalOpen, setAdminSelectedModelId, setAdminSettingsSubTab, setAdminSidebarCollapsed, setAdminSidebarMode, setAdminSidebarSearch, setAdminSourcingSubTab, setAdminStockFilter, setAdminTab, setAiCommandOpen, setAnnounceBoxOpen, setAppPortal, setAppliedPromo, setAppliedReferralClient, setApprovingRequestObj, setAuthModalTab, setAutoGenerateParts, setAutoTemplates, setBannerClosedText, setBrandDeleteProtectionModal, setBrandImages, setBrandManagerOpen, setBrands, setBrowserNotifPermission, setBulkPriceMode, setBulkPriceRound5, setBulkPriceToolOpen, setBulkPriceValue, setBundleDiscountPartIds, setCardImageIdx, setCart, setCartDrawerOpen, setCartQtyDirect, setCheckoutAddressChoice, setClientFollowupText, setClientLoginIdentifier, setClientLoginPassword, setClientOrdersSearch, setClientOrdersSort, setClientOrdersStatusFilter, setClientTab, setClients, setCloudSyncStatus, setCmdPaletteOpen, setCollapsedAdminModels, setComplaintReplies, setComplaints, setConfettiActive, setConfirmDialog, setCurrencies, setCustomAddressText, setDetailImageIdx, setDirectClientForm, setEditingBrandIdx, setEditingBrandImageFor, setEditingBrandText, setEditingModelObj, setEditingOrder, setEditingPartObj, setExitIntentContactInput, setExitIntentModalOpen, setExpandedAdminBrands, setExpandedAdminModels, setExpandedClientOrders, setFamilyModalOpen, setFavoritePartIds, setFilterSheet, setFilterSheetQuery, setFloatingBottomMenuOpen, setForgotConfirmPassword, setForgotIdentityVerify, setForgotNewPassword, setForgotOtpCode, setForgotPhone, setForgotStepStatus, setGmReportCustomNotes, setGmReportDateFrom, setGmReportDateTo, setGmReportOrderFilter, setGmReportPreset, setGmReportPrintPreviewOpen, setGmReportSections, setGridLimit, setGroupDrafts, setGroupModalSearchQuery, setGroups, setGuestFamilyDevices, setHeaderCompact, setHeaderFullH, setHeroAdIndex, setInvoicePartSearchQuery, setIsInitialCloudBooting, setIsSpinningWheel, setLang, setLastBulkPriceSnapshot, setLightbox, setLiveSocialToast, setLoginModalOpen, setManualPayAmount, setManualPayNote, setMigratingImages, setMigrationProgress, setMobileCols, setMobileFiltersExpanded, setModels, setNewAdForm, setNewBarForm, setNewBrandInput, setNewComplaintMsg, setNewComplaintSubject, setNewComplaintType, setNewFamilyModelId, setNewFamilyOwnerLabel, setNewGroupCurrency, setNewGroupDeliveryFee, setNewGroupModType, setNewGroupModVal, setNewGroupName, setNewModelAliases, setNewModelBrand, setNewModelImage, setNewModelModalOpen, setNewModelName, setNewPartModalOpen, setNewPromoForm, setNewTplBasePrice, setNewTplCategory, setNewTplCost, setNewTplImageKey, setNewTplNamePattern, setNewTplQuality, setNewTplSkuPrefix, setNewTplStock, setNewsletterEmail, setNlBody, setNlPromoCode, setNlSubject, setNotifDropdownOpen, setNotifications, setNotifiedPartIds, setOpenAdminCards, setOpenCmsSections, setOpenFeatureSections, setOpenSidebarGroups, setOrCloudSyncState, setOrLiveFetchState, setOrderNotes, setOrders, setPartGroupPricesModalPart, setParts, setPasswordForm, setPaymentBoxOpen, setPaymentMethod, setPendingSourcingOpen, setPlacedOrderInfo, setPlacingOrder, setPrintModalOrder, setProfileForm, setPromoCodeInput, setPromoCodes, setQuickStockBrand, setQuickStockCat, setQuickStockModel, setQuickStockPage, setQuickStockSearch, setQuickStockSort, setRealtimeConnected, setRecentlyViewedIds, setReferralCodeInput, setRegErrors, setRegForm, setRepurchaseShowAllMode, setRestockNotifyModalPart, setRestockVisitorName, setRestockVisitorPhone, setRetPartId, setRetPhotos, setRetReason, setReturnAdminNotes, setReturnModalOrder, setReturnsList, setSearchQuery, setSelectedAdminClientId, setSelectedBrand, setSelectedCategory, setSelectedColors, setSelectedDetailItem, setSelectedModelId, setSelectedQualityTiers, setServerFeatureFlags, setSheetDrag, setSheetDragging, setSheetExpanded, setShowClosedItems, setShowScrollTopBtn, setShowcaseBars, setSiteImageAuditStats, setSiteSettings, setSmartNotifsOpen, setSoundAlertsEnabled, setSourcingFormOpen, setSourcingRequests, setSpinContactInput, setSpinCooldownMessage, setSpinModalOpen, setSpinRotationDeg, setSpinWheelState, setSrcDraftImgs, setSrcDraftPdf, setSrcDrafts, setSrcFilter, setSrcForm, setSrcPriceDraft, setSrcSettingsOpen, setSrcSheetDrag, setSrcSheetDragging, setSrcSheetExp, setStoreAds, setStoreExtraEightShown, setStorePage, setStorePriceRangeFilter, setStoreQualityFilter, setStoreSortBy, setStoreStockFilter, setTemplateManagerOpen, setTermsBoxOpen, setToast, setUiTheme, setUseWalletBalance, setVipAdminPreviewUnlocked, setVipLinkUnlocked, setVisibilityBoxOpen, setVisitInfo, setVisitStats, setWalletActionNote, setWalletActionType, setWalletInputAmount, setWalletManageClient, setWarrantyClaimNotes, setWarrantyModalOpen, setWarrantyPhoneQuery, sharePartViaWhatsApp, sheetDrag, sheetDragging, sheetExpanded, sheetStartYRef, showClosedItems, showScrollTopBtn, showToast, showcaseBars, shownSocialOrderIdsRef, siteImageAuditStats, siteSettings, smartNotifsOpen, soundAlertsEnabled, sourcingFormOpen, sourcingRequests, spinContactInput, spinCooldownMessage, spinModalOpen, spinRotationDeg, spinWheelState, srcDraftImgs, srcDraftPdf, srcDrafts, srcFilter, srcForm, srcPriceDraft, srcSettingsOpen, srcSheetDrag, srcSheetDragging, srcSheetExp, srcSheetStartRef, storeAds, storeExtraEightShown, storeGridTopRef, storePage, storePriceRangeFilter, storeQualityFilter, storeSortBy, storeStockFilter, submitRegistrationRequestInner, submitSourcingRequest, submittingCustomerActionRef, swipeProps, swipeStartRef, swipeSuppressRef, switchPortal, templateManagerOpen, termsBoxOpen, toCamelCaseRow, toSnakeCaseRow, toast, todayIsoDate, toggleAdminCard, toggleCmsSection, toggleFavoritePart, toggleFeatureSection, toggleHideBrand, toggleHideCategory, toggleHideModel, toggleHidePart, toggleModelCollapse, togglePartCashback, togglePartCashierPin, togglePartSoldOut, togglePartVipOnly, toggleUiTheme, triggerBrowserAndSoundNotification, triggerConfettiCelebration, triggerLiveSocialToastImmediate, uiTheme, unsupportedColumnsRef, updateCartQty, updatePaymentMethods, uploadBlobToStorage, useFlag, useWalletBalance, validateRegistration, vipAdminPreviewUnlocked, vipCatalogParts, vipLinkUnlocked, vipMinOrders, vipRequiredSpentEgp, visibilityBoxOpen, visitInfo, visitSbHeaders, visitStats, waitForInvoiceAssets, walletActionNote, walletActionType, walletInputAmount, walletManageClient, warrantyClaimNotes, warrantyModalOpen, warrantyPhoneQuery, writeSessionTableCache, adminSession, setAdminSession, isAdminOwner, canAdmin, teamUsers, teamLoading, teamForm, setTeamForm, teamDeleteId, setTeamDeleteId, loadTeamUsers, saveTeamUser, deleteTeamUser, toggleTeamUserActive, renderAdminTeam, guidePhonesAll, guidePhonesView, guidePhonesAdmin: guidePhonesAll, karamboUi, setKaramboUi, karamboCfg, saveKaramboCfg, importGuideSeed, toggleGuidePhone, updateGuidePhone, deleteGuidePhone, submitPriceAlert, priceAlertsAdmin, loadPriceAlerts, deletePriceAlert, guideSyncState, syncGuideLive, addGuidePhone, updatePriceAlertStatus, karamboStats, trackKaramboEvent, resetKaramboStats, computeValueScore, renderKaramboStrip, renderKaramboPage, renderAdminKarambo };
+  ctxBag = { loadAdminCostMap, storeReviewEntities, storeReviewEntries, storeReviewQuestions, ensureStoreEntity, submitStoreReview, voteReviewHelpful, moderateStoreReview, deleteStoreReview, submitStoreEntity, updateStoreEntity, deleteStoreEntity, submitStoreQuestion, submitStoreAnswer, APPEND_ONLY_SLICES, CAMEL_TO_SNAKE_MAP, CATEGORY_GRADS, FLAG_KEY_TO_SETTING_KEY, NUMERIC_CAMEL_FIELDS, SESSION_CACHE_PREFIX, SESSION_CACHE_TTL, SNAKE_TO_CAMEL_MAP, SPIN_STORAGE_KEY, STATIC_SESSION_TABLES, TABLE_ALLOWED_COLUMNS, TABLE_DEFAULT_QUERY, TABLE_LIGHT_COLUMNS, accountRequests, accountSubTab, activeBirthdayOrSeasonalBanner, activeCatalogPricingGroupId, activeFamilyDevices, activeRole, activeSpinPrizes, adEditorOpen, adForm, adPreviewDevice, addingPartToModel, adminAddPartId, adminAuthenticated, adminCatalogBrand, adminCatalogSearch, adminCatalogSort, adminClientDossierTab, adminClientSearch, adminClientsFilterType, adminClientsGroupFilter, adminCmsSubTab, adminCreateClientModalOpen, adminCredentials, adminEditClientForm, adminFamilyModelId, adminFamilyOwnerLabel, adminFamilyTargetClientId, adminFlagsSubTab, adminGroupSearch, adminKpis, adminLoginPass, adminLoginUser, adminMenuOpen, adminNewPassword, adminNewUsername, adminNotifPanelOpen, adminNotify, adminOrFilterMode, adminOrderSearch, adminOrderSort, adminOrderStatusFilter, adminPwMap, adminReqPwMap, adminRestockWhatsappPart, adminReturnsSubTab, adminSaveSrcPrice, adminSecurityModalOpen, adminSelectedModelId, adminSetDeposit, adminSetSrcStatus, adminSettingsSubTab, adminSidebarCollapsed, adminSidebarMode, adminSidebarSearch, adminSourcingSubTab, adminStockFilter, adminTab, adminToggleSrcImages, aiCommandOpen, announceBoxOpen, appPortal, appliedPromo, appliedReferralClient, applySpinPrizePromo, approvingRequestObj, askConfirmDelete, authModalTab, autoGenerateParts, autoTemplates, backAction, backActionRef, backCandidates, bannerClosedText, blankAdForm, blankSrcForm, brandDeleteProtectionModal, brandImages, brandManagerOpen, brands, browserNotifPermission, buildInvoiceHtml, bulkPriceMode, bulkPriceRound5, bulkPriceToolOpen, bulkPriceValue, bundleDiscountPartIds, calculatePartPrice, callServerCroRpc, canGoBackInApp, canTriggerExitIntentNow, cancelSourcingByClient, cardImageIdx, cart, cartDrawerOpen, cartSummary, categoryEmoji, changeCols, changeLang, checkoutAddressChoice, clientCompletedOrderCount, clientFollowupText, clientLoginIdentifier, clientLoginPassword, clientLoyaltyInfo, clientNotify, clientOrdersSearch, clientOrdersSort, clientOrdersStatusFilter, clientTab, clients, cloudSourcingUpdate, cloudSyncStatus, cmdPaletteOpen, collapsedAdminModels, commitCustomerCloudTransaction, complaintReplies, complaints, compressImageDataUrl, computeGmReportData, confettiActive, confirmDialog, currencies, currentClient, currentCurrency, currentGroup, currentPeriodTotalSalesEgp, customAddressText, dataUrlToBlob, deepLinkOpenedRef, deferredSearchQuery, deletedIdsMapRef, deliveryFeeBase, detailImageIdx, diffFlushTimerRef, directClientForm, downloadImage, duplicateAd, editingBrandIdx, editingBrandImageFor, editingBrandText, editingModelObj, editingOrder, editingPartObj, enqueueLiveSocialProofOrder, estimateDataUrlBytes, exitIntentContactInput, exitIntentModalOpen, expandedAdminBrands, expandedAdminModels, expandedClientOrders, externalizeBase64Deep, extractEgyptianCityFromAddress, familyModalOpen, favoritePartIds, fetchSinglePartFullDetailsOnDemand, fetchSingleSourcingDetailsOnDemand, fetchSparePartsSliceOnDemand, fetchVisiblePartImagesOnDemand, fetchedModelPartsSetRef, fetchedPartDetailsSetRef, fetchedPartImagesSetRef, fetchedStorePagesSetRef, filterFetchDebounceRef, filterSheet, filterSheetQuery, filteredAdminOrders, filteredParts, floatingBottomMenuOpen, flushPendingDiffsToSupabase, forgotConfirmPassword, forgotIdentityVerify, forgotNewPassword, forgotOtpCode, forgotPhone, forgotStepStatus, formatMoney, formatSyncHttpError, generateTemplatePartsForModel, getCashierImpulseItems, getCategoryFallbackImg, getClientLoyaltyStatus, getFirstLetterMaskedName, getFooterConfig, getHeaderConfig, getMobilePushConfig, getPartCashbackPct, getPartImagesList, getPartQualityTiers, getPartWaitlistEntries, getSmartCrossSellSuggestions, getSpinCooldownInfoForUser, getSupabaseConfig, getTopCategories, gmReportCustomNotes, gmReportDateFrom, gmReportDateTo, gmReportOrderFilter, gmReportPreset, gmReportPrintPreviewOpen, gmReportSections, gridLimit, groupDrafts, groupModalSearchQuery, groups, guessAdTheme, guestFamilyDevices, handleAdImageUpload, handleAddCrossSellBundleItem, handleAddFamilyDevice, handleAdminAddClientFamilyDevice, handleAdminLoginSubmit, handleAdminSaveClientFullEdits, handleAdminUploadClientAvatar, handleApplyExitIntentOffer, handleApplyGroupModifier, handleApplyReferralCode, handleBulkDisableExpensiveCashback, handleBulkEnableAffordableCashback, handleChangeClientPassword, handleClientAvatarFileUpload, handleClientLoginSubmit, handleCloudSyncOrCatalog, handleCreateGroup, handleCreateModelWithTemplate, handleCreatePromoCode, handleDeleteModel, handleDeletePart, handleDirectClientAvatarUpload, handleDownloadInvoicePdf, handleExportGmReportCsv, handleForgotPasswordSubmit, handleInjectMissingTemplatesIntoModel, handleLiveFetchMoreOrProducts, handleMigrateAllBase64ImagesToStorage, handleNewAdImageUpload, handleNewModelImageFileUpload, handleNewsletterSubscribe, handleOptimizeAllSiteImagesToWebP, handlePlaceOrder, handlePrintInvoice, handleQuickReorder, handleRemoveFamilyDevice, handleRequestWarrantyReplacement, handleResolveReturn, handleSaveClientProfile, handleSaveLiveInvoiceEdit, handleSelectGmReportPreset, handleShareProduct, handleSpinTheWheel, handleSrcFormImage, handleSubmitCustomerRestockNotify, handleSubmitRegistrationRequest, handleSwitchRole, handleToggleSoundAndRequestPermission, handleToggleTargetedAdModel, handleToggleTargetedAdPart, handleUpdateOrderStatus, handleWaitlistRequest, hasAdminTablesPulledRef, hasBackSentinelRef, hasClientAlreadyUsedReferral, hasCloudInitialPullCompletedRef, hasCompletedOrderInSessionRef, hasCustomerRegisteredRestock, hasInitialBootPullRanRef, hasInteractedWithCartRef, hasRestoredLegacyFallbackRef, headerCompact, headerCompactRef, headerFullH, headerInnerRef, heroAdIndex, hiddenBrandsSet, hiddenCategoriesSet, hiddenModelIdsSet, hiddenPartIdsSet, homeActiveNow, homeElRef, i18nActive, inFlightRequestsMapRef, incomingSyncUntilRef, invalidateSessionTableCache, invoicePartSearchQuery, isBrandHidden, isCategoryHidden, isCurrentClientVip, isCustomerMutatingCloudRef, isFirstFilterRenderRef, isIncomingSyncRef, isInitialCloudBooting, isModelHidden, isPartCashbackEnabled, isPartFavorited, isPartHidden, isPartPinnedToCashier, isPartVipOnly, isSavingRef, isSpinningWheel, lang, lastBulkPriceSnapshot, lastKnownRemoteTimestampMsRef, lastKnownRemoteUpdatedAtRef, lastKnownTableTimestampsRef, lastLocalMutationAtRef, lastSavedPayloadRef, lastSeenOrderCountRef, lastSeenReqCountRef, lastSocialToastTsRef, lightbox, liveSocialQueueRef, liveSocialToast, loadScriptOnce, loadSessionMap, loadVisitStats, localModifiedMapRef, loginModalOpen, manualPayAmount, manualPayNote, markExitIntentTriggered24h, markLocalDelete, markLocalUpsert, markSrcRead, mergeServerWithLocal, migratingImages, migrationProgress, mobileCols, mobileFiltersExpanded, modelByIdMap, models, moveAd, myTabId, newAdForm, newBarForm, newBrandInput, newComplaintMsg, newComplaintSubject, newComplaintType, newFamilyModelId, newFamilyOwnerLabel, newGroupCurrency, newGroupDeliveryFee, newGroupModType, newGroupModVal, newGroupName, newModelAliases, newModelBrand, newModelImage, newModelModalOpen, newModelName, newPartModalOpen, newPromoForm, newTplBasePrice, newTplCategory, newTplCost, newTplImageKey, newTplNamePattern, newTplQuality, newTplSkuPrefix, newTplStock, newsletterEmail, nlBody, nlPromoCode, nlSubject, normalizeArabicSearch, notifDropdownOpen, notifInitializedRef, notifications, notifiedPartIds, openAdminCards, openCmsSections, openCustomerRestockModal, openEditAd, openFeatureSections, openNewAd, openOrderStatusWhatsApp, openSidebarGroups, openSourcing, orCloudSyncState, orLiveFetchState, orderNotes, orders, ordersRef, pageLoadedAtRef, parsedSearchWords, partCountByBrandMap, partCountByModelIdMap, partGroupPricesModalPart, partPassesStoreFilters, parts, passwordForm, paymentBoxOpen, paymentMethod, pendingDiffDeletesRef, pendingDiffUpsertsRef, pendingReflushRef, pendingSaveBundleRef, pendingScrollToProductsRef, pendingSourcingOpen, persistMutationMaps, pickSrcImages, pickSrcPdf, placeOrderInner, placedOrderInfo, placingOrder, playAppNotificationSound, playNotificationSound, prevFreeShipUnlockedRef, prevSlicesRef, printModalOrder, processAndUploadImage, productsGridAnchorRef, profileForm, promoCodeInput, promoCodes, publicBrands, publicModels, publicPartCountByBrandMap, publicPartCountByModelIdMap, publicParts, pullFromSupabaseCloud, pushToSupabaseCloud, quickStockBrand, quickStockCat, quickStockModel, quickStockPage, quickStockSearch, quickStockSort, readSessionTableCache, realtimeConnected, recentlyViewedIds, recordRecentlyViewedPart, recordRecoveredCartEvent, referralCodeInput, refreshServerFeatureFlags, regErrors, regForm, renderAdSeg, renderAdToggle, renderAddPartToModelModal, renderAdminApproveRequestModal, renderAdminCatalog, renderAdminClients, renderAdminCreateClientModal, renderAdminDashboard, renderAdminDatabaseSchema, renderAdminExecutiveReportsView, renderAdminFeatureFlagsDashboard, renderAdminGroups, renderAdminOrders, renderAdminOverview, renderAdminPromoCodes, renderAdminQuickStock, renderAdminRestockAlertsView, renderAdminRestockWhatsappModal, renderAdminReturnsAndComplaints, renderAdminSecurityModal, renderAdminSiteSettings, renderAdminSourcing, renderAdminStorefrontCms, renderAdminSubTabBar, renderAnnouncements, renderBrandImageModal, renderBrandManagerModal, renderCartDrawer, renderCashierImpulseShelf, renderCheckoutFooter, renderCheckoutView, renderClientAccountPortal, renderClientAvatar, renderClientComplaintsView, renderClientFooter, renderClientHeader, renderClientLedgerView, renderClientOrdersView, renderClientProfileSettingsView, renderClientReturnsView, renderClientSourcingSection, renderCmsAccordionHeader, renderConfettiOverlay, renderConfirmDialogModal, renderCustomerRestockNotifyModal, renderEditModelModal, renderEditPartModal, renderExitIntentModal, renderFamilyDevicesModal, renderFilterSheet, renderFloatingSpinTrigger, renderFreeShippingProgressBar, renderGmReportDocumentContent, renderGmReportPrintModal, renderHomeView, renderLightbox, renderLiveSocialProofToast, renderLoginModal, renderPartGroupPricesModal, renderPrecisionImageControls, renderPrintModal, renderProductCard, renderProductOrAdDetailModal, renderProfitProtectionShieldCard, renderRecentlyViewedStrip, renderReturnRequestModal, renderRoleSwitcherBar, renderSmartCrossSellBundles, renderSocialIconsGroup, renderSourcingBanner, renderSourcingFormModal, renderSpinToWinModal, renderSrcChat, renderStickyCartBar, renderStorefront, renderTemplateManagerModal, renderVipRouteView, renderVisitorStats, renderVvipBrandEmblem, renderWarrantyLookupModal, repurchaseShowAllMode, reqAllImages, resolveActualTableName, resolvePartModelObj, restockNotifyModalPart, restockVisitorName, restockVisitorPhone, retPartId, retPhotos, retReason, returnAdminNotes, returnModalOrder, returnsList, rootRef, runSiteImagesAudit, saveAdForm, saveDebounceTimerRef, saveSiteSettingsImmediate, sbDelete, sbFetchTable, sbHeaders, sbUpdate, sbUpsert, searchActiveNow, searchElRef, searchQuery, seenNotifIdsRef, selectedAdminClient, selectedAdminClientId, selectedBrand, selectedCategory, selectedColors, selectedDetailItem, selectedModelId, selectedQualityTiers, selectedTargetModelName, sendAdminRestockWhatsappToEntry, sendMobileOrderPushAlert, sendSourcingMessage, serverFeatureFlags, setAccountRequests, setAccountSubTab, setActiveCatalogPricingGroupId, setActiveRole, setAdEditorOpen, setAdForm, setAdPreviewDevice, setAddingPartToModel, setAdminAddPartId, setAdminAuthenticated, setAdminCatalogBrand, setAdminCatalogSearch, setAdminCatalogSort, setAdminClientDossierTab, setAdminClientSearch, setAdminClientsFilterType, setAdminClientsGroupFilter, setAdminCmsSubTab, setAdminCreateClientModalOpen, setAdminCredentials, setAdminEditClientForm, setAdminFamilyModelId, setAdminFamilyOwnerLabel, setAdminFamilyTargetClientId, setAdminFlagsSubTab, setAdminGroupSearch, setAdminLoginPass, setAdminLoginUser, setAdminMenuOpen, setAdminNewPassword, setAdminNewUsername, setAdminNotifPanelOpen, setAdminOrFilterMode, setAdminOrderSearch, setAdminOrderSort, setAdminOrderStatusFilter, setAdminPwMap, setAdminReqPwMap, setAdminRestockWhatsappPart, setAdminReturnsSubTab, setAdminSecurityModalOpen, setAdminSelectedModelId, setAdminSettingsSubTab, setAdminSidebarCollapsed, setAdminSidebarMode, setAdminSidebarSearch, setAdminSourcingSubTab, setAdminStockFilter, setAdminTab, setAiCommandOpen, setAnnounceBoxOpen, setAppPortal, setAppliedPromo, setAppliedReferralClient, setApprovingRequestObj, setAuthModalTab, setAutoGenerateParts, setAutoTemplates, setBannerClosedText, setBrandDeleteProtectionModal, setBrandImages, setBrandManagerOpen, setBrands, setBrowserNotifPermission, setBulkPriceMode, setBulkPriceRound5, setBulkPriceToolOpen, setBulkPriceValue, setBundleDiscountPartIds, setCardImageIdx, setCart, setCartDrawerOpen, setCartQtyDirect, setCheckoutAddressChoice, setClientFollowupText, setClientLoginIdentifier, setClientLoginPassword, setClientOrdersSearch, setClientOrdersSort, setClientOrdersStatusFilter, setClientTab, setClients, setCloudSyncStatus, setCmdPaletteOpen, setCollapsedAdminModels, setComplaintReplies, setComplaints, setConfettiActive, setConfirmDialog, setCurrencies, setCustomAddressText, setDetailImageIdx, setDirectClientForm, setEditingBrandIdx, setEditingBrandImageFor, setEditingBrandText, setEditingModelObj, setEditingOrder, setEditingPartObj, setExitIntentContactInput, setExitIntentModalOpen, setExpandedAdminBrands, setExpandedAdminModels, setExpandedClientOrders, setFamilyModalOpen, setFavoritePartIds, setFilterSheet, setFilterSheetQuery, setFloatingBottomMenuOpen, setForgotConfirmPassword, setForgotIdentityVerify, setForgotNewPassword, setForgotOtpCode, setForgotPhone, setForgotStepStatus, setGmReportCustomNotes, setGmReportDateFrom, setGmReportDateTo, setGmReportOrderFilter, setGmReportPreset, setGmReportPrintPreviewOpen, setGmReportSections, setGridLimit, setGroupDrafts, setGroupModalSearchQuery, setGroups, setGuestFamilyDevices, setHeaderCompact, setHeaderFullH, setHeroAdIndex, setInvoicePartSearchQuery, setIsInitialCloudBooting, setIsSpinningWheel, setLang, setLastBulkPriceSnapshot, setLightbox, setLiveSocialToast, setLoginModalOpen, setManualPayAmount, setManualPayNote, setMigratingImages, setMigrationProgress, setMobileCols, setMobileFiltersExpanded, setModels, setNewAdForm, setNewBarForm, setNewBrandInput, setNewComplaintMsg, setNewComplaintSubject, setNewComplaintType, setNewFamilyModelId, setNewFamilyOwnerLabel, setNewGroupCurrency, setNewGroupDeliveryFee, setNewGroupModType, setNewGroupModVal, setNewGroupName, setNewModelAliases, setNewModelBrand, setNewModelImage, setNewModelModalOpen, setNewModelName, setNewPartModalOpen, setNewPromoForm, setNewTplBasePrice, setNewTplCategory, setNewTplCost, setNewTplImageKey, setNewTplNamePattern, setNewTplQuality, setNewTplSkuPrefix, setNewTplStock, setNewsletterEmail, setNlBody, setNlPromoCode, setNlSubject, setNotifDropdownOpen, setNotifications, setNotifiedPartIds, setOpenAdminCards, setOpenCmsSections, setOpenFeatureSections, setOpenSidebarGroups, setOrCloudSyncState, setOrLiveFetchState, setOrderNotes, setOrders, setPartGroupPricesModalPart, setParts, setPasswordForm, setPaymentBoxOpen, setPaymentMethod, setPendingSourcingOpen, setPlacedOrderInfo, setPlacingOrder, setPrintModalOrder, setProfileForm, setPromoCodeInput, setPromoCodes, setQuickStockBrand, setQuickStockCat, setQuickStockModel, setQuickStockPage, setQuickStockSearch, setQuickStockSort, setRealtimeConnected, setRecentlyViewedIds, setReferralCodeInput, setRegErrors, setRegForm, setRepurchaseShowAllMode, setRestockNotifyModalPart, setRestockVisitorName, setRestockVisitorPhone, setRetPartId, setRetPhotos, setRetReason, setReturnAdminNotes, setReturnModalOrder, setReturnsList, setSearchQuery, setSelectedAdminClientId, setSelectedBrand, setSelectedCategory, setSelectedColors, setSelectedDetailItem, setSelectedModelId, setSelectedQualityTiers, setServerFeatureFlags, setSheetDrag, setSheetDragging, setSheetExpanded, setShowClosedItems, setShowScrollTopBtn, setShowcaseBars, setSiteImageAuditStats, setSiteSettings, setSmartNotifsOpen, setSoundAlertsEnabled, setSourcingFormOpen, setSourcingRequests, setSpinContactInput, setSpinCooldownMessage, setSpinModalOpen, setSpinRotationDeg, setSpinWheelState, setSrcDraftImgs, setSrcDraftPdf, setSrcDrafts, setSrcFilter, setSrcForm, setSrcPriceDraft, setSrcSettingsOpen, setSrcSheetDrag, setSrcSheetDragging, setSrcSheetExp, setStoreAds, setStoreExtraEightShown, setStorePage, setStorePriceRangeFilter, setStoreQualityFilter, setStoreSortBy, setStoreStockFilter, setTemplateManagerOpen, setTermsBoxOpen, setToast, setUiTheme, setUseWalletBalance, setVipAdminPreviewUnlocked, setVipLinkUnlocked, setVisibilityBoxOpen, setVisitInfo, setVisitStats, setWalletActionNote, setWalletActionType, setWalletInputAmount, setWalletManageClient, setWarrantyClaimNotes, setWarrantyModalOpen, setWarrantyPhoneQuery, sharePartViaWhatsApp, sheetDrag, sheetDragging, sheetExpanded, sheetStartYRef, showClosedItems, showScrollTopBtn, showToast, showcaseBars, shownSocialOrderIdsRef, siteImageAuditStats, siteSettings, smartNotifsOpen, soundAlertsEnabled, sourcingFormOpen, sourcingRequests, spinContactInput, spinCooldownMessage, spinModalOpen, spinRotationDeg, spinWheelState, srcDraftImgs, srcDraftPdf, srcDrafts, srcFilter, srcForm, srcPriceDraft, srcSettingsOpen, srcSheetDrag, srcSheetDragging, srcSheetExp, srcSheetStartRef, storeAds, storeExtraEightShown, storeGridTopRef, storePage, storePriceRangeFilter, storeQualityFilter, storeSortBy, storeStockFilter, submitRegistrationRequestInner, submitSourcingRequest, submittingCustomerActionRef, swipeProps, swipeStartRef, swipeSuppressRef, switchPortal, templateManagerOpen, termsBoxOpen, toCamelCaseRow, toSnakeCaseRow, toast, todayIsoDate, toggleAdminCard, toggleCmsSection, toggleFavoritePart, toggleFeatureSection, toggleHideBrand, toggleHideCategory, toggleHideModel, toggleHidePart, toggleModelCollapse, togglePartCashback, togglePartCashierPin, togglePartSoldOut, togglePartVipOnly, toggleUiTheme, triggerBrowserAndSoundNotification, triggerConfettiCelebration, triggerLiveSocialToastImmediate, uiTheme, unsupportedColumnsRef, updateCartQty, updatePaymentMethods, uploadBlobToStorage, useFlag, useWalletBalance, validateRegistration, vipAdminPreviewUnlocked, vipCatalogParts, vipLinkUnlocked, vipMinOrders, vipRequiredSpentEgp, visibilityBoxOpen, visitInfo, visitSbHeaders, visitStats, waitForInvoiceAssets, walletActionNote, walletActionType, walletInputAmount, walletManageClient, warrantyClaimNotes, warrantyModalOpen, warrantyPhoneQuery, writeSessionTableCache, adminSession, setAdminSession, isAdminOwner, canAdmin, teamUsers, teamLoading, teamForm, setTeamForm, teamDeleteId, setTeamDeleteId, loadTeamUsers, saveTeamUser, deleteTeamUser, toggleTeamUserActive, renderAdminTeam, guidePhonesAll, guidePhonesView, guidePhonesAdmin: guidePhonesAll, karamboUi, setKaramboUi, karamboCfg, saveKaramboCfg, importGuideSeed, toggleGuidePhone, updateGuidePhone, deleteGuidePhone, submitPriceAlert, priceAlertsAdmin, loadPriceAlerts, deletePriceAlert, guideSyncState, syncGuideLive, addGuidePhone, updatePriceAlertStatus, karamboStats, trackKaramboEvent, resetKaramboStats, computeValueScore, renderKaramboStrip, renderKaramboPage, renderAdminKarambo };
 return (
     <div ref={rootRef} dir={i18nActive ? 'ltr' : 'rtl'} className="min-h-[100svh] w-full max-w-full flex flex-col bg-bg text-fg font-sans relative">
       <style>{`
@@ -10566,6 +10642,7 @@ return (
             {clientTab === 'checkout' && renderCheckoutView()}
             {clientTab === 'account' && renderClientAccountPortal()}
             {clientTab === 'karambo' && renderKaramboPage()}
+            {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return <MarketplacePage sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />; })()}
           </main>
           {clientTab === 'checkout' ? renderCheckoutFooter() : renderClientFooter()}
         </div>
@@ -10574,6 +10651,7 @@ return (
       {/* Modals */}
       {renderCartDrawer()}
       {renderLoginModal()}
+      <MarketplaceHost currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />
       {renderReturnRequestModal()}
       {renderPrintModal()}
       {renderGmReportPrintModal()}

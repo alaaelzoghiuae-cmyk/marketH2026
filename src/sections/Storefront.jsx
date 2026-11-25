@@ -4,7 +4,7 @@ import React from 'react';
 import { DEFAULT_HOME_SHORTCUT_ICONS, ELZOGHBI_LOGO, PART_IMAGES, SHORTCUT_ICON_PRESETS } from '../data/constants.jsx';
 import { AdContent, BlurFitImage, ImageViewer } from '../components/widgets.jsx';
 import { Bidi } from '../i18n.jsx';
-import { adInSchedule, getAdTheme } from '../lib/utils.jsx';
+import { adInSchedule, getAdTheme, getSourcingBanner } from '../lib/utils.jsx';
 import { AppleHero, AppleAdMosaic } from '../components/AppleAds.jsx';
 import { normalizePartCategory } from '../lib/catalogUtils.js';
 import { mergeKaramboCfg, getOrderedKaramboServices } from '../data/karamboConfig.js';
@@ -139,14 +139,14 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
       >
         {/* Top Studio Product Stage (Pure White Studio Card so white-bg & transparent product photos both look crisp!) */}
         <div>
-          <div className="relative h-48 sm:h-56 rounded-[20px] bg-transparent dark:bg-white p-2 flex items-center justify-center overflow-hidden mb-4">
+          <div className="elz-pstage relative h-48 sm:h-56 p-3 flex items-center justify-center overflow-hidden mb-4">
             <BlurFitImage
               key={`${part.id}_${currentImgIdx}_${partFitMode}`}
               src={currentDisplayImg}
               alt={part.name}
               fit={partFitMode}
               imgClassName={`${
-                partFitMode === 'cover' ? 'w-full h-full object-cover' : 'max-h-40 sm:max-h-48 w-auto object-contain p-1 mix-blend-multiply dark:mix-blend-normal'
+                partFitMode === 'cover' ? 'w-full h-full object-cover' : 'max-h-40 sm:max-h-48 w-auto object-contain p-1 mix-blend-multiply'
               } group-hover:scale-105 transition duration-500`}
             />
 
@@ -456,11 +456,13 @@ export function renderClientHeader(ctx) {
           id: 'karambo',
           label: String(kc.title || 'كرومبو').split(' ')[0],
           img: kc.mascotUrl || '/karambo.png',
-          go: () => goK(svcs[0].id),
-          children: () => svcs.map(x => ({ id: 'karambo>' + x.id, label: x.title, emoji: '✦', go: () => goK(x.id) })),
+          go: () => goK('hub'),
+          alwaysGo: true,
+          children: () => [{ id: 'karambo>hub', label: 'كل خدمات ' + String(kc.title || 'كرومبو'), emoji: '🧭', go: () => goK('hub') }, ...svcs.map(x => ({ id: 'karambo>' + x.id, label: x.title, emoji: '✦', go: () => goK(x.id) }))],
         }];
         }
       } catch (e) { items = []; }
+      items = [...items, { id: 'sell', label: 'بيع عندنا', emoji: '🏷️', go: () => { window.location.hash = '#/sell'; ctx.setClientTab('sell'); window.scrollTo({ top: 0 }); } }];
       _karamboNavMemo = { cfg: ctx.karamboCfg, setter: ctx.setKaramboUi, items };
       return items;
     })();
@@ -1388,7 +1390,7 @@ export function renderHomeView(ctx) {
             className="elz-tile elz-tile-dark group rounded-[28px] px-6 py-7 sm:px-12 sm:py-9 flex flex-col sm:flex-row sm:items-center justify-between gap-5"
           >
             <div className="flex items-center gap-5 min-w-0">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-[20px] bg-white/10 flex items-center justify-center text-3xl shrink-0" aria-hidden="true">🌍</div>
+              <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-[22px] bg-white/10 flex items-center justify-center text-3xl shrink-0 overflow-hidden" aria-hidden="true">{(() => { const sb = getSourcingBanner(siteSettings); return sb && sb.image ? <img src={sb.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="w-full h-full object-contain p-1" /> : '🌍'; })()}</div>
               <div className="min-w-0">
                 <div className="text-[12px] font-semibold text-[#ffb340]">استيراد وتوفير خاص</div>
                 <div className="text-[22px] sm:text-[28px] font-semibold tracking-tight leading-tight text-white">خدمة اطلب منتجك</div>
@@ -1402,6 +1404,7 @@ export function renderHomeView(ctx) {
         {/* 2D. APPLE-STORE STYLE EDITORIAL SHOWCASE (categories, bento offers, horizontal rails — real catalogue data only) */}
         {siteSettings.showHomeShowcase !== false && (
           <AppleHomeShowcase
+            categoryIcons={siteSettings.categoryIcons}
             rtl={!i18nActive}
             parts={publicParts}
             calculatePartPrice={calculatePartPrice}
@@ -2795,6 +2798,7 @@ export function renderClientFooter(ctx, isPreview = false) {
                       <button type="button" onClick={() => showToast(`${siteSettings.termsTitle}: ${siteSettings.termsText}`, 'info')} className="hover:text-[#0066CC] transition">
                         شروط الاستخدام والضمان
                       </button>
+                      <button type="button" onClick={() => { window.location.hash = '#/sell/terms'; setClientTab('sell'); }} className="hover:text-[#0066CC] transition">شروط إعلانات «بيع عندنا»</button>
                     </li>
                   )}
                   {fCfg.showShippingPolicyLink && (

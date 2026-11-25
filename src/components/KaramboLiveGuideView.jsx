@@ -74,7 +74,7 @@ export default function KaramboLiveGuideView({
   // Auto-check Egypt prices for the visible grid (batched, never floods the browser)
   const checkedRef = React.useRef(new Set());
   useEffect(() => {
-    if (mode !== 'global' || gCfg.autoFetchEgyptPrice === false) return;
+    if (true) return; // Egypt price is fetched ONLY when the visitor presses «اعرف السعر في مصر»
     const todo = items.filter(it => !checkedRef.current.has(it.id) && !(localPhones.find(lp => lp.slug === it.slug && lp.price > 0)));
     if (!todo.length) return;
     let alive = true;
@@ -121,7 +121,7 @@ export default function KaramboLiveGuideView({
           specs: [],
           price: cachedPrice,
           loadingSpecs: true,
-          loadingPrice: !cachedPrice && gCfg.autoFetchEgyptPrice !== false,
+          loadingPrice: false,
           source: 'gsmarena'
         };
     onOpenPhone && onOpenPhone(initialDev);

@@ -12,6 +12,10 @@ import {
   resolveKaramboBarStyle
 } from '../data/karamboConfig.js';
 import { matchesPhoneSearch } from '../services/gsmarenaClient.js';
+import { QuickServicesBar } from '../components/QuickServices.jsx';
+import EgyptPriceReveal from '../components/EgyptPriceReveal.jsx';
+import AccessoryPreloader from '../components/AccessoryPreloader.jsx';
+import { modelsForPhone, partMatchLevel } from '../lib/accessoryMatch.js';
 import GsmarenaCompareView from '../components/GsmarenaCompareView.jsx';
 import GsmarenaPhonePicker from '../components/GsmarenaPhonePicker.jsx';
 import KaramboLiveGuideView from '../components/KaramboLiveGuideView.jsx';
@@ -234,13 +238,7 @@ function PhoneCard(ctx, phone, opts = {}) {
           </ul>
         )}
         <div className="mt-auto space-y-1.5">
-          <div className="flex items-end justify-between">
-            <div>
-              <div className="text-[10px] font-bold text-muted">سعر السوق الاسترشادي</div>
-              <div className="text-lg font-black text-[#0066CC] dark:text-[#2997FF]">{formatMoney(phone.price || 0)}</div>
-            </div>
-            {phone.priceDate ? <div className="text-[10px] text-muted font-bold">آخر مراجعة: {phone.priceDate}</div> : null}
-          </div>
+          <EgyptPriceReveal compact name={phone.name} curatedPrice={phone.price} curatedDate={phone.priceDate} formatMoney={formatMoney} />
           <ValueBadge score={phone.valueScore} />
           <div className="flex gap-1.5 pt-1">
             <button type="button" onClick={() => go('phone', { phoneId: phone.id })} className="flex-1 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-xs font-black transition">التفاصيل</button>
@@ -255,9 +253,9 @@ function PhoneCard(ctx, phone, opts = {}) {
 
 function matchAccessoriesForPhone(ctx, phone) {
   const parts = ctx.publicParts || [];
+  const models = ctx.models || [];
+  const modelById = new Map(models.map(m => [String(m.id), m]));
   const brandSlug = String(phone.brandSlug || phone.brand || '').toLowerCase();
-  const tokens = BRAND_TOKENS[brandSlug] || [brandSlug, String(phone.brand || '').toLowerCase()].filter(Boolean);
-  const modelNums = (String(phone.slug || phone.name || '').match(/\d{2,3}/g) || []);
   const isLightning = brandSlug === 'apple' && /iphone\s*(?:1[0-4]|[6-9]|x|se)/i.test(`${phone.name || ''} ${phone.slug || ''}`);
   const neededW = Number(phone.chargeW || 0);
 
@@ -266,25 +264,27 @@ function matchAccessoriesForPhone(ctx, phone) {
   const universalExtras = [];
 
   parts.forEach(part => {
-    const hay = `${part.name || ''} ${part.brand || ''} ${part.modelName || ''} ${part.category || ''}`.toLowerCase();
+    const level = partMatchLevel(part, phone, models, modelById);
+    const hay = `${part.name || ''} ${part.category || ''}`.toLowerCase();
     const isChargerOrCable = /شاحن|كابل|وصل|باور|بطار|charger|cable|adapter|power|type-c|lightning|pd|gan/i.test(hay);
     const isAudioOrWatch = /سماع|إيربود|ايربود|ساع|watch|buds|airpods|earbuds|headphone/i.test(hay);
 
-    let score = 0;
-    tokens.forEach(t => { if (t && hay.includes(t)) score += 2; });
-    modelNums.forEach(n => { if (hay.includes(n)) score += 2; });
-
-    if (score >= 2 && !isChargerOrCable) {
-      modelSpecific.push({ part, score });
+    if (level) {
+      // Real relation (model id / compatible list / exact model in title) → model-specific
+      modelSpecific.push({ part, score: level === 'model' ? 3 : level === 'list' ? 2 : 1 });
     } else if (isChargerOrCable) {
-      let cScore = 1;
-      if (isLightning && /lightning|لايتن|ايفون|iphone/i.test(hay)) cScore += 3;
-      if (!isLightning && /type-c|usb-c|تايب|pd/i.test(hay)) cScore += 2;
-      const wMatch = hay.match(/(\d{2,3})\s*(?:w|وات)/i);
-      if (wMatch && neededW > 0 && parseInt(wMatch[1], 10) >= neededW) cScore += 2;
-      chargersAndCables.push({ part, score: cScore });
+      // Generic charger / cable: only port-compatible ones, clearly separated from model-specific items
+      const wantsLightning = isLightning;
+      const hasLightning = /lightning|لايتن/i.test(hay);
+      const hasUsbC = /type-c|usb-c|تايب|usb c/i.test(hay);
+      if ((wantsLightning && hasLightning) || (!wantsLightning && hasUsbC)) {
+        let cScore = 2;
+        const wMatch = hay.match(/(\d{2,3})\s*(?:w|وات)/i);
+        if (wMatch && neededW > 0 && parseInt(wMatch[1], 10) >= neededW) cScore += 2;
+        chargersAndCables.push({ part, score: cScore });
+      }
     } else if (isAudioOrWatch) {
-      universalExtras.push({ part, score: score + 1 });
+      universalExtras.push({ part, score: 1 });
     }
   });
 
@@ -293,7 +293,7 @@ function matchAccessoriesForPhone(ctx, phone) {
     neededW,
     modelSpecific: modelSpecific.sort((a, b) => b.score - a.score).slice(0, 12).map(x => x.part),
     chargersAndCables: chargersAndCables.sort((a, b) => b.score - a.score).slice(0, 8).map(x => x.part),
-    universalExtras: universalExtras.sort((a, b) => b.score - a.score).slice(0, 8).map(x => x.part)
+    universalExtras: universalExtras.slice(0, 8).map(x => x.part)
   };
 }
 
@@ -316,7 +316,7 @@ export function renderKaramboStrip(ctx) {
   return (
     <section id="karambo-strip" aria-label={cfg.title} className="space-y-5">
       <div className="flex items-end justify-between gap-4">
-        <div className="flex items-center gap-4 min-w-0">
+        <button type="button" onClick={() => go('hub')} aria-label={`كل خدمات ${cfg.title}`} className="flex items-center gap-4 min-w-0 text-start cursor-pointer group">
           {cfg.showMascot !== false && (
             <img src={cfg.mascotUrl || '/karambo.png'} alt="" className="w-14 h-14 sm:w-16 sm:h-16 rounded-[20px] object-cover bg-surface shrink-0" />
           )}
@@ -325,7 +325,8 @@ export function renderKaramboStrip(ctx) {
             <h3 className="elz-h3 text-fg leading-tight">{cfg.title}</h3>
             {cfg.subtitle && <p className="text-[13px] sm:text-[15px] text-muted mt-0.5 line-clamp-2">{cfg.subtitle}</p>}
           </div>
-        </div>
+        </button>
+      <button type="button" onClick={() => go('hub')} className="shrink-0 text-[14px] font-medium text-[#0066CC] dark:text-[#2997FF] hover:underline">{rtlUi ? 'كل الخدمات ›' : 'All services ›'}</button>
       </div>
       <div className="elz-rail-track flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
         {services.map(s => {
@@ -351,6 +352,7 @@ export function renderKaramboStrip(ctx) {
       {cfg.disclaimer && (
         <p className="flex items-center gap-2 text-[12px] text-muted"><Shield className="w-3.5 h-3.5 shrink-0" aria-hidden="true" /><span>{cfg.disclaimer}</span></p>
       )}
+      <QuickServicesBar ctx={ctx} cfg={cfg} services={getOrderedKaramboServices(cfg).filter(s => s.enabled)} icons={ICONS} renderEmbedded={(id, ui, setUi) => renderKaramboPage({ ...ctx, karamboUi: ui, setKaramboUi: setUi, __embedded: true })} />
     </section>
   );
 }
@@ -392,7 +394,7 @@ export function renderKaramboPage(ctx) {
   const barStyle = resolveKaramboBarStyle(cfg);
 
   // Standalone Korombo World Shell — wraps any active service with dedicated Korombo Hero + Sidebar + Mobile Icon Dock
-  const wrapKoromboPortal = (contentNode) => (
+  const wrapKoromboPortal = (contentNode) => ctx.__embedded ? (<div className="space-y-3">{contentNode}</div>) : (
     <div id="korombo-standalone-hub" className="min-h-[85vh] bg-bg pb-20">
       {/* Dedicated Korombo Top Hero Banner */}
       <div style={barStyle} className="border-b shadow-lg">
@@ -640,7 +642,8 @@ export function renderKaramboPage(ctx) {
     const imgIdx = Math.min(ui.imgIdx || 0, Math.max(0, (phone.images || []).length - 1));
     const hist = phone.priceHistory || [];
     const accData = matchAccessoriesForPhone(ctx, phone);
-    const accessories = [...accData.modelSpecific, ...accData.chargersAndCables].slice(0, 8);
+    const accessories = accData.modelSpecific.slice(0, 8);
+    const generalPicks = accData.chargersAndCables.slice(0, 4);
     const similarPhones = phones
       .filter(p => p.id !== phone.id && p.price > 0 && phone.price > 0)
       .sort((a, b) => Math.abs(a.price - phone.price) - Math.abs(b.price - phone.price))
@@ -676,17 +679,11 @@ export function renderKaramboPage(ctx) {
                 <span className="text-xs font-black text-muted">سعر السوق الاسترشادي{phone.priceDate ? ` · آخر مراجعة ${phone.priceDate}` : ''}</span>
                 <ValueBadge score={phone.valueScore} />
               </div>
-              <div className="space-y-1">
-                {(phone.variants || []).length > 0 ? (phone.variants || []).map((v, i) => (
+              <EgyptPriceReveal key={phone.id || phone.name} name={phone.name} curatedPrice={phone.price} curatedDate={phone.priceDate} formatMoney={formatMoney} unavailableLabel={(cfg.guideCfg && cfg.guideCfg.notInEgyptLabel) || 'غير متوفر في مصر حالياً'}>
+                {(phone.variants || []).length > 0 && (<div className="space-y-1 pt-1">{(phone.variants || []).map((v, i) => (
                   <div key={i} className="flex items-center justify-between text-sm font-bold"><span className="text-muted">{v.label}</span><span className="font-black text-[#0066CC] dark:text-[#2997FF]">{formatMoney(v.price)}</span></div>
-                )) : phone.price > 0 ? (
-                  <div className="flex items-center justify-between text-sm font-bold"><span className="text-muted">السعر في مصر</span><span className="font-black text-emerald-600 dark:text-emerald-400">{formatMoney(phone.price)}</span></div>
-                ) : (
-                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-black text-rose-600 dark:text-rose-400">
-                    {(cfg.guideCfg && cfg.guideCfg.notInEgyptLabel) || 'غير متوفر في مصر حالياً'}
-                  </div>
-                )}
-              </div>
+                ))}</div>)}
+              </EgyptPriceReveal>
               {hist.length > 1 && (
                 <div className="pt-1 border-t border-line">
                   <div className="text-[11px] font-black text-muted mb-1">تاريخ السعر عندنا</div>
@@ -752,18 +749,21 @@ export function renderKaramboPage(ctx) {
           </div>
         </div>
 
-        {accessories.length > 0 && (
+        <AccessoryPreloader phone={phone} models={ctx.models || []} fetchSlice={ctx.fetchSparePartsSliceOnDemand} />
+        {(
           <div className="bg-surface border border-line rounded-3xl p-4 space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="font-black text-fg">إكسسواراته عندنا <span className="text-xs text-muted font-bold">— منتجات للبيع فعلًا من متجرنا</span></h3>
               <button type="button" onClick={() => go('compatibility', { compatPhone: phone })} className="text-xs font-black text-slate-600 hover:underline">عرض كل المتوافق مع {phone.name} ←</button>
             </div>
+            {accessories.length === 0 && <div className="rounded-2xl bg-surface2 border border-line p-4 text-center text-xs font-bold text-muted">لا توجد إكسسوارات متوافقة متاحة حاليًا</div>}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {accessories.map((part, i) => (
                 <button key={part.id || i} type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="text-start bg-surface2/60 border border-line rounded-2xl p-2.5 hover:border-[#0071E3] transition">
                   <div className="aspect-square rounded-xl bg-white dark:bg-[#1D1D1F] flex items-center justify-center overflow-hidden mb-2">{part.image ? <img src={part.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Smartphone className="w-8 h-8 text-muted" />}</div>
                   <div className="text-[11px] font-black text-fg line-clamp-2 leading-snug">{part.name}</div>
                   <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] mt-1">{formatMoney(partPrice(ctx, part))}</div>
+            {generalPicks.length > 0 && (<div className="pt-2 border-t border-line space-y-2"><div className="text-xs font-black text-muted">منتجات عامة تناسب منفذ الشحن ({accData.portLabel}) — غير مخصصة لهذا الموديل</div><div className="grid grid-cols-2 md:grid-cols-4 gap-3">{generalPicks.map((part, i) => (<button key={part.id || i} type="button" onClick={() => ctx.setSelectedDetailItem && ctx.setSelectedDetailItem(part)} className="text-start bg-surface2/60 border border-line rounded-2xl p-2.5 hover:border-[#0071E3] transition"><div className="elz-pstage aspect-[4/3] flex items-center justify-center overflow-hidden mb-2 p-2">{part.image ? <img src={part.image} alt="" loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain mix-blend-multiply" /> : null}</div><div className="text-[11px] font-black text-fg line-clamp-2 leading-snug">{part.name}</div></button>))}</div></div>)}
                 </button>
               ))}
             </div>
@@ -1195,6 +1195,7 @@ export function renderKaramboPage(ctx) {
           formatMoney={formatMoney}
           showToast={ctx.showToast}
           whatsappNumber={waNum}
+          onSell={() => window.dispatchEvent(new CustomEvent('elz:sell-open', { detail: {} }))}
         />
       </div>
     );
