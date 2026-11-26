@@ -1,6 +1,8 @@
+import React from 'react';
 import AdminLookPanel from '../components/AdminLookPanel.jsx';
 import { AdminThemeToggle } from '../components/AdminThemeGuard.jsx';
-import AdminMarketplace from './AdminMarketplace.jsx';
+// Code-split (hardening branch): the marketplace review tab loads on demand.
+const AdminMarketplace = React.lazy(() => import('./AdminMarketplace.jsx'));
 import AdminVisualEditor from '../components/AdminVisualEditor.jsx';
 import AdminThemeEditor from '../components/AdminThemeEditor.jsx';
 import AdminPageSectionBuilder from '../components/AdminPageSectionBuilder.jsx';
@@ -1112,7 +1114,7 @@ export function renderAdminDashboard(ctx) {
             <div className="w-full max-w-[1480px] mx-auto p-3 sm:p-5 pb-24 min-w-0">
             {adminTab === 'team' && isAdminOwner && renderAdminTeam()}
             {adminTab === 'karambo' && canAdmin('karambo') && renderAdminKarambo()}
-            {adminTab === 'marketplace' && canAdmin('marketplace') && (() => { const sc = ctx.getSupabaseConfig(); return <AdminMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} showToast={ctx.showToast} adminCredentials={adminCredentials} adminSession={adminSession} />; })()}
+            {adminTab === 'marketplace' && canAdmin('marketplace') && (() => { const sc = ctx.getSupabaseConfig(); return (<React.Suspense fallback={null}><AdminMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} showToast={ctx.showToast} adminCredentials={adminCredentials} adminSession={adminSession} /></React.Suspense>); })()}
             {adminTab === 'visual_editor' && canAdmin('visual_editor') && (
               <AdminVisualEditor
                 siteSettings={siteSettings}

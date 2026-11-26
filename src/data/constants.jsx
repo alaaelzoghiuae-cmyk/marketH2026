@@ -1,4 +1,8 @@
-import { OR_IMPORTED_BRANDS, OR_IMPORTED_MODELS } from '../orCatalogData';
+// The bundled OR catalog was removed from the bundle (hardening branch) —
+// its brands/models live in the database; the seed spreads below now add
+// nothing, keeping only the hand-written seed lists.
+const OR_IMPORTED_BRANDS = [];
+const OR_IMPORTED_MODELS = [];
 
 export const INITIAL_CURRENCIES = {
   EGP: { code: 'EGP', symbol: 'ج.م', name: 'جنيه مصري', rateFromBase: 1 },
