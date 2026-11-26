@@ -2242,7 +2242,73 @@ const sbFetchTableBase = async (tableName, select = null, query = null, forceNet
     inFlightRequestsMapRef.current.set(cacheKey, { ts: Date.now(), promise: fetchPromise });
     return fetchPromise;
   };
+// ---------------------------------------------------------------------------
+// Stage D (security phase 3): customer-data tables are RLS-locked (SQL 08).
+// Reads/writes for them flow through security-definer RPCs that authenticate
+// the caller (owner credentials / RBAC employee / Supabase Auth JWT / the
+// logged-in customer for their own rows). While the RPCs are not installed
+// yet (SQL 08 not run), every gated call falls back to the previous direct
+// table access, so deploying this code first is safe.
+// ---------------------------------------------------------------------------
+const GATED_TABLES = new Set(['orders', 'complaints', 'returns_list', 'sourcing_requests', 'account_requests', 'clients', 'price_alerts', 'guide_phones']);
+const CLIENT_GATED_READ_TABLES = new Set(['orders', 'complaints', 'returns_list', 'sourcing_requests', 'clients']);
+const CLIENT_GATED_WRITE_TABLES = new Set(['complaints', 'returns_list', 'sourcing_requests', 'clients']);
+const adminRpcCredsRef = useRef(null);
+const clientRpcPassRef = useRef('');
+const getClientRpcCreds = () => {
+    if (currentClient && currentClient.id && clientRpcPassRef.current) {
+      return { id: currentClient.id, password: clientRpcPassRef.current };
+    }
+    return null;
+};
+const getAdminRpcCreds = () => {
+    if (adminCredentials && adminCredentials.username && adminCredentials.password) {
+      return { username: adminCredentials.username, password: adminCredentials.password };
+    }
+    if (adminRpcCredsRef.current && adminRpcCredsRef.current.username) return adminRpcCredsRef.current;
+    if (getAdminJwt()) return { username: '', password: '' };
+    return null;
+};
+const gatedRpcCall = async (fn, body) => {
+    try {
+      const { sbUrl, sbKey, isValid } = getSupabaseConfig();
+      if (!isValid) return { ok: false, status: 0 };
+      const jwt = getAdminJwt();
+      const res = await fetch(`${sbUrl}/rest/v1/rpc/${fn}`, {
+        method: 'POST',
+        headers: { apikey: sbKey, Authorization: `Bearer ${jwt || sbKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) return { ok: false, status: res.status };
+      return { ok: true, data: await res.json() };
+    } catch (e) { return { ok: false, status: 0 }; }
+};
+const tryGatedFetch = async (realTable, query) => {
+    const q = String(query || '');
+    const lim = parseInt((q.match(/limit=(\d+)/) || [])[1] || '500', 10);
+    const off = parseInt((q.match(/offset=(\d+)/) || [])[1] || '0', 10);
+    const creds = getAdminRpcCreds();
+    if (creds) {
+      const g = await gatedRpcCall('gated_rows', { p_username: creds.username, p_password: creds.password, p_table: realTable, p_limit: lim, p_offset: off });
+      if (g.ok && Array.isArray(g.data)) return g.data.map(toCamelCaseRow);
+      if (g.ok) return null; // RPC answered but denied/unavailable -> fall back
+      if (g.status !== 404 && g.status !== 400) return null;
+      return null;
+    }
+    const clientCreds = getClientRpcCreds();
+    if (clientCreds && CLIENT_GATED_READ_TABLES.has(realTable)) {
+      const g = await gatedRpcCall('client_rows', { p_client_id: clientCreds.id, p_password: clientCreds.password, p_table: realTable, p_limit: lim });
+      if (g.ok && Array.isArray(g.data)) return g.data.map(toCamelCaseRow);
+    }
+    return null;
+};
+useEffect(() => { if (!adminAuthenticated) adminRpcCredsRef.current = null; }, [adminAuthenticated]);
 const sbFetchTable = async (tableName, select = null, query = null, forceNetwork = false) => {
+    const gatedReal = resolveActualTableName(tableName);
+    if (GATED_TABLES.has(gatedReal) && gatedReal !== 'guide_phones') {
+      const gatedRows = await tryGatedFetch(gatedReal, query === null || query === undefined || query === '' ? (TABLE_DEFAULT_QUERY[gatedReal] || '') : query);
+      if (gatedRows) return gatedRows;
+    }
     const rows = await sbFetchTableBase(tableName, select, query, forceNetwork);
     try {
       if (Array.isArray(rows) && resolveActualTableName(tableName) === 'spare_parts' && (appPortal === 'admin' || adminAuthenticated) && getAdminJwt()) {
@@ -2413,7 +2479,28 @@ const sbUpsert = async (tableName, recordOrArray) => {
         const chunk = rawList.slice(b, b + BATCH_SIZE);
         let success = false;
 
-        for (let attempt = 0; attempt < 12; attempt++) {
+        // Stage D: gated tables are written through the RPC when we hold
+        // credentials (admin, or the logged-in customer for their own rows).
+        if (GATED_TABLES.has(realTable)) {
+          const adminCreds = getAdminRpcCreds();
+          const clientCreds = (!adminCreds && CLIENT_GATED_WRITE_TABLES.has(realTable)) ? getClientRpcCreds() : null;
+          if (adminCreds || clientCreds) {
+            const payload = chunk.map((r, idx) => toSnakeCaseRow(r, realTable, b + idx));
+            let gatedDone = true;
+            for (const row of payload) {
+              const g = await gatedRpcCall('gated_upsert', {
+                p_username: adminCreds ? adminCreds.username : '',
+                p_password: adminCreds ? adminCreds.password : clientCreds.password,
+                p_table: realTable, p_row: row
+              });
+              if (!g.ok) { gatedDone = false; break; }
+              if (g.data !== true) return false;
+            }
+            if (gatedDone) success = true;
+          }
+        }
+
+        for (let attempt = 0; attempt < 12 && !success; attempt++) {
           const payload = chunk.map((r, idx) => toSnakeCaseRow(r, realTable, b + idx));
           const res = await fetch(`${sbUrl}/rest/v1/${realTable}`, {
             method: 'POST',
@@ -2460,6 +2547,21 @@ const sbUpdate = async (tableName, id, patchObj) => {
       unsupportedColumnsRef.current[realTable] = new Set();
     }
     const pkCol = realTable === 'brands' ? 'name' : 'id';
+    // Stage D: gated tables patch through the RPC when we hold credentials.
+    if (GATED_TABLES.has(realTable)) {
+      const adminCreds = getAdminRpcCreds();
+      const clientCreds = (!adminCreds && CLIENT_GATED_WRITE_TABLES.has(realTable)) ? getClientRpcCreds() : null;
+      if (adminCreds || clientCreds) {
+        const payload = {};
+        for (const [k, v] of Object.entries(patchObj)) { payload[CAMEL_TO_SNAKE_MAP[k] || k] = v; }
+        const g = await gatedRpcCall('gated_patch', {
+          p_username: adminCreds ? adminCreds.username : '',
+          p_password: adminCreds ? adminCreds.password : clientCreds.password,
+          p_table: realTable, p_id: id, p_patch: payload
+        });
+        if (g.ok) return g.data === true;
+      }
+    }
     try {
       for (let attempt = 0; attempt < 8; attempt++) {
         const blocked = unsupportedColumnsRef.current[realTable];
@@ -2493,6 +2595,14 @@ const sbDelete = async (tableName, id) => {
     const realTable = resolveActualTableName(tableName);
     invalidateSessionTableCache(realTable);
     const pkCol = realTable === 'brands' ? 'name' : 'id';
+    // Stage D: gated tables delete through the RPC when admin credentials exist.
+    if (GATED_TABLES.has(realTable)) {
+      const adminCreds = getAdminRpcCreds();
+      if (adminCreds) {
+        const g = await gatedRpcCall('gated_delete', { p_username: adminCreds.username, p_password: adminCreds.password, p_table: realTable, p_id: id });
+        if (g.ok) return g.data === true;
+      }
+    }
     try {
       const res = await fetch(`${sbUrl}/rest/v1/${realTable}?${pkCol}=eq.${encodeURIComponent(id)}`, {
         method: 'DELETE',
@@ -3767,20 +3877,30 @@ useEffect(() => {
         if (typeof document !== 'undefined' && document.hidden) return;
         const { sbUrl, sbKey, isValid } = getSupabaseConfig();
         if (!isValid) return;
-        // Step 1: Tiny ~80-byte ID probe; only fetch full order rows if a truly new order ID appeared!
-        const probeRes = await fetch(`${sbUrl}/rest/v1/orders?select=id&order=created_at.desc&limit=1`, {
-          headers: sbHeaders(sbKey)
-        });
-        if (!probeRes.ok) return;
-        const probeRows = await probeRes.json();
-        const latestId = Array.isArray(probeRows) && probeRows[0]?.id ? String(probeRows[0].id) : '';
-        if (!latestId || (ordersRef.current || []).some(o => String(o.id) === latestId)) return;
-        const ordRes = await fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=5`, {
-          headers: sbHeaders(sbKey)
-        });
-        if (ordRes.ok) {
-          const rawOrders = await ordRes.json();
-          if (Array.isArray(rawOrders) && rawOrders.length > 0) {
+        // Step 1: Tiny ID probe; only fetch full order rows if a truly new order ID appeared!
+        // Stage D: with RLS on, the anon key cannot read orders — poll through
+        // gated_rows when admin credentials exist; fall back to the direct
+        // probe while the RPC is not installed.
+        let rawOrders = null;
+        const rpcCreds = getAdminRpcCreds();
+        if (rpcCreds) {
+          const g = await gatedRpcCall('gated_rows', { p_username: rpcCreds.username, p_password: rpcCreds.password, p_table: 'orders', p_limit: 5, p_offset: 0 });
+          if (g.ok && Array.isArray(g.data)) rawOrders = g.data;
+        }
+        if (rawOrders === null) {
+          const probeRes = await fetch(`${sbUrl}/rest/v1/orders?select=id&order=created_at.desc&limit=1`, {
+            headers: sbHeaders(sbKey)
+          });
+          if (!probeRes.ok) return;
+          const probeRows = await probeRes.json();
+          const latestId = Array.isArray(probeRows) && probeRows[0]?.id ? String(probeRows[0].id) : '';
+          if (!latestId || (ordersRef.current || []).some(o => String(o.id) === latestId)) return;
+          const ordRes = await fetch(`${sbUrl}/rest/v1/orders?select=${TABLE_LIGHT_COLUMNS.orders}&order=created_at.desc&limit=5`, {
+            headers: sbHeaders(sbKey)
+          });
+          if (ordRes.ok) rawOrders = await ordRes.json();
+        }
+        if (Array.isArray(rawOrders) && rawOrders.length > 0) {
             const freshOrders = rawOrders.map(toCamelCaseRow);
             setOrders(prev => {
               const prevIds = new Set(prev.map(o => String(o.id)));
@@ -3804,7 +3924,6 @@ useEffect(() => {
               }
               return mergeServerWithLocal('orders', prev, freshOrders);
             });
-          }
         }
       } catch (e) {}
     };
@@ -5841,6 +5960,7 @@ const handleSwitchRole = (newRole) => {
       return;
     }
 
+    if (!String(normalizedRole).startsWith('cli_')) clientRpcPassRef.current = '';
     setActiveRole(normalizedRole);
     switchPortal('storefront');
     const targetClient = clients.find(c => c.id === normalizedRole);
@@ -7836,6 +7956,7 @@ const handleAdminLoginSubmit = async (e) => {
         if (res.ok) {
           const ok = await res.json();
           if (ok === true) {
+            adminRpcCredsRef.current = { username: u, password: p };
             setAdminCredentials({ username: u, password: p });
             setAdminSession({ username: u, displayName: u, roleLabel: 'المالك', isOwner: true, permissions: null });
             setAdminAuthenticated(true);
@@ -7852,6 +7973,7 @@ const handleAdminLoginSubmit = async (e) => {
             if (r2.ok) {
               const data = await r2.json();
               if (data && data.ok) {
+                adminRpcCredsRef.current = { username: u, password: p };
                 setAdminSession({
                   username: data.username,
                   displayName: data.display_name || data.username,
@@ -9224,6 +9346,7 @@ const handleClientLoginSubmit = async (e) => {
           const rpcClient = await res.json();
           if (rpcClient && rpcClient.id) {
             const mapped = toCamelCaseRow(rpcClient);
+            clientRpcPassRef.current = passClean;
             setClients(prev => {
               const exists = prev.some(c => c.id === mapped.id);
               const next = exists ? prev.map(c => (c.id === mapped.id ? { ...c, ...mapped } : c)) : [mapped, ...prev];
@@ -9281,6 +9404,7 @@ const handleClientLoginSubmit = async (e) => {
       return;
     }
 
+    clientRpcPassRef.current = passClean;
     handleSwitchRole(matchedClient.id);
     setLoginModalOpen(false);
     setClientLoginIdentifier('');
