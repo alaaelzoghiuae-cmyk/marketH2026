@@ -7,12 +7,20 @@ import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY
 import { getAdminJwt, adminSignIn, adminSignOut, fetchMyAdminProfile, ensureFreshAdminJwt } from './lib/sbAuth.js';
 import { applyThemeTokensToDocument, DEFAULT_CMS_PAGES } from './lib/adminControlCenter.js';
 import { ensureCacheVersions } from './lib/cacheVersions.js';
-import { MarketplacePage, MarketplaceHost } from './sections/Marketplace.jsx';
+
 import { B64_UPLOAD_CACHE, applyVisit, b64Key, detectVisitSource, escapeHtml, getPaymentMethods, loadPersisted, localDayKey, normalizeDigits, nowStamp, readFileAsDataUrl } from './lib/utils.jsx';
 import { isOrCatalogDisabledInStorage, isOrPrefixedName, mergeOrBrandsList, mergeOrModelsList, mergeOrPartsList, normalizePartCategory, readPersistedDeletedSliceMap } from './lib/catalogUtils.js';
 import { I18N_ATTRS, i18nRestoreNode, i18nTranslateNode } from './i18n.jsx';
 import { renderVvipBrandEmblem as renderVvipBrandEmblemImpl, renderRoleSwitcherBar as renderRoleSwitcherBarImpl, renderClientAvatar as renderClientAvatarImpl, renderProductCard as renderProductCardImpl, renderSocialIconsGroup as renderSocialIconsGroupImpl, renderClientHeader as renderClientHeaderImpl, renderCheckoutFooter as renderCheckoutFooterImpl, renderAnnouncements as renderAnnouncementsImpl, renderRecentlyViewedStrip as renderRecentlyViewedStripImpl, renderHomeView as renderHomeViewImpl, renderStickyCartBar as renderStickyCartBarImpl, renderStorefront as renderStorefrontImpl, renderFreeShippingProgressBar as renderFreeShippingProgressBarImpl, renderSmartCrossSellBundles as renderSmartCrossSellBundlesImpl, renderCashierImpulseShelf as renderCashierImpulseShelfImpl, renderCartDrawer as renderCartDrawerImpl, renderVipRouteView as renderVipRouteViewImpl, renderFilterSheet as renderFilterSheetImpl, renderLightbox as renderLightboxImpl, renderClientFooter as renderClientFooterImpl } from './sections/Storefront.jsx';
-import { renderKaramboStrip as renderKaramboStripImpl, renderKaramboPage as renderKaramboPageImpl, renderAdminKarambo as renderAdminKaramboImpl, parseGuideSitemap, parseGuidePhoneHtml, computeValueScore } from './sections/Karambo.jsx';
+import { renderKaramboStrip as renderKaramboStripImpl, renderAdminKarambo as renderAdminKaramboImpl, parseGuideSitemap, parseGuidePhoneHtml, computeValueScore } from './sections/Karambo.jsx';
+
+// Karambo service pages are code-split (hardening branch): the home page
+// ships only the strip; the pages chunk loads on first navigation to them.
+const KaramboPageLazy = React.lazy(() => import('./sections/KaramboPage.jsx').then(m => ({
+  default: function KaramboPageRoute(props) { return m.renderKaramboPage(props.ctx); }
+})));
+const MarketplacePageLazy = React.lazy(() => import('./sections/Marketplace.jsx').then(m => ({ default: m.MarketplacePage })));
+const MarketplaceHostLazy = React.lazy(() => import('./sections/Marketplace.jsx').then(m => ({ default: m.MarketplaceHost })));
 import { GUIDE_PHONES_SEED } from './data/guidePhonesSeed.js';
 import { mergeKaramboCfg } from './data/karamboConfig.js';
 import { STORE_REVIEW_ENTITIES_SEED, STORE_REVIEW_ENTRIES_SEED, STORE_REVIEW_QUESTIONS_SEED } from './data/storeReviewsSeed.js';
@@ -55,7 +63,11 @@ export default function App() {
   const renderStickyCartBar = (...args) => renderStickyCartBarImpl(ctxBag, ...args);
   const renderStorefront = (...args) => renderStorefrontImpl(ctxBag, ...args);
   const renderKaramboStrip = (...args) => renderKaramboStripImpl(ctxBag, ...args);
-  const renderKaramboPage = (...args) => renderKaramboPageImpl(ctxBag, ...args);
+  const renderKaramboPage = (ctxOverride) => (
+    <React.Suspense fallback={null}>
+      <KaramboPageLazy ctx={ctxOverride || ctxBag} />
+    </React.Suspense>
+  );
   const renderAdminKarambo = (...args) => renderAdminKaramboImpl(ctxBag, ...args);
   const renderFreeShippingProgressBar = (...args) => renderFreeShippingProgressBarImpl(ctxBag, ...args);
   const renderSmartCrossSellBundles = (...args) => renderSmartCrossSellBundlesImpl(ctxBag, ...args);
@@ -10843,7 +10855,7 @@ return (
             {clientTab === 'checkout' && renderCheckoutView()}
             {clientTab === 'account' && renderClientAccountPortal()}
             {clientTab === 'karambo' && renderKaramboPage()}
-            {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return <MarketplacePage sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />; })()}
+            {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return (<React.Suspense fallback={null}><MarketplacePageLazy sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} /></React.Suspense>); })()}
             {clientTab === 'cms_page' && (() => {
               const allPages = Array.isArray(siteSettings?.cmsPages) && siteSettings.cmsPages.length > 0 ? siteSettings.cmsPages : DEFAULT_CMS_PAGES;
               const pg = allPages.find((p) => p.slug === activeCmsPageSlug && p.status === 'published');
@@ -10903,7 +10915,9 @@ return (
       {/* Modals */}
       {renderCartDrawer()}
       {renderLoginModal()}
-      <MarketplaceHost currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />
+      <React.Suspense fallback={null}>
+        <MarketplaceHostLazy currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />
+      </React.Suspense>
       {renderReturnRequestModal()}
       {renderPrintModal()}
       {renderGmReportPrintModal()}
