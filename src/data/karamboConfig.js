@@ -108,7 +108,7 @@ export const DEFAULT_KARAMBO_CFG = {
   newsCfg: {
     enabledLive: true,
     bannerTitle: 'آخر أخبار الموبايلات',
-    maxArticles: 18,
+    maxArticles: 48,
     customArticles: []
   },
   marketCfg: {

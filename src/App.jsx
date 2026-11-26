@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { resolveCategoryIconKey } from './lib/categoryIcons.jsx';
+import { AdminThemeGuard } from './components/AdminThemeGuard.jsx';
 import { OR_BRAND_IMAGES } from './orCatalogData';
 import { X, Check, Phone } from 'lucide-react';
 import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY_REG_FORM, INITIAL_ACCOUNT_REQUESTS, INITIAL_AUTO_TEMPLATES, INITIAL_BRANDS, INITIAL_CLIENTS, INITIAL_COMPLAINTS, INITIAL_CURRENCIES, INITIAL_GROUPS, INITIAL_MODELS, INITIAL_ORDERS, INITIAL_PARTS, INITIAL_PROMO_CODES, INITIAL_RETURNS, INITIAL_SHOWCASE_BARS, INITIAL_SITE_SETTINGS, INITIAL_STORE_ADS, PART_IMAGES, SHORTCUT_ICON_PRESETS, SRC_DEPOSIT_LABEL } from './data/constants.jsx';
@@ -376,6 +378,27 @@ useEffect(() => {
       }
     } catch (e) {}
   }, [siteSettings?.themeTokens, siteSettings?.discoveredControls?.seo, uiTheme]);
+  // Admin-controlled look & feel (accent colour, tile radius, content width). Falls back to defaults when unset.
+  useEffect(() => {
+    try {
+      const root = document.documentElement;
+      const hex = String(siteSettings?.brandAccent || '').trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(hex)) {
+        const rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)).join(' ');
+        root.style.setProperty('--accent', rgb);
+        root.style.setProperty('--go', rgb);
+        root.style.setProperty('--accent-text', rgb);
+        root.style.setProperty('--apple-blue', hex);
+      } else {
+        ['--accent', '--go', '--accent-text', '--apple-blue'].forEach(k => root.style.removeProperty(k));
+      }
+      const r = Number(siteSettings?.tileRadius);
+      if ([8, 18, 28].includes(r)) root.style.setProperty('--r-tile', r + 'px'); else root.style.removeProperty('--r-tile');
+      const w = Number(siteSettings?.containerWidth);
+      if (w >= 1100 && w <= 1800) root.style.setProperty('--container', w + 'px'); else root.style.removeProperty('--container');
+    } catch (e) {}
+  }, [siteSettings?.brandAccent, siteSettings?.tileRadius, siteSettings?.containerWidth]);
+
 const toggleUiTheme = () => {
     const next = uiTheme === 'dark' ? 'light' : 'dark';
     setUiTheme(next);
@@ -3415,6 +3438,39 @@ const pullFromSupabaseCloud = async (silent = false) => {
               });
             }
           });
+          // Products deleted from the dashboard (maybe on another device) must not survive in this device's cache.
+          // Ask the server which cached ids still exist (read-only, tiny id-only query) and drop the ones that are gone.
+          try {
+            const cachedRaw = JSON.parse(window.localStorage.getItem('elzoghbi_v2_parts') || '[]');
+            const modMap = localModifiedMapRef.current.parts || {};
+            const cand = (Array.isArray(cachedRaw) ? cachedRaw : [])
+              .map(x => String(x && x.id || '').trim())
+              .filter(id => id && !bgMap.has(id) && !modMap[id])
+              .slice(0, 600);
+            if (cand.length > 0) {
+              const alive = new Set();
+              let allOk = true;
+              for (let i = 0; i < cand.length; i += 50) {
+                const chunk = cand.slice(i, i + 50);
+                const inList = chunk.map(id => '"' + id.replace(/"/g, '') + '"').join(',');
+                const rr = await fetch(`${sbUrl}/rest/v1/spare_parts?select=id&id=in.(${encodeURIComponent(inList)})`, { headers: sbHeaders(sbKey) });
+                if (!rr.ok) { allOk = false; break; }
+                (await rr.json()).forEach(r => alive.add(String(r.id).trim()));
+              }
+              if (allOk) {
+                const gone = new Set(cand.filter(id => !alive.has(id)));
+                if (gone.size > 0) {
+                  markIncomingWindow();
+                  setParts(prev => {
+                    const next = prev.filter(x => !gone.has(String(x && x.id || '').trim()));
+                    if (prevSlicesRef.current) prevSlicesRef.current.parts = next;
+                    try { window.localStorage.setItem('elzoghbi_v2_parts', JSON.stringify(next)); } catch (e) {}
+                    return next;
+                  });
+                }
+              }
+            }
+          } catch (e) {}
           if (bgMap.size > initialLinkedParts.length) {
             const { linkedParts: fullLinked } = normalizeAndLinkParts(Array.from(bgMap.values()), initialModels);
             markIncomingWindow();
@@ -6077,14 +6133,9 @@ const toggleHideCategory = (catName, e) => {
     );
   };
 const categoryEmoji = cat => {
-    if (/شاش/.test(cat)) return '📱';
-    if (/بطار/.test(cat)) return '🔋';
-    if (/شاحن|كابل|وصل/.test(cat)) return '🔌';
-    if (/كام/.test(cat)) return '📷';
-    if (/سماع|صوت/.test(cat)) return '🎧';
-    if (/جراب|حماي|اسكرين|زجاج/.test(cat)) return '🛡️';
-    if (/فلات|بورد|ماذر/.test(cat)) return '⚙️';
-    return '🧩';
+    // Same classifier as the category icons, so the emoji always matches the icon.
+    const EMOJI = { smartphone: '📱', laptop: '💻', tablet: '📲', headphones: '🎧', headset: '🎙️', watch: '⌚', cable: '🔌', charger: '🔌', battery: '🔋', screen: '🖥️', camera: '📷', speaker: '🔊', gaming: '🎮', protection: '🛡️', parts: '🔧', chip: '🧩', tv: '📺', keyboard: '⌨️', mouse: '🖱️', storage: '💾', power: '⚡', sparkles: '✨', grooming: '✂️', light: '💡', lens: '🔍', car: '🚗', glass: '🪟', package: '📦' };
+    return EMOJI[resolveCategoryIconKey(cat, (siteSettings && siteSettings.categoryIcons) || {})] || '📦';
   };
 const CATEGORY_GRADS = ['from-blue-500 to-slate-500', 'from-emerald-500 to-slate-500', 'from-amber-500 to-orange-500', 'from-rose-500 to-slate-500', 'from-slate-500 to-slate-500', 'from-slate-500 to-slate-500', 'from-lime-500 to-green-600', 'from-slate-500 to-rose-500'];
 const deferredSearchQuery = React.useDeferredValue(searchQuery);
@@ -6148,7 +6199,11 @@ const publicModels = useMemo(
     [models, hiddenBrandsSet, hiddenModelIdsSet]
   );
 const publicParts = useMemo(
-    () => parts.filter(p => !isPartHidden(p) && (!isPartVipOnly(p) || isCurrentClientVip)),
+    () => parts.filter(p => !isPartHidden(p)
+      && (!isPartVipOnly(p) || isCurrentClientVip)
+      // Never show items with no price (0 / empty) to customers, and never show leftovers of the bundled demo catalog unless the admin turned it on.
+      && (Number(p.basePrice) > 0 || Number(p.vipPrice || p.customGroupPrices?._vipPrice) > 0)
+      && !(p._isOrCatalog && siteSettings.disableBundledOrCatalog === true)),
     [parts, models, modelByIdMap, hiddenBrandsSet, hiddenModelIdsSet, hiddenPartIdsSet, hiddenCategoriesSet, siteSettings.hideOutOfStockInStore, siteSettings.keepOutOfStockVisible, isCurrentClientVip]
   );
 const vipCatalogParts = useMemo(
@@ -10613,7 +10668,7 @@ return (
 
       {/* Portal Switch: Standalone Admin Dashboard vs Standalone Customer Storefront */}
       {appPortal === 'admin' ? (
-        <main className="flex-1 flex flex-col">{renderAdminDashboard()}</main>
+        <main className="flex-1 flex flex-col"><AdminThemeGuard />{renderAdminDashboard()}</main>
       ) : (
         <div className="flex flex-col flex-1 min-h-[100svh] w-full max-w-[100vw] overflow-x-hidden justify-between">
           <main className="flex-1 w-full max-w-[100vw] min-w-0 overflow-x-hidden">

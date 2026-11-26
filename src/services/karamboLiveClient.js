@@ -178,7 +178,7 @@ export async function fetchLiveNewsResilient(limit = 18, force = false) {
   if (force) { try { window.sessionStorage.removeItem(PREFIX + `news:${limit}`); mem.delete(`news:${limit}`); } catch {} }
   const r = await fetchLiveNews(limit);
   if (r.ok && r.articles.length) {
-    try { window.localStorage.setItem(NEWS_LS, JSON.stringify({ articles: r.articles.slice(0, 30), at: Date.now() })); } catch {}
+    try { window.localStorage.setItem(NEWS_LS, JSON.stringify({ articles: r.articles.slice(0, 60), at: Date.now() })); } catch {}
     return { ...r, stale: false };
   }
   const last = readLastGoodNews();

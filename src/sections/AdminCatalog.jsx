@@ -297,8 +297,8 @@ export function renderAdminCatalog(ctx) {
 
           {/* Search, Filter & Pricing Group Selector */}
           <div className="flex flex-wrap items-center justify-between gap-2.5 pt-2 text-xs">
-            <div className="flex flex-wrap items-center gap-2 flex-1">
-              <div className="relative flex-1 min-w-[200px]">
+            <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:items-center flex-1 [&>select]:w-full [&>select]:min-w-0 [&>select]:text-xs sm:[&>select]:w-auto sm:[&>select]:text-sm">
+              <div className="relative col-span-2 flex-1 min-w-0 sm:min-w-[200px]">
                 <Search className="w-4 h-4 text-muted absolute right-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
@@ -422,14 +422,14 @@ export function renderAdminCatalog(ctx) {
                           {brandPartsCount} منتج
                         </span>
                       </div>
-                      <div className="text-[11px] text-muted font-bold mt-0.5">
+                      <div className="hidden sm:block text-[11px] text-muted font-bold mt-0.5">
                         {isBrandOpen ? 'اضغط (−) لإغلاق شريط البراند' : 'اضغط (+) لإظهار شرائط الموديلات التابعة لهذا البراند'}
                       </div>
                     </div>
                   </div>
 
                   {/* Buttons inside Brand Bar: Hide/Show Brand + Brand Image + Add Model + Delete Entire Brand */}
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="grid grid-cols-2 gap-1.5 w-full sm:w-auto sm:flex sm:flex-wrap sm:items-center sm:gap-2 [&>button]:justify-center [&>button]:px-2 [&>button]:py-1.5 [&>button]:text-[11px] sm:[&>button]:px-3 sm:[&>button]:py-2 sm:[&>button]:text-xs">
                     <button
                       type="button"
                       onClick={(e) => toggleHideBrand(brandName, e)}

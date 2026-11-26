@@ -711,7 +711,10 @@ const NEWS_RSS_SOURCES = [
   { id: 'tech-wd', name: 'تك دبليو دي', url: 'https://www.tech-wd.com/wd/feed/', filter: true },
   { id: 'aitnews', name: 'عالم التقنية', url: 'https://aitnews.com/feed/', filter: true },
   { id: 'youm7', name: 'اليوم السابع - تكنولوجيا', url: 'https://www.youm7.com/rss/SectionRss?SectionID=332', filter: true },
-  { id: 'gsmarena', name: 'GSMArena', url: 'https://www.gsmarena.com/rss-news-reviews.php3', filter: false, lang: 'en', max: 4 }
+  { id: 'gsmarena', name: 'GSMArena', url: 'https://www.gsmarena.com/rss-news-reviews.php3', filter: false, lang: 'en', max: 4 },
+  // Google News (Arabic / Egypt edition) aggregates many Arabic outlets; each item keeps its real outlet name and links to the original article.
+  { id: 'gn_mobile', name: 'أخبار الموبايلات', url: 'https://news.google.com/rss/search?q=' + encodeURIComponent('موبايلات OR هواتف OR آيفون OR سامسونج OR شاومي when:7d') + '&hl=ar&gl=EG&ceid=EG:ar', filter: false, gnews: true, max: 20 },
+  { id: 'gn_tech', name: 'أخبار التقنية', url: 'https://news.google.com/rss/search?q=' + encodeURIComponent('تكنولوجيا الهواتف الذكية والذكاء الاصطناعي when:3d') + '&hl=ar&gl=EG&ceid=EG:ar', filter: false, gnews: true, max: 14 }
 ];
 const NEWS_MOBILE_RE = /موبايل|هاتف|هواتف|جوال|آيفون|ايفون|iphone|سامسونج|samsung|galaxy|جالاكسي|شاومي|xiaomi|redmi|poco|ريدمي|ريلمي|realme|أوبو|اوبو|oppo|فيفو|vivo|هونر|honor|هواوي|huawei|انفينكس|infinix|تكنو|tecno|ون بلس|oneplus|بيكسل|pixel|موتورولا|motorola|nothing|اندرويد|أندرويد|android|ios|سماعة|سماعات|ايربودز|airpods|buds|ساعة ذكية|ساعات ذكية|smartwatch|apple watch|هونر|معالج|سناب دراجون|snapdragon|ديمنسيتي|dimensity|شحن|بطارية/i;
 
@@ -726,7 +729,7 @@ function rssTag(block, tag) {
 export function parseRssToNews(xml, src) {
   const items = String(xml || '').split(/<item[\s>]/i).slice(1);
   const out = [];
-  for (const raw of items.slice(0, 25)) {
+  for (const raw of items.slice(0, 40)) {
     const title = rssTag(raw, 'title');
     const link = rssTag(raw, 'link') || (raw.match(/<link>([^<]+)</) || [])[1] || '';
     const html = rssTag(raw, 'content:encoded') || rssTag(raw, 'description');
@@ -750,6 +753,14 @@ export function parseRssToNews(xml, src) {
     });
     if (!art) continue;
     art.source = src.name;
+    if (src.gnews) {
+      const sn = stripHtml(rssTag(raw, 'source'));
+      // Keep only Arabic-language outlets (drop foreign or unnamed domains).
+      if (!sn || !(/[\u0600-\u06FF]/.test(sn) || /arabic|arabia/i.test(sn))) continue;
+      art.source = sn;
+      const sfx = sn ? new RegExp('\\s*[-–|]\\s*' + sn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*$') : null;
+      if (sfx && art.title) art.title = art.title.replace(sfx, '').trim();
+    }
     art.sourceUrl = link;
     art.lang = src.lang || 'ar';
     art.ts = d && !isNaN(d) ? d.getTime() : 0;
@@ -773,14 +784,14 @@ function titleKey(t) {
 
 let lastGoodNews = [];
 async function fetchLiveNews(limit = 16) {
-  const ck = `news_v26:${limit}`;
+  const ck = `news_v27:${limit}`;
   const cached = cacheGet(ck);
   if (cached) return { ok: true, articles: cached, cached: true, updatedAt: cached._t };
 
   const [wp, ...rss] = await Promise.all([
     (async () => {
       try {
-        const r = await safeRequest(`https://mobizil.com/wp-json/wp/v2/posts?_embed&per_page=${Math.min(20, limit)}`, {}, 6000);
+        const r = await safeRequest(`https://mobizil.com/wp-json/wp/v2/posts?_embed&per_page=${Math.min(30, limit)}`, {}, 6000);
         if (r.status === 200 && r.body.trim().startsWith('[')) {
           return parseWpPostsToNews(JSON.parse(r.body)).map(a => {
             const raw = a.date ? new Date(a.date).getTime() : 0;
@@ -918,7 +929,7 @@ export default async function handler(req, res) {
     }
 
     if (action === 'news') {
-      const limit = Math.min(20, Math.max(4, parseInt(req.query?.limit || '16', 10) || 16));
+      const limit = Math.min(60, Math.max(4, parseInt(req.query?.limit || '16', 10) || 16));
       const data = await fetchLiveNews(limit);
       return res.status(200).json(data);
     }

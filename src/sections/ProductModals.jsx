@@ -291,8 +291,8 @@ export function renderProductOrAdDetailModal(ctx) {
           {/* Sticky top bar */}
           <div className="flex items-center justify-between gap-2 px-5 sm:px-8 py-3 sm:py-4 border-b border-line/60 bg-bg/80 backdrop-blur">
             <div className="min-w-0">
-              <div className="text-[11px] text-accent-text font-extrabold truncate">{targetPart.category}</div>
-              <div className="font-semibold text-fg text-[15px] sm:text-[17px] truncate">{targetPart.name}</div>
+              <div className="text-[12px] sm:text-[13px] font-semibold truncate elz-pdp-eyebrow">{targetPart.category}</div>
+              <div className="font-bold text-fg text-[17px] sm:text-[26px] leading-tight truncate elz-pdp-title">{targetPart.name}</div>
             </div>
             <div className="hidden sm:flex items-center gap-1.5 shrink-0">
               <button
@@ -345,7 +345,7 @@ export function renderProductOrAdDetailModal(ctx) {
                   if (swipeSuppressRef.current) return;
                   setLightbox({ list: imagesList, index: safeIdx });
                 }}
-                className="relative rounded-[28px] overflow-hidden bg-white dark:bg-white h-72 sm:h-[440px] p-4 cursor-zoom-in flex items-center justify-center"
+                className="relative rounded-[28px] overflow-hidden bg-surface elz-pdp-stage h-72 sm:h-[520px] p-4 cursor-zoom-in flex items-center justify-center"
               >
                 <BlurFitImage src={activeModalImg} alt={targetPart.name} fit={targetPart.imageFit || siteSettings.productImageFit || "contain"} draggable={false} imgClassName="select-none max-h-full max-w-full" />
                 <div className="absolute bottom-3 right-3 z-20 px-2.5 py-1 rounded-xl bg-nav/90 text-white text-[11px] font-bold flex items-center gap-1 shadow">
@@ -433,7 +433,7 @@ export function renderProductOrAdDetailModal(ctx) {
 
             {/* Product Specs */}
             <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-surface2 border border-line flex items-center justify-between gap-2 flex-wrap">
+              <div className="p-0 bg-transparent flex items-center justify-between gap-2 flex-wrap elz-pdp-price">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-muted font-bold">سعر الوحدة:</span>
@@ -444,7 +444,7 @@ export function renderProductOrAdDetailModal(ctx) {
                     )}
                   </div>
                   <div className="flex items-baseline gap-2.5 mt-0.5 flex-wrap">
-                    <div className="text-2xl font-extrabold text-fg">
+                    <div className="text-3xl sm:text-4xl font-bold text-fg tracking-tight">
                       {priceInfo.displayPrice.toLocaleString()}{' '}
                       <span className="text-sm text-accent-text">{priceInfo.currencySymbol}</span>
                     </div>
@@ -484,7 +484,7 @@ export function renderProductOrAdDetailModal(ctx) {
               <div className="space-y-1.5">
                 <div className="font-extrabold text-fg">الموديلات المتوافقة معها القطعة:</div>
                 <div className="flex flex-wrap gap-1.5">
-                  {targetPart.compatibleModels.map(cm => (
+                  {(Array.isArray(targetPart.compatibleModels) ? targetPart.compatibleModels : []).map(cm => (
                     <span
                       key={cm}
                       className="px-2.5 py-1 rounded-lg bg-surface2 text-fg border border-line font-bold"

@@ -460,7 +460,7 @@ export function HRail({ rtl = true, title, subtitle, onViewAll, viewAllLabel, ch
 /* ------------------------------------------------------------------ */
 export function AppleHomeShowcase({
   categoryIcons, rtl = true, parts = [], calculatePartPrice, currentGroup, getTopCategories, categoryEmoji, brands = [], getBrandImg,
-  renderProductCard, actions,
+  renderProductCard, actions, headTitle, headSub, showHead = true, showCats = true,
 }) {
   const t = rtl
     ? {
@@ -501,13 +501,15 @@ export function AppleHomeShowcase({
 
   return (
     <div className="elz-showcase space-y-10 sm:space-y-14">
+      {showHead && (
       <header className="text-center max-w-3xl mx-auto pt-2 sm:pt-6">
         <p className="elz-eyebrow">{t.eyebrow}</p>
-        <h2 className="elz-display">{t.headline}</h2>
-        <p className="text-sm sm:text-base text-muted mt-3">{t.sub}</p>
+        <h2 className="elz-display">{headTitle || t.headline}</h2>
+        <p className="text-sm sm:text-base text-muted mt-3">{headSub || t.sub}</p>
       </header>
+      )}
 
-      {cats.length > 0 && (
+      {showCats && cats.length > 0 && (
         <section aria-label={t.cats}>
           <div className="elz-cat-rail flex gap-4 sm:gap-7 overflow-x-auto no-scrollbar snap-x justify-start lg:justify-center px-1 pb-1">
             {cats.map((c) => (

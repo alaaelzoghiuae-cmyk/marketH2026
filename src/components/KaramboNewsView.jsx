@@ -15,7 +15,7 @@ import { fetchLiveNewsResilient } from '../services/karamboLiveClient.js';
 export default function KaramboNewsView({ cfg, initialArticle = null }) {
   const nCfg = (cfg && cfg.newsCfg) || {};
   const customArticles = Array.isArray(nCfg.customArticles) ? nCfg.customArticles : [];
-  const maxArticles = Number(nCfg.maxArticles || 16);
+  const maxArticles = Number(nCfg.maxArticles || 48);
 
   const [liveArticles, setLiveArticles] = useState([]);
   const [loading, setLoading] = useState(nCfg.enabledLive !== false);
@@ -28,7 +28,7 @@ export default function KaramboNewsView({ cfg, initialArticle = null }) {
   const loadNews = async (force = true) => {
     if (nCfg.enabledLive === false) { setLoading(false); return; }
     setLoading(true);
-    const r = await fetchLiveNewsResilient(Math.max(maxArticles, 18), force);
+    const r = await fetchLiveNewsResilient(Math.max(maxArticles, 48), force);
     setLoading(false);
     if (r.ok && Array.isArray(r.articles)) {
       setLiveArticles(r.articles);

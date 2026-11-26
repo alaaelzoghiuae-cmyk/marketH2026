@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Smartphone, Laptop, Tablet, Headphones, Watch, Cable, Plug, Battery, Monitor, Camera, Speaker, Gamepad2,
-  Shield, Package, Wrench, Cpu, Tv, Keyboard, Mouse, HardDrive, Zap, Sparkles
+  Shield, Package, Wrench, Cpu, Tv, Keyboard, Mouse, HardDrive, Zap, Sparkles, Scissors, Lightbulb, Aperture, Car, Layers, Mic
 } from 'lucide-react';
 
 // One consistent icon set (Lucide, 1.75 stroke — Apple-like line style).
@@ -27,28 +27,41 @@ export const CATEGORY_ICONS = {
   storage: { Icon: HardDrive, label: 'تخزين' },
   power: { Icon: Zap, label: 'طاقة' },
   sparkles: { Icon: Sparkles, label: 'مميز' },
+  grooming: { Icon: Scissors, label: 'عناية وحلاقة' },
+  light: { Icon: Lightbulb, label: 'إضاءة' },
+  lens: { Icon: Aperture, label: 'عدسات' },
+  car: { Icon: Car, label: 'إكسسوارات سيارة' },
+  glass: { Icon: Layers, label: 'زجاج / ظهر' },
+  headset: { Icon: Mic, label: 'ميكروفون / هيدسيت' },
   package: { Icon: Package, label: 'عام' }
 };
 
 // Ordered rules: first match wins. Works with Arabic + English category names.
 const RULES = [
+  [/ring ?light|اضاءة|إضاءة|لمبة|رينج/i, 'light'],
   [/tablet|تابلت|ايباد|آيباد|ipad|لوحي|لوحية/i, 'tablet'],
   [/laptop|notebook|macbook|لابتوب|لاب توب|ماك ?بوك/i, 'laptop'],
+  [/shav|trimmer|groom|حلاقة|حلاقه|ماكينات|عناية/i, 'grooming'],
+  [/smart ?watch|apple ?watch|fitness|tracker|smart ?band|ساع|اسوره|أسورة|اسورة|اساور|أساور|(^|\s)سوار/i, 'watch'],
+  [/headset|هيدست|ميكروفون/i, 'headset'],
+  [/اسكرين|سكرين|screen ?protector|جراب|كفر|\bcase\b|\bcover\b/i, 'protection'],
+  [/game|gaming|play ?station|ألعاب|العاب|جيم|ماوس|mouse|keyboard|كيبورد/i, 'gaming'],
   [/headphone|earbud|airpod|buds|سماع|ايربود|إيربود|هيدفون/i, 'headphones'],
-  [/watch|smart ?band|ساع|اسوره|أسورة|سوار ذكي/i, 'watch'],
-  [/power ?bank|باور ?بانك|battery|بطار/i, 'battery'],
-  [/charger|adapter|شاحن|محول|وصلة شحن/i, 'charger'],
-  [/cable|كابل|كيبل|اكسسوار|إكسسوار|accessor/i, 'cable'],
-  [/case|cover|protector|glass|جراب|كفر|حماية|سكرين|زجاج/i, 'protection'],
-  [/screen|display|lcd|oled|شاشة|شاشه/i, 'screen'],
-  [/camera|كاميرا|كاميره/i, 'camera'],
   [/speaker|سبيكر|مكبر/i, 'speaker'],
-  [/game|gaming|play ?station|ألعاب|العاب|جيم/i, 'gaming'],
-  [/keyboard|كيبورد|لوحة مفاتيح/i, 'keyboard'],
-  [/mouse|ماوس/i, 'mouse'],
+  [/power ?bank|باور ?بانك/i, 'battery'],
+  [/batter|بطار/i, 'battery'],
+  [/back ?glass|ظهر|شاسيه|بصمة|بصمه/i, 'glass'],
+  [/lens|عدس/i, 'lens'],
+  [/camera|كاميرا|كاميره|كاميرات/i, 'camera'],
+  [/car|سيارة|سيارات|حوامل/i, 'car'],
+  [/flex|فلات|فالات|بوردة|بورد شحن|ماذر|housing|هاوسينج|باغات|بوتم|تتشات|touch/i, 'parts'],
+  [/charger|adapter|شاحن|شواحن|شحن/i, 'charger'],
+  [/cable|كابل|كيبل|محول|اكسسوار|إكسسوار|accessor|مشتركات|اجهزة ذكية|أجهزة ذكية/i, 'cable'],
+  [/screen|display|lcd|oled|شاشة|شاشه|شاشات/i, 'screen'],
+  [/case|cover|protector|glass|جراب|كفر|حماية|اسكرين|سكرين|زجاج/i, 'protection'],
   [/ssd|hdd|flash|memory|storage|فلاش|ميموري|هارد/i, 'storage'],
-  [/tv|تلفزيون|تليفزيون/i, 'tv'],
-  [/spare|part|قطع|غيار|فلاتة|فلات|مكونات/i, 'parts'],
+  [/\btv\b|تلفزيون|تليفزيون/i, 'tv'],
+  [/tool|عدة|spare|part|قطع|غيار|مكونات/i, 'parts'],
   [/phone|mobile|iphone|galaxy|redmi|موبايل|هاتف|تليفون|ايفون|آيفون|سامسونج|شاومي/i, 'smartphone']
 ];
 

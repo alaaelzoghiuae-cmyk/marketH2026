@@ -11,6 +11,8 @@ export const readPersistedDeletedSliceMap = (sliceKey) => {
   return {};
 };
 
+// The bundled demo catalog (src/orCatalogData.js, 586 products) is OFF by default so products deleted from the
+// dashboard never come back. The admin can turn it on with siteSettings.enableBundledOrCatalog = true.
 export const isOrCatalogDisabledInStorage = () => {
   try {
     const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');

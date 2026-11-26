@@ -205,6 +205,17 @@ function storeWhatsappNumber(ctx, override) {
   return digits.startsWith('0') ? '2' + digits : digits;
 }
 
+
+// Scroll only as far as the services content (never to the very top) so tapping inside the Karambo services keeps the user's place.
+export function keepKaramboInView() {
+  try {
+    const el = document.getElementById('korombo-content-top');
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 120;
+    if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y) });
+  } catch (e) {}
+}
+
 function ValueBadge({ score }) {
   const b = valueBand(score || 0);
   return <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black text-white ${b.cls}`}><Gauge className="w-3 h-3" /> قيمة مقابل السعر: {score || 0} — {b.label}</span>;
@@ -216,7 +227,7 @@ function PhoneCard(ctx, phone, opts = {}) {
   const go = (page, extra = {}) => {
     if (ctx.trackKaramboEvent && page === 'phone') ctx.trackKaramboEvent('phone_view', phone.name);
     setKaramboUi(p => ({ ...p, page, ...extra }));
-    window.scrollTo({ top: 0 });
+    keepKaramboInView();
   };
   return (
     <div key={phone.id} className="bg-surface border border-line rounded-3xl overflow-hidden flex flex-col hover:border-[#0071E3] transition group">
@@ -369,7 +380,7 @@ export function renderKaramboPage(ctx) {
   const go = (pg, extra = {}) => {
     if (ctx.trackKaramboEvent && pg !== page) ctx.trackKaramboEvent('visit', pg);
     set({ page: pg, ...extra });
-    window.scrollTo({ top: 0 });
+    keepKaramboInView();
   };
   const maxCompare = (cfg.compareCfg && cfg.compareCfg.maxDevices === 2) ? 2 : 3;
   const toggleCompare = (id) => {
@@ -468,6 +479,7 @@ export function renderKaramboPage(ctx) {
       </div>
 
       {/* Standalone 2-Column Workspace: Sticky Korombo Sidebar + Active Service Stage */}
+      <div id="korombo-content-top" aria-hidden="true" />
       <div className="max-w-[1360px] mx-auto px-3 sm:px-6 py-5 grid lg:grid-cols-[275px_1fr] gap-5 items-start">
         {/* Desktop Persistent Korombo Services Sidebar */}
         <aside className="hidden lg:block sticky top-5 bg-surface border border-line rounded-3xl p-3 space-y-1.5 shadow-sm">
@@ -622,7 +634,7 @@ export function renderKaramboPage(ctx) {
   // ---------- 1a. SMART WATCHES & EARBUDS ----------
   if (page === 'wearables') {
     return wrapKoromboPortal(
-      <KaramboWearablesView cfg={cfg} formatMoney={formatMoney} onRequestOrder={requestImport} />
+      <KaramboWearablesView ctx={ctx} cfg={cfg} formatMoney={formatMoney} onRequestOrder={requestImport} />
     );
   }
 

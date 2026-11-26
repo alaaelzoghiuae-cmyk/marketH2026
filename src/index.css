@@ -538,7 +538,7 @@ main { overflow-wrap: anywhere; }
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  touch-action: pan-y pinch-zoom;
+  touch-action: pan-x pan-y pinch-zoom;
   padding: 10px 2px 22px; margin: -10px -2px -10px;
   cursor: grab; outline: none;
 }
@@ -768,3 +768,56 @@ main { overflow-wrap: anywhere; }
   overflow-y: auto;
   overscroll-behavior-y: contain;
 }
+
+/* ===== Mobile tightening (storefront) ===== */
+@media (max-width: 639px) {
+  .elz-ac-card[data-size='sm'] { --ac-h: 290px; }
+  .elz-ac-card[data-size='md'] { --ac-h: 330px; }
+  .elz-ac-card[data-size='lg'] { --ac-h: 370px; }
+  .elz-ac-card { --ac-h: 330px; }
+  .elz-ac-text { padding: 18px 18px 0; }
+  .elz-ac-controls { margin-top: 8px; }
+  .elz-store-head { padding-top: 6px; padding-bottom: 4px; }
+  .elz-store-title { font-size: clamp(26px, 8vw, 34px); }
+  .elz-home > * + * { margin-top: 0; }
+}
+/* ===== Mobile admin tables / catalog ===== */
+@media (max-width: 767px) {
+  #elz-admin-sidebar ~ div table, .elz-admin-main-scroll table { font-size: 11px; }
+  #elz-admin-sidebar ~ div table th, #elz-admin-sidebar ~ div table td,
+  .elz-admin-main-scroll table th, .elz-admin-main-scroll table td { padding: 6px 7px !important; white-space: normal; word-break: break-word; }
+  #elz-admin-sidebar ~ div table img, .elz-admin-main-scroll table img { max-width: 40px; max-height: 40px; }
+  #elz-admin-sidebar ~ div [class*="min-w-["][class*="px]"], .elz-admin-main-scroll [class*="min-w-["][class*="px]"] { min-width: 0 !important; }
+  .elz-admin-main-scroll, #elz-admin-sidebar ~ div { max-width: 100vw; overflow-x: hidden; }
+  #elz-admin-sidebar ~ div .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+  #elz-admin-sidebar ~ div [class*="p-6"], #elz-admin-sidebar ~ div [class*="sm:p-6"] { padding: 12px; }
+}
+
+/* home sections are ordered/hidden/styled from the dashboard (data-home-sec) */
+.elz-home { display: flex; flex-direction: column; }
+@media (max-width: 639px) {
+  .elz-home > [data-home-sec="hero_ads"] { order: 10; }
+  .elz-home > [data-home-sec="best_sellers"] { order: 20; }
+  .elz-home > [data-home-sec="karambo_strip"] { order: 30; }
+  .elz-home > [data-home-sec="editorial_showcase"] { order: 300; }
+  .elz-home > [data-home-sec="sourcing_tile"] { order: 310; }
+  .elz-home > [data-home-sec="trust_strip"] { order: 400; }
+  .elz-home > [data-home-sec="newsletter"] { order: 410; }
+}
+
+
+/* ---------- Ported from the Apple redesign (presentation only) ---------- */
+:root { --r-tile: 28px; --apple-blue: #0071e3; }
+/* admin-controlled accent & radius (Look panel) */
+[class~="bg-[#0071E3]"] { background-color: var(--apple-blue, #0071e3); }
+.elz-pcard { border-radius: var(--r-tile) !important; }
+/* Product page */
+.elz-modal-panel { border-radius: 28px; }
+.elz-pdp-eyebrow { color: #bf4800; }
+.elz-pdp-stage img { mix-blend-mode: multiply; }
+.dark .elz-pdp-stage img { mix-blend-mode: normal; }
+.elz-modal-panel .elz-pdp-price .text-sm.text-accent-text { font-size: 18px; }
+@media (max-width: 639px) { .elz-pdp-title { font-size: 17px; } }
+/* Cart drawer: soft corners */
+.fixed.inset-0 > div.max-w-md { border-radius: 28px 0 0 28px; }
+[dir="rtl"] .fixed.inset-0 > div.max-w-md { border-radius: 0 28px 28px 0; }

@@ -129,8 +129,12 @@ export function translateArabicPhoneQuery(raw) {
 
 // ---------- HTML Helpers ----------
 function decodeEntities(str) {
-  return String(str || '')
-    .replace(/&nbsp;/gi, ' ')
+  const once = (x) => String(x || '')
+    .replace(/&nbsp;|&thinsp;|&hairsp;|&ensp;|&emsp;/gi, ' ')
+    .replace(/&ndash;/gi, '-')
+    .replace(/&mdash;/gi, '-')
+    .replace(/&euro;/gi, '€')
+    .replace(/&pound;/gi, '£')
     .replace(/&amp;/gi, '&')
     .replace(/&quot;/gi, '"')
     .replace(/&#39;|&apos;/gi, "'")
@@ -138,6 +142,8 @@ function decodeEntities(str) {
     .replace(/&gt;/gi, '>')
     .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  // Run twice: the source page sometimes double-escapes (e.g. "&amp;thinsp;").
+  return once(once(str));
 }
 
 function stripTags(html) {

@@ -671,3 +671,39 @@ export const GLOBAL_CONTROL_SEARCH_INDEX = [
   { id: 'gs_promos', label: 'الكوبونات وأكواد الخصم وحماية الربح', tab: 'promos', kw: 'كوبونات خصم اكواد حماية ربح' },
   { id: 'gs_loyalty', label: 'محرك المبيعات والولاء والكاش باك وعجلة الحظ', tab: 'feature_flags', kw: 'كاش باك ولاء عجلة حظ vip جودة' }
 ];
+
+
+// ---- Home section runtime styles: makes the Visual Editor settings actually affect the storefront ----
+const _okColor = (v) => typeof v === 'string' && /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\))$/i.test(v.trim());
+const _num = (v, min, max) => { const n = Number(v); return Number.isFinite(n) && v !== '' && v !== null && v !== undefined ? Math.min(max, Math.max(min, n)) : null; };
+export function buildHomeSectionCss(config) {
+  if (!Array.isArray(config)) return '';
+  const out = [];
+  config.forEach((sec, idx) => {
+    if (!sec || !/^[a-z0-9_]+$/i.test(String(sec.id || ''))) return;
+    const sel = `.elz-home > [data-home-sec="${sec.id}"]`;
+    const r = [`order:${(idx + 1) * 10} !important`];
+    const st = sec.style || {};
+    const pad = { compact: 8, normal: null, spacious: 40 };
+    const pt = _num(st.paddingTop, 0, 200) ?? (pad[st.paddingY] ?? null);
+    const pb = _num(st.paddingBottom, 0, 200) ?? (pad[st.paddingY] ?? null);
+    if (pt !== null) r.push(`padding-top:${pt}px`);
+    if (pb !== null) r.push(`padding-bottom:${pb}px`);
+    const mt = _num(st.marginTop, -40, 200); if (mt !== null) r.push(`margin-top:${mt}px !important`);
+    if (st.bgMode === 'dark') r.push('background:#1D1D1F;color:#fff');
+    else if (st.bgMode === 'accent' && _okColor(st.accentColor)) r.push(`background:${st.accentColor};color:#fff`);
+    else if (st.bgMode === 'surface') r.push('background:var(--surface,#F5F5F7)');
+    if (_okColor(st.bgColor)) r.push(`background:${st.bgColor}`);
+    if (_okColor(st.textColor)) r.push(`color:${st.textColor}`);
+    const rad = _num(st.radius, 0, 80); if (rad !== null) r.push(`border-radius:${rad}px;overflow:hidden`);
+    const mh = _num(st.minHeight, 0, 1200); if (mh !== null && mh > 0) r.push(`min-height:${mh}px`);
+    const w = _num(st.widthPct, 30, 100); if (w !== null && w < 100) r.push(`width:${w}%;margin-left:auto;margin-right:auto`);
+    out.push(`${sel}{${r.join(';')}}`);
+    if (sec.visible === false) out.push(`${sel}{display:none !important}`);
+    const d = sec.devices || {};
+    if (d.mobile === false) out.push(`@media (max-width:639px){${sel}{display:none !important}}`);
+    if (d.tablet === false) out.push(`@media (min-width:640px) and (max-width:1023px){${sel}{display:none !important}}`);
+    if (d.desktop === false) out.push(`@media (min-width:1024px){${sel}{display:none !important}}`);
+  });
+  return out.join('\n');
+}

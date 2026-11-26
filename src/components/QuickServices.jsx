@@ -71,11 +71,11 @@ export function QuickServicesBar({ ctx, cfg, services, icons, renderEmbedded }) 
         </div>
       )}
       {inline.map((it) => {
-        const svc = svcOf(it); const label = it.label || svc.title; const isClosed = closed[it.id];
+        const svc = svcOf(it); const label = it.label || svc.title; const isClosed = closed[it.id] !== false;
         return (
           <div key={it.id} className="rounded-[24px] bg-surface border border-line overflow-hidden">
             <div className="flex items-center justify-between gap-3 px-4 py-3">
-              <button type="button" onClick={() => setClosed((p) => ({ ...p, [it.id]: !p[it.id] }))} className="flex items-center gap-3 min-w-0 flex-1 text-start" aria-expanded={!isClosed}>
+              <button type="button" onClick={() => setClosed((p) => ({ ...p, [it.id]: p[it.id] === false }))} className="flex items-center gap-3 min-w-0 flex-1 text-start" aria-expanded={!isClosed}>
                 <ItemIcon item={it} svc={svc} icons={icons} />
                 <span className="min-w-0"><span className="block text-[15px] font-semibold text-fg truncate">{label}</span><span className="block text-[12px] text-muted truncate">{svc.desc}</span></span>
                 {isClosed ? <ChevronDown className="w-4 h-4 text-muted shrink-0" /> : <ChevronUp className="w-4 h-4 text-muted shrink-0" />}

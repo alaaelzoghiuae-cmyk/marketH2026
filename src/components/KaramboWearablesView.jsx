@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Watch, Headphones, Search, Star, RefreshCw, ShoppingCart, ExternalLink, BatteryFull, Info } from 'lucide-react';
+import { Watch, Headphones, Search, Star, RefreshCw, ShoppingCart, ExternalLink, BatteryFull, Info, Plus, Minus, ChevronDown, ChevronUp, Store } from 'lucide-react';
 import { fetchWearablesList, fetchWearableLive } from '../services/karamboLiveClient.js';
 
 const TYPES = [
@@ -31,7 +31,7 @@ function Stars({ value, size = 'w-3.5 h-3.5' }) {
  * Smart watches + earbuds from global brands.
  * Stars = real customer rating on Amazon when we can read it (source shown), otherwise the editorial score.
  */
-export default function KaramboWearablesView({ formatMoney, onRequestOrder, cfg }) {
+function GlobalWearables({ formatMoney, onRequestOrder, cfg }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [type, setType] = useState('all');
@@ -180,6 +180,159 @@ export default function KaramboWearablesView({ formatMoney, onRequestOrder, cfg 
         </div>
       )}
       {cfg && cfg.disclaimer && <div className="text-[10px] font-bold text-muted text-center">{cfg.disclaimer}</div>}
+    </div>
+  );
+}
+
+
+// ---------------------------------------------------------------------------
+// Real store products (smart watches + earbuds/headphones) with compact filters.
+// ---------------------------------------------------------------------------
+const WATCH_RE = /ساعة|ساعات|سوار|أساور|اساور|watch|smartwatch|smart watch|band|kospet|kieslect|amazfit/i;
+const AUDIO_RE = /سماع|earbud|airpod|buds|headphone|headset|هيدفون|ايربود|neckband|earphone|airdots|tws|speaker|سبيكر/i;
+
+function classify(p) {
+  const cat = String(p.category || '');
+  const text = `${cat} ${p.name || ''}`;
+  if (/ساعات|ساعة|أساور/.test(cat) || (WATCH_RE.test(p.name || '') && !AUDIO_RE.test(p.name || ''))) return 'watch';
+  if (/سماع/.test(cat) || AUDIO_RE.test(text)) return 'audio';
+  return '';
+}
+
+function brandOf(p) {
+  const n = String(p.name || '').replace(/^OR\s*-\s*/i, '').trim();
+  const first = n.split(/[\s\-–/]+/)[0] || '';
+  return first.length > 1 ? first : 'أخرى';
+}
+
+export default function KaramboWearablesView({ ctx, formatMoney, onRequestOrder, cfg }) {
+  // Watches/earbuds are often attached to an admin-hidden "model" (e.g. the AI-sourcing import model), which made them vanish from publicParts.
+  // So: respect part-level, category-level and price rules, but ignore model/brand hide rules for this page.
+  const parts = (() => {
+    if (!ctx) return [];
+    const all = Array.isArray(ctx.parts) ? ctx.parts : (Array.isArray(ctx.publicParts) ? ctx.publicParts : []);
+    return all.filter((p) => p && !p.hidden && !(p.customGroupPrices && p.customGroupPrices._hidden)
+      && !(ctx.hiddenPartIdsSet && ctx.hiddenPartIdsSet.has(String(p.id || '').trim()))
+      && !(p.category && ctx.isCategoryHidden && ctx.isCategoryHidden(p.category))
+      && !(ctx.isPartVipOnly && ctx.isPartVipOnly(p) && !ctx.isCurrentClientVip)
+      && Number(p.basePrice) > 0
+      && !(p._isOrCatalog && ctx.siteSettings && ctx.siteSettings.disableBundledOrCatalog === true));
+  })();
+  const [type, setType] = useState('all');
+  const [brand, setBrand] = useState('all');
+  const [q, setQ] = useState('');
+  const [sort, setSort] = useState('new');
+  const [showGlobal, setShowGlobal] = useState(false);
+  const [limit, setLimit] = useState(24);
+
+  const priceOf = (p) => {
+    try { const pi = ctx.calculatePartPrice(p, ctx.currentGroup); return Number(pi && pi.displayPrice) || 0; } catch (e) { return Number(p.basePrice) || 0; }
+  };
+  const base = useMemo(() => parts.filter(p => p && classify(p) && Number(p.basePrice) > 0).map(p => ({ p, kind: classify(p), brand: brandOf(p) })), [parts]);
+  const counts = useMemo(() => ({ all: base.length, watch: base.filter(x => x.kind === 'watch').length, audio: base.filter(x => x.kind === 'audio').length }), [base]);
+  const brands = useMemo(() => {
+    const m = {};
+    base.filter(x => type === 'all' || x.kind === type).forEach(x => { m[x.brand] = (m[x.brand] || 0) + 1; });
+    return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 14).map(e => e[0]);
+  }, [base, type]);
+  const list = useMemo(() => {
+    const t = q.trim().toLowerCase();
+    const out = base.filter(x => (type === 'all' || x.kind === type) && (brand === 'all' || x.brand === brand) && (!t || `${x.p.name} ${x.p.category}`.toLowerCase().includes(t)));
+    if (sort === 'price') out.sort((a, b) => priceOf(a.p) - priceOf(b.p));
+    else if (sort === 'price_desc') out.sort((a, b) => priceOf(b.p) - priceOf(a.p));
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [base, type, brand, q, sort]);
+  useEffect(() => { setLimit(24); }, [type, brand, q, sort]);
+
+  const seg = (k, l, n) => (
+    <button key={k} type="button" onClick={() => { setType(k); setBrand('all'); }} className={`flex-1 px-2 py-1.5 rounded-lg text-[12px] font-black transition whitespace-nowrap ${type === k ? 'bg-surface text-fg shadow-sm' : 'text-muted'}`}>{l} <span className="opacity-60">({n})</span></button>
+  );
+
+  const money = ctx && ctx.formatMoney ? ctx.formatMoney : formatMoney;
+
+  return (
+    <div className="space-y-3">
+      <div className="bg-surface border border-line rounded-2xl p-2.5 sm:p-3 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="flex-1 min-w-0 flex items-center gap-2 rounded-xl px-3 py-2 bg-surface2 border border-line">
+            <Search className="w-4 h-4 text-muted shrink-0" />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="ابحث في ساعاتنا وسماعاتنا..." className="flex-1 min-w-0 bg-transparent border-0 text-[13px] font-bold focus:outline-none text-fg" />
+          </div>
+          <select value={sort} onChange={e => setSort(e.target.value)} className="shrink-0 rounded-xl px-2 py-2 bg-surface2 border border-line text-[11px] font-black text-fg max-w-[104px]">
+            <option value="new">الافتراضي</option>
+            <option value="price">الأرخص</option>
+            <option value="price_desc">الأغلى</option>
+          </select>
+        </div>
+        <div className="flex gap-1 p-1 rounded-xl bg-surface2">
+          {seg('all', 'الكل', counts.all)}{seg('watch', 'ساعات', counts.watch)}{seg('audio', 'سماعات', counts.audio)}
+        </div>
+        {brands.length > 1 && (
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar -mx-1 px-1 pb-0.5">
+            <button type="button" onClick={() => setBrand('all')} className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-black border ${brand === 'all' ? 'bg-slate-900 text-white border-slate-900' : 'bg-surface border-line text-fg'}`}>كل الماركات</button>
+            {brands.map(b => (
+              <button key={b} type="button" onClick={() => setBrand(b)} className={`shrink-0 px-3 py-1 rounded-full text-[11px] font-black border ${brand === b ? 'bg-slate-900 text-white border-slate-900' : 'bg-surface border-line text-fg'}`}>{b}</button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {base.length === 0 ? (
+        <div className="bg-surface border border-line rounded-2xl p-8 text-center space-y-2">
+          <Store className="w-8 h-8 mx-auto text-muted" />
+          <div className="text-sm font-black text-fg">لسه مفيش ساعات أو سماعات في المتجر</div>
+          <div className="text-xs font-bold text-muted">أول ما تضيف منتجات في قسم «ساعات» أو «سماعات» هتظهر هنا لوحدها.</div>
+        </div>
+      ) : list.length === 0 ? (
+        <div className="bg-surface border border-line rounded-2xl p-8 text-center text-sm font-bold text-muted">مفيش منتجات مطابقة للبحث</div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-3">
+            {list.slice(0, limit).map(({ p }) => {
+              const price = priceOf(p);
+              const imgs = ctx.getPartImagesList ? ctx.getPartImagesList(p) : [p.image];
+              const img = (imgs && imgs[0]) || p.image;
+              const out = Number(p.stock) <= 0 || !!p.soldOut;
+              const qty = (ctx.cart && ctx.cart[p.id] && ctx.cart[p.id].qty) || 0;
+              return (
+                <div key={p.id} className="bg-surface border border-line rounded-2xl overflow-hidden flex flex-col">
+                  <button type="button" onClick={() => { try { ctx.recordRecentlyViewedPart && ctx.recordRecentlyViewedPart(p.id); ctx.setDetailImageIdx && ctx.setDetailImageIdx(0); ctx.setSelectedDetailItem({ type: 'part', part: p }); } catch (e) {} }} className="relative bg-white dark:bg-slate-900 aspect-square flex items-center justify-center p-2 border-b border-line">
+                    {img ? <img src={img} alt={p.name} loading="lazy" referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" /> : <Watch className="w-10 h-10 text-muted" />}
+                    {out && <span className="absolute top-1.5 start-1.5 px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-black">نفدت الكمية</span>}
+                  </button>
+                  <div className="p-2.5 flex flex-col gap-1.5 flex-1">
+                    <div className="font-black text-[12.5px] text-fg leading-snug line-clamp-2 min-h-[2.2rem]">{String(p.name || '').replace(/^OR\s*-\s*/i, '')}</div>
+                    <div className="mt-auto text-[15px] font-black text-fg tabular-nums">{money(price)}</div>
+                    {out ? (
+                      <div className="text-[11px] font-bold text-muted">غير متاح حالياً</div>
+                    ) : qty === 0 ? (
+                      <button type="button" onClick={() => ctx.updateCartQty(p.id, 1)} className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#0071E3] hover:bg-[#0077ED] text-white text-[12px] font-black"><ShoppingCart className="w-3.5 h-3.5" /> أضف للسلة</button>
+                    ) : (
+                      <div className="flex items-center justify-between rounded-xl bg-[#0071E3]/10 p-1">
+                        <button type="button" onClick={() => ctx.updateCartQty(p.id, -1)} className="w-8 h-8 rounded-lg bg-[#0071E3] text-white flex items-center justify-center"><Minus className="w-4 h-4" /></button>
+                        <span className="text-sm font-black text-fg tabular-nums">{qty}</span>
+                        <button type="button" onClick={() => ctx.updateCartQty(p.id, 1)} className="w-8 h-8 rounded-lg bg-[#0071E3] text-white flex items-center justify-center"><Plus className="w-4 h-4" /></button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {list.length > limit && (
+            <button type="button" onClick={() => setLimit(l => l + 24)} className="w-full py-2.5 rounded-xl bg-surface border border-line text-[13px] font-black text-fg">عرض المزيد ({list.length - limit})</button>
+          )}
+        </>
+      )}
+
+      <div className="rounded-2xl border border-line bg-surface overflow-hidden">
+        <button type="button" onClick={() => setShowGlobal(v => !v)} className="w-full flex items-center justify-between gap-2 px-4 py-3 text-start">
+          <span className="min-w-0"><span className="block text-[13px] font-black text-fg">موديلات عالمية بأسعار تقريبية</span><span className="block text-[11px] font-bold text-muted">مش في المتجر دلوقتي، تقدر تطلبها استيراد</span></span>
+          {showGlobal ? <ChevronUp className="w-4 h-4 text-muted shrink-0" /> : <ChevronDown className="w-4 h-4 text-muted shrink-0" />}
+        </button>
+        {showGlobal && <div className="p-3 border-t border-line"><GlobalWearables formatMoney={formatMoney} onRequestOrder={onRequestOrder} cfg={cfg} /></div>}
+      </div>
     </div>
   );
 }

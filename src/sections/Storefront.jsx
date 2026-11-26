@@ -1,4 +1,5 @@
 import { Share2, Bell, ShoppingCart, Plus, Minus, ChevronDown, ChevronLeft, Search, Shield, Phone, User, X, RefreshCw, CheckCircle2, Truck, Sparkles, Filter, Award, Clock, MapPin } from 'lucide-react';
+import { buildHomeSectionCss } from '../lib/adminControlCenter.js';
 import { OR_BRAND_IMAGES } from '../orCatalogData';
 import React from 'react';
 import { DEFAULT_HOME_SHORTCUT_ICONS, ELZOGHBI_LOGO, PART_IMAGES, SHORTCUT_ICON_PRESETS } from '../data/constants.jsx';
@@ -1225,8 +1226,9 @@ export function renderHomeView(ctx) {
     const currentHeroTheme = getAdTheme(currentSlide);
 
     return (
-      <div className="elz-home max-w-[1380px] mx-auto px-4 sm:px-8 py-4 sm:py-6 space-y-12 sm:space-y-16 w-full max-w-[100vw] overflow-x-hidden min-w-0">
+      <div className="elz-home max-w-[1380px] mx-auto px-4 sm:px-8 py-3 sm:py-6 space-y-5 sm:space-y-16 w-full max-w-[100vw] overflow-x-hidden min-w-0">
         {/* 1. APPLE-STYLE HERO CAMPAIGN (dynamic ads from the admin dashboard) + WHY-SHOP ROW */}
+        <div data-home-sec="hero_ads" className="empty:hidden">
         {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
           <div className="space-y-6">
             {adsMode === ADS_MODE_CLASSIC ? (
@@ -1252,40 +1254,14 @@ export function renderHomeView(ctx) {
                 label={i18nActive ? 'Featured campaigns' : 'العروض المميزة'}
               />
             )}
-            {(() => {
-              const heroCfg = Array.isArray(siteSettings?.homeSectionsConfig) ? siteSettings.homeSectionsConfig.find(s => s.id === 'hero_ads') : null;
-              if (heroCfg && heroCfg.content && heroCfg.content.showTrustStrip === false) return null;
-              const iconMap = { check: CheckCircle2, truck: Truck, shield: Shield, phone: Phone };
-              const customBadges = Array.isArray(siteSettings?.discoveredControls?.trustBadges) && siteSettings.discoveredControls.trustBadges.length > 0
-                ? siteSettings.discoveredControls.trustBadges.filter(b => b && b.visible !== false)
-                : [
-                    { id: 'tb1', icon: 'check', title: 'ضمان حقيقي معتمد', desc: 'استبدال وفحص فوري' },
-                    { id: 'tb2', icon: 'truck', title: 'شحن سريع ومؤمّن', desc: 'لجميع المحافظات' },
-                    { id: 'tb3', icon: 'shield', title: 'معاينة ودفع آمن', desc: 'عند الاستلام أو بالمحفظة' },
-                    { id: 'tb4', icon: 'phone', title: 'دعم ومتابعة مستمرة', desc: 'خدمة عملاء سريعة' }
-                  ];
-              return (
-                <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5 rounded-[28px] bg-surface px-6 py-6 sm:px-10">
-                  {customBadges.map((b) => {
-                    const Icon = iconMap[b.icon] || CheckCircle2;
-                    return (
-                      <li key={b.id || b.title} className="flex items-start gap-3">
-                        <Icon className="w-7 h-7 shrink-0 text-fg" strokeWidth={1.4} aria-hidden="true" />
-                        <div>
-                          <div className="text-[14px] font-semibold text-fg leading-snug">{b.title}</div>
-                          <div className="text-[12px] text-muted leading-snug">{b.desc}</div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              );
-            })()}
           </div>
         )}
 
+        </div>
         {/* 1.5 KARAMBO EL-SHOGHLAANA STRIP (under the search layer) */}
+        <div data-home-sec="karambo_strip" className="empty:hidden">
         {renderKaramboStrip && renderKaramboStrip()}
+        </div>
 
         {/* 2. COMPACT QUICK CATEGORY SHORTCUTS STRIP (Compact on Mobile + Scrolls Directly to Products!) */}
         {siteSettings.showLegacyHomeStrips === true && siteSettings.showHomeShortcuts !== false && siteSettings.showHomeModels !== false && (() => {
@@ -1413,6 +1389,7 @@ export function renderHomeView(ctx) {
         })()}
 
         {/* 2C. "اطلب منتجك" — Apple-style service tile */}
+        <div data-home-sec="sourcing_tile" className="empty:hidden">
         {siteSettings.showHomeSourcing !== false && (
           <section
             role="button"
@@ -1433,10 +1410,16 @@ export function renderHomeView(ctx) {
           </section>
         )}
 
+        </div>
         {/* 2D. APPLE-STORE STYLE EDITORIAL SHOWCASE (categories, bento offers, horizontal rails — real catalogue data only) */}
+        <div data-home-sec="editorial_showcase" className="empty:hidden">
         {siteSettings.showHomeShowcase !== false && (
           <AppleHomeShowcase
             categoryIcons={siteSettings.categoryIcons}
+            headTitle={siteSettings.homeStoreTitle}
+            headSub={siteSettings.homeStoreSubtitle}
+            showHead={siteSettings.showHomeStoreHeadline !== false}
+            showCats={siteSettings.showHomeCategoryRow !== false}
             rtl={!i18nActive}
             parts={publicParts}
             calculatePartPrice={calculatePartPrice}
@@ -1468,7 +1451,9 @@ export function renderHomeView(ctx) {
           />
         )}
 
+        </div>
         {/* 3. PROMOTIONAL MOSAIC (large + small tiles, driven by ads with placement promo_split / both) */}
+        <div data-home-sec="promo_split" className="empty:hidden">
         {siteSettings.showHomePromoSplit !== false && adsMode === ADS_MODE_CLASSIC && adsClassicCfg.mosaic && promoSplitAds.length > 0 && (
           <AppleAdMosaic ads={promoSplitAds} onOpen={handleOpenAdDetails} rtl={!i18nActive} />
         )}
@@ -1483,7 +1468,9 @@ export function renderHomeView(ctx) {
           />
         )}
 
+        </div>
         {/* 4. BEST SELLERS 4-COLUMN PRODUCT GRID */}
+        <div data-home-sec="best_sellers" className="empty:hidden">
         {siteSettings.showHomeBestSellers !== false && bestSellerParts.length > 0 && (
           <section className="space-y-5">
             <div className="flex items-center justify-between gap-3">
@@ -1518,6 +1505,7 @@ export function renderHomeView(ctx) {
           </section>
         )}
 
+        </div>
         {/* 5. ADMIN-CURATED SHOWCASE BARS */}
         {siteSettings.showHomeShowcaseBars !== false && activeBars.map((bar, barIdx) => {
           const rawIds = Array.isArray(bar.partIds) ? bar.partIds : [];
@@ -1638,7 +1626,45 @@ export function renderHomeView(ctx) {
             );
           })}
 
+        {/* 6.5 TRUST STRIP (moved to the bottom of the home page, above the newsletter) */}
+        <div data-home-sec="trust_strip" className="empty:hidden">
+        {siteSettings.showHomeHeroAds !== false && siteSettings.showHomeAds !== false && (
+          <div className="space-y-6">
+            {(() => {
+              const heroCfg = Array.isArray(siteSettings?.homeSectionsConfig) ? siteSettings.homeSectionsConfig.find(s => s.id === 'hero_ads') : null;
+              if (heroCfg && heroCfg.content && heroCfg.content.showTrustStrip === false) return null;
+              const iconMap = { check: CheckCircle2, truck: Truck, shield: Shield, phone: Phone };
+              const customBadges = Array.isArray(siteSettings?.discoveredControls?.trustBadges) && siteSettings.discoveredControls.trustBadges.length > 0
+                ? siteSettings.discoveredControls.trustBadges.filter(b => b && b.visible !== false)
+                : [
+                    { id: 'tb1', icon: 'check', title: 'ضمان حقيقي معتمد', desc: 'استبدال وفحص فوري' },
+                    { id: 'tb2', icon: 'truck', title: 'شحن سريع ومؤمّن', desc: 'لجميع المحافظات' },
+                    { id: 'tb3', icon: 'shield', title: 'معاينة ودفع آمن', desc: 'عند الاستلام أو بالمحفظة' },
+                    { id: 'tb4', icon: 'phone', title: 'دعم ومتابعة مستمرة', desc: 'خدمة عملاء سريعة' }
+                  ];
+              return (
+                <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-3 sm:gap-x-6 sm:gap-y-5 rounded-[20px] sm:rounded-[28px] bg-surface px-4 py-4 sm:px-10 sm:py-6">
+                  {customBadges.map((b) => {
+                    const Icon = iconMap[b.icon] || CheckCircle2;
+                    return (
+                      <li key={b.id || b.title} className="flex items-start gap-3">
+                        <Icon className="w-5 h-5 sm:w-7 sm:h-7 shrink-0 text-fg" strokeWidth={1.4} aria-hidden="true" />
+                        <div>
+                          <div className="text-[12.5px] sm:text-[14px] font-semibold text-fg leading-snug">{b.title}</div>
+                          <div className="text-[11px] sm:text-[12px] text-muted leading-snug">{b.desc}</div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
+          </div>
+        )}
+
+        </div>
         {/* 7. NEWSLETTER */}
+        <div data-home-sec="newsletter" className="empty:hidden">
         {siteSettings.showHomeNewsletter !== false && (
           <section className="rounded-[28px] bg-surface px-6 py-10 sm:px-14 sm:py-14 text-center">
             <h3 className="elz-display">اشترك في نشرتنا البريدية</h3>
@@ -1656,7 +1682,9 @@ export function renderHomeView(ctx) {
             </form>
           </section>
         )}
+        </div>
 
+        <style data-home-sections-css>{buildHomeSectionCss(siteSettings?.homeSectionsConfig)}</style>
         {renderRecentlyViewedStrip()}
         {cartSummary.totalQty > 0 && renderStickyCartBar()}
       </div>

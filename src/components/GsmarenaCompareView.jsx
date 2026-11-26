@@ -16,6 +16,9 @@ import GsmarenaPhonePicker from './GsmarenaPhonePicker.jsx';
  * Uses GsmarenaPhonePicker so every slot searches GSMArena live (13,000+ phones)
  * and shows live GSMArena trending devices immediately on click!
  */
+// Some feeds deliver HTML entities (e.g. thin spaces) as literal text; show them as plain text.
+const cleanEnt = (v) => (typeof v === 'string' ? v.replace(/&amp;/g, '&').replace(/&(?:thin|hair|ens|ems)p;/g, ' ').replace(/&nbsp;|&#8201;|&#x2009;/g, ' ').replace(/\s{2,}/g, ' ') : v);
+
 export default function GsmarenaCompareView({
   cfg,
   localPhones = [],
@@ -172,14 +175,14 @@ export default function GsmarenaCompareView({
       )}
 
       {/* 2 or 3 Live GSMArena Slots */}
-      <div className={`grid gap-3 ${maxDevices === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
+      <div className={`grid gap-2 sm:gap-3 ${maxDevices === 2 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
         {slots.map((dev, idx) => {
           const isLoading = !!slotLoading[idx];
           const score = dev ? (analysis.scores[dev.id] || 0) : 0;
           const isWinner = dev && analysis.winnerId === dev.id && selectedDevices.length >= 2;
 
           return (
-            <div key={idx} className={`relative bg-surface rounded-3xl border p-3.5 transition ${isWinner ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-line'}`}>
+            <div key={idx} className={`relative bg-surface rounded-2xl sm:rounded-3xl border p-2.5 sm:p-3.5 transition ${isWinner ? 'border-emerald-500 ring-2 ring-emerald-500/20' : 'border-line'}`}>
               {isWinner && (
                 <span className="absolute -top-2.5 start-3 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black shadow">
                   <Award className="w-3 h-3" /> الأعلى نقاطاً ({score})
@@ -194,7 +197,7 @@ export default function GsmarenaCompareView({
               ) : dev ? (
                 <div className="space-y-2.5">
                   <div className="flex items-start gap-2.5">
-                    <div className="w-16 h-16 rounded-2xl bg-white dark:bg-[#1D1D1F] border border-line flex items-center justify-center overflow-hidden shrink-0">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-white dark:bg-[#1D1D1F] border border-line flex items-center justify-center overflow-hidden shrink-0">
                       {dev.images && dev.images[0]
                         ? <img src={dev.images[0]} alt={dev.name} referrerPolicy="no-referrer" className="max-h-full max-w-full object-contain" />
                         : <Smartphone className="w-8 h-8 text-muted" />}
@@ -212,7 +215,7 @@ export default function GsmarenaCompareView({
                       </div>
                       <div className="text-sm font-black text-fg leading-snug line-clamp-2">{dev.name}</div>
                       <div className="text-xs font-black text-[#0066CC] dark:text-[#2997FF] mt-0.5">
-                        {dev.price ? formatMoney(dev.price) : (dev.priceGlobal || 'مواصفات كاملة')}
+                        {dev.price ? formatMoney(dev.price) : (cleanEnt(dev.priceGlobal) || 'مواصفات كاملة')}
                       </div>
                     </div>
                     <button
@@ -318,13 +321,13 @@ export default function GsmarenaCompareView({
             </div>
           </div>
 
-          <div className="bg-surface border border-line rounded-3xl overflow-x-auto">
-            <table className="w-full text-xs font-bold min-w-[560px]">
+          <div className="bg-surface border border-line rounded-2xl sm:rounded-3xl overflow-hidden">
+            <table className="w-full table-fixed text-[11px] sm:text-xs font-bold">
               <thead>
                 <tr className="border-b border-line bg-surface2/60">
-                  <th className="p-3 text-start text-muted w-40">وجه المقارنة</th>
+                  <th className="p-2 sm:p-3 text-start text-muted w-[27%] sm:w-40">وجه المقارنة</th>
                   {selectedDevices.map(d => (
-                    <th key={d.id} className="p-3 text-start">
+                    <th key={d.id} className="p-2 sm:p-3 text-start align-top">
                       <div className="flex items-center gap-2">
                         {d.images && d.images[0] && <img src={d.images[0]} alt="" referrerPolicy="no-referrer" className="w-8 h-8 object-contain bg-white rounded-lg shrink-0" />}
                         <span className="text-fg font-black">{d.name}</span>
@@ -336,14 +339,14 @@ export default function GsmarenaCompareView({
               <tbody>
                 {analysis.keyRows.filter(r => !diffOnly || r.isDiff).map((row, ri) => (
                   <tr key={ri} className={ri % 2 ? 'bg-surface2/40' : ''}>
-                    <td className="p-3 text-muted font-black">{row.label}</td>
+                    <td className="p-2 sm:p-3 text-muted font-black break-words align-top">{row.label}</td>
                     {row.values.map((val, vi) => (
                       <td
                         key={vi}
-                        className={`p-3 ${row.wins[vi] ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300 font-black' : 'text-fg'}`}
+                        className={`p-2 sm:p-3 break-words align-top ${row.wins[vi] ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300 font-black' : 'text-fg'}`}
                       >
-                        <span className="inline-flex items-center gap-1">
-                          {val}
+                        <span className="inline-flex items-start gap-1">
+                          {cleanEnt(val)}
                           {row.wins[vi] && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
                         </span>
                       </td>
@@ -372,14 +375,14 @@ export default function GsmarenaCompareView({
                       <ChevronDown className={`w-4 h-4 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />
                     </button>
                     {!isCollapsed && (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-xs font-bold min-w-[560px]">
+                      <div>
+                        <table className="w-full table-fixed text-[11px] sm:text-xs font-bold">
                           <tbody>
                             {visibleRows.map((row, ri) => (
                               <tr key={ri} className={`border-t border-line/60 ${ri % 2 ? 'bg-surface2/30' : ''}`}>
-                                <td className="p-2.5 text-muted w-40 align-top">{row.label}</td>
+                                <td className="p-2 sm:p-2.5 text-muted w-[30%] sm:w-40 align-top break-words">{row.label}</td>
                                 {row.values.map((v, vi) => (
-                                  <td key={vi} className="p-2.5 text-fg align-top">{v}</td>
+                                  <td key={vi} className="p-2 sm:p-2.5 text-fg align-top break-words">{cleanEnt(v)}</td>
                                 ))}
                               </tr>
                             ))}

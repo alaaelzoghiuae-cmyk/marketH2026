@@ -289,7 +289,7 @@ export default function KaramboStoreReviewsView({
     }
     setTab('detail');
     setRevOpen(false);
-    window.scrollTo({ top: 0 });
+    try { const el = document.getElementById('korombo-content-top'); const y = el ? el.getBoundingClientRect().top + window.scrollY - 120 : 0; if (window.scrollY > y) window.scrollTo({ top: Math.max(0, y) }); } catch (e) {}
   };
 
   const handleProofFile = (e) => {

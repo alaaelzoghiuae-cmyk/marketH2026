@@ -1,3 +1,5 @@
+import AdminLookPanel from '../components/AdminLookPanel.jsx';
+import { AdminThemeToggle } from '../components/AdminThemeGuard.jsx';
 import AdminMarketplace from './AdminMarketplace.jsx';
 import AdminVisualEditor from '../components/AdminVisualEditor.jsx';
 import AdminThemeEditor from '../components/AdminThemeEditor.jsx';
@@ -1092,6 +1094,7 @@ export function renderAdminDashboard(ctx) {
                   <span>{cloudSyncStatus === 'syncing' ? 'يحفظ...' : 'حفظ التعديلات'}</span>
                 </button>
 
+                <AdminThemeToggle />
                 <button
                   type="button"
                   onClick={() => switchPortal('storefront')}
@@ -1124,6 +1127,8 @@ export function renderAdminDashboard(ctx) {
               />
             )}
             {adminTab === 'theme_editor' && canAdmin('theme_editor') && (
+              <div className="space-y-4">
+              <AdminLookPanel siteSettings={siteSettings} setSiteSettings={ctx.setSiteSettings} />
               <AdminThemeEditor
                 siteSettings={siteSettings}
                 setSiteSettings={ctx.setSiteSettings}
@@ -1131,6 +1136,7 @@ export function renderAdminDashboard(ctx) {
                 adminSession={adminSession}
                 showToast={showToast}
               />
+              </div>
             )}
             {adminTab === 'page_builder' && canAdmin('page_builder') && (
               <AdminPageSectionBuilder

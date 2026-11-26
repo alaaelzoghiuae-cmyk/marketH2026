@@ -624,6 +624,27 @@ export default function AdminVisualEditor({
                 </div>
               </div>
 
+              {/* Size / colour controls (applied live on the storefront) */}
+              <div className="grid grid-cols-2 gap-2 border-t border-line pt-3">
+                {[['paddingTop','مسافة داخلية أعلى (px)',0,200],['paddingBottom','مسافة داخلية أسفل (px)',0,200],['marginTop','مسافة فوق القسم (px)',-40,200],['minHeight','أقل ارتفاع (px)',0,1200],['radius','انحناء الحواف (px)',0,80],['widthPct','عرض القسم (%)',30,100]].map(([k,l,mn,mx]) => (
+                  <div key={k} className="space-y-1">
+                    <label className="font-extrabold text-muted block">{l}</label>
+                    <input type="number" min={mn} max={mx} value={selectedSection.style?.[k] ?? ''} placeholder="تلقائي"
+                      onChange={(e) => updateSectionStyle(selectedSection.id, { [k]: e.target.value === '' ? '' : Number(e.target.value) })}
+                      className="w-full px-2.5 py-2 rounded-xl border border-line bg-bg text-fg font-bold" />
+                  </div>
+                ))}
+                {[['bgColor','لون الخلفية'],['textColor','لون النص']].map(([k,l]) => (
+                  <div key={k} className="space-y-1">
+                    <label className="font-extrabold text-muted block">{l}</label>
+                    <div className="flex gap-1">
+                      <input type="color" value={selectedSection.style?.[k] || '#ffffff'} onChange={(e) => updateSectionStyle(selectedSection.id, { [k]: e.target.value })} className="flex-1 h-9 rounded-xl border border-line bg-bg cursor-pointer" />
+                      <button type="button" onClick={() => updateSectionStyle(selectedSection.id, { [k]: '' })} className="px-2 rounded-xl border border-line bg-surface2 text-muted font-bold">مسح</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               {/* Dynamic Content Fields per Section Type */}
               {selectedSection.type === 'hero_ads' && (
                 <div className="space-y-2.5 border-t border-line pt-3">
