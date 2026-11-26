@@ -797,8 +797,8 @@ main { overflow-wrap: anywhere; }
 .elz-home { display: flex; flex-direction: column; }
 @media (max-width: 639px) {
   .elz-home > [data-home-sec="hero_ads"] { order: 10; }
-  .elz-home > [data-home-sec="best_sellers"] { order: 20; }
-  .elz-home > [data-home-sec="karambo_strip"] { order: 30; }
+  .elz-home > [data-home-sec="karambo_strip"] { order: 20; }
+  .elz-home > [data-home-sec="best_sellers"] { order: 30; }
   .elz-home > [data-home-sec="editorial_showcase"] { order: 300; }
   .elz-home > [data-home-sec="sourcing_tile"] { order: 310; }
   .elz-home > [data-home-sec="trust_strip"] { order: 400; }

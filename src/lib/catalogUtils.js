@@ -18,10 +18,14 @@ export const isOrCatalogDisabledInStorage = () => {
     const raw = window.localStorage.getItem('elzoghbi_v2_siteSettings');
     if (raw) {
       const parsed = JSON.parse(raw);
-      return Boolean(parsed && parsed.disableBundledOrCatalog);
+      if (parsed && parsed.disableBundledOrCatalog === true) return true;
+      // OFF by default: the bundled catalog merges ONLY when the admin explicitly
+      // enabled it (enableBundledOrCatalog = true). Previously the merge ran unless
+      // a disable flag existed, so dashboard-deleted bundled items kept coming back.
+      return !(parsed && parsed.enableBundledOrCatalog === true);
     }
   } catch (e) {}
-  return false;
+  return true;
 };
 
 export const mergeOrBrandsList = (baseBrands, delMap = {}, disabled = false) => {
