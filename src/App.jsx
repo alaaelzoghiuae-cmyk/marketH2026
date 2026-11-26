@@ -3418,12 +3418,16 @@ const pullFromSupabaseCloud = async (silent = false) => {
       setTimeout(async () => {
         try {
           // Single paginated catalog hydration (Cached in localStorage for 35m -> Zero redundant multi-query Egress!)
-          // Egress fix (2026-11-22): the extra 650-row catalog wave is admin-only now.
-          // Storefront visitors already get the 200 newest parts in Phase B and every
-          // brand/model/category/search navigation fetches its slice server-side via
-          // fetchSparePartsSliceOnDemand, so this wave (~665 KB) was pure waste for them.
+          // Egress fix (2026-11-22): the extra catalog waves were made admin-only.
+          // BUT (2026-11-26): Phase B loads only the newest 60 rows, and when those are
+          // dominated by a hidden model/brand/category a fresh visitor sees almost no
+          // products (reproduced live: newest 60 -> 57 hidden-model rows -> 3 visible).
+          // So customers now also hydrate the newest 500 rows in the background
+          // (offset 60, limit 440, light columns, session-cached). The asc wave and
+          // the full 650 desc wave stay admin-only; deeper catalog still loads
+          // on demand via fetchSparePartsSliceOnDemand.
           const [moreCustomDate, moreAsc] = await Promise.all([
-            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=60', false) : Promise.resolve([]),
+            isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=650&offset=60', false) : sbFetchTable('spare_parts', null, '&order=created_at.desc&limit=440&offset=60', false),
             isAdmin ? sbFetchTable('spare_parts', null, '&order=created_at.asc&limit=650', false) : Promise.resolve([])
           ]);
           const moreCustomSku = [];
