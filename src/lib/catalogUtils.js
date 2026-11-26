@@ -1,4 +1,11 @@
-import { OR_IMPORTED_BRANDS, OR_IMPORTED_MODELS, OR_IMPORTED_PARTS } from '../orCatalogData';
+// The bundled OR catalog (src/orCatalogData.js, 1.29MB / 586 products) was
+// removed from the bundle on the hardening branch: every one of those
+// products also exists in the database as or_prt_* rows, so the store loses
+// nothing. The merge helpers below stay as no-ops (empty lists), which makes
+// the old enableBundledOrCatalog setting inert.
+const OR_IMPORTED_BRANDS = [];
+const OR_IMPORTED_MODELS = [];
+const OR_IMPORTED_PARTS = [];
 
 export const readPersistedDeletedSliceMap = (sliceKey) => {
   try {

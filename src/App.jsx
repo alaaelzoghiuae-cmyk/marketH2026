@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { resolveCategoryIconKey } from './lib/categoryIcons.jsx';
 import { AdminThemeGuard } from './components/AdminThemeGuard.jsx';
-import { OR_BRAND_IMAGES } from './orCatalogData';
+import { OR_BRAND_IMAGES } from './data/brandImages';
 import { X, Check, Phone } from 'lucide-react';
 import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY_REG_FORM, INITIAL_ACCOUNT_REQUESTS, INITIAL_AUTO_TEMPLATES, INITIAL_BRANDS, INITIAL_CLIENTS, INITIAL_COMPLAINTS, INITIAL_CURRENCIES, INITIAL_GROUPS, INITIAL_MODELS, INITIAL_ORDERS, INITIAL_PARTS, INITIAL_PROMO_CODES, INITIAL_RETURNS, INITIAL_SHOWCASE_BARS, INITIAL_SITE_SETTINGS, INITIAL_STORE_ADS, PART_IMAGES, SHORTCUT_ICON_PRESETS, SRC_DEPOSIT_LABEL } from './data/constants.jsx';
 import { getAdminJwt, adminSignIn, adminSignOut, fetchMyAdminProfile, ensureFreshAdminJwt } from './lib/sbAuth.js';

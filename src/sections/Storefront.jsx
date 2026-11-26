@@ -1,6 +1,6 @@
 import { Share2, Bell, ShoppingCart, Plus, Minus, ChevronDown, ChevronLeft, Search, Shield, Phone, User, X, RefreshCw, CheckCircle2, Truck, Sparkles, Filter, Award, Clock, MapPin } from 'lucide-react';
 import { buildHomeSectionCss } from '../lib/adminControlCenter.js';
-import { OR_BRAND_IMAGES } from '../orCatalogData';
+import { OR_BRAND_IMAGES } from '../data/brandImages';
 import React from 'react';
 import { DEFAULT_HOME_SHORTCUT_ICONS, ELZOGHBI_LOGO, PART_IMAGES, SHORTCUT_ICON_PRESETS } from '../data/constants.jsx';
 import { AdContent, BlurFitImage, ImageViewer } from '../components/widgets.jsx';
