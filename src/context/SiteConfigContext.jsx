@@ -59,13 +59,18 @@ export const DEFAULT_SITE_CONFIG = {
     },
   },
   blocks: {
-    'home.hero.badge': { ar: 'جودة مضمونة وأسعار تنافسية ⚡', en: 'Guaranteed quality & competitive prices ⚡' },
-    'home.hero.title': { ar: 'تسوق بذكاء .. عيش تجربة أفضل', en: 'Shop smarter.. live a better experience' },
+    'home.hero.badge': { ar: 'جودة مضمونة وأسعار تنافسية ⚡', en: 'Guaranteed quality, competitive prices ⚡' },
+    'home.hero.title': { ar: 'تسوق بذكاء .. عيش تجربة أفضل', en: 'Shop smart. Live better.' },
     'home.hero.subtitle': {
       ar: 'تشكيلة متكاملة من أحدث المنتجات والأجهزة ومستلزماتها بضمان حقيقي وشحن سريع لكل المحافظات',
-      en: 'Complete selection of original parts & accessories with real warranty and fast delivery',
+      en: 'A complete range of the latest products and accessories with real warranty and fast shipping nationwide',
     },
     'home.hero.cta': { ar: 'تصفح كل المنتجات', en: 'Browse all products' },
+    'home.showcase.headline': { ar: 'اكتشف ما تحب. بأفضل طريقة للشراء.', en: 'Discover what you love. The best way to buy.' },
+    'home.showcase.sub': {
+      ar: 'تصفّح التصنيفات والعروض والمنتجات المختارة بضمان حقيقي وشحن لكل المحافظات.',
+      en: 'Browse categories, offers and curated products with genuine warranty and nationwide delivery.',
+    },
   },
   sections: [],
   navigation: [],

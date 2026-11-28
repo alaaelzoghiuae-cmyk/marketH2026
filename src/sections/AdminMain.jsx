@@ -5,9 +5,10 @@ import AdminVisualEditor from '../components/AdminVisualEditor.jsx';
 import AdminThemeEditor from '../components/AdminThemeEditor.jsx';
 import AdminPageSectionBuilder from '../components/AdminPageSectionBuilder.jsx';
 import { AdminVersionHistoryPanel, AdminAdvancedRolesStudio } from '../components/AdminVersionAndRbac.jsx';
+import AdminSiteControl from '../components/AdminSiteControl.jsx';
 import AdminDashboardCustomizer from '../components/AdminDashboardCustomizer.jsx';
 import { GLOBAL_CONTROL_SEARCH_INDEX, readVersionHistory } from '../lib/adminControlCenter.js';
-import { User, Lock, Shield, TrendingUp, Palette, History, MousePointerClick, FileText, Printer, ClipboardList, LayoutGrid, Globe, RotateCcw, Layers, DollarSign, Upload, Camera, Database, Bell, Sparkles, Zap, Percent, Users, Tag, Building2, Cpu, X, Search, ChevronLeft, LogOut, Menu, RefreshCw, Save, Eye, AlertTriangle, Trash2, Plus, Phone } from 'lucide-react';
+import { User, Lock, Shield, TrendingUp, Palette, History, MousePointerClick, FileText, Printer, ClipboardList, LayoutGrid, Globe, RotateCcw, Layers, DollarSign, Upload, Camera, Database, Bell, Sparkles, Zap, Percent, Users, Tag, Building2, Cpu, X, Search, ChevronLeft, LogOut, Menu, RefreshCw, Save, Eye, AlertTriangle, Trash2, Plus, Phone, SlidersHorizontal } from 'lucide-react';
 import { BusinessIntelligenceView, OrderWorkflowBoard, AdminCommandPalette, SmartNotificationsPopover } from '../components/OrderWorkflowAndBI';
 import ExcelProductManager from '../components/ExcelProductManager';
 import SmartPricingEngine from '../components/SmartPricingEngine';
@@ -336,6 +337,15 @@ export function renderAdminDashboard(ctx) {
             keywords: 'منشئ صفحات اقسام page builder section builder seo شارات نصوص',
             icon: FileText,
             badge: 'CMS',
+            urgent: false
+          },
+          {
+            id: 'site_control',
+            label: 'التحكم الشامل في الموقع',
+            desc: 'محرك Site Control: ثيمات ونصوص وأقسام — مسودة ومعاينة ونشر واسترجاع',
+            keywords: 'site control تحكم شامل ثيم نصوص اقسام نشر مسودة استرجاع',
+            icon: SlidersHorizontal,
+            badge: 'جديد',
             urgent: false
           },
           {
@@ -1147,6 +1157,14 @@ export function renderAdminDashboard(ctx) {
                 showToast={showToast}
               />
             )}
+            {adminTab === 'site_control' && canAdmin('site_control') && (() => { const sc = ctx.getSupabaseConfig(); return (
+              <AdminSiteControl
+                showToast={showToast}
+                adminCredentials={adminCredentials}
+                sbUrl={sc.sbUrl}
+                sbKey={sc.sbKey}
+              />
+            ); })()}
             {adminTab === 'version_history' && canAdmin('version_history') && (
               <AdminVersionHistoryPanel
                 siteSettings={siteSettings}
@@ -1721,6 +1739,7 @@ export function renderAdminOverview(ctx) {
       { id: 'visual_editor', label: 'المحرر المرئي', icon: MousePointerClick },
       { id: 'theme_editor', label: 'الهوية والألوان', icon: Palette },
       { id: 'page_builder', label: 'الصفحات والأقسام', icon: FileText },
+      { id: 'site_control', label: 'التحكم الشامل', icon: SlidersHorizontal },
       { id: 'orders', label: 'الطلبات', icon: ClipboardList },
       { id: 'marketplace', label: 'مراجعة الإعلانات', icon: Sparkles },
       { id: 'catalog', label: 'الكتالوج', icon: Layers },
@@ -2407,7 +2426,7 @@ const TEAM_PERMISSION_GROUPS = [
   { title: 'الملخص والتقارير', tabs: [['overview', 'الرئيسية والملخص'], ['bi_analytics', 'تحليلات الأعمال (BI)'], ['reports', 'تقارير المدير العام']] },
   { title: 'المبيعات والطلبات', tabs: [['orders', 'الطلبات والفواتير'], ['order_workflow', 'سير عمل الطلبات (Kanban)'], ['sourcing', 'طلبات الاستيراد (من برّه)'], ['returns', 'المرتجعات والشكاوى']] },
   { title: 'المنتجات والمخازن', tabs: [['catalog', 'الكتالوج والموديلات'], ['excel_products', 'جدول المنتجات (Excel)'], ['smart_pricing', 'محرك التسعير الذكي (AI)'], ['ai_product_sourcing', 'وكيل الاستيراد الذكي (AI)'], ['bulk_importer', 'المستورد الذكي بالروابط'], ['quality_images', 'جودة الكتالوج والصور'], ['quick_stock', 'الجرد السريع للمخزن'], ['restock_alerts', 'قائمة الانتظار (نبّهني)']] },
-  { title: 'تصميم المتجر والتسويق', tabs: [['visual_editor', 'المحرر المرئي للموقع'], ['theme_editor', 'محرر الهوية والألوان'], ['page_builder', 'منشئ الصفحات والأقسام'], ['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['marketplace', 'إعلانات بيع الموبايلات (بيع عندنا)'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
+  { title: 'تصميم المتجر والتسويق', tabs: [['visual_editor', 'المحرر المرئي للموقع'], ['theme_editor', 'محرر الهوية والألوان'], ['page_builder', 'منشئ الصفحات والأقسام'], ['site_control', 'التحكم الشامل في الموقع (Site Control)'], ['storefront_cms', 'استوديو الواجهة والإعلانات'], ['feature_flags', 'محرك المبيعات والولاء'], ['marketplace', 'إعلانات بيع الموبايلات (بيع عندنا)'], ['promos', 'الكوبونات وحماية الربح'], ['karambo', 'كرومبو الشغلانة']] },
   { title: 'العملاء والإعدادات', tabs: [['clients', 'العملاء والحسابات'], ['groups', 'شرائح الأسعار والشحن'], ['site_settings', 'إعدادات المتجر والدفع'], ['version_history', 'سجل الإصدارات والنسخ'], ['schema', 'قاعدة البيانات السحابية']] }
 ];
 const TEAM_ALL_TABS = TEAM_PERMISSION_GROUPS.flatMap(g => g.tabs.map(t => t[0]));

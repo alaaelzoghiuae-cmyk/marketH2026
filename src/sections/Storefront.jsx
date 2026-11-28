@@ -1158,10 +1158,10 @@ export function renderHomeView(ctx) {
       layout: 'icon_3d_studio',
       iconPreset: 'flagship_iphones',
       theme: uiTheme === 'light' ? 'light' : 'indigo',
-      badge: 'جودة مضمونة وأسعار تنافسية ⚡',
-      title: `تسوق بذكاء .. عيش تجربة أفضل`,
-      subtitle: 'تشكيلة متكاملة من أحدث المنتجات والأجهزة ومستلزماتها بضمان حقيقي وشحن سريع لكل المحافظات',
-      buttonText: 'تصفح كل المنتجات'
+      badge: ctx.tBlock ? ctx.tBlock('home.hero.badge', 'جودة مضمونة وأسعار تنافسية ⚡', 'Guaranteed quality, competitive prices ⚡') : 'جودة مضمونة وأسعار تنافسية ⚡',
+      title: ctx.tBlock ? ctx.tBlock('home.hero.title', 'تسوق بذكاء .. عيش تجربة أفضل', 'Shop smart. Live better.') : `تسوق بذكاء .. عيش تجربة أفضل`,
+      subtitle: ctx.tBlock ? ctx.tBlock('home.hero.subtitle', 'تشكيلة متكاملة من أحدث المنتجات والأجهزة ومستلزماتها بضمان حقيقي وشحن سريع لكل المحافظات', 'A complete range of the latest products and accessories with real warranty and fast shipping nationwide') : 'تشكيلة متكاملة من أحدث المنتجات والأجهزة ومستلزماتها بضمان حقيقي وشحن سريع لكل المحافظات',
+      buttonText: ctx.tBlock ? ctx.tBlock('home.hero.cta', 'تصفح كل المنتجات', 'Browse all products') : 'تصفح كل المنتجات'
     };
 
     const heroSlides =
@@ -1416,8 +1416,8 @@ export function renderHomeView(ctx) {
         {siteSettings.showHomeShowcase !== false && (
           <AppleHomeShowcase
             categoryIcons={siteSettings.categoryIcons}
-            headTitle={siteSettings.homeStoreTitle}
-            headSub={siteSettings.homeStoreSubtitle}
+            headTitle={siteSettings.homeStoreTitle || (ctx.tBlock ? ctx.tBlock('home.showcase.headline', 'اكتشف ما تحب. بأفضل طريقة للشراء.', 'Discover what you love. The best way to buy.') : undefined)}
+            headSub={siteSettings.homeStoreSubtitle || (ctx.tBlock ? ctx.tBlock('home.showcase.sub', 'تصفّح التصنيفات والعروض والمنتجات المختارة بضمان حقيقي وشحن لكل المحافظات.', 'Browse categories, offers and curated products with genuine warranty and nationwide delivery.') : undefined)}
             showHead={siteSettings.showHomeStoreHeadline !== false}
             showCats={siteSettings.showHomeCategoryRow !== false}
             rtl={!i18nActive}

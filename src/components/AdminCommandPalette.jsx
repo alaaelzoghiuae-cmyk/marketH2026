@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Palette, Layers,
-  Megaphone, BarChart3, Settings, ShieldCheck, History, Search, Sparkles, Tag
+  Megaphone, BarChart3, Settings, ShieldCheck, History, Search, Sparkles, Tag, SlidersHorizontal
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ const ADMIN_QUICK_LINKS = [
   { id: 'quick_stock', label: 'الجرد السريع للمخزن', group: 'المنتجات', icon: Package, keywords: 'stock inventory مخزن جرد' },
   { id: 'visual_editor', label: 'المحرر المرئي للموقع', group: 'نظام التحكم', icon: Sparkles, keywords: 'visual editor محرر مرئي' },
   { id: 'theme_editor', label: 'محرر الهوية والألوان', group: 'نظام التحكم', icon: Palette, keywords: 'theme colors fonts الوان خطوط مظهر' },
+  { id: 'site_control', label: 'التحكم الشامل في الموقع', group: 'نظام التحكم', icon: SlidersHorizontal, keywords: 'site control تحكم شامل ثيم نصوص اقسام نشر مسودة' },
   { id: 'page_builder', label: 'منشئ الصفحات والأقسام', group: 'نظام التحكم', icon: Layers, keywords: 'sections pages اقسام صفحات' },
   { id: 'storefront_cms', label: 'استوديو الواجهة والإعلانات', group: 'نظام التحكم', icon: Megaphone, keywords: 'cms ads banners اعلانات واجهة' },
   { id: 'promos', label: 'الكوبونات وحماية الربح', group: 'التسويق', icon: Tag, keywords: 'promos coupons كوبونات خصم' },

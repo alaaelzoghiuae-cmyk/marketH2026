@@ -23,6 +23,7 @@ import KaramboNewsView from '../components/KaramboNewsView.jsx';
 import KaramboWearablesView from '../components/KaramboWearablesView.jsx';
 import KaramboPhoneHydrator from '../components/KaramboPhoneHydrator.jsx';
 import KaramboStoreReviewsView from '../components/KaramboStoreReviewsView.jsx';
+import TrustCheckerPanel from '../components/TrustCheckerPanel.jsx';
 import { KaramboLiveAdvisorView, KaramboLiveRadarView, KaramboGulfView, KaramboTradeInView } from '../components/KaramboLiveMarketViews.jsx';
 import { renderAdminKarambo } from './KaramboAdmin.jsx';
 
@@ -603,6 +604,34 @@ export function renderKaramboPage(ctx) {
         onSubmitAnswer={ctx.submitStoreAnswer}
         onGoToStore={() => { setClientTab('home'); window.scrollTo({ top: 0 }); }}
         showToast={ctx.showToast}
+      />
+    );
+  }
+
+  // ---------- 0c. TRUST CHECKER (كشّاف النصب) ----------
+  if (page === 'trust') {
+    const q = ui.trustQuery || '';
+    const qNorm = q.trim().toLowerCase();
+    const digits = qNorm.replace(/\D+/g, '');
+    const localMatches = qNorm.length >= 3 ? (ctx.storeReviewEntities || []).filter(e => {
+      const hay = `${e.name || ''} ${e.socialUrl || ''} ${(e.phones || []).join(' ')}`.toLowerCase();
+      if (hay.includes(qNorm)) return true;
+      if (digits.length >= 4 && (e.phones || []).some(ph => String(ph).replace(/\D+/g, '').includes(digits))) return true;
+      return false;
+    }) : [];
+    return wrapKoromboPortal(
+      <TrustCheckerPanel
+        query={q}
+        setQuery={(v) => set({ trustQuery: v })}
+        localMatches={localMatches}
+        renderStoreCard={(e) => (
+          <div key={e.id} className="rounded-xl border border-line bg-surface p-3.5 space-y-1">
+            <div className="text-sm font-black text-fg">{e.name}</div>
+            <div className="text-[11px] font-bold text-muted">{[e.governorate, ...((e.phones || []).slice(0, 2))].filter(Boolean).join(' • ')}</div>
+            {e.socialUrl && <a href={e.socialUrl} target="_blank" rel="noopener noreferrer" className="block text-[11px] font-black text-[#0066CC] break-all">{e.socialUrl}</a>}
+            <button type="button" onClick={() => go('reviews')} className="text-[11px] font-black text-amber-600">شوف تقييمات وتجارب الناس معاه ←</button>
+          </div>
+        )}
       />
     );
   }

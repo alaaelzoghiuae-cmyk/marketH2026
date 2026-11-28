@@ -4,6 +4,7 @@ export const KARAMBO_SERVICES = [
   { id: 'guide', title: 'دليل الموبايلات', desc: 'كل موديلات العالم بمواصفاتها وأسعارها في مصر', icon: 'Smartphone', color: 'bg-slate-700', badge: 'شامل' },
   { id: 'compare', title: 'قارن بنفسك', desc: 'قارن أي موبايل في العالم بالتفصيل', icon: 'Scale', color: 'bg-slate-700', badge: 'مباشر' },
   { id: 'reviews', title: 'تحريات كرومبو: تقييم المحلات', desc: 'اعرف تجارب الناس مع المحلات والمنصات قبل ما تشتري', icon: 'Shield', color: 'bg-slate-700', badge: 'جديد' },
+  { id: 'trust', title: 'كشّاف النصب', desc: 'افحص رقم تليفون أو صفحة محل قبل ما تحوّل أي عربون', icon: 'Shield', color: 'bg-slate-700', badge: 'جديد' },
   { id: 'news', title: 'آخر الأخبار', desc: 'أحدث أخبار ومراجعات وإطلاقات الموبايلات', icon: 'Megaphone', color: 'bg-slate-700', badge: '' },
   { id: 'wearables', title: 'ساعات وسماعات ذكية', desc: 'ساعات وسماعات أصلية من أشهر الماركات العالمية بالسعر وتقييم العملاء', icon: 'Watch', color: 'bg-slate-700', badge: 'جديد' },
   { id: 'choose', title: 'ساعدني أختار', desc: 'ترشيحات حية من السوق المصري على قد ميزانيتك', icon: 'Sparkles', color: 'bg-slate-700', badge: '' },

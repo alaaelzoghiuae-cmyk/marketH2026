@@ -104,11 +104,11 @@ await test('Editorial News Rewriter & Kanbkam Parser', () => {
   assert.equal(k[0].trend, 'down');
 });
 
-await test('Translator, Config (10 services) & Static Icon Integrity', () => {
+await test('Translator, Config (13 services) & Static Icon Integrity', () => {
   assert.equal(translateArabicPhoneQuery('ايفون ١٦ برو ماكس'), 'iphone 16 pro max');
   assert.equal(buildCleanPhoneQuery('Samsung Galaxy S25 Ultra (2025) 5G'), 'Galaxy S25 Ultra');
-  assert.equal(KARAMBO_SERVICES.length, 11);
-  assert.equal(getOrderedKaramboServices(mergeKaramboCfg({})).length, 11);
+  assert.equal(KARAMBO_SERVICES.length, 13);
+  assert.equal(getOrderedKaramboServices(mergeKaramboCfg({})).length, 13);
   assert.ok(fs.existsSync('public/karambo.png'));
   assert.ok(resolveKaramboBarStyle(mergeKaramboCfg({})).background.includes('linear-gradient'));
   const idx = parseQuicksearchIndex(JSON.stringify([{ '9': 'Samsung' }, [[9, 13322, 'Galaxy S25 Ultra', '', 's25.jpg']]]));
