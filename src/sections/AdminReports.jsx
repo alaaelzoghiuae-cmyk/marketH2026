@@ -162,10 +162,10 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
                   <div key={cat.category} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
                     <div>
                       <span className="font-black text-fg">{cat.category}</span>
-                      <span className="text-[11px] text-muted mr-2">({cat.qtySold} قطعة)</span>
+                      <span className="text-[11px] text-muted me-2">({cat.qtySold} قطعة)</span>
                     </div>
                     <div className="text-left">
-                      <span className="font-mono font-bold text-fg ml-3">{formatMoney(cat.revenueBase)}</span>
+                      <span className="font-mono font-bold text-fg ms-3">{formatMoney(cat.revenueBase)}</span>
                       <span className="font-mono font-black text-emerald-500">ربح: +{formatMoney(cat.profitBase)}</span>
                     </div>
                   </div>
@@ -180,10 +180,10 @@ export function renderGmReportDocumentContent(ctx, rep, forPrintModal = false) {
                   <div key={br.brand} className="p-2.5 rounded-xl bg-surface2 border border-line flex items-center justify-between">
                     <div>
                       <span className="font-black text-fg">{br.brand}</span>
-                      <span className="text-[11px] text-muted mr-2">({br.qtySold} قطعة)</span>
+                      <span className="text-[11px] text-muted me-2">({br.qtySold} قطعة)</span>
                     </div>
                     <div className="text-left">
-                      <span className="font-mono font-bold text-fg ml-3">{formatMoney(br.revenueBase)}</span>
+                      <span className="font-mono font-bold text-fg ms-3">{formatMoney(br.revenueBase)}</span>
                       <span className="font-mono font-black text-emerald-500">ربح: +{formatMoney(br.profitBase)}</span>
                     </div>
                   </div>
@@ -792,7 +792,7 @@ export function renderGmReportPrintModal(ctx) {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto pr-1">
+          <div className="flex-1 overflow-y-auto pe-1">
             {renderGmReportDocumentContent(rep, false)}
           </div>
         </div>

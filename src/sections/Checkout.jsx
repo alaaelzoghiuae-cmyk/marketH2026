@@ -244,7 +244,7 @@ export function renderCheckoutView(ctx) {
 
               {renderFreeShippingProgressBar()}
 
-              <div className="space-y-2.5 max-h-60 overflow-y-auto pl-1">
+              <div className="space-y-2.5 max-h-60 overflow-y-auto ps-1">
                 {cartSummary.items.map(item => (
                   <div
                     key={item.part.id}
@@ -297,7 +297,7 @@ export function renderCheckoutView(ctx) {
                               return rest;
                             });
                           }}
-                          className="h-6 px-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 font-black flex items-center gap-1 hover:bg-rose-500/20 mr-1"
+                          className="h-6 px-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-500 font-black flex items-center gap-1 hover:bg-rose-500/20 me-1"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           مسح

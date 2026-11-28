@@ -13,7 +13,7 @@ export function renderSrcChat(ctx, req, side) {
     return (
       <div className="rounded-xl border border-line bg-surface2 p-3 space-y-2">
         <div className="text-[11px] font-extrabold text-muted">المحادثة</div>
-        <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+        <div className="max-h-72 overflow-y-auto space-y-2 pe-1">
           {msgs.length === 0 && <div className="text-center text-[11px] text-muted py-4">مفيش رسائل لسه. ابدأ المحادثة 👇</div>}
           {msgs.map(m => {
             const mine = m.from === side;

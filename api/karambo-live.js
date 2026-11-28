@@ -1,3 +1,4 @@
+import { applyCors } from './_lib/cors.js';
 /**
  * ELZOGHBI MARKET — Korombo Live Market Intelligence API (/api/karambo-live) v25
  *
@@ -882,9 +883,7 @@ export function parseKanbkamHtml(html, minPrice = 2200) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  applyCors(req, res, 'GET, POST, OPTIONS', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const action = String(req.query?.action || req.body?.action || '').trim().toLowerCase();

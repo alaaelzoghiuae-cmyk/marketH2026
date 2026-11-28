@@ -130,7 +130,7 @@ export function renderPrintModal(ctx) {
                       <td className="p-2.5 font-mono font-bold text-slate-800">{item.sku}</td>
                       <td className="p-2.5 font-extrabold text-slate-900">
                         {item.name}
-                        <span className="mr-1.5 px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold">
+                        <span className="me-1.5 px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-[10px] font-bold">
                           {item.qualityGrade}
                         </span>
                       </td>
@@ -670,7 +670,7 @@ export function renderPartGroupPricesModal(ctx) {
               value={groupModalSearchQuery}
               onChange={e => setGroupModalSearchQuery(e.target.value)}
               placeholder="ابحث عن اسم المجموعة لتغيير سعرها فوراً (يدعم +20 مجموعة)..."
-              className="w-full pr-9 pl-3 py-2.5 rounded-xl border border-line font-bold"
+              className="w-full pe-9 ps-3 py-2.5 rounded-xl border border-line font-bold"
             />
           </div>
 

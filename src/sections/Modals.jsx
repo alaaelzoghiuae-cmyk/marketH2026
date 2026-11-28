@@ -692,7 +692,7 @@ export function renderFamilyDevicesModal(ctx) {
                   <div key={dev.id} className="p-3 rounded-2xl bg-surface2 border border-line space-y-2">
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] font-black text-[10px] ml-2">
+                        <span className="px-2 py-0.5 rounded-full bg-[#0071E3]/15 text-[#0066CC] font-black text-[10px] ms-2">
                           {dev.ownerLabel}
                         </span>
                         <span className="font-black text-fg text-xs">{dev.modelName}</span>

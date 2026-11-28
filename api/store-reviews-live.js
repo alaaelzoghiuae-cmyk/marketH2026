@@ -1,3 +1,4 @@
+import { applyCors } from './_lib/cors.js';
 // Vercel Serverless API — 100% Zero-Key Automatic Background Store Discovery & Real Reviews Engine
 // Works completely out-of-the-box with ZERO API keys, ZERO signups, and ZERO credit cards:
 //   Store Discovery (Parallel):
@@ -638,15 +639,13 @@ async function fetchGooglePlaceDetails(placeId, name, gov, apiKey) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-google-places-key');
+  applyCors(req, res, 'GET, POST, OPTIONS', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const qObj = req.query || {};
   const action = String(qObj.action || 'status');
   const headerKey = req.headers && (req.headers['x-google-places-key'] || req.headers['X-Google-Places-Key']);
-  const apiKey = String(process.env.GOOGLE_PLACES_API_KEY || headerKey || qObj.apiKey || '').trim();
+  const apiKey = String(process.env.GOOGLE_PLACES_API_KEY || '').trim();
 
   if (action === 'status') {
     return res.status(200).json({

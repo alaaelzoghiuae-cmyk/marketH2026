@@ -4,12 +4,17 @@
 
 /* ---- Design tokens: graphite & silver, single blue accent (light + dark) ---- */
 :root {
-  --bg: 255 255 255;
-  --surface: 245 245 247;
-  --surface2: 232 232 237;
+  --bg: 250 250 252;
+  --surface: 255 255 255;
+  --surface2: 245 245 247;
   --fg: 29 29 31;
   --muted: 110 110 115;
-  --line: 217 217 222;
+  --line: 210 210 215;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+  --r-pill: 980px;
   --accent: 0 113 227;
   --accent-ink: 255 255 255;
   --accent-text: 0 102 204;
@@ -25,7 +30,7 @@
 }
 
 .dark {
-  --bg: 0 0 0;
+  --bg: 22 22 23;
   --surface: 29 29 31;
   --surface2: 44 44 46;
   --fg: 245 245 247;
@@ -821,3 +826,87 @@ main { overflow-wrap: anywhere; }
 /* Cart drawer: soft corners */
 .fixed.inset-0 > div.max-w-md { border-radius: 28px 0 0 28px; }
 [dir="rtl"] .fixed.inset-0 > div.max-w-md { border-radius: 0 28px 28px 0; }
+
+/* =====================================================================
+   shadcn/ui token bridge (component layer)
+   ---------------------------------------------------------------------
+   MY tokens keep their exact meaning. The shadcn role names are mapped
+   ONTO my tokens instead of introducing a second palette:
+     --background = var(--bg)          --foreground = var(--fg)
+     --card       = var(--surface)     --border/--input = var(--line)
+     --primary    = var(--accent)      --primary-foreground = var(--accent-ink)
+     --radius     = var(--r-lg)
+   shadcn's own `--accent` means "subtle hover" while MY `--accent` is the
+   brand blue, and shadcn's `--muted` means "subtle background" while MY
+   `--muted` is secondary TEXT. Those two roles therefore live under the
+   `ui-` prefix only (--ui-accent / --ui-muted) — no token changes meaning.
+   Every value is declared in BOTH the light and the .dark block, and no
+   component carries a hardcoded hex.
+   ===================================================================== */
+:root {
+  /* shadcn standard names, bound to my tokens */
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--surface);
+  --card-foreground: var(--fg);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-ink);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--accent);
+  --destructive: 215 0 21;
+  --destructive-foreground: 255 255 255;
+  --radius: var(--r-lg);
+
+  /* ui-* roles consumed by src/components/ui/** */
+  --ui-bg: var(--bg);
+  --ui-fg: var(--fg);
+  --ui-card: var(--surface);
+  --ui-card-fg: var(--fg);
+  --ui-muted: var(--surface2);
+  --ui-muted-fg: var(--muted);
+  --ui-line: var(--line);
+  --ui-primary: var(--accent);
+  --ui-primary-fg: var(--accent-ink);
+  --ui-accent: var(--surface2);
+  --ui-accent-fg: var(--fg);
+  --ui-ring: var(--accent);
+  --ui-destructive: 215 0 21;
+  --ui-success: var(--success);
+  --ui-warning: var(--warning);
+  --ui-radius: var(--r-sm);
+  --ui-radius-lg: var(--r-lg);
+}
+
+.dark {
+  --background: var(--bg);
+  --foreground: var(--fg);
+  --card: var(--surface);
+  --card-foreground: var(--fg);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-ink);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--accent);
+  --destructive: 255 105 97;
+  --destructive-foreground: 255 255 255;
+  --radius: var(--r-lg);
+
+  --ui-bg: var(--bg);
+  --ui-fg: var(--fg);
+  --ui-card: var(--surface);
+  --ui-card-fg: var(--fg);
+  --ui-muted: var(--surface2);
+  --ui-muted-fg: var(--muted);
+  --ui-line: var(--line);
+  --ui-primary: var(--accent);
+  --ui-primary-fg: var(--accent-ink);
+  --ui-accent: var(--surface2);
+  --ui-accent-fg: var(--fg);
+  --ui-ring: var(--accent);
+  --ui-destructive: 255 105 97;
+  --ui-success: var(--success);
+  --ui-warning: var(--warning);
+  --ui-radius: var(--r-sm);
+  --ui-radius-lg: var(--r-lg);
+}

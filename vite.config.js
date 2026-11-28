@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { fileURLToPath } from 'node:url'
 import gsmarenaHandler from './api/gsmarena.js'
 import aiSourcingHandler from './api/ai-sourcing.js'
 import karamboLiveHandler from './api/karambo-live.js'
@@ -63,17 +64,50 @@ function localVercelApiPlugin() {
 
 export default defineConfig({
   plugins: [react(), localVercelApiPlugin()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
   build: {
     target: 'es2020',
     cssCodeSplit: true,
-    chunkSizeWarningLimit: 1200,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (id.includes('lucide-react')) return 'vendor-icons';
-            if (id.includes('react') || id.includes('scheduler')) return 'vendor-react';
+            if (id.includes('@radix-ui')) return 'vendor-radix';
+            if (id.includes('react-dom') || id.includes('/react/') || id.includes('scheduler')) return 'vendor-react';
             return 'vendor-libs';
+          }
+          // Strictly isolate Admin Dashboard & Admin-only editors into separate chunks
+          if (
+            id.includes('/src/sections/Admin') ||
+            id.includes('/src/sections/KaramboAdmin') ||
+            id.includes('/src/sections/lazy/LazyAdminPortal') ||
+            id.includes('/src/components/Admin') ||
+            id.includes('/src/components/AiProductSourcingAgent') ||
+            id.includes('/src/components/BulkProductImporter') ||
+            id.includes('/src/components/ExcelProductManager') ||
+            id.includes('/src/components/SmartPricingEngine') ||
+            id.includes('/src/components/OrderWorkflowAndBI') ||
+            id.includes('/src/components/AdsAdminPanels')
+          ) {
+            return 'chunk-admin';
+          }
+          if (id.includes('/src/sections/Karambo') || id.includes('/src/components/Karambo') || id.includes('/src/components/Gsmarena')) {
+            return 'chunk-karambo';
+          }
+          if (id.includes('/src/sections/Marketplace')) {
+            return 'chunk-marketplace';
+          }
+          if (id.includes('/src/sections/Checkout')) {
+            return 'chunk-checkout';
+          }
+          if (id.includes('/src/sections/Account')) {
+            return 'chunk-account';
           }
         }
       }

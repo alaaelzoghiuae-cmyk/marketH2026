@@ -934,7 +934,7 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
  <div className="font-black text-fg text-xs">📐 2. الموضع والإطار وملاءمة الأبعاد</div>
 
  <div className="flex flex-wrap items-center gap-1.5">
- <span className="text-[10px] font-bold text-muted ml-1">التخطيط:</span>
+ <span className="text-[10px] font-bold text-muted ms-1">التخطيط:</span>
  {[
  ['editorial_split', 'صورة + نص'],
  ['full', 'خلفية كاملة'],
@@ -946,11 +946,11 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
 
  {curLayout !== 'text' && curLayout !== 'full_clean' && curLayout !== 'full' && (
  <div className="flex flex-wrap items-center gap-1.5">
- <span className="text-[10px] font-bold text-muted ml-1">الجهة:</span>
+ <span className="text-[10px] font-bold text-muted ms-1">الجهة:</span>
  {miniPill((targetObj.imagePos || 'left') === 'left', () => patchObj({ imagePos: 'left' }), '⬅️ يسار')}
  {miniPill(targetObj.imagePos === 'right', () => patchObj({ imagePos: 'right' }), '➡️ يمين')}
  {miniPill(targetObj.imagePos === 'top', () => patchObj({ imagePos: 'top' }), '⬆️ أعلى')}
- <span className="text-[10px] font-bold text-muted mr-1">المساحة:</span>
+ <span className="text-[10px] font-bold text-muted me-1">المساحة:</span>
  {miniPill(Number(targetObj.imageWidthPct) === 36, () => patchObj({ imageWidthPct: 36 }), '36%')}
  {miniPill((Number(targetObj.imageWidthPct) || 44) === 44, () => patchObj({ imageWidthPct: 44 }), '44%')}
  {miniPill(Number(targetObj.imageWidthPct) === 52, () => patchObj({ imageWidthPct: 52 }), '52%')}
@@ -959,12 +959,12 @@ export function renderPrecisionImageControls(ctx, targetObj, patchObj, onUploadF
 
  {hasImg && curLayout !== 'text' && curLayout !== 'icon_3d_studio' && (
  <div className="flex flex-wrap items-center gap-1.5">
- <span className="text-[10px] font-bold text-muted ml-1">الأبعاد:</span>
+ <span className="text-[10px] font-bold text-muted ms-1">الأبعاد:</span>
  {miniPill((targetObj.imageFit || 'contain') === 'contain', () => patchObj({ imageFit: 'contain' }), 'كاملة بدون قص')}
  {miniPill(targetObj.imageFit === 'cover', () => patchObj({ imageFit: 'cover' }), 'ملء الإطار')}
  {curLayout === 'editorial_split' && (
  <>
- <span className="text-[10px] font-bold text-muted mr-1">الإطار:</span>
+ <span className="text-[10px] font-bold text-muted me-1">الإطار:</span>
  {AD_IMAGE_FRAME_OPTIONS.map(([fKey, fLbl]) =>
  miniPill((targetObj.imageFrameStyle || 'white_pedestal') === fKey, () => patchObj({ imageFrameStyle: fKey, blendWhiteBg: fKey === 'white_cutout' }), fLbl)
  )}
@@ -1884,7 +1884,7 @@ export function renderAdminStorefrontCms(ctx) {
  <button
  type="button"
  onClick={() => askConfirmDelete('حذف الإعلان', `هل تريد حذف الإعلان "${ad.title || 'البانر'}" نهائياً؟`, () => setStoreAds(prev => prev.filter(a => a.id !== ad.id)))}
- className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white mr-auto transition"
+ className="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white me-auto transition"
  >
  حذف
  </button>
@@ -2248,7 +2248,7 @@ export function renderAdminStorefrontCms(ctx) {
  <button type="button" onClick={() => moveHomeBrand(idx, -1)} disabled={idx === 0} className="px-1 hover:text-[#0066CC] disabled:opacity-30" title="تقديم">→</button>
  <span>{String(br).replace(/^OR\s*-\s*/i, '')}</span>
  <button type="button" onClick={() => moveHomeBrand(idx, 1)} disabled={idx === selectedHomeBrands.length - 1} className="px-1 hover:text-[#0066CC] disabled:opacity-30" title="تأخير">←</button>
- <button type="button" onClick={() => toggleHomeBrand(br)} className="text-rose-500 hover:text-rose-600 pr-0.5" title="إخفاء">×</button>
+ <button type="button" onClick={() => toggleHomeBrand(br)} className="text-rose-500 hover:text-rose-600 pe-0.5" title="إخفاء">×</button>
  </div>
  ))}
  </div>
@@ -2610,7 +2610,7 @@ export function renderAdminStorefrontCms(ctx) {
  + إضافة يدوي
  </button>
  </div>
- <div className="flex-1 space-y-1.5 pr-1">
+ <div className="flex-1 space-y-1.5 pe-1">
  {(!Array.isArray(siteSettings.newsletterSubscribers) || siteSettings.newsletterSubscribers.length === 0) ? (
  <div className="py-8 text-center text-muted">لا يوجد مشتركين في النشرة البريدية حتى الآن</div>
  ) : (

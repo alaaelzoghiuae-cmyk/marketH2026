@@ -1,3 +1,4 @@
+import { applyCors } from './_lib/cors.js';
 /**
  * ELZOGHBI MARKET — Smartwatches & Earbuds guide API (/api/wearables)
  *
@@ -97,8 +98,7 @@ async function liveFor(it) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  applyCors(req, res, 'GET, OPTIONS', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   const action = String(req.query?.action || 'list').toLowerCase();
   try {

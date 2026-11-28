@@ -74,7 +74,7 @@ export function renderClientOrdersView(ctx) {
                 value={clientOrdersSearch}
                 onChange={e => setClientOrdersSearch(e.target.value)}
                 placeholder="دوّر برقم الفاتورة (INV-...) أو اسم القطعة أو التاريخ..."
-                className="w-full pr-9 pl-3 py-2 rounded-xl border border-line bg-surface2"
+                className="w-full pe-9 ps-3 py-2 rounded-xl border border-line bg-surface2"
               />
             </div>
 
@@ -268,7 +268,7 @@ export function renderClientOrdersView(ctx) {
                                 <td className="py-2.5 font-mono text-[11px] text-muted">{item.sku}</td>
                                 <td className="py-2.5 font-bold text-fg">
                                   {item.name}
-                                  <span className="mr-2 px-2 py-0.5 rounded bg-surface2 text-muted text-[10px]">
+                                  <span className="me-2 px-2 py-0.5 rounded bg-surface2 text-muted text-[10px]">
                                     {item.qualityGrade}
                                   </span>
                                 </td>
@@ -666,7 +666,7 @@ export function renderClientComplaintsView(ctx) {
 
                 {/* Conversation Thread Replies */}
                 {(tck.replies || []).length > 0 && (
-                  <div className="space-y-2 pr-3 border-r-2 border-blue-200">
+                  <div className="space-y-2 pe-3 border-r-2 border-blue-200">
                     {tck.replies.map(rep => (
                       <div
                         key={rep.id}

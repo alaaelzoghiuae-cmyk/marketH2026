@@ -305,7 +305,7 @@ export function renderAdminCatalog(ctx) {
                   value={adminCatalogSearch}
                   onChange={e => setAdminCatalogSearch(e.target.value)}
                   placeholder="ابحث باسم البراند، الموديل، اسم القطعة، أو الكود SKU..."
-                  className="w-full pr-9 pl-3 py-2 rounded-xl border border-line font-bold"
+                  className="w-full pe-9 ps-3 py-2 rounded-xl border border-line font-bold"
                 />
               </div>
 
@@ -1531,7 +1531,7 @@ export function renderAdminGroups(ctx) {
               value={adminGroupSearch}
               onChange={e => setAdminGroupSearch(e.target.value)}
               placeholder="ابحث عن أي مجموعة تسعير بالاسم أو العملة (يدعم البحث السريع وسط +20 مجموعة)..."
-              className="w-full pr-9 pl-3 py-2 rounded-xl border border-line"
+              className="w-full pe-9 ps-3 py-2 rounded-xl border border-line"
             />
           </div>
           <span className="font-bold text-muted">

@@ -1,3 +1,4 @@
+import { applyCors } from './_lib/cors.js';
 /**
  * ELZOGHBI MARKET — Phone number / social page / website checker (/api/trust-check?q=...)
  * "فاحص الأرقام وصفحات السوشيال قبل تحويل أي عربون"
@@ -163,8 +164,7 @@ async function pageMeta(url, platform) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  applyCors(req, res, 'GET, OPTIONS', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const raw = String(req.query?.q || '').trim().slice(0, 300);

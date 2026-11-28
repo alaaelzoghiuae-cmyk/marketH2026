@@ -9,7 +9,7 @@ import { adInSchedule, getAdTheme, getSourcingBanner } from '../lib/utils.jsx';
 import { AppleAdMosaic } from '../components/AppleAds.jsx';
 import { AppleCardsCarousel, ClassicHeroBanner } from '../components/AdsShowcase.jsx';
 import { ADS_MODE_CLASSIC, resolveAdsMode, resolveCarouselCfg, resolveClassicCfg } from '../lib/adsDisplay.js';
-import { normalizePartCategory } from '../lib/catalogUtils.js';
+import { normalizePartCategory, stripOrPrefix } from '../lib/catalogUtils.js';
 import { mergeKaramboCfg, getOrderedKaramboServices } from '../data/karamboConfig.js';
 import { ServicesNav, AppleHomeShowcase } from '../components/AppleStore.jsx';
 
@@ -146,7 +146,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             <BlurFitImage
               key={`${part.id}_${currentImgIdx}_${partFitMode}`}
               src={currentDisplayImg}
-              alt={part.name}
+              alt={stripOrPrefix(part.name)}
               fit={partFitMode}
               imgClassName={`${
                 partFitMode === 'cover' ? 'w-full h-full object-cover' : 'max-h-40 sm:max-h-48 w-auto object-contain p-1 mix-blend-multiply'
@@ -171,7 +171,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             <button
               type="button"
               onClick={(e) => toggleFavoritePart(part.id, e)}
-              className={`absolute top-1 start-1 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 border z-10 ${
+              className={`absolute top-1 start-1 w-11 h-11 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all duration-200 border z-10 ${
                 isFav
                   ? 'bg-rose-500 text-white border-rose-400 shadow-md scale-105'
                   : 'bg-white/95 text-slate-500 hover:text-rose-500 border-slate-200 shadow-sm'
@@ -187,7 +187,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
             <button
               type="button"
               onClick={(e) => sharePartViaWhatsApp(part, e)}
-              className="absolute top-11 start-1 w-8 h-8 rounded-full bg-white/95 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-slate-200 shadow-sm flex items-center justify-center transition-all duration-200 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 z-10"
+              className="absolute top-[54px] start-1 w-11 h-11 sm:top-11 sm:w-9 sm:h-9 rounded-full bg-white/95 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-slate-200 shadow-sm flex items-center justify-center transition-all duration-200 opacity-90 sm:opacity-0 sm:group-hover:opacity-100 z-10"
               title="مشاركة المنتج والسعر عبر واتساب"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -243,7 +243,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
               {part.sku && <span className="font-mono text-[10px] opacity-75 shrink-0">{part.sku}</span>}
             </div>
             <h3 className="text-[15px] sm:text-[17px] font-semibold text-fg leading-snug tracking-tight line-clamp-2 min-h-[2.8rem] transition">
-              <Bidi text={part.name} />
+              <Bidi text={stripOrPrefix(part.name)} />
             </h3>
           </div>
 
@@ -307,7 +307,7 @@ export function renderProductCard(ctx, part, cardIdx = 0) {
               onClick={(e) => {
                 e.stopPropagation();
                 if (hasCustomerRegisteredRestock(part)) {
-                  showToast(`✅ تم تسجيل طلب تنبيهك للمنتج "${part.name}" بالفعل!`, 'info');
+                  showToast(`✅ تم تسجيل طلب تنبيهك للمنتج "${stripOrPrefix(part.name)}" بالفعل!`, 'info');
                 } else {
                   openCustomerRestockModal(part);
                 }
@@ -1513,11 +1513,14 @@ export function renderHomeView(ctx) {
           let barParts = [];
 
           if (bar.sourceType === 'category' && bar.sourceValue) {
-            barParts = publicParts.filter(p => p.category === bar.sourceValue).slice(0, barLimit);
+            const targetCat = normalizePartCategory(bar.sourceValue);
+            barParts = publicParts.filter(p => p.category === bar.sourceValue || normalizePartCategory(p.category, p.name) === targetCat).slice(0, barLimit);
           } else if (bar.sourceType === 'brand' && bar.sourceValue) {
+            const targetBrand = stripOrPrefix(bar.sourceValue).toLowerCase();
             barParts = publicParts.filter(p => {
               const mObj = resolvePartModelObj(p);
-              return (mObj?.brand || p.brand) === bar.sourceValue;
+              const bVal = mObj?.brand || p.brand || '';
+              return bVal === bar.sourceValue || stripOrPrefix(bVal).toLowerCase() === targetBrand;
             }).slice(0, barLimit);
           } else if (bar.sourceType === 'model' && bar.sourceValue) {
             barParts = publicParts.filter(p => {
@@ -1706,7 +1709,7 @@ export function renderStickyCartBar(ctx) {
           {cartSummary.totalQty}
         </span>
       </div>
-      <div className="text-right pr-1 pl-2 hidden sm:block">
+      <div className="text-right pe-1 ps-2 hidden sm:block">
         <div className="text-[10px] text-blue-200 font-bold leading-none mb-1">سلة المشتريات</div>
         <div className="text-xs font-black text-white font-mono leading-none">
           {formatMoney(cartSummary.subtotalBase)}
@@ -1884,7 +1887,7 @@ export function renderStorefront(ctx) {
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="ابحث باسم المنتج، الموديل، أو الكود..."
-                className="w-full pr-9 pl-12 py-2 sm:py-2.5 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#0071E3]"
+                className="w-full pe-9 ps-12 py-2 sm:py-2.5 rounded-full bg-bg text-fg placeholder:text-muted border border-line text-xs sm:text-sm font-bold focus:outline-none focus:border-[#0071E3]"
               />
               {searchQuery && (
                 <button
@@ -2027,7 +2030,7 @@ export function renderStorefront(ctx) {
                       fetchSparePartsSliceOnDemand({ brand: nextBr, limit: 250 });
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pe-3 ps-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">كل البراندات</option>
                   {publicBrands.map(br => (
@@ -2054,7 +2057,7 @@ export function renderStorefront(ctx) {
                       fetchSparePartsSliceOnDemand({ modelId: nextMid, limit: 200 });
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pe-3 ps-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">
                     {selectedBrand === 'ALL'
@@ -2078,7 +2081,7 @@ export function renderStorefront(ctx) {
                 <select
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pe-3 ps-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="ALL">كل التصنيفات</option>
                   {dynamicCategories.filter(c => c !== 'ALL').map(cat => (
@@ -2098,7 +2101,7 @@ export function renderStorefront(ctx) {
                 <select
                   value={storeSortBy}
                   onChange={e => setStoreSortBy(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pr-3 pl-8 focus:outline-none focus:border-[#0071E3]"
+                  className="w-full px-3 py-2.5 rounded-xl border border-line bg-bg text-fg font-extrabold text-xs appearance-none pe-3 ps-8 focus:outline-none focus:border-[#0071E3]"
                 >
                   <option value="date_desc">الأحدث أولاً</option>
                   <option value="best_selling">الأكثر مبيعاً</option>
@@ -2116,7 +2119,7 @@ export function renderStorefront(ctx) {
 
           {/* Quick Customer Budget & Cashback Filter Pills */}
           <div className="flex items-center gap-1.5 flex-wrap pt-2 border-t border-line/60 text-[11px] font-extrabold">
-            <span className="text-muted ml-1">فلتر سريع بالسعر:</span>
+            <span className="text-muted ms-1">فلتر سريع بالسعر:</span>
             {[
               ['ALL', 'كل الأسعار'],
               ['UNDER_300', 'أقل من 300 ج.م'],
@@ -2145,7 +2148,7 @@ export function renderStorefront(ctx) {
               <span className="text-muted font-bold">
                 النتائج: <span className="text-accent-text font-extrabold">{totalItems}</span>
                 {totalItems > 0 && (
-                  <span className="text-muted mr-1">
+                  <span className="text-muted me-1">
                     (عرض {rangeStart} – {rangeEnd})
                   </span>
                 )}
@@ -2191,8 +2194,8 @@ export function renderStorefront(ctx) {
         <div className="flex items-center justify-between gap-2 sm:hidden px-1">
           <span className="text-xs text-muted font-bold">
             المنتجات: <span className="text-accent-text font-black">{totalItems}</span>
-            {selectedCategory !== 'ALL' && <span className="mr-1.5 text-[11px] text-[#0066CC] font-extrabold">• {selectedCategory}</span>}
-            {selectedBrand !== 'ALL' && <span className="mr-1.5 text-[11px] text-emerald-500 font-extrabold">• {String(selectedBrand).replace(/^OR\s*-\s*/i, '')}</span>}
+            {selectedCategory !== 'ALL' && <span className="me-1.5 text-[11px] text-[#0066CC] font-extrabold">• {selectedCategory}</span>}
+            {selectedBrand !== 'ALL' && <span className="me-1.5 text-[11px] text-emerald-500 font-extrabold">• {String(selectedBrand).replace(/^OR\s*-\s*/i, '')}</span>}
           </span>
           <div className="flex items-center bg-surface2 rounded-full p-0.5 border border-line gap-0.5">
             <button type="button" onClick={() => changeCols(1)} className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${mobileCols === 1 ? 'bg-[#0071E3] text-white' : 'text-muted'}`}>☰</button>
@@ -2879,7 +2882,7 @@ export function renderClientFooter(ctx, isPreview = false) {
                   {fCfg.showBadgeMastercard && (
                     <span className="h-8 px-2.5 rounded-lg bg-surface2 dark:bg-[#1D1D1F] border border-line inline-flex items-center justify-center" title="Mastercard">
                       <span className="w-3.5 h-3.5 rounded-full bg-[#EB001B] inline-block" />
-                      <span className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] -ml-1.5 inline-block opacity-90" />
+                      <span className="w-3.5 h-3.5 rounded-full bg-[#F79E1B] -ms-1.5 inline-block opacity-90" />
                     </span>
                   )}
                   {fCfg.showBadgeApplePay && (
@@ -2929,12 +2932,18 @@ export function renderClientFooter(ctx, isPreview = false) {
                     </li>
                   )}
                   {fCfg.showTermsLink && (
-                    <li>
-                      <button type="button" onClick={() => showToast(`${siteSettings.termsTitle}: ${siteSettings.termsText}`, 'info')} className="hover:text-[#0066CC] transition">
-                        شروط الاستخدام والضمان
-                      </button>
-                      <button type="button" onClick={() => { window.location.hash = '#/sell/terms'; setClientTab('sell'); }} className="hover:text-[#0066CC] transition">شروط إعلانات «بيع عندنا»</button>
-                    </li>
+                    <>
+                      <li>
+                        <button type="button" onClick={() => showToast(`${siteSettings.termsTitle}: ${siteSettings.termsText}`, 'info')} className="hover:text-[#0066CC] transition">
+                          شروط الاستخدام والضمان
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" onClick={() => { window.location.hash = '#/sell/terms'; setClientTab('sell'); }} className="hover:text-[#0066CC] transition">
+                          شروط إعلانات «بيع عندنا»
+                        </button>
+                      </li>
+                    </>
                   )}
                   {fCfg.showShippingPolicyLink && (
                     <li>

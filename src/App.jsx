@@ -1,13 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import { ChunkErrorBoundary, PageSkeleton, AdminSkeleton } from './components/ChunkErrorBoundary.jsx';
+import { Toaster } from './components/ui/sonner.jsx';
+
+const LazyAdminPortal = lazy(() => import('./sections/lazy/LazyAdminPortal.jsx'));
+const LazyCheckout = lazy(() => import('./sections/lazy/LazyCheckout.jsx'));
+const LazyAccount = lazy(() => import('./sections/lazy/LazyAccount.jsx'));
+const LazyMarketplace = lazy(() => import('./sections/lazy/LazyMarketplace.jsx'));
 import { resolveCategoryIconKey } from './lib/categoryIcons.jsx';
-import { AdminThemeGuard } from './components/AdminThemeGuard.jsx';
 import { OR_BRAND_IMAGES } from './orCatalogData';
 import { X, Check, Phone } from 'lucide-react';
 import { AD_THEMES, CREDIT_PAYMENT_ID, DEFAULT_SPIN_PRIZES, ELZOGHBI_LOGO, EMPTY_REG_FORM, INITIAL_ACCOUNT_REQUESTS, INITIAL_AUTO_TEMPLATES, INITIAL_BRANDS, INITIAL_CLIENTS, INITIAL_COMPLAINTS, INITIAL_CURRENCIES, INITIAL_GROUPS, INITIAL_MODELS, INITIAL_ORDERS, INITIAL_PARTS, INITIAL_PROMO_CODES, INITIAL_RETURNS, INITIAL_SHOWCASE_BARS, INITIAL_SITE_SETTINGS, INITIAL_STORE_ADS, PART_IMAGES, SHORTCUT_ICON_PRESETS, SRC_DEPOSIT_LABEL } from './data/constants.jsx';
 import { getAdminJwt, adminSignIn, adminSignOut, fetchMyAdminProfile, ensureFreshAdminJwt } from './lib/sbAuth.js';
 import { applyThemeTokensToDocument, DEFAULT_CMS_PAGES } from './lib/adminControlCenter.js';
 import { ensureCacheVersions } from './lib/cacheVersions.js';
-import { MarketplacePage, MarketplaceHost } from './sections/Marketplace.jsx';
+import { MarketplaceHost } from './sections/Marketplace.jsx';
 import { B64_UPLOAD_CACHE, applyVisit, b64Key, detectVisitSource, escapeHtml, getPaymentMethods, loadPersisted, localDayKey, normalizeDigits, nowStamp, readFileAsDataUrl } from './lib/utils.jsx';
 import { isOrCatalogDisabledInStorage, isOrPrefixedName, mergeOrBrandsList, mergeOrModelsList, mergeOrPartsList, normalizePartCategory, readPersistedDeletedSliceMap } from './lib/catalogUtils.js';
 import { I18N_ATTRS, i18nRestoreNode, i18nTranslateNode } from './i18n.jsx';
@@ -16,14 +22,6 @@ import { renderKaramboStrip as renderKaramboStripImpl, renderKaramboPage as rend
 import { GUIDE_PHONES_SEED } from './data/guidePhonesSeed.js';
 import { mergeKaramboCfg } from './data/karamboConfig.js';
 import { STORE_REVIEW_ENTITIES_SEED, STORE_REVIEW_ENTRIES_SEED, STORE_REVIEW_QUESTIONS_SEED } from './data/storeReviewsSeed.js';
-import { renderCheckoutView as renderCheckoutViewImpl } from './sections/Checkout.jsx';
-import { renderClientOrdersView as renderClientOrdersViewImpl, renderClientLedgerView as renderClientLedgerViewImpl, renderClientReturnsView as renderClientReturnsViewImpl, renderClientComplaintsView as renderClientComplaintsViewImpl, renderClientProfileSettingsView as renderClientProfileSettingsViewImpl, renderClientAccountPortal as renderClientAccountPortalImpl } from './sections/Account.jsx';
-import { renderAdminDashboard as renderAdminDashboardImpl, renderAdminSubTabBar as renderAdminSubTabBarImpl, renderAdminOverview as renderAdminOverviewImpl, renderVisitorStats as renderVisitorStatsImpl, renderAdminOrders as renderAdminOrdersImpl, renderAdminTeam as renderAdminTeamImpl } from './sections/AdminMain.jsx';
-import { renderAdminCatalog as renderAdminCatalogImpl, renderAdminQuickStock as renderAdminQuickStockImpl, renderAdminGroups as renderAdminGroupsImpl, renderProfitProtectionShieldCard as renderProfitProtectionShieldCardImpl } from './sections/AdminCatalog.jsx';
-import { renderAdminPromoCodes as renderAdminPromoCodesImpl, renderAdSeg as renderAdSegImpl, renderAdToggle as renderAdToggleImpl, renderAdminRestockAlertsView as renderAdminRestockAlertsViewImpl, renderAdminFeatureFlagsDashboard as renderAdminFeatureFlagsDashboardImpl } from './sections/AdminMarketing.jsx';
-import { renderAdminSiteSettings as renderAdminSiteSettingsImpl, renderAdminStorefrontCms as renderAdminStorefrontCmsImpl, renderCmsAccordionHeader as renderCmsAccordionHeaderImpl, renderPrecisionImageControls as renderPrecisionImageControlsImpl } from './sections/AdminCms.jsx';
-import { renderAdminClients as renderAdminClientsImpl, renderAdminReturnsAndComplaints as renderAdminReturnsAndComplaintsImpl, renderAdminApproveRequestModal as renderAdminApproveRequestModalImpl, renderAdminCreateClientModal as renderAdminCreateClientModalImpl, renderAdminSecurityModal as renderAdminSecurityModalImpl } from './sections/AdminClients.jsx';
-import { renderGmReportDocumentContent as renderGmReportDocumentContentImpl, renderAdminExecutiveReportsView as renderAdminExecutiveReportsViewImpl, renderGmReportPrintModal as renderGmReportPrintModalImpl, renderAdminDatabaseSchema as renderAdminDatabaseSchemaImpl } from './sections/AdminReports.jsx';
 import { renderConfirmDialogModal as renderConfirmDialogModalImpl, renderSpinToWinModal as renderSpinToWinModalImpl, renderFloatingSpinTrigger as renderFloatingSpinTriggerImpl, renderLiveSocialProofToast as renderLiveSocialProofToastImpl, renderExitIntentModal as renderExitIntentModalImpl, renderCustomerRestockNotifyModal as renderCustomerRestockNotifyModalImpl, renderAdminRestockWhatsappModal as renderAdminRestockWhatsappModalImpl, renderWarrantyLookupModal as renderWarrantyLookupModalImpl, renderFamilyDevicesModal as renderFamilyDevicesModalImpl, renderConfettiOverlay as renderConfettiOverlayImpl, renderLoginModal as renderLoginModalImpl, renderReturnRequestModal as renderReturnRequestModalImpl } from './sections/Modals.jsx';
 import { renderSrcChat as renderSrcChatImpl, renderSourcingBanner as renderSourcingBannerImpl, renderSourcingFormModal as renderSourcingFormModalImpl, renderClientSourcingSection as renderClientSourcingSectionImpl, renderAdminSourcing as renderAdminSourcingImpl } from './sections/Sourcing.jsx';
 import { renderPrintModal as renderPrintModalImpl, renderProductOrAdDetailModal as renderProductOrAdDetailModalImpl, renderPartGroupPricesModal as renderPartGroupPricesModalImpl, renderBrandManagerModal as renderBrandManagerModalImpl, renderTemplateManagerModal as renderTemplateManagerModalImpl, renderBrandImageModal as renderBrandImageModalImpl, renderAddPartToModelModal as renderAddPartToModelModalImpl, renderEditPartModal as renderEditPartModalImpl, renderEditModelModal as renderEditModelModalImpl } from './sections/ProductModals.jsx';
@@ -65,41 +63,41 @@ export default function App() {
   const renderFilterSheet = (...args) => renderFilterSheetImpl(ctxBag, ...args);
   const renderLightbox = (...args) => renderLightboxImpl(ctxBag, ...args);
   const renderClientFooter = (...args) => renderClientFooterImpl(ctxBag, ...args);
-  const renderCheckoutView = (...args) => renderCheckoutViewImpl(ctxBag, ...args);
-  const renderClientOrdersView = (...args) => renderClientOrdersViewImpl(ctxBag, ...args);
-  const renderClientLedgerView = (...args) => renderClientLedgerViewImpl(ctxBag, ...args);
-  const renderClientReturnsView = (...args) => renderClientReturnsViewImpl(ctxBag, ...args);
-  const renderClientComplaintsView = (...args) => renderClientComplaintsViewImpl(ctxBag, ...args);
-  const renderClientProfileSettingsView = (...args) => renderClientProfileSettingsViewImpl(ctxBag, ...args);
-  const renderClientAccountPortal = (...args) => renderClientAccountPortalImpl(ctxBag, ...args);
-  const renderAdminDashboard = (...args) => renderAdminDashboardImpl(ctxBag, ...args);
-  const renderAdminSubTabBar = (...args) => renderAdminSubTabBarImpl(ctxBag, ...args);
-  const renderAdminOverview = (...args) => renderAdminOverviewImpl(ctxBag, ...args);
-  const renderAdminTeam = (...args) => renderAdminTeamImpl(ctxBag, ...args);
-  const renderVisitorStats = (...args) => renderVisitorStatsImpl(ctxBag, ...args);
-  const renderAdminOrders = (...args) => renderAdminOrdersImpl(ctxBag, ...args);
-  const renderAdminCatalog = (...args) => renderAdminCatalogImpl(ctxBag, ...args);
-  const renderAdminQuickStock = (...args) => renderAdminQuickStockImpl(ctxBag, ...args);
-  const renderAdminGroups = (...args) => renderAdminGroupsImpl(ctxBag, ...args);
-  const renderProfitProtectionShieldCard = (...args) => renderProfitProtectionShieldCardImpl(ctxBag, ...args);
-  const renderAdminPromoCodes = (...args) => renderAdminPromoCodesImpl(ctxBag, ...args);
-  const renderAdSeg = (...args) => renderAdSegImpl(ctxBag, ...args);
-  const renderAdToggle = (...args) => renderAdToggleImpl(ctxBag, ...args);
-  const renderAdminRestockAlertsView = (...args) => renderAdminRestockAlertsViewImpl(ctxBag, ...args);
-  const renderAdminFeatureFlagsDashboard = (...args) => renderAdminFeatureFlagsDashboardImpl(ctxBag, ...args);
-  const renderAdminSiteSettings = (...args) => renderAdminSiteSettingsImpl(ctxBag, ...args);
-  const renderAdminStorefrontCms = (...args) => renderAdminStorefrontCmsImpl(ctxBag, ...args);
-  const renderCmsAccordionHeader = (...args) => renderCmsAccordionHeaderImpl(ctxBag, ...args);
-  const renderPrecisionImageControls = (...args) => renderPrecisionImageControlsImpl(ctxBag, ...args);
-  const renderAdminClients = (...args) => renderAdminClientsImpl(ctxBag, ...args);
-  const renderAdminReturnsAndComplaints = (...args) => renderAdminReturnsAndComplaintsImpl(ctxBag, ...args);
-  const renderAdminApproveRequestModal = (...args) => renderAdminApproveRequestModalImpl(ctxBag, ...args);
-  const renderAdminCreateClientModal = (...args) => renderAdminCreateClientModalImpl(ctxBag, ...args);
-  const renderAdminSecurityModal = (...args) => renderAdminSecurityModalImpl(ctxBag, ...args);
-  const renderGmReportDocumentContent = (...args) => renderGmReportDocumentContentImpl(ctxBag, ...args);
-  const renderAdminExecutiveReportsView = (...args) => renderAdminExecutiveReportsViewImpl(ctxBag, ...args);
-  const renderGmReportPrintModal = (...args) => renderGmReportPrintModalImpl(ctxBag, ...args);
-  const renderAdminDatabaseSchema = (...args) => renderAdminDatabaseSchemaImpl(ctxBag, ...args);
+  const renderCheckoutView = () => null;
+  const renderClientOrdersView = () => null;
+  const renderClientLedgerView = () => null;
+  const renderClientReturnsView = () => null;
+  const renderClientComplaintsView = () => null;
+  const renderClientProfileSettingsView = () => null;
+  const renderClientAccountPortal = () => null;
+  const renderAdminDashboard = () => null;
+  const renderAdminSubTabBar = () => null;
+  const renderAdminOverview = () => null;
+  const renderAdminTeam = () => null;
+  const renderVisitorStats = () => null;
+  const renderAdminOrders = () => null;
+  const renderAdminCatalog = () => null;
+  const renderAdminQuickStock = () => null;
+  const renderAdminGroups = () => null;
+  const renderProfitProtectionShieldCard = () => null;
+  const renderAdminPromoCodes = () => null;
+  const renderAdSeg = () => null;
+  const renderAdToggle = () => null;
+  const renderAdminRestockAlertsView = () => null;
+  const renderAdminFeatureFlagsDashboard = () => null;
+  const renderAdminSiteSettings = () => null;
+  const renderAdminStorefrontCms = () => null;
+  const renderCmsAccordionHeader = () => null;
+  const renderPrecisionImageControls = () => null;
+  const renderAdminClients = () => null;
+  const renderAdminReturnsAndComplaints = () => null;
+  const renderAdminApproveRequestModal = () => null;
+  const renderAdminCreateClientModal = () => null;
+  const renderAdminSecurityModal = () => null;
+  const renderGmReportDocumentContent = () => null;
+  const renderAdminExecutiveReportsView = () => null;
+  const renderGmReportPrintModal = () => null;
+  const renderAdminDatabaseSchema = () => null;
   const renderConfirmDialogModal = (...args) => renderConfirmDialogModalImpl(ctxBag, ...args);
   const renderSpinToWinModal = (...args) => renderSpinToWinModalImpl(ctxBag, ...args);
   const renderFloatingSpinTrigger = (...args) => renderFloatingSpinTriggerImpl(ctxBag, ...args);
@@ -10672,7 +10670,7 @@ return (
 
       {/* Portal Switch: Standalone Admin Dashboard vs Standalone Customer Storefront */}
       {appPortal === 'admin' ? (
-        <main className="flex-1 flex flex-col"><AdminThemeGuard />{renderAdminDashboard()}</main>
+        <ChunkErrorBoundary><Suspense fallback={<AdminSkeleton />}><LazyAdminPortal ctx={ctxBag} /></Suspense></ChunkErrorBoundary>
       ) : (
         <div className="flex flex-col flex-1 min-h-[100svh] w-full max-w-[100vw] overflow-x-hidden justify-between">
           <main className="flex-1 w-full max-w-[100vw] min-w-0 overflow-x-hidden">
@@ -10716,10 +10714,10 @@ return (
             {homeActiveNow && renderHomeView()}
             {searchActiveNow && renderStorefront()}
             {clientTab === 'vip' && renderVipRouteView()}
-            {clientTab === 'checkout' && renderCheckoutView()}
-            {clientTab === 'account' && renderClientAccountPortal()}
+            {clientTab === 'checkout' && <ChunkErrorBoundary><Suspense fallback={<PageSkeleton label="جاري تحميل صفحة إتمام الطلب..." />}><LazyCheckout ctx={ctxBag} /></Suspense></ChunkErrorBoundary>}
+            {clientTab === 'account' && <ChunkErrorBoundary><Suspense fallback={<PageSkeleton label="جاري تحميل حسابك..." />}><LazyAccount ctx={ctxBag} /></Suspense></ChunkErrorBoundary>}
             {clientTab === 'karambo' && renderKaramboPage()}
-            {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return <MarketplacePage sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} />; })()}
+            {clientTab === 'sell' && (() => { const sc = getSupabaseConfig(); return <ChunkErrorBoundary><Suspense fallback={<PageSkeleton label="جاري تحميل سوق بيع عندنا..." />}><LazyMarketplace sbUrl={sc.sbUrl} sbKey={sc.sbKey} currentClient={currentClient} openLogin={() => setLoginModalOpen(true)} showToast={showToast} /></Suspense></ChunkErrorBoundary>; })()}
             {clientTab === 'cms_page' && (() => {
               const allPages = Array.isArray(siteSettings?.cmsPages) && siteSettings.cmsPages.length > 0 ? siteSettings.cmsPages : DEFAULT_CMS_PAGES;
               const pg = allPages.find((p) => p.slug === activeCmsPageSlug && p.status === 'published');
@@ -10776,6 +10774,7 @@ return (
         </div>
       )}
 
+      <Toaster position="top-center" richColors closeButton />
       {/* Modals */}
       {renderCartDrawer()}
       {renderLoginModal()}

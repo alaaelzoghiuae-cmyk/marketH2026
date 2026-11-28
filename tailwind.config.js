@@ -1,3 +1,5 @@
+import tailwindcssAnimate from 'tailwindcss-animate';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -32,6 +34,38 @@ export default {
         'announce-ink': '#1d1d1f',
         'maint-bg': '#d70015',
 
+        // ---- shadcn/ui token bridge (mapped onto MY tokens, never a second palette) ----
+        // NOTE: shadcn's `muted` and `accent` mean "subtle background/hover"; my `muted`
+        // and `accent` mean "secondary text" and "brand blue". Those two shadcn roles are
+        // exposed under the `ui-` prefix below instead, so no token changes meaning.
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        card: 'rgb(var(--card) / <alpha-value>)',
+        'card-foreground': 'rgb(var(--card-foreground) / <alpha-value>)',
+        primary: 'rgb(var(--primary) / <alpha-value>)',
+        'primary-foreground': 'rgb(var(--primary-foreground) / <alpha-value>)',
+        border: 'rgb(var(--border) / <alpha-value>)',
+        input: 'rgb(var(--input) / <alpha-value>)',
+        ring: 'rgb(var(--ring) / <alpha-value>)',
+        destructive: 'rgb(var(--destructive) / <alpha-value>)',
+        'destructive-foreground': 'rgb(var(--destructive-foreground) / <alpha-value>)',
+        // ui-* roles used by src/components/ui/**
+        'ui-bg': 'rgb(var(--ui-bg) / <alpha-value>)',
+        'ui-fg': 'rgb(var(--ui-fg) / <alpha-value>)',
+        'ui-card': 'rgb(var(--ui-card) / <alpha-value>)',
+        'ui-card-fg': 'rgb(var(--ui-card-fg) / <alpha-value>)',
+        'ui-muted': 'rgb(var(--ui-muted) / <alpha-value>)',
+        'ui-muted-fg': 'rgb(var(--ui-muted-fg) / <alpha-value>)',
+        'ui-line': 'rgb(var(--ui-line) / <alpha-value>)',
+        'ui-primary': 'rgb(var(--ui-primary) / <alpha-value>)',
+        'ui-primary-fg': 'rgb(var(--ui-primary-fg) / <alpha-value>)',
+        'ui-accent': 'rgb(var(--ui-accent) / <alpha-value>)',
+        'ui-accent-fg': 'rgb(var(--ui-accent-fg) / <alpha-value>)',
+        'ui-destructive': 'rgb(var(--ui-destructive) / <alpha-value>)',
+        'ui-success': 'rgb(var(--ui-success) / <alpha-value>)',
+        'ui-warning': 'rgb(var(--ui-warning) / <alpha-value>)',
+        'ui-ring': 'rgb(var(--ui-ring) / <alpha-value>)',
+
         // ---- Neutral scale: graphite / silver ----
         slate: {
           50: '#fbfbfd', 100: '#f5f5f7', 200: '#e8e8ed', 300: '#d2d2d7', 400: '#86868b',
@@ -57,10 +91,10 @@ export default {
         },
       },
       // ---- Design tokens (mirrors the CSS variables in src/index.css) ----
-      borderRadius: { ctl: 'var(--r-md)', card: 'var(--r-lg)', tile: 'var(--r-xl)' },
+      borderRadius: { ctl: 'var(--r-md)', card: 'var(--r-lg)', tile: 'var(--r-xl)', ui: 'var(--ui-radius)', 'ui-lg': 'var(--ui-radius-lg)' },
       boxShadow: { 'tok-1': 'var(--shadow-1)', 'tok-2': 'var(--shadow-2)', 'tok-3': 'var(--shadow-3)' },
       maxWidth: { container: 'var(--container)', narrow: 'var(--container-narrow)' },
-      zIndex: { nav: '40', mega: '70', sheet: '80', modal: '90', toast: '100' },
+      zIndex: { nav: '40', menus: '70', mega: '70', sheet: '80', modal: '90', toast: '100' },
       transitionTimingFunction: { apple: 'cubic-bezier(0.22, 1, 0.36, 1)' },
       transitionDuration: { fast: '140ms', base: '240ms', slow: '420ms' },
       fontFamily: {
@@ -71,5 +105,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [tailwindcssAnimate],
 }

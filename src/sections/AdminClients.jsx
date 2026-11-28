@@ -318,7 +318,7 @@ export function renderAdminClients(ctx) {
  value={adminClientSearch}
  onChange={e => setAdminClientSearch(e.target.value)}
  placeholder="ابحث بالاسم أو رقم الموبايل..."
- className="w-full pr-9 pl-3 py-2 rounded-xl border border-line text-xs font-bold"
+ className="w-full pe-9 ps-3 py-2 rounded-xl border border-line text-xs font-bold"
  />
  </div>
 
@@ -337,7 +337,7 @@ export function renderAdminClients(ctx) {
  </div>
 
  {/* Clean Scrollable Clients List */}
- <div className="space-y-2 pl-1">
+ <div className="space-y-2 ps-1">
  {filteredClients.length === 0 ? (
  <div className="py-10 text-center text-xs text-muted font-bold">لا توجد حسابات مطابقة للبحث</div>
  ) : (
@@ -964,7 +964,7 @@ export function renderAdminReturnsAndComplaints(ctx) {
 
  {/* Previous Admin Replies History on this Return */}
  {(ret.replies || []).length > 0 && (
- <div className="space-y-1.5 pr-3 border-r-2 border-emerald-300">
+ <div className="space-y-1.5 pe-3 border-r-2 border-emerald-300">
  {ret.replies.map(rrep => (
  <div key={rrep.id} className="p-2 rounded-lg bg-accent/15 border border-accent/30 text-xs text-fg">
  <div className="flex justify-between text-[10px] font-bold text-accent-text">
@@ -1152,7 +1152,7 @@ export function renderAdminReturnsAndComplaints(ctx) {
 
  {/* Full Conversation Thread */}
  {(tck.replies || []).length > 0 && (
- <div className="space-y-2 pr-3 border-r-2 border-slate-200 ">
+ <div className="space-y-2 pe-3 border-r-2 border-slate-200 ">
  {tck.replies.map(rep => (
  <div
  key={rep.id}

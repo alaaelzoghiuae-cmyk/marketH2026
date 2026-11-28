@@ -100,7 +100,7 @@ export function renderAdminDashboard(ctx) {
                     value={adminLoginUser}
                     onChange={e => setAdminLoginUser(e.target.value)}
                     placeholder="admin"
-                    className="w-full pr-10 pl-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
+                    className="w-full pe-10 ps-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
                   />
                 </div>
               </div>
@@ -115,7 +115,7 @@ export function renderAdminDashboard(ctx) {
                     value={adminLoginPass}
                     onChange={e => setAdminLoginPass(e.target.value)}
                     placeholder="••••••"
-                    className="w-full pr-10 pl-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
+                    className="w-full pe-10 ps-4 py-3 rounded-xl bg-bg border border-line text-fg font-mono focus:outline-none"
                   />
                 </div>
               </div>
@@ -591,7 +591,7 @@ export function renderAdminDashboard(ctx) {
               value={adminSidebarSearch}
               onChange={e => setAdminSidebarSearch(e.target.value)}
               placeholder="ابحث عن صفحة أو أداة..."
-              className="w-full pr-8 pl-6 py-1.5 rounded-xl bg-bg border border-line focus:border-[#0071E3] text-[11px] font-bold text-fg placeholder:text-muted focus:outline-none"
+              className="w-full pe-8 ps-6 py-1.5 rounded-xl bg-bg border border-line focus:border-[#0071E3] text-[11px] font-bold text-fg placeholder:text-muted focus:outline-none"
             />
             {adminSidebarSearch && (
               <button
@@ -816,8 +816,8 @@ export function renderAdminDashboard(ctx) {
 
     const isDocked = adminSidebarMode === 'docked';
     const desktopContentMarginCls = isDocked
-      ? (i18nActive ? 'lg:ml-[70px]' : 'lg:mr-[70px]')
-      : (i18nActive ? 'lg:ml-[272px]' : 'lg:mr-[272px]');
+      ? (i18nActive ? 'lg:ms-[70px]' : 'lg:me-[70px]')
+      : (i18nActive ? 'lg:ms-[272px]' : 'lg:me-[272px]');
 
     return (
       <div className="elz-admin-shell">
@@ -1967,7 +1967,7 @@ export function renderAdminOrders(ctx) {
               value={adminOrderSearch}
               onChange={e => setAdminOrderSearch(e.target.value)}
               placeholder="بحث برقم الفاتورة، اسم المحل/التاجر، العنوان، أو التاريخ..."
-              className="w-full pr-9 pl-3 py-2 rounded-xl border border-line"
+              className="w-full pe-9 ps-3 py-2 rounded-xl border border-line"
             />
           </div>
 
@@ -2007,7 +2007,7 @@ export function renderAdminOrders(ctx) {
               <span className="px-2.5 py-1 rounded bg-amber-500 text-fg font-extrabold text-xs">
                 وضع التعديل اللحظي للفاتورة: {editingOrder.id}
               </span>
-              <span className="mr-3 text-sm font-extrabold text-fg">
+              <span className="me-3 text-sm font-extrabold text-fg">
                 العميل: {editingOrder.clientName}
               </span>
             </div>

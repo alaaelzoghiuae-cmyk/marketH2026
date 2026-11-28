@@ -170,3 +170,7 @@ export const mergeOrPartsList = (baseParts, delMap = {}, disabled = false) => {
 };
 
 export const isOrPrefixedName = v => /^OR[\s\-_]/.test(String(v || '').toUpperCase());
+
+
+// Display-only helper: strips 'OR - ' prefix at render time without mutating DB records
+export const stripOrPrefix = (str) => String(str || '').replace(/^OR\s*-\s*/i, '').trim();
